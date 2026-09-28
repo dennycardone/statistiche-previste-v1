@@ -1,0 +1,184 @@
+"""Scarica da football-data.co.uk i CSV dei campionati della dashboard nella cartella data/.
+Campionati europei: stagione corrente sempre, le 5 precedenti solo se mancano (servono per gli H2H).
+"""
+import datetime, json, os, urllib.request
+
+LEAGUES = ["I1", "I2", "E0", "SP1", "F1", "D1", "N1", "P1"]
+NEW_LEAGUES = []
+BASE = "https://www.football-data.co.uk/mmz4281/{code}/{lg}.csv"
+NEW = "https://www.football-data.co.uk/new/{lg}.csv"
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+os.makedirs(OUT, exist_ok=True)
+
+
+def code(y):
+    return f"{y % 100:02d}{(y + 1) % 100:02d}"
+
+
+def get(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "statistiche-previste/1.0"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return r.read().decode("utf-8-sig", errors="replace")
+
+
+def save(name, txt):
+    open(os.path.join(OUT, name), "w", encoding="utf-8").write(txt)
+
+
+today = datetime.date.today()
+cur = today.year if today.month >= 7 else today.year - 1
+files = []
+
+for lg in LEAGUES:
+    for y in range(cur, cur - 6, -1):
+        name = f"{lg}_{code(y)}.csv"
+        path = os.path.join(OUT, name)
+        if y == cur or not os.path.exists(path):
+            try:
+                txt = get(BASE.format(code=code(y), lg=lg))
+                if "HomeTeam" in txt:
+                    save(name, txt)
+            except Exception as e:
+                print("skip", name, e)
+        if os.path.exists(path):
+            files.append(name)
+
+for lg in NEW_LEAGUES:
+    name = f"{lg}.csv"
+    try:
+        txt = get(NEW.format(lg=lg))
+        if "Home" in txt:
+            save(name, txt)
+    except Exception as e:
+        print("skip", name, e)
+    if os.path.exists(os.path.join(OUT, name)):
+        files.append(name)
+
+# prossime giornate: calendario completo da fixturedownload.com (gratuito, senza chiave).
+# I nomi delle squadre vengono convertiti in quelli usati da football-data.co.uk.
+FD_SLUGS = {"I1": "serie-a", "E0": "epl", "SP1": "la-liga", "F1": "ligue-1", "D1": "bundesliga", "N1": "eredivisie", "P1": "primeira-liga"}
+ALIAS = {
+    "I1": {"Internazionale": "Inter"},
+    "E0": {"Man Utd": "Man United", "Spurs": "Tottenham"},
+    "SP1": {"Atlético de Madrid": "Ath Madrid", "Athletic Club": "Ath Bilbao", "CA Osasuna": "Osasuna", "Deportivo Alavés": "Alaves",
+            "Elche CF": "Elche", "FC Barcelona": "Barcelona", "Getafe CF": "Getafe", "Levante UD": "Levante", "Málaga CF": "Malaga",
+            "R. Racing Club": "Santander", "Rayo Vallecano": "Vallecano", "RC Deportivo": "La Coruna", "RCD Espanyol de Barcelona": "Espanol",
+            "Real Betis": "Betis", "Real Sociedad": "Sociedad", "Sevilla FC": "Sevilla", "Valencia CF": "Valencia", "Villarreal CF": "Villarreal",
+            "RCD Mallorca": "Mallorca", "Girona FC": "Girona", "UD Las Palmas": "Las Palmas", "Real Valladolid CF": "Valladolid", "RC Celta": "Celta",
+            "Real Oviedo": "Oviedo", "SD Eibar": "Eibar", "CD Leganés": "Leganes"},
+    "D1": {"FC Bayern München": "Bayern Munich", "VfB Stuttgart": "Stuttgart", "SV Elversberg": "Elversberg", "1. FC Köln": "FC Koln",
+           "1. FC Union Berlin": "Union Berlin", "1. FSV Mainz 05": "Mainz", "FC Augsburg": "Augsburg", "Sport-Club Freiburg": "Freiburg",
+           "TSG Hoffenheim": "Hoffenheim", "Borussia Dortmund": "Dortmund", "Bayer 04 Leverkusen": "Leverkusen", "SV Werder Bremen": "Werder Bremen",
+           "Hamburger SV": "Hamburg", "Borussia Mönchengladbach": "M'gladbach", "Eintracht Frankfurt": "Ein Frankfurt", "FC Schalke 04": "Schalke 04",
+           "SC Paderborn 07": "Paderborn", "VfL Wolfsburg": "Wolfsburg", "1. FC Heidenheim 1846": "Heidenheim", "FC St. Pauli": "St Pauli", "VfL Bochum 1848": "Bochum"},
+    "F1": {"Olympique de Marseille": "Marseille", "RC Strasbourg Alsace": "Strasbourg", "RC Lens": "Lens", "AJ Auxerre": "Auxerre", "Le Mans FC": "Le Mans",
+           "Stade Brestois 29": "Brest", "OGC Nice": "Nice", "Toulouse FC": "Toulouse", "Estac Troyes": "Troyes", "Angers SCO": "Angers",
+           "Havre Athletic Club": "Le Havre", "LOSC Lille": "Lille", "Stade Rennais FC": "Rennes", "FC Lorient": "Lorient", "Olympique Lyonnais": "Lyon",
+           "AS Monaco": "Monaco", "Paris Saint-Germain": "Paris SG", "FC Nantes": "Nantes", "FC Metz": "Metz", "AS Saint-Étienne": "St Etienne"},
+    "N1": {"SC Cambuur": "Cambuur", "N.E.C. Nijmegen": "Nijmegen", "PSV": "PSV Eindhoven", "AZ": "AZ Alkmaar", "PEC Zwolle": "Zwolle", "FC Groningen": "Groningen",
+           "sc Heerenveen": "Heerenveen", "FC Utrecht": "Utrecht", "Excelsior Rotterdam": "Excelsior", "ADO Den Haag": "Den Haag", "Fortuna Sittard": "For Sittard",
+           "FC Twente": "Twente", "NAC Breda": "NAC Breda", "Heracles Almelo": "Heracles", "FC Volendam": "Volendam"},
+    "P1": {"Académico": "Academico Viseu", "Casa Pia AC": "Casa Pia", "CD Nacional": "Nacional", "Estoril Praia": "Estoril", "Estrela Amadora": "Estrela",
+           "FC Alverca": "Alverca", "FC Arouca": "Arouca", "FC Famalicão": "Famalicao", "FC Porto": "Porto", "Gil Vicente FC": "Gil Vicente",
+           "Marítimo M.": "Maritimo", "Moreirense FC": "Moreirense", "Rio Ave FC": "Rio Ave", "SC Braga": "Sp Braga", "SL Benfica": "Benfica",
+           "Sporting CP": "Sp Lisbon", "Vitória SC": "Guimaraes"},
+}
+try:
+    from zoneinfo import ZoneInfo
+    ROME = ZoneInfo("Europe/Rome")
+except Exception:
+    ROME = datetime.timezone(datetime.timedelta(hours=2))
+rows = ["Div,Date,Time,HomeTeam,AwayTeam,Round"]
+unknown = set()
+for lg, slug in FD_SLUGS.items():
+    try:
+        data = json.loads(get(f"https://fixturedownload.com/feed/json/{slug}-{cur}"))
+    except Exception as e:
+        print("skip calendario", lg, e)
+        continue
+    for m in data:
+        if m.get("HomeTeamScore") is not None:
+            continue
+        try:
+            dt = datetime.datetime.strptime(m["DateUtc"], "%Y-%m-%d %H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+        except Exception:
+            continue
+        loc = dt.astimezone(ROME)
+        # 00:00Z o 23:00Z = solo data, orario non ancora ufficiale
+        tm = "" if dt.strftime("%H:%M") in ("00:00", "23:00") else loc.strftime("%H:%M")
+        h = ALIAS[lg].get(m["HomeTeam"], m["HomeTeam"]); a = ALIAS[lg].get(m["AwayTeam"], m["AwayTeam"])
+        if h == m["HomeTeam"] and h not in ALIAS[lg].values(): unknown.add((lg, h))
+        if a == m["AwayTeam"] and a not in ALIAS[lg].values(): unknown.add((lg, a))
+        rows.append(",".join([lg, loc.strftime("%d/%m/%Y"), tm, h.replace(",", " "), a.replace(",", " "), str(m.get("RoundNumber", ""))]))
+save("next_fixtures.csv", "\n".join(rows))
+files.append("next_fixtures.csv")
+if unknown:
+    print("Nomi non convertiti (verificare ALIAS se non coincidono con football-data):", sorted(unknown))
+
+# calendario: solo i campionati della dashboard
+try:
+    fx = get("https://www.football-data.co.uk/fixtures.csv").splitlines()
+    keep = [fx[0]] + [l for l in fx[1:] if l.split(",")[0] in LEAGUES]
+    save("fixtures.csv", "\n".join(keep))
+    files.append("fixtures.csv")
+except Exception as e:
+    print("skip fixtures", e)
+
+# stemmi ufficiali: link alle immagini di football-data.org (serve il token gratuito, segreto FD_TOKEN su GitHub).
+# Si aggiornano una volta a settimana. Serie B non è nel piano gratuito di football-data.org: niente stemmi.
+import unicodedata, re, time
+FD_COMP = {"I1": "SA", "E0": "PL", "SP1": "PD", "F1": "FL1", "D1": "BL1", "N1": "DED", "P1": "PPL"}
+CREST_ALIAS = {  # nome football-data.co.uk -> parola chiave nel nome ufficiale
+    "Inter": "internazionale", "Milan": "ac milan", "Man United": "manchester united", "Man City": "manchester city",
+    "Nott'm Forest": "nottingham", "Wolves": "wolverhampton", "Newcastle": "newcastle", "Tottenham": "tottenham",
+    "Ath Madrid": "atletico", "Ath Bilbao": "athletic", "Sociedad": "real sociedad", "Vallecano": "rayo", "Espanol": "espanyol",
+    "Betis": "betis", "La Coruna": "coruna", "Santander": "racing", "Celta": "celta", "Alaves": "alaves",
+    "Paris SG": "paris saint", "St Etienne": "etienne", "Ein Frankfurt": "eintracht frankfurt", "M'gladbach": "monchengladbach",
+    "FC Koln": "koln", "Bayern Munich": "bayern", "Sp Lisbon": "sporting clube de portugal", "Sp Braga": "braga",
+    "Guimaraes": "vitoria", "For Sittard": "fortuna", "PSV Eindhoven": "psv", "Verona": "verona", "Leverkusen": "leverkusen",
+}
+def norm(x):
+    x = unicodedata.normalize("NFKD", x).encode("ascii", "ignore").decode().lower().replace("'", "")
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]", " ", x)).strip()
+crest_path = os.path.join(OUT, "crests.json")
+token = os.environ.get("FD_TOKEN", "").strip()
+old = {}
+if os.path.exists(crest_path):
+    try: old = json.load(open(crest_path))
+    except Exception: old = {}
+fresh = old.get("updated") and (datetime.date.today() - datetime.date.fromisoformat(old["updated"])).days < 7
+if token and not fresh:
+    crests = {"updated": datetime.date.today().isoformat(), "teams": {}}
+    for lg, comp in FD_COMP.items():
+        try:
+            req = urllib.request.Request(f"https://api.football-data.org/v4/competitions/{comp}/teams", headers={"X-Auth-Token": token})
+            api = json.loads(urllib.request.urlopen(req, timeout=60).read().decode("utf-8"))["teams"]
+        except Exception as e:
+            print("skip stemmi", lg, e); continue
+        time.sleep(7)   # piano gratuito: 10 richieste al minuto
+        # squadre della stagione in corso nei CSV
+        mine = set()
+        cur_file = os.path.join(OUT, f"{lg}_{code(cur)}.csv")
+        if os.path.exists(cur_file):
+            for line in open(cur_file, encoding="utf-8").read().splitlines()[1:]:
+                c = line.split(",")
+                if len(c) > 4: mine.update([c[3] if ":" in c[2] else c[2], c[4] if ":" in c[2] else c[3]])
+        mine.discard("")
+        out = {}
+        for t in sorted(mine):
+            key = norm(CREST_ALIAS.get(t, t)); best = None
+            for a in api:
+                names = [norm(a.get("shortName") or ""), norm(a.get("name") or ""), norm(a.get("tla") or "")]
+                if key in names: best = a; break
+                if any(re.search(r"\b" + re.escape(key) + r"\b", n) for n in names[:2]): best = best or a
+            if best and best.get("crest"): out[t] = best["crest"]
+            else: print("stemma non trovato:", lg, t)
+        crests["teams"][lg] = out
+    json.dump(crests, open(crest_path, "w"), indent=1)
+elif not token:
+    print("FD_TOKEN non impostato: stemmi saltati")
+
+now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))
+json.dump({"updated": now.strftime("%d/%m/%Y %H:%M"), "files": files},
+          open(os.path.join(OUT, "manifest.json"), "w"), indent=1)
+print("ok", len(files), "file")
