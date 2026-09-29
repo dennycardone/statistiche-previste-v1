@@ -469,6 +469,7 @@ summary{cursor:pointer;font-weight:600}
       <p><b>Media dinamica.</b> Previsto casa = normale in casa del campionato × attacco della squadra di casa × difesa dell'ospite (e viceversa). Attacco e difesa sono voti (1,00 = normale) calcolati su tutte le partite, casa e trasferta, tenendo conto degli avversari. Ogni voto parte da 1,00 e si sposta verso i dati della squadra con peso partite ÷ (partite + P). P la sceglie l'app da sola per ogni statistica: prova 2, 3, 5, 8, 12 e 20 prevedendo ogni partita giocata solo con i giorni precedenti, e usa quella con l'errore più basso (tra le partite giocate prima della data della previsione, così le previsioni passate non cambiano). Falli: difesa = falli subiti.</p>
       <p><b>Media dinamica – corner.</b> Anche per i corner la Media dinamica usa un modello verificato: regressione di Poisson con corner medi del campionato per sede (365 giorni), fattore campo, un rating attacco × difesa dei corner sugli ultimi 4 anni (una partita di 2 anni fa pesa il 37%, prudenza P = 20), differenza di Elo calcolato dall'app e corner delle ultime 5 partite (fatti dalla squadra, concessi dall'avversario). Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in ogni stagione. Il totale segue una Binomiale Negativa con r = 60 (i corner di casa e ospite sono correlati negativamente, quindi il totale varia meno della somma); per il 1X2 corner ogni squadra ha la sua Binomiale Negativa con r = 12. I tiri non cambiano.</p>
       <p><b>Media dinamica – falli.</b> Anche per i falli la Media dinamica usa un modello verificato: due regressioni di Poisson, una per la squadra di casa e una per l'ospite, con falli medi del campionato per sede (365 giorni), un rating falli commessi × subiti sugli ultimi 2 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4), falli delle ultime 5 partite (commessi dalla squadra, subiti dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 (chi va spesso in vantaggio fa meno falli) e tiri delle ultime 15. Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in 67 stagioni su 73 (nelle altre 6 peggiore di pochi centesimi). Il totale segue una Binomiale Negativa con r = 150, ogni squadra con r = 200 (i falli sono quasi Poisson). L'arbitro non è incluso: nei dati del sito non c'è.</p>
+      <p><b>Media dinamica – tiri e tiri in porta.</b> Anche tiri e tiri in porta usano modelli verificati: regressioni di Poisson che partono dalla media di lega per sede (365 giorni). Tiri: rating tiri fatti × concessi degli ultimi 4 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4) con una parte casa/trasferta, tiri delle ultime 10 (fatti dalla squadra, concessi dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 ed Elo. Tiri in porta: rating tiri in porta (una partita di un anno fa pesa il 37%, prudenza P = 8), rating dei tiri totali (chi tira molto finisce per avere più tiri in porta), tiri delle ultime 8 ed Elo. Coefficienti stimati su 8 campionati, solo stagioni in cui football-data misura i tiri nello stesso modo (quota in porta fino al 40%); nel test walk-forward migliori della versione precedente in tutti gli 8 campionati e, per squadra, in ogni stagione. Totale: Binomiale Negativa r = 150 per i tiri e r = 100 per i tiri in porta; per squadra r = 25 e r = 40.</p>
       <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre, calcolato dall'app dai risultati delle partite dei giorni precedenti (le stesse stagioni caricate): nel test rende quasi quanto l'Elo ufficiale di ClubElo. Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è ancora, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG).</p>
       <p><b>Gol (Media ponderata).</b> 60% media casa/trasferta sugli xG · 30% media casa/trasferta sui gol veri · 10% correttivo avversari sugli xG (se in una partita l'xG manca, vale il gol vero). Nessuna media del campionato né media totale. Poi tabella dei risultati con Poisson, da cui Over/Under, 1X2, Gol/No gol e risultati esatti. <b>Media classica</b>: solo gol veri.</p>
       <p><b>Statistica richiesta.</b> <i>Media ponderata</i>: i 4 pezzi qui sopra su tutte le partite della stagione. <i>Ultime 5</i>: stessi pezzi, solo sulle ultime 5 partite di ogni squadra. <i>Media classica</i>: (fatti in casa + concessi in trasferta dall'avversario) ÷ 2, senza correzione per gli avversari.</p>
@@ -1599,10 +1600,111 @@ distribuzione: Binomiale Negativa sul totale r = ${FD_R_TOT}; per squadra r = ${
     muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
 }
 
+/* ===== Media dinamica su TIRI e TIRI IN PORTA: modelli verificati (regressione di Poisson con livello di lega) =====
+   Tiri:          ln(tiri attesi) = ln(tiri medi di lega per sede, 365 giorni) + b0 + casa + a·ln(rating tiri ÷ media) + b·ln(tiri fatti ultime 10 ÷ media)
+                                    + c·ln(tiri concessi dall'avversario ultime 10 ÷ media) + quote in vantaggio/svantaggio all'intervallo (ultime 38) + e·ΔElo/100
+   Tiri in porta: ln(attesi) = ln(tiri in porta medi di lega per sede) + b0 + casa + a·ln(rating tiri in porta ÷ media) + b·ln(rating tiri ÷ media tiri)
+                                    + c·ln(tiri fatti ultime 8 ÷ media tiri) + d·ln(tiri concessi dall'avversario ultime 8 ÷ media tiri) + e·ΔElo/100
+   Rating: fatti × concessi degli ultimi 4 anni con una parte casa/trasferta (peso 40); tiri: peso e^(−giorni/180), prudenza 4; tiri in porta: e^(−giorni/365), prudenza 8.
+   Coefficienti stimati su 8 campionati (stagioni con tiri misurati in modo uniforme, 2008/09–2024/25, 68.736 righe).
+   Test walk-forward: migliore della media dinamica precedente in tutti gli 8 campionati, per squadra in ogni stagione. Solo partite con data precedente. */
+const TDYN = { s: { b0: -0.0261693, home: 0.0530592, r_s: 0.5564974, T_lead: 0.1065572, T_trail: -0.0642793, O_lead: -0.0940323, O_trail: 0.0400625, f10: 0.1148320, c10: 0.1573729, elo: 0.0260591, mean: { home: 0.50000, r_s: -0.01814, T_lead: 0.29372, T_trail: 0.29099, O_lead: 0.29372, O_trail: 0.29099, f10: -0.01303, c10: -0.01490, elo: 0.00000 } },
+  t: { b0: -0.0266780, home: 0.0405018, r_t: 0.3243054, r_s: 0.3944580, f8: 0.1363442, c8: 0.0820395, elo: 0.0460436, mean: { home: 0.50000, r_t: -0.02351, r_s: -0.01814, f8: -0.01502, c8: -0.01685, elo: 0.00000 } } };
+const TD_CFG = { s: { tau: 180, P: 4 }, t: { tau: 365, P: 8 } }, TD_LOOK = 1460, TD_PV = 40, TD_R = { s: { tot: 150, team: 25 }, t: { tot: 100, team: 40 } };
+function tdynFit(div, D, kind) {   // rating fatti × concessi con parte casa/trasferta; kind "s" = tiri, "t" = tiri in porta
+  const key = "tdyn|" + kind + "|" + div + "|" + D; if (CACHE.has(key)) return CACHE.get(key);
+  const [kh, ka] = kind === "s" ? ["hs", "as"] : ["hst", "ast"], { tau, P } = TD_CFG[kind];
+  const L = [...S.matches.values()].filter(m => m.div === div && +m.date < D && +m.date >= D - TD_LOOK * DAYMS && m[kh] != null && m[ka] != null);
+  const y365 = L.filter(m => +m.date >= D - 365 * DAYMS);
+  let res = null;
+  if (y365.length > 100 && L.length >= 50) {
+    const muH = y365.reduce((x, m) => x + m[kh], 0) / y365.length, muA = y365.reduce((x, m) => x + m[ka], 0) / y365.length;
+    const w = L.map(m => Math.exp(-Math.round((D - m.date) / DAYMS) / tau)), W = w.reduce((a, b) => a + b, 0);
+    const sH = L.reduce((x, m, i) => x + w[i] * m[kh], 0) / W, sA = L.reduce((x, m, i) => x + w[i] * m[ka], 0) / W, u = (sH + sA) / 2;
+    const idx = new Map(); L.forEach(m => { if (!idx.has(m.home)) idx.set(m.home, idx.size); if (!idx.has(m.away)) idx.set(m.away, idx.size); });
+    const T = idx.size, H = L.map(m => idx.get(m.home)), A = L.map(m => idx.get(m.away));
+    let att = new Float64Array(T).fill(1), def = new Float64Array(T).fill(1);
+    for (let it = 0; it < 6; it++) {
+      const xa = new Float64Array(T), ea = new Float64Array(T), xd = new Float64Array(T), ed = new Float64Array(T);
+      for (let i = 0; i < L.length; i++) { const m = L[i], h = H[i], a = A[i], wi = w[i];
+        xa[h] += wi * m[kh]; ea[h] += wi * sH * def[a]; xa[a] += wi * m[ka]; ea[a] += wi * sA * def[h];
+        xd[h] += wi * m[ka]; ed[h] += wi * sA * att[a]; xd[a] += wi * m[kh]; ed[a] += wi * sH * att[h]; }
+      const na = new Float64Array(T), nd = new Float64Array(T);
+      for (let t = 0; t < T; t++) { na[t] = (xa[t] + P * u) / (ea[t] + P * u); nd[t] = (xd[t] + P * u) / (ed[t] + P * u); }
+      att = na; def = nd;
+    }
+    // parte casa/trasferta, tirata verso il rating complessivo con peso TD_PV
+    const hx = new Float64Array(T), he = new Float64Array(T), hdx = new Float64Array(T), hde = new Float64Array(T), ax = new Float64Array(T), ae = new Float64Array(T), adx = new Float64Array(T), ade = new Float64Array(T);
+    for (let i = 0; i < L.length; i++) { const m = L[i], h = H[i], a = A[i], wi = w[i];
+      hx[h] += wi * m[kh]; he[h] += wi * sH * def[a]; hdx[h] += wi * m[ka]; hde[h] += wi * sA * att[a];
+      ax[a] += wi * m[ka]; ae[a] += wi * sA * def[h]; adx[a] += wi * m[kh]; ade[a] += wi * sH * att[h]; }
+    const aH = new Float64Array(T), dH = new Float64Array(T), aA = new Float64Array(T), dA = new Float64Array(T), pu = TD_PV * u;
+    for (let t = 0; t < T; t++) { aH[t] = (hx[t] + pu * att[t]) / (he[t] + pu); dH[t] = (hdx[t] + pu * def[t]) / (hde[t] + pu);
+      aA[t] = (ax[t] + pu * att[t]) / (ae[t] + pu); dA[t] = (adx[t] + pu * def[t]) / (ade[t] + pu); }
+    res = { muH, muA, sH, sA, aH, dH, aA, dA, idx, n: L.length };
+  }
+  CACHE.set(key, res); return res;
+}
+function tdynExp(F, home, away) {   // tiri attesi dal rating (casa, ospite); squadra senza storico = media
+  const ix = t => F.idx.has(t) ? F.idx.get(t) : -1, ih = ix(home), ia = ix(away);
+  return [F.sH * (ih >= 0 ? F.aH[ih] : 1) * (ia >= 0 ? F.dA[ia] : 1), F.sA * (ia >= 0 ? F.aA[ia] : 1) * (ih >= 0 ? F.dH[ih] : 1)];
+}
+function shotForm(div, team, D) {   // storico della squadra (anche stagioni passate), solo partite prima di D
+  const g = [...S.matches.values()].filter(m => m.div === div && +m.date < D && (m.home === team || m.away === team)).sort((a, b) => a.date - b.date);
+  const sh = g.filter(m => m.hs != null && m.as != null).map(m => m.home === team ? [m.hs, m.as] : [m.as, m.hs]);
+  const last = N => { const r = sh.slice(-N); return r.length ? { f: r.reduce((x, v) => x + v[0], 0) / r.length, c: r.reduce((x, v) => x + v[1], 0) / r.length, n: r.length } : null; };
+  const ht = g.filter(m => m.hht != null && m.aht != null).slice(-38).map(m => m.home === team ? [m.hht, m.aht] : [m.aht, m.hht]);
+  const GS = ht.length ? { lead: ht.filter(v => v[0] > v[1]).length / ht.length, trail: ht.filter(v => v[0] < v[1]).length / ht.length, n: ht.length } : null;
+  return { S10: last(10), S8: last(8), GS };
+}
+function shotDynParts(home, away, k) {   // k = "s" tiri, "st" tiri in porta
+  const D = goalDate(home, away), FS = tdynFit(S.league, D, "s"); if (!FS) return null;
+  const FT = k === "st" ? tdynFit(S.league, D, "t") : null; if (k === "st" && !FT) return null;
+  const [rsH, rsA] = tdynExp(FS, home, away), fH = shotForm(S.league, home, D), fA = shotForm(S.league, away, D);
+  const eH = eloAt(S.league, home, D), eA = eloAt(S.league, away, D), ed = eH && eA ? (eH.elo - eA.elo) / 100 : null;
+  const lr = (v, mu, mean) => v != null && v > 0 ? Math.log(v / mu) : mean, vv = (v, mean) => v != null ? v : mean;
+  const pc0 = v => Math.round(v * 100) + "%";
+  let lh, la, muH, muA, extra;
+  if (k === "s") {
+    const C = TDYN.s, M = C.mean; muH = FS.muH; muA = FS.muA;
+    const eq = (mu, rs, T, O, hv, e) => Math.exp(Math.log(mu) + C.b0 + C.home * hv + C.r_s * lr(rs, mu, M.r_s) + C.f10 * lr(T.S10 && T.S10.f, mu, M.f10) + C.c10 * lr(O.S10 && O.S10.c, mu, M.c10)
+      + C.T_lead * vv(T.GS && T.GS.lead, M.T_lead) + C.T_trail * vv(T.GS && T.GS.trail, M.T_trail) + C.O_lead * vv(O.GS && O.GS.lead, M.O_lead) + C.O_trail * vv(O.GS && O.GS.trail, M.O_trail)
+      + C.elo * (e != null ? e : M.elo));
+    lh = eq(muH, rsH, fH, fA, 1, ed); la = eq(muA, rsA, fA, fH, 0, ed != null ? -ed : null);
+    const s10 = x => x.S10 ? `fatti ${f1(x.S10.f)}, concessi ${f1(x.S10.c)} (${x.S10.n} partite)` : "N/D, uso la media";
+    const gs = x => x.GS ? `in vantaggio ${pc0(x.GS.lead)}, in svantaggio ${pc0(x.GS.trail)} (${x.GS.n} partite)` : "N/D, uso la media";
+    extra = `rating tiri (4 anni, ${FS.n} partite): tiri attesi ${esc(home)} ${f2(rsH)} · ${esc(away)} ${f2(rsA)}
+ultime 10: ${esc(home)} ${s10(fH)} — ${esc(away)} ${s10(fA)}
+intervallo, ultime 38: ${esc(home)} ${gs(fH)} — ${esc(away)} ${gs(fA)}`;
+  } else {
+    const C = TDYN.t, M = C.mean, [rtH, rtA] = tdynExp(FT, home, away); muH = FT.muH; muA = FT.muA;
+    const eq = (mu, ms, rt, rs, T, O, hv, e) => Math.exp(Math.log(mu) + C.b0 + C.home * hv + C.r_t * lr(rt, mu, M.r_t) + C.r_s * lr(rs, ms, M.r_s)
+      + C.f8 * lr(T.S8 && T.S8.f, ms, M.f8) + C.c8 * lr(O.S8 && O.S8.c, ms, M.c8) + C.elo * (e != null ? e : M.elo));
+    lh = eq(muH, FS.muH, rtH, rsH, fH, fA, 1, ed); la = eq(muA, FS.muA, rtA, rsA, fA, fH, 0, ed != null ? -ed : null);
+    const s8 = x => x.S8 ? `fatti ${f1(x.S8.f)}, concessi ${f1(x.S8.c)} (${x.S8.n} partite)` : "N/D, uso la media";
+    extra = `rating tiri in porta (4 anni, ${FT.n} partite): attesi ${esc(home)} ${f2(rtH)} · ${esc(away)} ${f2(rtA)}
+rating tiri: attesi ${esc(home)} ${f2(rsH)} · ${esc(away)} ${f2(rsA)}
+tiri, ultime 8: ${esc(home)} ${s8(fH)} — ${esc(away)} ${s8(fA)}`;
+  }
+  if (!isFinite(lh) || !isFinite(la)) return null;
+  const R = TD_R[k === "s" ? "s" : "t"], kh = k === "s" ? "hs" : "hst";
+  const cur = [...S.matches.values()].filter(m => m.div === S.league && m.season === S.season && +m.date < D && m[kh] != null);
+  const nHt = cur.filter(m => m.home === home || m.away === home).length, nAt = cur.filter(m => m.home === away || m.away === away).length;
+  const nH = cur.filter(m => m.home === home).length, nA = cur.filter(m => m.away === away).length;
+  const text = `modello ${k === "s" ? "tiri" : "tiri in porta"} verificato (regressione di Poisson con livello di lega) · dati fino al ${dstr(new Date(D - DAYMS))}
+${k === "s" ? "tiri" : "tiri in porta"} medi di lega (365 giorni): casa ${f2(muH)} · fuori ${f2(muA)}
+${extra}
+Elo (calcolato dai risultati): ${eH && eA ? `${esc(home)} ${Math.round(eH.elo)} · ${esc(away)} ${Math.round(eA.elo)}` : "non disponibile: uso il valore medio"}
+attesi: ${esc(home)} ${f2(lh)} · ${esc(away)} ${f2(la)} · totale ${f2(lh + la)}
+distribuzione: Binomiale Negativa sul totale r = ${R.tot}; per squadra r = ${R.team}`;
+  return { lh, la, dynText: text, tdyn: true, r: R.tot, rTeam: R.team, W: { cl: 0 }, cl: { lh, la }, lg: { lh: muH, la: muA }, av: { lh, la }, tt: { lh, la },
+    muH, muA, n: FS.n, nH, nA, nHt, nAt };
+}
+
 /* Gol (Media ponderata): 60% media casa/trasferta sugli xG · 30% media casa/trasferta sui gol veri · 10% correttivo avversari sugli xG */
 const GOAL_W = { xg: 0.60, gv: 0.30, av: 0.10 };
 function blendParts(list, home, away, cfg, k) {
-  if (cfg.dyn) return (k === "gm" && goalDynParts(home, away)) || (k === "c" && cornerDynParts(home, away)) || (k === "f" && foulDynParts(home, away)) || dynParts(list, home, away, k);
+  if (cfg.dyn) return (k === "gm" && goalDynParts(home, away)) || (k === "c" && cornerDynParts(home, away)) || (k === "f" && foulDynParts(home, away)) || ((k === "s" || k === "st") && shotDynParts(home, away, k)) || dynParts(list, home, away, k);
   if (k === "gm") {
     const X = blendParts(list, home, away, cfg, "x"), Gv = blendParts(list, home, away, cfg, "g");
     if (!X || !Gv) return null;
@@ -1672,7 +1774,7 @@ function dispersion(k, cfg) {
 }
 function model(home, away, cfg, k = "c") {
   const list = metricMatches(k); let L = league(list, k);
-  const gdyn = cfg.dyn && (k === "gm" || k === "c" || k === "f");   // gol, corner e falli in Media dinamica: modelli verificati, funzionano anche a inizio stagione
+  const gdyn = cfg.dyn && (k === "gm" || k === "c" || k === "f" || k === "s" || k === "st");   // gol, corner, falli e tiri in Media dinamica: modelli verificati, funzionano anche a inizio stagione
   if (!L && !gdyn) return null;
   const D = gdyn ? { r: Infinity, used: 0 } : dispersion(k, cfg), maxK = (k === "f" || k === "s") ? 90 : 40;
   if (cfg.classic) {
@@ -1938,7 +2040,7 @@ function precIdx(team, list, kind, venue, cfg, pL, sBar) {
   return ((num + K * sBar * pL) / (den + K * sBar)) / pL;
 }
 function modelShots(home, away, hl) {
-  const list = shotMatches(); if (!list.length) return null;
+  const list = shotMatches(); if (!list.length && !hl.dyn) return null;
   const MS = model(home, away, hl, "s"), MD = model(home, away, hl, "st");
   if (!MS || !MD) return null;
   return { MS, MD, classic: !!hl.classic, lh: MD.lh, la: MD.la, tot: MD.tot, pmf: MD.pmf };
@@ -2060,7 +2162,7 @@ function render() {
     <h2>Riepilogo · valori attesi</h2>
     <p class="small muted" style="margin:0">${esc(LG[S.league].name)} · statistica richiesta: <b>${hl.label}</b></p>
     ${staleNote()}
-    ${M && M.nH != null ? `<div class="warnbox">Basato su ${M.nHt} partite di ${esc(home)} (${M.nH} in casa) e ${M.nAt} di ${esc(away)} (${M.nA} in trasferta). ${hl.dyn ? "Media dinamica: normale del campionato × attacco × difesa, con prudenza che cala partita dopo partita; gol, corner e falli con i modelli verificati. Calcolo completo in Dati e metodo." : `Pesi della Media ponderata: classica 50% · campionato 25% · avversari 20% · totale squadra 5% (falli: classica ${MF && MF.Bp && MF.Bp.W && MF.Bp.W.cl === 0.5 ? "50% · totale squadra 50%" : "20% · totale squadra 80%, dall'11ª partita 50% · 50%"}; gol: 60% xG · 30% gol veri · 10% avversari).${M.nHt > RECENT_FROM || M.nAt > RECENT_FROM ? " Oltre le 10 partite le ultime 5 di ogni squadra contano il doppio." : ""}`}</div>` : ""}
+    ${M && M.nH != null ? `<div class="warnbox">Basato su ${M.nHt} partite di ${esc(home)} (${M.nH} in casa) e ${M.nAt} di ${esc(away)} (${M.nA} in trasferta). ${hl.dyn ? "Media dinamica: normale del campionato × attacco × difesa, con prudenza che cala partita dopo partita; gol, corner, falli e tiri con i modelli verificati. Calcolo completo in Dati e metodo." : `Pesi della Media ponderata: classica 50% · campionato 25% · avversari 20% · totale squadra 5% (falli: classica ${MF && MF.Bp && MF.Bp.W && MF.Bp.W.cl === 0.5 ? "50% · totale squadra 50%" : "20% · totale squadra 80%, dall'11ª partita 50% · 50%"}; gol: 60% xG · 30% gol veri · 10% avversari).${M.nHt > RECENT_FROM || M.nAt > RECENT_FROM ? " Oltre le 10 partite le ultime 5 di ogni squadra contano il doppio." : ""}`}</div>` : ""}
     ${rowsTable(["Statistica", teamHead(home, "--s1"), teamHead(away, "--s2"), "Totale atteso"], [
       G ? ["🥅 Gol", f2(G.lh), f2(G.la), `<b>${f2(G.tot)}</b>`] : ["🥅 Gol", "N/D", "N/D", "N/D"], sumRow("⚽ Corner", M), sumRow("🟨 Falli", MF), sumRow("🎯 Tiri", MT ? MT.MS : null), sumRow("🎯 Tiri in porta", MT)])}
   </section>
