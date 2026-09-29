@@ -2268,6 +2268,7 @@ function markNext() {
 }
 
 function refreshAll() {
+  try { ROWC.clear(); } catch (e) {}   // i dati sono cambiati: le righe della home vanno ricalcolate
   let saved = null; try { saved = JSON.parse(lsGet(PICK_KEY) || "null"); } catch (e) {}
   if (saved && saved.league && LG[saved.league] && !refreshAll.started) S.league = saved.league;
   refreshAll.started = true;
