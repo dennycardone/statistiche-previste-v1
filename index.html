@@ -466,7 +466,8 @@ summary{cursor:pointer;font-weight:600}
         <li><b>Falli:</b> solo media classica e media totale della squadra. Finché una delle due squadre ha giocato 10 partite o meno: classica 20%, totale 80%. Dall'11ª partita: 50% e 50%.</li>
         <li><b>Probabilità.</b> Il totale segue una Binomiale Negativa, con la variabilità misurata sugli errori reali: ogni partita già giocata viene prevista senza usarla e confrontata con il risultato vero.</li>
       </ol>
-      <p><b>Media dinamica.</b> Previsto casa = normale in casa del campionato × attacco della squadra di casa × difesa dell'ospite (e viceversa). Attacco e difesa sono voti (1,00 = normale) calcolati su tutte le partite, casa e trasferta, tenendo conto degli avversari. Ogni voto parte da 1,00 e si sposta verso i dati della squadra con peso partite ÷ (partite + P). P la sceglie l'app da sola per ogni statistica: prova 2, 3, 5, 8, 12 e 20 prevedendo ogni partita giocata solo con i giorni precedenti, e usa quella con l'errore più basso (tra le partite giocate prima della data della previsione, così le previsioni passate non cambiano). Falli: difesa = falli subiti. Gol: voti sugli xG (gol veri dove l'xG manca).</p>
+      <p><b>Media dinamica.</b> Previsto casa = normale in casa del campionato × attacco della squadra di casa × difesa dell'ospite (e viceversa). Attacco e difesa sono voti (1,00 = normale) calcolati su tutte le partite, casa e trasferta, tenendo conto degli avversari. Ogni voto parte da 1,00 e si sposta verso i dati della squadra con peso partite ÷ (partite + P). P la sceglie l'app da sola per ogni statistica: prova 2, 3, 5, 8, 12 e 20 prevedendo ogni partita giocata solo con i giorni precedenti, e usa quella con l'errore più basso (tra le partite giocate prima della data della previsione, così le previsioni passate non cambiano). Falli: difesa = falli subiti.</p>
+      <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre (ClubElo, ultima istantanea prima della partita). Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG). Corner, falli e tiri non cambiano.</p>
       <p><b>Gol (Media ponderata).</b> 60% media casa/trasferta sugli xG · 30% media casa/trasferta sui gol veri · 10% correttivo avversari sugli xG (se in una partita l'xG manca, vale il gol vero). Nessuna media del campionato né media totale. Poi tabella dei risultati con Poisson, da cui Over/Under, 1X2, Gol/No gol e risultati esatti. <b>Media classica</b>: solo gol veri.</p>
       <p><b>Statistica richiesta.</b> <i>Media ponderata</i>: i 4 pezzi qui sopra su tutte le partite della stagione. <i>Ultime 5</i>: stessi pezzi, solo sulle ultime 5 partite di ogni squadra. <i>Media classica</i>: (fatti in casa + concessi in trasferta dall'avversario) ÷ 2, senza correzione per gli avversari.</p>
       <p class="small muted">Con poche partite (2–3 per sede a inizio stagione) i valori possono essere estremi: nessun numero viene aggiunto per "addolcirli".</p>
@@ -1337,10 +1338,97 @@ ${esc(away)} = ${f2(F.muA)} × ${f2(F.att[away])} × ${f2(F.def[home])} = ${f2(l
   return { lh, la, dynText: text, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la }, muH: F.muH, muA: F.muA, n: list.length, nH, nA, nHt: F.cnt[home], nAt: F.cnt[away] };
 }
 
+/* ===== Media dinamica sui GOL: modello validato (regressione di Poisson) =====
+   log(gol attesi) = b0 + a·log(gol medi di lega per quella sede, ultimi 365 giorni) + c·casa
+                     + d·log(gol attesi dal rating sui tiri in porta) + e·(Elo squadra − Elo avversario)/100
+   Rating sui tiri in porta: attacco × difesa sulle partite del campionato degli ultimi 4 anni (anche stagioni passate),
+   peso di una partita = e^(−giorni/365), prudenza P = 4, 6 iterazioni; convertito in gol con gol ÷ tiri in porta della lega (365 giorni).
+   Coefficienti stimati su 8 campionati, solo stagioni complete 2007/08–2024/25 (81.792 righe squadra-partita).
+   Test walk-forward: migliore della media dinamica precedente in tutti gli 8 campionati e in ogni stagione di test.
+   Senza Elo per una delle due squadre si usa la stessa regressione stimata senza Elo (anch'essa migliore della precedente).
+   Tutto usa solo partite con data precedente alla partita prevista: le previsioni passate restano quelle di quel momento. */
+const GDYN = { b0: 0.0012753, lmu: 0.1740118, home: 0.0703184, lst: 0.6223358, elo: 0.1064962 };
+const GDYN0 = { b0: -0.0213109, lmu: -0.1741235, home: 0.0469935, lst: 1.1518468 };
+const DAYMS = 864e5, GD_TAU = 365, GD_P = 4, GD_LOOK = 1460, GD_ELO_AGE = 40;
+let ELO = {};   // ELO[div][squadra] = [[giorno ms, elo], ...] in ordine di data (file data/elo.csv, da ClubElo)
+function parseElo(text) {
+  const out = {};
+  for (const line of text.split(/\r?\n/).slice(1)) {
+    const [d, div, team, v] = line.split(","); if (!d || !div || !team || !isFinite(+v)) continue;
+    const t = Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10));
+    ((out[div] = out[div] || {})[team] = out[div][team] || []).push([t, +v]);
+  }
+  for (const div in out) for (const t in out[div]) out[div][t].sort((a, b) => a[0] - b[0]);
+  return out;
+}
+function eloAt(div, team, D) {   // ultima istantanea con data precedente al giorno della partita (al massimo 40 giorni prima)
+  const s = ELO[div] && ELO[div][team]; if (!s) return null;
+  let r = null; for (const x of s) { if (x[0] < D) r = x; else break; }
+  return r && D - r[0] <= GD_ELO_AGE * DAYMS ? { elo: r[1], date: r[0] } : null;
+}
+function goalDate(home, away) {   // giorno della partita: data limite (partite giocate) o data in calendario
+  if (S.cutoff) return +S.cutoff;
+  const last = leagueMatches().reduce((x, m) => Math.max(x, +m.date), 0);
+  const f = S.fixtures.filter(x => x.div === S.league && x.home === home && x.away === away && +x.date > last).sort((a, b) => a.date - b.date)[0];
+  if (f) return +f.date;
+  const t = new Date(); return Math.max(last + DAYMS, Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()));
+}
+function gdynFit(div, D) {
+  const key = "gdyn|" + div + "|" + D; if (CACHE.has(key)) return CACHE.get(key);
+  const all = [...S.matches.values()].filter(m => m.div === div && +m.date < D && +m.date >= D - GD_LOOK * DAYMS && m.hg != null && m.ag != null);
+  const y365 = all.filter(m => +m.date >= D - 365 * DAYMS), s365 = y365.filter(m => m.hst != null && m.ast != null);
+  let res = null;
+  const L = all.filter(m => m.hst != null && m.ast != null);
+  if (y365.length > 100 && s365.length > 100 && L.length >= 50) {
+    const muH = y365.reduce((x, m) => x + m.hg, 0) / y365.length, muA = y365.reduce((x, m) => x + m.ag, 0) / y365.length;
+    const conv = s365.reduce((x, m) => x + m.hg + m.ag, 0) / s365.reduce((x, m) => x + m.hst + m.ast, 0);
+    const w = L.map(m => Math.exp(-Math.round((D - m.date) / DAYMS) / GD_TAU)), W = w.reduce((a, b) => a + b, 0);
+    const sH = L.reduce((x, m, i) => x + w[i] * m.hst, 0) / W, sA = L.reduce((x, m, i) => x + w[i] * m.ast, 0) / W, u = (sH + sA) / 2;
+    const idx = new Map(); L.forEach(m => { if (!idx.has(m.home)) idx.set(m.home, idx.size); if (!idx.has(m.away)) idx.set(m.away, idx.size); });
+    const T = idx.size, H = L.map(m => idx.get(m.home)), A = L.map(m => idx.get(m.away));
+    let att = new Float64Array(T).fill(1), def = new Float64Array(T).fill(1);
+    for (let it = 0; it < 6; it++) {
+      const xa = new Float64Array(T), ea = new Float64Array(T), xd = new Float64Array(T), ed = new Float64Array(T);
+      for (let i = 0; i < L.length; i++) { const m = L[i], h = H[i], a = A[i], wi = w[i];
+        xa[h] += wi * m.hst; ea[h] += wi * sH * def[a]; xa[a] += wi * m.ast; ea[a] += wi * sA * def[h];
+        xd[h] += wi * m.ast; ed[h] += wi * sA * att[a]; xd[a] += wi * m.hst; ed[a] += wi * sH * att[h]; }
+      const na = new Float64Array(T), nd = new Float64Array(T);
+      for (let t = 0; t < T; t++) { na[t] = (xa[t] + GD_P * u) / (ea[t] + GD_P * u); nd[t] = (xd[t] + GD_P * u) / (ed[t] + GD_P * u); }
+      att = na; def = nd;
+    }
+    res = { muH, muA, conv, sH, sA, att, def, idx, n: L.length };
+  }
+  CACHE.set(key, res); return res;
+}
+function goalDynParts(home, away) {
+  const D = goalDate(home, away), F = gdynFit(S.league, D); if (!F) return null;
+  const ix = t => F.idx.has(t) ? F.idx.get(t) : -1, ih = ix(home), ia = ix(away);
+  const aH = ih >= 0 ? F.att[ih] : 1, dH = ih >= 0 ? F.def[ih] : 1, aA = ia >= 0 ? F.att[ia] : 1, dA = ia >= 0 ? F.def[ia] : 1;
+  const tpH = F.sH * aH * dA * F.conv, tpA = F.sA * aA * dH * F.conv;
+  const eH = eloAt(S.league, home, D), eA = eloAt(S.league, away, D), withElo = !!(eH && eA);
+  const C = withElo ? GDYN : GDYN0, ed = withElo ? (eH.elo - eA.elo) / 100 : 0;
+  const lh = Math.exp(C.b0 + C.lmu * Math.log(F.muH) + C.home + C.lst * Math.log(tpH) + (withElo ? C.elo * ed : 0));
+  const la = Math.exp(C.b0 + C.lmu * Math.log(F.muA) + C.lst * Math.log(tpA) - (withElo ? C.elo * ed : 0));
+  if (!isFinite(lh) || !isFinite(la)) return null;
+  const cur = [...S.matches.values()].filter(m => m.div === S.league && m.season === S.season && +m.date < D);
+  const nHt = cur.filter(m => m.home === home || m.away === home).length, nAt = cur.filter(m => m.home === away || m.away === away).length;
+  const nH = cur.filter(m => m.home === home).length, nA = cur.filter(m => m.away === away).length;
+  const c3 = v => v.toFixed(3).replace(".", ","), sg = v => (v < 0 ? " − " : " + ") + c3(Math.abs(v)), sd = v => v < 0 ? "−" + c3(-v) : c3(v);
+  const text = `modello gol validato (regressione di Poisson) · dati fino al ${dstr(new Date(D - DAYMS))}
+gol medi di lega (365 giorni): casa ${f2(F.muH)} · fuori ${f2(F.muA)} · gol per tiro in porta ${c3(F.conv)}
+rating tiri in porta (4 anni, ${F.n} partite): ${esc(home)} attacco ${f2(aH)} · difesa ${f2(dH)} — ${esc(away)} attacco ${f2(aA)} · difesa ${f2(dA)}
+gol attesi dai tiri in porta: ${esc(home)} ${f2(tpH)} · ${esc(away)} ${f2(tpA)}
+Elo (ClubElo): ${withElo ? `${esc(home)} ${Math.round(eH.elo)} · ${esc(away)} ${Math.round(eA.elo)} (differenza ${ed >= 0 ? "+" : "−"}${Math.round(Math.abs(ed) * 100)})` : "non disponibile per " + [eH ? null : home, eA ? null : away].filter(Boolean).map(esc).join(" e ") + ": uso la versione senza Elo"}
+${esc(home)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muH)}${sg(C.home)}${sg(C.lst)}·ln ${f2(tpH)}${withElo ? `${sg(C.elo)}·(${f2(ed)})` : ""}) = ${f2(lh)}
+${esc(away)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muA)}${sg(C.lst)}·ln ${f2(tpA)}${withElo ? `${sg(C.elo)}·(${f2(-ed)})` : ""}) = ${f2(la)}`;
+  return { lh, la, dynText: text, gdyn: true, withElo, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
+    muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
+}
+
 /* Gol (Media ponderata): 60% media casa/trasferta sugli xG · 30% media casa/trasferta sui gol veri · 10% correttivo avversari sugli xG */
 const GOAL_W = { xg: 0.60, gv: 0.30, av: 0.10 };
 function blendParts(list, home, away, cfg, k) {
-  if (cfg.dyn) return dynParts(list, home, away, k);
+  if (cfg.dyn) return (k === "gm" && goalDynParts(home, away)) || dynParts(list, home, away, k);
   if (k === "gm") {
     const X = blendParts(list, home, away, cfg, "x"), Gv = blendParts(list, home, away, cfg, "g");
     if (!X || !Gv) return null;
@@ -1409,9 +1497,10 @@ function dispersion(k, cfg) {
   CACHE.set(key, res); return res;
 }
 function model(home, away, cfg, k = "c") {
-  const list = metricMatches(k); const L = league(list, k);
-  if (!L) return null;
-  const D = dispersion(k, cfg), maxK = (k === "f" || k === "s") ? 90 : 40;
+  const list = metricMatches(k); let L = league(list, k);
+  const gdyn = cfg.dyn && k === "gm";   // gol in Media dinamica: modello validato, funziona anche a inizio stagione
+  if (!L && !gdyn) return null;
+  const D = gdyn ? { r: Infinity, used: 0 } : dispersion(k, cfg), maxK = (k === "f" || k === "s") ? 90 : 40;
   if (cfg.classic) {
     const gH = teamGames(home, list, k).filter(x => x.venue === "C"), gA = teamGames(away, list, k).filter(x => x.venue === "T");
     if (!gH.length || !gA.length) return null;
@@ -1422,6 +1511,7 @@ function model(home, away, cfg, k = "c") {
   }
   const Bp = blendParts(list, home, away, cfg, k); if (!Bp) return null;
   const lh = Bp.lh, la = Bp.la;
+  if (!L) L = { n: 0, muH: Bp.muH, muA: Bp.muA, mean: Bp.muH + Bp.muA, v: null };
   return { L, Bp, nH: Bp.nH, nA: Bp.nA, nHt: Bp.nHt, nAt: Bp.nAt,
     base: { lh, la }, lh, la, tot: lh + la, h: 0, h2hN: 0, r: D.r, rUsed: D.used, pmf: pmfTotal(lh + la, D.r, maxK) };
 }
@@ -1795,7 +1885,7 @@ function render() {
     <h2>Riepilogo · valori attesi</h2>
     <p class="small muted" style="margin:0">${esc(LG[S.league].name)} · statistica richiesta: <b>${hl.label}</b></p>
     ${staleNote()}
-    ${M && M.nH != null ? `<div class="warnbox">Basato su ${M.nHt} partite di ${esc(home)} (${M.nH} in casa) e ${M.nAt} di ${esc(away)} (${M.nA} in trasferta). ${hl.dyn ? "Media dinamica: normale del campionato × attacco × difesa, con prudenza che cala partita dopo partita (calcolo completo in Dati e metodo)." : `Pesi della Media ponderata: classica 50% · campionato 25% · avversari 20% · totale squadra 5% (falli: classica ${MF && MF.Bp && MF.Bp.W && MF.Bp.W.cl === 0.5 ? "50% · totale squadra 50%" : "20% · totale squadra 80%, dall'11ª partita 50% · 50%"}; gol: 60% xG · 30% gol veri · 10% avversari).${M.nHt > RECENT_FROM || M.nAt > RECENT_FROM ? " Oltre le 10 partite le ultime 5 di ogni squadra contano il doppio." : ""}`}</div>` : ""}
+    ${M && M.nH != null ? `<div class="warnbox">Basato su ${M.nHt} partite di ${esc(home)} (${M.nH} in casa) e ${M.nAt} di ${esc(away)} (${M.nA} in trasferta). ${hl.dyn ? "Media dinamica: normale del campionato × attacco × difesa, con prudenza che cala partita dopo partita; gol con il modello verificato (tiri in porta degli ultimi 4 anni + Elo). Calcolo completo in Dati e metodo." : `Pesi della Media ponderata: classica 50% · campionato 25% · avversari 20% · totale squadra 5% (falli: classica ${MF && MF.Bp && MF.Bp.W && MF.Bp.W.cl === 0.5 ? "50% · totale squadra 50%" : "20% · totale squadra 80%, dall'11ª partita 50% · 50%"}; gol: 60% xG · 30% gol veri · 10% avversari).${M.nHt > RECENT_FROM || M.nAt > RECENT_FROM ? " Oltre le 10 partite le ultime 5 di ogni squadra contano il doppio." : ""}`}</div>` : ""}
     ${rowsTable(["Statistica", teamHead(home, "--s1"), teamHead(away, "--s2"), "Totale atteso"], [
       G ? ["🥅 Gol", f2(G.lh), f2(G.la), `<b>${f2(G.tot)}</b>`] : ["🥅 Gol", "N/D", "N/D", "N/D"], sumRow("⚽ Corner", M), sumRow("🟨 Falli", MF), sumRow("🎯 Tiri", MT ? MT.MS : null), sumRow("🎯 Tiri in porta", MT)])}
   </section>
@@ -1847,7 +1937,7 @@ ${parts.filter(([, , w]) => w > 0).map(([t, o, w]) => `${t}  ${r2(o)}   × ${Mat
   };
   $("#methodLive").innerHTML = `<p class="small muted" style="margin:0">Statistica richiesta: <b>${hl.label}</b>. ${hl.dyn ? "Ogni valore = normale del campionato × attacco della squadra × difesa dell'avversaria. I voti usano tutte le partite, tengono conto degli avversari e partono da 1,00: pesano i dati della squadra per partite ÷ (partite + P)." : `Ogni valore è la somma pesata di 4 pezzi: media classica 50%, media del campionato 25%, correttivo avversari 20%, media totale della squadra 5%. Falli: classica 20% e totale squadra 80% finché una delle due squadre ha giocato 10 partite o meno, poi 50% e 50%.`}</p>
     <div class="formula">${[
-      G ? blk("GOL", G.M) + `\n(xG mancante in una partita = gol veri di quella partita) · risultati: Poisson(${f2(G.lh)}) × Poisson(${f2(G.la)})` : "GOL: N/D",
+      G ? blk("GOL", G.M) + `\n${G.M.Bp && G.M.Bp.gdyn ? "" : "(xG mancante in una partita = gol veri di quella partita) · "}risultati: Poisson(${f2(G.lh)}) × Poisson(${f2(G.la)})` : "GOL: N/D",
       blk("CORNER", M), blk("FALLI", MF), blk("TIRI", MT && MT.MS), blk("TIRI IN PORTA", MT && MT.MD)].join("\n\n")}</div>`;
 }
 
@@ -2028,6 +2118,7 @@ async function tryHosted() {
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
     try { const cr = await fetch("data/crests.json", { cache: "no-store" }); if (cr.ok) CRESTS = (await cr.json()).teams || {}; } catch (e) {}
+    try { const er = await fetch("data/elo.csv", { cache: "no-store" }); if (er.ok) { ELO = parseElo(await er.text()); clearCache(); } } catch (e) {}
     S.meta = { source: "football-data.co.uk · I1.csv (aggiornamento automatico)", fetched: man.updated || "N/D", mode: "scaricati il" };
     return true;
   } catch (e) { return false; }
