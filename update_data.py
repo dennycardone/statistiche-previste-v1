@@ -198,9 +198,9 @@ old = {}
 if os.path.exists(crest_path):
     try: old = json.load(open(crest_path))
     except Exception: old = {}
-fresh = old.get("v") == 2 and old.get("updated") and (datetime.date.today() - datetime.date.fromisoformat(old["updated"])).days < 7
+fresh = old.get("v") == 3 and old.get("updated") and (datetime.date.today() - datetime.date.fromisoformat(old["updated"])).days < 7
 if token and not fresh:
-    crests = {"v": 2, "updated": datetime.date.today().isoformat(), "teams": {}}
+    crests = {"v": 3, "updated": datetime.date.today().isoformat(), "teams": {}, "colors": {}}
     for lg, comp in FD_COMP.items():
         try:
             req = urllib.request.Request(f"https://api.football-data.org/v4/competitions/{comp}/teams", headers={"X-Auth-Token": token})
@@ -216,7 +216,7 @@ if token and not fresh:
                 c = line.split(",")
                 if len(c) > 4: mine.update([c[3] if ":" in c[2] else c[2], c[4] if ":" in c[2] else c[3]])
         mine.discard("")
-        out = {}
+        out = {}; cols = {}
         for t in sorted(mine):
             if t in CREST_MANUAL: out[t] = CREST_MANUAL[t]; continue
             key = norm(CREST_ALIAS.get(t, t)); best = None; part = []
@@ -225,9 +225,10 @@ if token and not fresh:
                 if key in names: best = a; break
                 if any(re.search(r"\b" + re.escape(key) + r"\b", n) for n in names[:2]): part.append(a)
             if not best and part: best = min(part, key=lambda a: len(a.get("name") or ""))   # il nome più corto che contiene la parola
+            if best and best.get("clubColors"): cols[t] = best["clubColors"]   # colori sociali, es. "Red / Black"
             if best and best.get("crest"): out[t] = best["crest"]
             else: print("STEMMA NON TROVATO:", lg, t, "| squadre disponibili:", ", ".join(a.get("shortName") or a.get("name") for a in api))
-        crests["teams"][lg] = out
+        crests["teams"][lg] = out; crests["colors"][lg] = cols
     json.dump(crests, open(crest_path, "w"), indent=1)
 elif not token:
     print("FD_TOKEN non impostato: stemmi saltati")

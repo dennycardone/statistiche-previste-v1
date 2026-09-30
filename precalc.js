@@ -32,6 +32,7 @@ for (const mode of ["season", "last5", "dyn", "classic"]) {
       if (!e.m) {   // partite da giocare: anche tutti gli Over e corner/falli/tiri (servono alla sezione Generali)
         row.push(R.G ? R.G.over.map(r4) : null);
         const st = {}; for (const [k, v] of Object.entries(R.stats || {})) st[k] = v.map(r4); row.push(st);
+        row.push(R.G ? [r4(R.G.lh), r4(R.G.la)] : null);   // gol attesi casa/ospite (segnalazioni)
       }
       rows[e.id + "|" + mode] = row;
     } catch (err) { console.log("errore", e.id, mode, err.message); }
