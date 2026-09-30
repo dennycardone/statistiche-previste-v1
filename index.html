@@ -357,6 +357,7 @@ select{border-radius:10px}
 .selhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .info{background:none;border:1px solid var(--line);border-radius:999px;width:28px;height:28px;padding:0;font-size:15px;color:var(--accent);flex:none;cursor:pointer}
 .self{display:flex;flex-wrap:wrap;gap:6px}
+.selwin{margin:0}
 .cbar{position:relative;flex:1 1 auto;min-width:60px;height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
 .cfill{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--ink-3)}
 .cbar.c-ap .cfill{background:linear-gradient(90deg,var(--gold),#e8563a)}.cbar.c-a .cfill{background:var(--good)}.cbar.c-b .cfill{background:var(--accent)}.cbar.c-c .cfill{background:var(--dot-y)}
@@ -401,7 +402,7 @@ select{border-radius:10px}
   </div>
   <nav class="tabbar" aria-label="Sezioni">
   <button id="navStats" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" /></svg>Partite</button>
-  <button id="navSel" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" /></svg>Selezione</button>
+  <button id="navSel" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" /></svg>Radar</button>
   <button id="navSig" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-6 4 3 7-9" /><circle cx="20" cy="6" r="1.6" /></svg>Segnalazioni</button>
   <button id="navGen" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7" /></svg>Generali</button>
 </nav>
@@ -432,9 +433,10 @@ select{border-radius:10px}
   </div>
 
   <div class="view" id="viewSel" hidden>
-    <section class="card aplus" id="selAplus" aria-label="A+ Opportunities"></section>
-    <section class="card" aria-label="Prossime 72 ore">
-      <div class="selhead"><h2>📅 Prossime 72 ore</h2><button class="info" data-conf-info aria-label="Cos'è il Confidence Score">ⓘ</button></div>
+    <label class="fl selwin" for="selWin">Periodo<select id="selWin"><option value="24" selected>Prossime 24 ore</option><option value="48">Prossime 48 ore</option><option value="72">Prossime 72 ore</option></select></label>
+    <section class="card aplus" id="selAplus" aria-label="A+ sul radar"></section>
+    <section class="card" aria-label="Partite in arrivo">
+      <div class="selhead"><h2>📅 Partite in arrivo</h2><button class="info" data-conf-info aria-label="Cos'è il Confidence Score">ⓘ</button></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
         <button class="chip" data-sf="all" aria-pressed="true">Tutte</button><button class="chip" data-sf="aplus" aria-pressed="false">A+</button>
         <button class="chip" data-sf="a" aria-pressed="false">A</button><button class="chip" data-sf="b" aria-pressed="false">B</button>
@@ -515,7 +517,7 @@ select{border-radius:10px}
 
   <div class="view" id="viewStats">
     <div class="daystrip" id="days" role="tablist" aria-label="Giorni"></div>
-    <div class="lgchips" id="lgChips" role="group" aria-label="Campionati"></div>
+    <div class="lgchips" id="lgChips" role="group" aria-label="Campionati" hidden></div>
     <div id="sched" class="sched"></div>
     <p class="small muted schedlegend">Pallini <i class="ldot" style="background:var(--dot-g)"></i> = segnalazioni con lo stesso esito in tutte e 3 le medie (ponderata, dinamica, classica), uno per ognuna. Sotto: C corner · F falli · T tiri · TP tiri in porta, con 1 o 2 = chi ne fa di più. Probabilità nella scheda della partita. Partite finite: pronostici giusti sugli 8 mercati (Over/Under 1,5 · 2,5 · 3,5, Gol/No gol e 1X2 di corner, falli, tiri, tiri in porta), prendendo sempre l'esito più probabile. O2,5 e GG in verde se il lato più probabile è uscito. <span id="dataStamp"></span></p>
   </div>
@@ -3046,7 +3048,7 @@ function renderSched() {
   else if (sel) sel.scrollIntoView({ block: "nearest", inline: "nearest" });
   const today = all.filter(e => e.d === SCHED.day);
   const lgs = LEAGUES.filter(L => today.some(e => e.lg.code === L.code));
-  if (SCHED.lg !== "all" && !lgs.some(L => L.code === SCHED.lg)) SCHED.lg = "all";
+  SCHED.lg = "all";   // la home mostra sempre tutti i campionati del giorno
   $("#lgChips").innerHTML = [`<button class="chip" data-lg="all" aria-pressed="${SCHED.lg === "all"}">Tutti · ${today.length}</button>`]
     .concat(lgs.map(L => `<button class="chip" data-lg="${L.code}" aria-pressed="${SCHED.lg === L.code}">${esc(lgName(L))} · ${today.filter(e => e.lg.code === L.code).length}</button>`)).join("");
   $("#lgChips").querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => { SCHED.lg = b.dataset.lg; lsSet("statPreviste.lg", SCHED.lg); renderSched(); }));
@@ -3487,10 +3489,10 @@ $("#genLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAG
 document.querySelectorAll("#genVenue .segb").forEach(b => b.addEventListener("click", () => { GEN.venue = b.dataset.gv; GEN.shown = 10; document.querySelectorAll("#genVenue .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
 document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("click", () => { GEN.per = b.dataset.gp; GEN.shown = 10; document.querySelectorAll("#genPer .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
 
-/* ===== Confidence Score: interfaccia (Selezione, scheda partita) ===== */
+/* ===== Confidence Score: interfaccia (Radar, scheda partita) ===== */
 const CONF_C = new Map();   // previsioni con punteggio per partita e metodo (sessione)
 const CONF_STATUS = { aplus: "🔥 A+ OPPORTUNITY", watch: "🟢 WATCH", none: "⚪ NO SIGNAL" };
-const SEL = { f: "all" };
+const SEL = { f: "all", h: 24 };
 function entryOdds(e) {
   if (e.m) return e.m.odds || null;
   const f = S.fixtures.find(x => x.div === e.lg.code && x.home === e.home && x.away === e.away && isoD(x.date) === e.d);
@@ -3548,22 +3550,27 @@ function renderMatchConf(home, away, e, cfg) {
     ${e.m ? `<p class="small muted" style="margin:0">Partita giocata: punteggi calcolati solo con le partite precedenti.</p>` : ""}`;
   box.querySelectorAll("[data-ci]").forEach(b => b.addEventListener("click", () => { const P = $("#mconfInfo"); const same = !P.hidden && P.dataset.i === b.dataset.ci; P.hidden = same; P.dataset.i = b.dataset.ci; if (!same) P.innerHTML = confInfoHTML(L[+b.dataset.ci]); }));
 }
-function selEntries() {
-  const t0 = localIso(), lim = isoD(new Date(Date.now() + 72 * 36e5));
-  return allEntries().filter(e => !e.m && e.d >= t0 && e.d <= lim);
+function selEntries() {   // partite da giocare nelle prossime SEL.h ore (orario del calcio d'inizio se c'è, altrimenti il giorno)
+  const now = Date.now(), end = now + SEL.h * 36e5, t0 = localIso(), lim = localIso(new Date(end));
+  return allEntries().filter(e => {
+    if (e.m || e.d < t0 || e.d > lim) return false;
+    const t = /^(\d{1,2}):(\d{2})/.exec(e.time || ""); if (!t) return true;
+    const [y, mo, d] = e.d.split("-").map(Number), ko = new Date(y, mo - 1, d, +t[1], +t[2]).getTime();
+    return ko >= now - 2 * 36e5 && ko <= end;
+  });
 }
 let SEL_T = 0;
 function renderSel() {
   const cfg = MODES[$("#decay").value] || MODES.season, ents = selEntries();
   const noModel = !Object.keys(CONF_COEF).length;
   const aBox = $("#selAplus"), list = $("#selList");
-  if (noModel) { aBox.innerHTML = `<h2>🔥 A+ Opportunities</h2><p class="muted" style="margin:0">Confidence Score non disponibile.</p>`; list.innerHTML = ""; return; }
+  if (noModel) { aBox.innerHTML = `<h2>🔥 A+ sul radar</h2><p class="muted" style="margin:0">Confidence Score non disponibile.</p>`; list.innerHTML = ""; return; }
   const got = [], todo = [];
   for (const e of ents) { const L = confEntry(e, cfg, true); if (L === undefined) todo.push(e); else got.push([e, L]); }
   const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "hp" ? r.p >= 0.7 : SEL.f === "c3" ? r.agreeN === 3 : true;
   const aplus = got.flatMap(([e, L]) => L.filter(r => r.status === "aplus").map(r => [e, { ...r, h: e.home, a: e.away }])).sort((a, b) => b[1].score - a[1].score || b[1].p - a[1].p);
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
-  aBox.innerHTML = `<div class="selhead"><h2>🔥 A+ Opportunities</h2><span class="small muted" style="white-space:nowrap">72 ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
+  aBox.innerHTML = `<div class="selhead"><h2>🔥 A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     aplus.length ? `<div class="aplist">${aplus.map(([e, r]) => `<button class="apcard" data-id="${esc(e.id)}">
       <span class="aptag">🔥 A+ OPPORTUNITY</span>
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
@@ -3571,7 +3578,7 @@ function renderSel() {
       <span class="apgrid small"><span>Probabilità <b>${pc1(r.p)}</b></span><span>Confidence <b>${r.score}/100</b></span><span>Classe <b>${r.cls}</b></span><span>Modelli <b>${r.agreeN}/3 concordi</b></span><span>Campione <b>${r.samp}</b></span><span>Stabilità <b>${r.stab}</b></span></span>
       ${confBar(r.score, r.cls)}</button>`).join("")}</div>` : `<p class="apnone">NESSUNA OPPORTUNITÀ A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
-  list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime 72 ore.</p>` :
+  list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime ${SEL.h} ore.</p>` :
     (rows.length ? rows.map(([e, L]) => `<button class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
       ${L.slice(0, 3).map(r => `<span class="selp"><span>${esc(confLab(r))}</span><span class="num">${pc(r.p)}</span><span class="num">${r.score}</span><span class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
@@ -3580,6 +3587,7 @@ function renderSel() {
   clearTimeout(SEL_T);
   if (todo.length) SEL_T = setTimeout(() => { const t = performance.now(); for (const e of todo) { try { confEntry(e, cfg); } catch (x) { CONF_C.set(e.id + "|" + cfg.key, []); } if (performance.now() - t > 250) break; } if (!$("#viewSel").hidden) renderSel(); }, 20);
 }
+$("#selWin").addEventListener("change", () => { SEL.h = +$("#selWin").value; renderSel(); });
 document.querySelectorAll("#selF .chip").forEach(b => b.addEventListener("click", () => { SEL.f = b.dataset.sf; document.querySelectorAll("#selF .chip").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderSel(); }));
 document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null); P.scrollIntoView({ block: "nearest" }); } }));
 
