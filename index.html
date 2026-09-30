@@ -419,7 +419,7 @@ summary{cursor:pointer;font-weight:600}
       <section class="card" id="tableOut" aria-label="Classifica"></section>
     </div>
     <div class="mpane" data-mp="info" hidden>
-  <section class="card" aria-label="Scelta partita">
+  <section class="card" aria-label="Scelta partita" hidden style="display:none">   <!-- i menu restano (li usa il codice), ma non si vedono -->
    <details class="fold">
     <summary><h2>Confronta altre squadre</h2></summary>
     <div class="foldbody">
@@ -2467,21 +2467,93 @@ function quotaValue(p, draw, q, dnb) {
   return { ev, fair, stake: Math.min(0.05, kelly / 4) };
 }
 
+/* ===== Righe della home: calcolo puro (lo usa anche precalc.js su GitHub) ===== */
+const isoD = d => d.toISOString().slice(0, 10);
+const localIso = (n = new Date()) => `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+const addDays = (iso, k) => { const d = new Date(iso + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + k); return isoD(d); };
+function allEntries(t0 = localIso()) {
+  const out = [], lo = addDays(t0, -10), hi = addDays(t0, 14);
+  const c0 = S.cutoff; S.cutoff = null;
+  try {
+    for (const L of LEAGUES) withLeague(L.code, () => {
+      const sm = seasonMatches(), tset = new Set(teams()), done = new Set(sm.map(m => m.home + "|" + m.away));
+      for (const m of sm) { const d = isoD(m.date); if (d >= lo && d <= hi) out.push({ id: `${L.code}|${d}|${m.home}|${m.away}`, lg: L, date: m.date, d, time: m.time || "", home: m.home, away: m.away, m }); }
+      const seen = new Set();
+      for (const f of S.fixtures.filter(f => f.div === L.code).sort((a, b) => a.date - b.date)) {
+        const pair = f.home + "|" + f.away, d = isoD(f.date);
+        if (!tset.has(f.home) || !tset.has(f.away) || done.has(pair) || seen.has(pair) || d < lo || d > hi) continue;
+        seen.add(pair); out.push({ id: `${L.code}|${d}|${f.home}|${f.away}`, lg: L, date: f.date, d, time: f.time || "", home: f.home, away: f.away, m: null });
+      }
+    });
+  } finally { S.cutoff = c0; }
+  return out.sort((a, b) => a.d.localeCompare(b.d) || (a.time || "99").localeCompare(b.time || "99") || a.home.localeCompare(b.home));
+}
+const DOT_MK = ["c", "f", "s", "st"];
+/* esito di una segnalazione su una partita giocata; null se la statistica manca */
+function sigOutcome(x, m) {
+  if (x.mk === "gg") { if (m.hg == null) return null; const both = m.hg > 0 && m.ag > 0; return { ok: both === (x.sel === "Gol"), txt: `${m.hg}-${m.ag}` }; }
+  const { h: kh, a: ka } = MET[x.k]; if (m[kh] == null || m[ka] == null) return null;
+  if (x.sel === "1" || x.sel === "2") return { ok: x.sel === "1" ? m[kh] > m[ka] : m[ka] > m[kh], txt: `${m[kh]}-${m[ka]}` };
+  const t = m[kh] + m[ka]; return { ok: t > x.line, txt: `totale ${t}` };
+}
+/* Pronostici di una partita giocata: per ogni mercato l'esito più probabile (niente soglia).
+   Over 1,5 / 2,5 / 3,5 e Gol/No gol: il lato sopra il 50%. Corner, falli, tiri, tiri in porta: il più alto tra 1, X e 2. */
+function matchPicks(home, away, cfg, m) {
+  const out = [], G = modelGoals(home, away, cfg);
+  if (G && m.hg != null) {
+    const tg = m.hg + m.ag;
+    THG.slice(0, 3).forEach((th, i) => { const p = G.over[i], ov = p >= 0.5;
+      out.push({ lab: `O/U ${th1(th)} gol`, pick: `${ov ? "Over" : "Under"} ${th1(th)}`, p: ov ? p : 1 - p, ok: ov === (tg > th), txt: `${tg}` }); });
+    const gg = G.btts >= 0.5, both = m.hg > 0 && m.ag > 0;
+    out.push({ lab: "Gol/No gol", pick: gg ? "Gol" : "No gol", p: gg ? G.btts : 1 - G.btts, ok: gg === both, txt: `${m.hg}-${m.ag}` });
+  }
+  const T = modelShots(home, away, cfg);
+  for (const [k, R] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
+    const { h: kh, a: ka } = MET[k]; if (!R || m[kh] == null || m[ka] == null) continue;
+    const P = headToHeadProb(R.lh, R.la, R.r, R.rTeam);
+    const [pick, p] = [["1", P.home], ["X", P.draw], ["2", P.away]].sort((a, b) => b[1] - a[1])[0];
+    const real = m[kh] > m[ka] ? "1" : m[kh] < m[ka] ? "2" : "X";
+    out.push({ lab: `1X2 ${SIG_LABEL[k].toLowerCase()}`, pick, p, ok: pick === real, txt: `${m[kh]}-${m[ka]}` });
+  }
+  return out;
+}
+function rowCompute(e, cfg, st) {
+  let r = { G: null, sig: [], all: [] };
+  const c0 = S.cutoff; S.cutoff = e.m ? e.date : null;
+  try {
+    withLeague(e.lg.code, () => {
+      r.G = modelGoals(e.home, e.away, cfg);
+      r.all = computeSignals3({ lgSel: e.lg.code, markets: st.markets, cfg, minP: st.minP, needGames: false, noStale: false,
+        pick: code => code === e.lg.code ? [{ div: e.lg.code, date: e.date, time: e.time, home: e.home, away: e.away }] : [] }).rows;
+      r.sig = r.all.filter(x => DOT_MK.includes(x.mk) && x.c3);   // pallino: solo corner, falli, tiri, tiri in porta concordi 3/3
+      if (e.m) { r.done = matchPicks(e.home, e.away, cfg, e.m); r.hit = r.done.filter(o => o.ok).length; }
+    });
+  } finally { S.cutoff = c0; }
+  return r;
+}
+
 /* ===== FINE MODELLO: tutto ciò che sta sopra è usato anche da storico.js su GitHub ===== */
 
 /* ===== Caricamento dati ===== */
 async function tryHosted() {
   // Versione GitHub Pages: i file li aggiorna una GitHub Action in data/
   try {
-    const r = await fetch("data/manifest.json", { cache: "no-store" });
-    if (!r.ok) return false;
-    const man = await r.json();
-    const texts = await Promise.all((man.files || []).map(f => fetch("data/" + f, { cache: "no-store" }).then(x => x.ok ? x.text() : "")));
+    // un solo file compatto con tutti i dati (preparato da GitHub); se manca, i singoli CSV
+    let man = null, texts = null;
+    try { const rb = await fetch("data/bundle.json", { cache: "no-store" }); if (rb.ok) { const b = await rb.json(); man = { updated: b.updated }; texts = b.files.map(f => f.text); } } catch (e) {}
+    if (!texts) {
+      const r = await fetch("data/manifest.json", { cache: "no-store" });
+      if (!r.ok) return false;
+      man = await r.json();
+      texts = await Promise.all((man.files || []).map(f => fetch("data/" + f, { cache: "no-store" }).then(x => x.ok ? x.text() : "")));
+    }
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
     try { const cr = await fetch("data/crests.json", { cache: "no-store" }); if (cr.ok) CRESTS = (await cr.json()).teams || {}; } catch (e) {}
     S.meta = { source: "football-data.co.uk · I1.csv (aggiornamento automatico)", fetched: man.updated || "N/D", mode: "scaricati il" };
+    // previsioni della home già calcolate da GitHub con questi stessi dati (non salvate sul telefono: si riscaricano ogni volta)
+    try { const rp = await fetch("data/precalc.json", { cache: "no-store" }); if (rp.ok) { const P = await rp.json(); if (P.updated === S.meta.fetched) PRECALC = P; } } catch (e) {}
     return true;
   } catch (e) { return false; }
 }
@@ -2582,80 +2654,34 @@ function crest(div, team, cls = "cr") {
   return u ? `<img class="${cls}" src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : "";
 }
 /* ===== Palinsesto (stile app risultati) ===== */
-const isoD = d => d.toISOString().slice(0, 10);
-const localIso = (n = new Date()) => `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
-const addDays = (iso, k) => { const d = new Date(iso + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + k); return isoD(d); };
 const MONTHS = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
 const SCHED = { day: null, lg: (() => lsGet("statPreviste.lg") || "all")() };
 const ROWC = new Map();
 let CUR = null;   // partita aperta nella scheda
-function allEntries() {
-  const out = [], t0 = localIso(), lo = addDays(t0, -10), hi = addDays(t0, 14);
-  const c0 = S.cutoff; S.cutoff = null;
-  try {
-    for (const L of LEAGUES) withLeague(L.code, () => {
-      const sm = seasonMatches(), tset = new Set(teams()), done = new Set(sm.map(m => m.home + "|" + m.away));
-      for (const m of sm) { const d = isoD(m.date); if (d >= lo && d <= hi) out.push({ id: `${L.code}|${d}|${m.home}|${m.away}`, lg: L, date: m.date, d, time: m.time || "", home: m.home, away: m.away, m }); }
-      const seen = new Set();
-      for (const f of S.fixtures.filter(f => f.div === L.code).sort((a, b) => a.date - b.date)) {
-        const pair = f.home + "|" + f.away, d = isoD(f.date);
-        if (!tset.has(f.home) || !tset.has(f.away) || done.has(pair) || seen.has(pair) || d < lo || d > hi) continue;
-        seen.add(pair); out.push({ id: `${L.code}|${d}|${f.home}|${f.away}`, lg: L, date: f.date, d, time: f.time || "", home: f.home, away: f.away, m: null });
-      }
-    });
-  } finally { S.cutoff = c0; }
-  return out.sort((a, b) => a.d.localeCompare(b.d) || (a.time || "99").localeCompare(b.time || "99") || a.home.localeCompare(b.home));
-}
 function rowKey(e) {
   const cfg = MODES[$("#decay").value] || MODES.season, st = sigSettings();
   return [e.id, cfg.key, st.markets.join(","), st.minP, "v3"].join("|");
 }
-function rowCached(e) { return ROWC.get(rowKey(e)) || null; }
+function rowCached(e) {
+  const k = rowKey(e); if (ROWC.has(k)) return ROWC.get(k);
+  const cfg = MODES[$("#decay").value] || MODES.season, pre = precalcRow(e, cfg, sigSettings());
+  if (pre) ROWC.set(k, pre); return pre;
+}
+/* previsioni già calcolate da GitHub (data/precalc.json), valide solo per gli stessi dati e le stesse impostazioni */
+let PRECALC = null;
+function precalcRow(e, cfg, st) {
+  const P = PRECALC; if (!P || P.updated !== S.meta.fetched || P.st.minP !== st.minP || P.st.markets.join(",") !== st.markets.join(",")) return null;
+  const x = P.rows[e.id + "|" + cfg.key]; if (!x) return null;
+  const [o25, gg, sig, nDone, hit] = x;
+  return { G: o25 == null ? null : { over: [null, o25], btts: gg }, sig: sig.map(([mk, fav, p]) => ({ mk, fav, p })), done: nDone == null ? undefined : { length: nDone }, hit, pre: true };
+}
 function rowCalc(e) {
   const cfg = MODES[$("#decay").value] || MODES.season, st = sigSettings();
   const key = rowKey(e);
   if (ROWC.has(key)) return ROWC.get(key);
-  let r = { G: null, sig: [], all: [] };
-  const c0 = S.cutoff; S.cutoff = e.m ? e.date : null;
-  try {
-    withLeague(e.lg.code, () => {
-      r.G = modelGoals(e.home, e.away, cfg);
-      r.all = computeSignals3({ lgSel: e.lg.code, markets: st.markets, cfg, minP: st.minP, needGames: false, noStale: false,
-        pick: code => code === e.lg.code ? [{ div: e.lg.code, date: e.date, time: e.time, home: e.home, away: e.away }] : [] }).rows;
-      r.sig = r.all.filter(x => DOT_MK.includes(x.mk) && x.c3);   // pallino: solo corner, falli, tiri, tiri in porta concordi 3/3
-      if (e.m) { r.done = matchPicks(e.home, e.away, cfg, e.m); r.hit = r.done.filter(o => o.ok).length; }
-    });
-  } finally { S.cutoff = c0; }
+  const pre = precalcRow(e, cfg, st); if (pre) { ROWC.set(key, pre); return pre; }
+  const r = rowCompute(e, cfg, st);
   ROWC.set(key, r); return r;
-}
-const DOT_MK = ["c", "f", "s", "st"];
-/* esito di una segnalazione su una partita giocata; null se la statistica manca */
-function sigOutcome(x, m) {
-  if (x.mk === "gg") { if (m.hg == null) return null; const both = m.hg > 0 && m.ag > 0; return { ok: both === (x.sel === "Gol"), txt: `${m.hg}-${m.ag}` }; }
-  const { h: kh, a: ka } = MET[x.k]; if (m[kh] == null || m[ka] == null) return null;
-  if (x.sel === "1" || x.sel === "2") return { ok: x.sel === "1" ? m[kh] > m[ka] : m[ka] > m[kh], txt: `${m[kh]}-${m[ka]}` };
-  const t = m[kh] + m[ka]; return { ok: t > x.line, txt: `totale ${t}` };
-}
-/* Pronostici di una partita giocata: per ogni mercato l'esito più probabile (niente soglia).
-   Over 1,5 / 2,5 / 3,5 e Gol/No gol: il lato sopra il 50%. Corner, falli, tiri, tiri in porta: il più alto tra 1, X e 2. */
-function matchPicks(home, away, cfg, m) {
-  const out = [], G = modelGoals(home, away, cfg);
-  if (G && m.hg != null) {
-    const tg = m.hg + m.ag;
-    THG.slice(0, 3).forEach((th, i) => { const p = G.over[i], ov = p >= 0.5;
-      out.push({ lab: `O/U ${th1(th)} gol`, pick: `${ov ? "Over" : "Under"} ${th1(th)}`, p: ov ? p : 1 - p, ok: ov === (tg > th), txt: `${tg}` }); });
-    const gg = G.btts >= 0.5, both = m.hg > 0 && m.ag > 0;
-    out.push({ lab: "Gol/No gol", pick: gg ? "Gol" : "No gol", p: gg ? G.btts : 1 - G.btts, ok: gg === both, txt: `${m.hg}-${m.ag}` });
-  }
-  const T = modelShots(home, away, cfg);
-  for (const [k, R] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
-    const { h: kh, a: ka } = MET[k]; if (!R || m[kh] == null || m[ka] == null) continue;
-    const P = headToHeadProb(R.lh, R.la, R.r, R.rTeam);
-    const [pick, p] = [["1", P.home], ["X", P.draw], ["2", P.away]].sort((a, b) => b[1] - a[1])[0];
-    const real = m[kh] > m[ka] ? "1" : m[kh] < m[ka] ? "2" : "X";
-    out.push({ lab: `1X2 ${SIG_LABEL[k].toLowerCase()}`, pick, p, ok: pick === real, txt: `${m[kh]}-${m[ka]}` });
-  }
-  return out;
 }
 const dotCls = p => p >= 0.8 ? "g" : p >= 0.65 ? "y" : "r";
 function dotsHTML(sig) {

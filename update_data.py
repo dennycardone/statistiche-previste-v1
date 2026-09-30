@@ -236,4 +236,23 @@ elif not token:
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))
 json.dump({"updated": now.strftime("%d/%m/%Y %H:%M"), "files": files},
           open(os.path.join(OUT, "manifest.json"), "w"), indent=1)
+
+# bundle.json: tutti i dati in un solo file, con solo le colonne che usa l'app (l'app si apre più in fretta)
+KEEP = {"Div", "Date", "Time", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "HTHG", "HTAG", "HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC", "HxG", "AxG", "Round",
+        "AvgH", "AvgD", "AvgA", "B365H", "B365D", "B365A", "Avg>2.5", "Avg<2.5", "B365>2.5", "B365<2.5",
+        "Country", "League", "Season", "Home", "Away", "HG", "AG", "AvgCH", "AvgCD", "AvgCA", "PSCH", "PSCD", "PSCA", "AvgC>2.5", "AvgC<2.5"}
+bundle = []
+for f in files:
+    try:
+        rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, f), encoding="utf-8-sig").read())))
+        if not rd: continue
+        hdr = [h.strip() for h in rd[0]]; idx = [i for i, h in enumerate(hdr) if h in KEEP]
+        buf = io.StringIO(); w = csv.writer(buf, lineterminator="\n")
+        w.writerow([hdr[i] for i in idx])
+        for r in rd[1:]:
+            if any(x.strip() for x in r): w.writerow([r[i] if i < len(r) else "" for i in idx])
+        bundle.append({"name": f, "text": buf.getvalue()})
+    except Exception as e:
+        print("bundle: salto", f, e)
+json.dump({"updated": now.strftime("%d/%m/%Y %H:%M"), "files": bundle}, open(os.path.join(OUT, "bundle.json"), "w"), separators=(",", ":"))
 print("ok", len(files), "file")
