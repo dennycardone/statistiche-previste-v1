@@ -1010,10 +1010,40 @@ const LEAGUES = [
   { code: "F1",  name: "Ligue 1",               country: "Francia",     file: "mmz4281/2627/F1.csv" },
   { code: "D1",  name: "Bundesliga",            country: "Germania",    file: "mmz4281/2627/D1.csv" },
   { code: "N1",  name: "Eredivisie",            country: "Olanda",      file: "mmz4281/2627/N1.csv" },
-  { code: "P1",  name: "Primeira Liga",         country: "Portogallo",  file: "mmz4281/2627/P1.csv" }
+  { code: "P1",  name: "Primeira Liga",         country: "Portogallo",  file: "mmz4281/2627/P1.csv" },
+  { code: "E1", name: "Championship", country: "Inghilterra", file: "mmz4281/2627/E1.csv" },
+  { code: "E2", name: "League One", country: "Inghilterra", file: "mmz4281/2627/E2.csv" },
+  { code: "E3", name: "League Two", country: "Inghilterra", file: "mmz4281/2627/E3.csv" },
+  { code: "EC", name: "National League", country: "Inghilterra", file: "mmz4281/2627/EC.csv", noStats: true },
+  { code: "SC0", name: "Premiership", country: "Scozia", file: "mmz4281/2627/SC0.csv" },
+  { code: "SC1", name: "Championship", country: "Scozia", file: "mmz4281/2627/SC1.csv" },
+  { code: "SC2", name: "League One", country: "Scozia", file: "mmz4281/2627/SC2.csv" },
+  { code: "SC3", name: "League Two", country: "Scozia", file: "mmz4281/2627/SC3.csv" },
+  { code: "D2", name: "2. Bundesliga", country: "Germania", file: "mmz4281/2627/D2.csv" },
+  { code: "F2", name: "Ligue 2", country: "Francia", file: "mmz4281/2627/F2.csv" },
+  { code: "SP2", name: "Segunda División", country: "Spagna", file: "mmz4281/2627/SP2.csv" },
+  { code: "B1", name: "Pro League", country: "Belgio", file: "mmz4281/2627/B1.csv" },
+  { code: "T1", name: "Süper Lig", country: "Turchia", file: "mmz4281/2627/T1.csv" },
+  { code: "G1", name: "Super League", country: "Grecia", file: "mmz4281/2627/G1.csv" },
+  { code: "ARG", name: "Liga Profesional", country: "Argentina", file: "new/ARG.csv", newCountry: "Argentina", noStats: true, cal: true },
+  { code: "AUT", name: "Bundesliga", country: "Austria", file: "new/AUT.csv", newCountry: "Austria", noStats: true },
+  { code: "BRA", name: "Série A", country: "Brasile", file: "new/BRA.csv", newCountry: "Brazil", noStats: true, cal: true },
+  { code: "CHN", name: "Super League", country: "Cina", file: "new/CHN.csv", newCountry: "China", noStats: true, cal: true },
+  { code: "DNK", name: "Superliga", country: "Danimarca", file: "new/DNK.csv", newCountry: "Denmark", noStats: true },
+  { code: "FIN", name: "Veikkausliiga", country: "Finlandia", file: "new/FIN.csv", newCountry: "Finland", noStats: true, cal: true },
+  { code: "IRL", name: "Premier Division", country: "Irlanda", file: "new/IRL.csv", newCountry: "Ireland", noStats: true, cal: true },
+  { code: "JPN", name: "J1 League", country: "Giappone", file: "new/JPN.csv", newCountry: "Japan", noStats: true, cal: true },
+  { code: "MEX", name: "Liga MX", country: "Messico", file: "new/MEX.csv", newCountry: "Mexico", noStats: true },
+  { code: "NOR", name: "Eliteserien", country: "Norvegia", file: "new/NOR.csv", newCountry: "Norway", noStats: true, cal: true },
+  { code: "POL", name: "Ekstraklasa", country: "Polonia", file: "new/POL.csv", newCountry: "Poland", noStats: true },
+  { code: "ROU", name: "Liga I", country: "Romania", file: "new/ROU.csv", newCountry: "Romania", noStats: true },
+  { code: "RUS", name: "Premier League", country: "Russia", file: "new/RUS.csv", newCountry: "Russia", noStats: true },
+  { code: "SWE", name: "Allsvenskan", country: "Svezia", file: "new/SWE.csv", newCountry: "Sweden", noStats: true, cal: true },
+  { code: "SWZ", name: "Super League", country: "Svizzera", file: "new/SWZ.csv", newCountry: "Switzerland", noStats: true },
+  { code: "USA", name: "MLS", country: "USA", file: "new/USA.csv", newCountry: "USA", noStats: true, cal: true }
 ];
 const LG = Object.fromEntries(LEAGUES.map(l => [l.code, l]));
-const NEW_BY_COUNTRY = Object.fromEntries(LEAGUES.filter(l => l.newCountry).map(l => [l.newCountry, l.code]));
+const NEW_BY_COUNTRY = Object.fromEntries(LEAGUES.filter(l => l.newCountry).flatMap(l => [[l.newCountry, l.code], [l.code, l.code]]));   // nome del paese o codice (GitHub riscrive la colonna con il codice)
 const seasonLabel = (y, cal) => cal ? String(y) : `${y}/${String((y + 1) % 100).padStart(2, "0")}`;
 const numOrNull = v => (v === undefined || v === null || String(v).trim() === "") ? null : (isFinite(+v) ? +v : null);
 
@@ -1030,8 +1060,8 @@ function parseCSV(text, forceDiv) {
         iHxG = ix("HxG"), iAxG = ix("AxG");
   // quote: media dei bookmaker (fallback Bet365) per 1X2 e Over/Under 2.5
   const pickCol = (...names) => { for (const n of names) { const i = ix(n); if (i >= 0) return i; } return -1; };
-  const iO1 = pickCol("AvgH", "B365H"), iOX = pickCol("AvgD", "B365D"), iO2 = pickCol("AvgA", "B365A"),
-        iOO = pickCol("Avg>2.5", "B365>2.5"), iOU = pickCol("Avg<2.5", "B365<2.5");
+  const iO1 = pickCol("AvgH", "B365H", "AvgCH", "PSCH"), iOX = pickCol("AvgD", "B365D", "AvgCD", "PSCD"), iO2 = pickCol("AvgA", "B365A", "AvgCA", "PSCA"),
+        iOO = pickCol("Avg>2.5", "B365>2.5", "AvgC>2.5"), iOU = pickCol("Avg<2.5", "B365<2.5", "AvgC<2.5");
   const out = { matches: [], fixtures: [], skipped: 0 };
   if (iDate < 0 || iH < 0 || iA < 0) return out;
   for (let i = 1; i < lines.length; i++) {
@@ -1450,6 +1480,59 @@ ${esc(away)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muA)}${sg(C.lst)}·ln ${f2(
     muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
 }
 
+/* ===== Media dinamica sui GOL per i campionati senza tiri in porta (solo risultati) =====
+   Come il modello precedente, ma con un rating attacco × difesa sui GOL (ultimi 4 anni, peso e^(−giorni/730), prudenza P = 12, 6 iterazioni)
+   al posto di quello sui tiri in porta. Coefficienti stimati su 8 campionati 2007/08–2024/25; nel test walk-forward quasi uguale al modello
+   con i tiri in porta e migliore della media dinamica precedente in 68 stagioni su 69. */
+const GONLY = { b0: 0.0279083, lmu: 0.2394232, home: 0.0452138, lrg: 0.5475475, elo: 0.0977350 };
+const GO_TAU = 730, GO_P = 12, GO_LOOK = 1460;
+function gonlyFit(div, D) {
+  const key = "gonly|" + div + "|" + D; if (CACHE.has(key)) return CACHE.get(key);
+  const L = [...S.matches.values()].filter(m => m.div === div && +m.date < D && +m.date >= D - GO_LOOK * DAYMS && m.hg != null && m.ag != null);
+  const y365 = L.filter(m => +m.date >= D - 365 * DAYMS);
+  let res = null;
+  if (y365.length > 100 && L.length >= 50) {
+    const muH = y365.reduce((x, m) => x + m.hg, 0) / y365.length, muA = y365.reduce((x, m) => x + m.ag, 0) / y365.length;
+    const w = L.map(m => Math.exp(-Math.round((D - m.date) / DAYMS) / GO_TAU)), W = w.reduce((a, b) => a + b, 0);
+    const sH = L.reduce((x, m, i) => x + w[i] * m.hg, 0) / W, sA = L.reduce((x, m, i) => x + w[i] * m.ag, 0) / W, u = (sH + sA) / 2;
+    const idx = new Map(); L.forEach(m => { if (!idx.has(m.home)) idx.set(m.home, idx.size); if (!idx.has(m.away)) idx.set(m.away, idx.size); });
+    const T = idx.size, H = L.map(m => idx.get(m.home)), A = L.map(m => idx.get(m.away));
+    let att = new Float64Array(T).fill(1), def = new Float64Array(T).fill(1);
+    for (let it = 0; it < 6; it++) {
+      const xa = new Float64Array(T), ea = new Float64Array(T), xd = new Float64Array(T), ed = new Float64Array(T);
+      for (let i = 0; i < L.length; i++) { const m = L[i], h = H[i], a = A[i], wi = w[i];
+        xa[h] += wi * m.hg; ea[h] += wi * sH * def[a]; xa[a] += wi * m.ag; ea[a] += wi * sA * def[h];
+        xd[h] += wi * m.ag; ed[h] += wi * sA * att[a]; xd[a] += wi * m.hg; ed[a] += wi * sH * att[h]; }
+      const na = new Float64Array(T), nd = new Float64Array(T);
+      for (let t = 0; t < T; t++) { na[t] = (xa[t] + GO_P * u) / (ea[t] + GO_P * u); nd[t] = (xd[t] + GO_P * u) / (ed[t] + GO_P * u); }
+      att = na; def = nd;
+    }
+    res = { muH, muA, sH, sA, att, def, idx, n: L.length };
+  }
+  CACHE.set(key, res); return res;
+}
+function goalOnlyDynParts(home, away) {
+  const D = goalDate(home, away), F = gonlyFit(S.league, D); if (!F) return null;
+  const ix = t => F.idx.has(t) ? F.idx.get(t) : -1, ih = ix(home), ia = ix(away);
+  const aH = ih >= 0 ? F.att[ih] : 1, dH = ih >= 0 ? F.def[ih] : 1, aA = ia >= 0 ? F.att[ia] : 1, dA = ia >= 0 ? F.def[ia] : 1;
+  const rgH = F.sH * aH * dA, rgA = F.sA * aA * dH, C = GONLY;
+  const eH = eloAt(S.league, home, D), eA = eloAt(S.league, away, D), ed = eH && eA ? (eH.elo - eA.elo) / 100 : 0;
+  const lh = Math.exp(C.b0 + C.lmu * Math.log(F.muH) + C.home + C.lrg * Math.log(rgH) + C.elo * ed);
+  const la = Math.exp(C.b0 + C.lmu * Math.log(F.muA) + C.lrg * Math.log(rgA) - C.elo * ed);
+  if (!isFinite(lh) || !isFinite(la)) return null;
+  const cur = [...S.matches.values()].filter(m => m.div === S.league && m.season === S.season && +m.date < D);
+  const nHt = cur.filter(m => m.home === home || m.away === home).length, nAt = cur.filter(m => m.home === away || m.away === away).length;
+  const nH = cur.filter(m => m.home === home).length, nA = cur.filter(m => m.away === away).length;
+  const text = `modello gol verificato, versione senza tiri in porta (regressione di Poisson) · dati fino al ${dstr(new Date(D - DAYMS))}
+gol medi di lega (365 giorni): casa ${f2(F.muH)} · fuori ${f2(F.muA)}
+rating gol (4 anni, ${F.n} partite): ${esc(home)} attacco ${f2(aH)} · difesa ${f2(dH)} — ${esc(away)} attacco ${f2(aA)} · difesa ${f2(dA)}
+gol attesi dal rating: ${esc(home)} ${f2(rgH)} · ${esc(away)} ${f2(rgA)}
+Elo (calcolato dai risultati): ${eH && eA ? `${esc(home)} ${Math.round(eH.elo)} · ${esc(away)} ${Math.round(eA.elo)}` : "non disponibile: differenza 0"}
+gol attesi: ${esc(home)} ${f2(lh)} · ${esc(away)} ${f2(la)}`;
+  return { lh, la, dynText: text, gdyn: true, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
+    muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
+}
+
 /* ===== Media dinamica sui CORNER: modello verificato (regressione di Poisson) =====
    log(corner attesi) = b0 + a·log(corner medi di lega per quella sede, 365 giorni) + c·casa + d·log(corner attesi dal rating)
                         + e·(Elo squadra − Elo avversario)/100 + f·log(corner fatti nelle ultime 5) + g·log(corner concessi dall'avversario nelle ultime 5)
@@ -1704,7 +1787,7 @@ distribuzione: Binomiale Negativa sul totale r = ${R.tot}; per squadra r = ${R.t
 /* Gol (Media ponderata): 60% media casa/trasferta sugli xG · 30% media casa/trasferta sui gol veri · 10% correttivo avversari sugli xG */
 const GOAL_W = { xg: 0.60, gv: 0.30, av: 0.10 };
 function blendParts(list, home, away, cfg, k) {
-  if (cfg.dyn) return (k === "gm" && goalDynParts(home, away)) || (k === "c" && cornerDynParts(home, away)) || (k === "f" && foulDynParts(home, away)) || ((k === "s" || k === "st") && shotDynParts(home, away, k)) || dynParts(list, home, away, k);
+  if (cfg.dyn) return (k === "gm" && (goalDynParts(home, away) || goalOnlyDynParts(home, away))) || (k === "c" && cornerDynParts(home, away)) || (k === "f" && foulDynParts(home, away)) || ((k === "s" || k === "st") && shotDynParts(home, away, k)) || dynParts(list, home, away, k);
   if (k === "gm") {
     const X = blendParts(list, home, away, cfg, "x"), Gv = blendParts(list, home, away, cfg, "g");
     if (!X || !Gv) return null;
@@ -1763,7 +1846,8 @@ function dispersion(k, cfg) {
   if (CACHE.has(key)) return CACHE.get(key);
   const { h: kh, a: ka } = MET[k]; const list = metricMatches(k);
   let num = 0, den = 0, used = 0;
-  for (let i = 0; i < list.length; i++) {
+  // stima sulle ultime 200 partite (lascia-una-fuori): con campionati da 24 squadre tutte le partite rallenterebbero troppo la home
+  for (let i = Math.max(0, list.length - 200); i < list.length; i++) {
     const m = list[i], sub = list.slice(0, i).concat(list.slice(i + 1));
     const P = predictWith(sub, m.home, m.away, cfg, k); if (!P) continue;
     const lam = P.lh + P.la, T = m[kh] + m[ka];
@@ -2100,7 +2184,7 @@ function render() {
   renderMatchExtras(home, away);
   if (!teams().length) {
     const L_ = LG[S.league];
-    out.innerHTML = `<section class="card"><h2>${esc(L_.name)} · nessun dato</h2><p style="margin:0">Nella versione su questo link non ci sono ancora partite di ${esc(L_.name)}. Scarica <span class="num">football-data.co.uk/${L_.file}</span> e caricalo nella sezione "Dati utilizzati" qui sotto; nella versione GitHub arriva da solo.</p>${L_.cal ? `<p class="small muted" style="margin:0">Per questo campionato la fonte gratuita contiene solo risultati e quote: corner, falli, tiri e tiri in porta risulteranno N/D.</p>` : ""}</section>`;
+    out.innerHTML = `<section class="card"><h2>${esc(L_.name)} · nessun dato</h2><p style="margin:0">Nella versione su questo link non ci sono ancora partite di ${esc(L_.name)}. Scarica <span class="num">football-data.co.uk/${L_.file}</span> e caricalo nella sezione "Dati utilizzati" qui sotto; nella versione GitHub arriva da solo.</p>${L_.noStats ? `<p class="small muted" style="margin:0">Per questo campionato la fonte gratuita contiene solo risultati e quote: corner, falli, tiri e tiri in porta risulteranno N/D.</p>` : ""}</section>`;
     $("#methodLive").innerHTML = ""; return;
   }
   if (!home || !away || home === away) { out.innerHTML = `<section class="card"><p>Scegli due squadre diverse.</p></section>`; return; }
@@ -2108,8 +2192,8 @@ function render() {
   const M = model(home, away, hl);
   if (!M && !cornerMatches().length) {
     out.innerHTML = `<section class="card"><div class="matchhead"><span><span class="dot" style="background:var(--s1)"></span>${esc(home)}</span><span class="vs">VS</span><span><span class="dot" style="background:var(--s2)"></span>${esc(away)}</span></div>
-      <h2>Statistiche N/D</h2><p style="margin:0">Per ${esc(LG[S.league].name)} la fonte gratuita (football-data.co.uk) fornisce solo risultati e quote: corner, falli, tiri e tiri in porta non sono disponibili partita per partita, quindi non calcolo nessuna stima.</p>
-      <p class="small muted" style="margin:0">Partite con risultato nei dati: ${seasonMatches().length}. Per queste statistiche servirebbe un'API a pagamento (vedi note).</p></section>`;
+      <p class="small muted" style="margin:0">Per ${esc(LG[S.league].name)} la fonte gratuita (football-data.co.uk) fornisce solo risultati e quote: calcolo gol, Over/Under, Gol/No gol e 1X2; corner, falli, tiri e tiri in porta non sono disponibili. Partite con risultato nei dati: ${seasonMatches().length}.</p></section>
+      ${goalsCard(home, away, modelGoals(home, away, hl), hl)}`;
     $("#methodLive").innerHTML = ""; return;
   }
   if (!M) { out.innerHTML = `<section class="card"><p>N/D: dati insufficienti per la statistica scelta (servono gare in casa per la squadra di casa e in trasferta per l\'ospite).</p></section>`; return; }
@@ -2522,9 +2606,14 @@ function allEntries() {
   } finally { S.cutoff = c0; }
   return out.sort((a, b) => a.d.localeCompare(b.d) || (a.time || "99").localeCompare(b.time || "99") || a.home.localeCompare(b.home));
 }
+function rowKey(e) {
+  const cfg = MODES[$("#decay").value] || MODES.season, st = sigSettings();
+  return [e.id, cfg.key, st.markets.join(","), st.minP, "v3"].join("|");
+}
+function rowCached(e) { return ROWC.get(rowKey(e)) || null; }
 function rowCalc(e) {
   const cfg = MODES[$("#decay").value] || MODES.season, st = sigSettings();
-  const key = [e.id, cfg.key, st.markets.join(","), st.minP, "v3"].join("|");
+  const key = rowKey(e);
   if (ROWC.has(key)) return ROWC.get(key);
   let r = { G: null, sig: [], all: [] };
   const c0 = S.cutoff; S.cutoff = e.m ? e.date : null;
@@ -2604,21 +2693,38 @@ function renderSched() {
   const shown = lgs.filter(L => SCHED.lg === "all" || SCHED.lg === L.code);
   if (!today.length) { box.innerHTML = `<div class="empty">Nessuna partita di questi campionati in questo giorno.<br><span class="small">Scegli un altro giorno qui sopra.</span></div>`; return; }
   const playedToday = today.filter(e => e.m && shown.some(L => L.code === e.lg.code));
-  let dayTot = 0, dayHit = 0; for (const e of playedToday) { const R = rowCalc(e); dayTot += R.done ? R.done.length : 0; dayHit += R.hit || 0; }
-  box.innerHTML = (dayTot ? `<div class="daysum"><span>Pronostici giusti in questo giorno</span><b class="${dayHit / dayTot >= 0.5 ? "good" : "bad"}">${Math.round(dayHit / dayTot * 100)}%</b><small>${dayHit} su ${dayTot} · 8 mercati per partita</small></div>` : "") + shown.map(L => `<section class="lgblock" aria-label="${esc(L.name)}">
-      <div class="lghead"><span class="cc">${L.code}</span>${esc(L.name)} <small>${esc(L.country)}</small></div>
-      ${today.filter(e => e.lg.code === L.code).map(e => {
-        const R = rowCalc(e), G = R.G, m = e.m;
-        const o25 = G ? G.over[1] : null, gg = G ? G.btts : null;
-        const hitO = m && o25 != null ? (o25 >= 0.5) === (m.hg + m.ag > 2.5) : null, hitG = m && gg != null ? (gg >= 0.5) === (m.hg > 0 && m.ag > 0) : null;
-        const pv = (lab, p, hit) => `<span class="pv${hit == null || p == null ? "" : hit ? " ok" : " ko"}"><small>${lab}</small><b>${p == null ? "N/D" : Math.round(p * 100)}</b></span>`;
-        return `<button class="mrow" data-id="${esc(e.id)}">
+  // righe calcolate un po' alla volta: con tanti campionati il calcolo completo bloccherebbe la pagina
+  const pv = (lab, p, hit) => `<span class="pv${hit == null || p == null ? "" : hit ? " ok" : " ko"}"><small>${lab}</small><b>${p == null ? "N/D" : Math.round(p * 100)}</b></span>`;
+  const rowHTML = (e, R) => {
+    const m = e.m, G = R ? R.G : null, o25 = G ? G.over[1] : null, gg = G ? G.btts : null;
+    const hitO = m && o25 != null ? (o25 >= 0.5) === (m.hg + m.ag > 2.5) : null, hitG = m && gg != null ? (gg >= 0.5) === (m.hg > 0 && m.ag > 0) : null;
+    const vals = R ? `${pv("O2,5 %", o25, hitO)}${pv("GG %", gg, hitG)}${m ? presiHTML(R) : dotsHTML(R.sig)}` : `<span class="pv"><small>O2,5 %</small><b>…</b></span><span class="pv"><small>GG %</small><b>…</b></span>`;
+    return `<button class="mrow" data-id="${esc(e.id)}">
           <span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>
           <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}</span><b>${m ? m.ag : ""}</b></span>
-          ${pv("O2,5 %", o25, hitO)}${pv("GG %", gg, hitG)}${m ? presiHTML(R) : dotsHTML(R.sig)}
-        </button>`; }).join("")}
+          ${vals}
+        </button>`; };
+  const bind = b => b.addEventListener("click", () => { const e = all.find(x => x.id === b.dataset.id); if (e) openEntry(e); });
+  const daySum = () => {
+    let dayTot = 0, dayHit = 0; for (const e of playedToday) { const R = rowCalc(e); dayTot += R.done ? R.done.length : 0; dayHit += R.hit || 0; }
+    return dayTot ? `<div class="daysum"><span>Pronostici giusti in questo giorno</span><b class="${dayHit / dayTot >= 0.5 ? "good" : "bad"}">${Math.round(dayHit / dayTot * 100)}%</b><small>${dayHit} su ${dayTot} · 8 mercati per partita</small></div>` : "";
+  };
+  const rows = shown.flatMap(L => today.filter(e => e.lg.code === L.code));
+  const todo = rows.filter(e => !rowCached(e));
+  box.innerHTML = `<div id="daysumBox">${todo.length ? "" : daySum()}</div>` + shown.map(L => `<section class="lgblock" aria-label="${esc(L.name)}">
+      <div class="lghead"><span class="cc">${L.code}</span>${esc(L.name)} <small>${esc(L.country)}</small></div>
+      ${today.filter(e => e.lg.code === L.code).map(e => rowHTML(e, rowCached(e))).join("")}
     </section>`).join("");
-  box.querySelectorAll(".mrow").forEach(b => b.addEventListener("click", () => { const e = all.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
+  box.querySelectorAll(".mrow").forEach(bind);
+  const job = renderSched.job = {};
+  const step = () => {
+    if (renderSched.job !== job) return;                     // la pagina è cambiata: questo calcolo non serve più
+    const e = todo.shift(); if (!e) { const d = box.querySelector("#daysumBox"); if (d) d.innerHTML = daySum(); return; }
+    const R = rowCalc(e), el = [...box.querySelectorAll(".mrow")].find(b => b.dataset.id === e.id);
+    if (el) { el.insertAdjacentHTML("afterend", rowHTML(e, R)); const nb = el.nextElementSibling; el.remove(); bind(nb); }
+    setTimeout(step, 0);
+  };
+  if (todo.length) setTimeout(step, 0);
   $("#dataStamp").textContent = `Dati ${S.meta.mode} ${S.meta.fetched}.`;
 }
 

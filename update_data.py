@@ -3,8 +3,10 @@ Campionati europei: stagione corrente sempre, le 5 precedenti solo se mancano (s
 """
 import datetime, json, os, urllib.request
 
-LEAGUES = ["I1", "I2", "E0", "SP1", "F1", "D1", "N1", "P1"]
-NEW_LEAGUES = []
+LEAGUES = ["I1", "I2", "E0", "SP1", "F1", "D1", "N1", "P1",
+           "E1", "E2", "E3", "EC", "SC0", "SC1", "SC2", "SC3", "D2", "F2", "SP2", "B1", "T1", "G1"]
+# campionati "extra" di football-data.co.uk (un file con tutte le stagioni, solo risultati e quote)
+NEW_LEAGUES = ["ARG", "AUT", "BRA", "CHN", "DNK", "FIN", "IRL", "JPN", "MEX", "NOR", "POL", "ROU", "RUS", "SWE", "SWZ", "USA"]
 BASE = "https://www.football-data.co.uk/mmz4281/{code}/{lg}.csv"
 NEW = "https://www.football-data.co.uk/new/{lg}.csv"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -43,12 +45,24 @@ for lg in LEAGUES:
         if os.path.exists(path):
             files.append(name)
 
+import csv, io
 for lg in NEW_LEAGUES:
     name = f"{lg}.csv"
     try:
         txt = get(NEW.format(lg=lg))
         if "Home" in txt:
-            save(name, txt)
+            rd = list(csv.reader(io.StringIO(txt)))
+            hdr, body = rd[0], [r for r in rd[1:] if r]
+            iS = hdr.index("Season") if "Season" in hdr else -1
+            keep = []
+            for r in body:
+                try: y = int(str(r[iS]).strip()[:4]) if iS >= 0 else None
+                except Exception: y = None
+                if y is None or y >= today.year - 6:        # ultime stagioni, come per gli altri campionati
+                    r[0] = lg                                # colonna Country = codice del campionato (l'app lo riconosce)
+                    keep.append(r)
+            buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows([hdr] + keep)
+            save(name, buf.getvalue())
     except Exception as e:
         print("skip", name, e)
     if os.path.exists(os.path.join(OUT, name)):
@@ -56,7 +70,9 @@ for lg in NEW_LEAGUES:
 
 # prossime giornate: calendario completo da fixturedownload.com (gratuito, senza chiave).
 # I nomi delle squadre vengono convertiti in quelli usati da football-data.co.uk.
-FD_SLUGS = {"I1": "serie-a", "E0": "epl", "SP1": "la-liga", "F1": "ligue-1", "D1": "bundesliga", "N1": "eredivisie", "P1": "primeira-liga"}
+FD_SLUGS = {"I1": "serie-a", "E0": "epl", "SP1": "la-liga", "F1": "ligue-1", "D1": "bundesliga", "N1": "eredivisie", "P1": "primeira-liga",
+            "E1": "championship", "E2": "efl-league-one", "E3": "efl-league-two", "T1": "super-lig", "USA": "mls"}
+CAL_YEAR = {"USA"}   # campionati con stagione per anno solare: il file del calendario ha l'anno in corso
 ALIAS = {
     "I1": {"Internazionale": "Inter"},
     "E0": {"Man Utd": "Man United", "Spurs": "Tottenham"},
@@ -88,11 +104,42 @@ try:
     ROME = ZoneInfo("Europe/Rome")
 except Exception:
     ROME = datetime.timezone(datetime.timedelta(hours=2))
+import difflib, unicodedata as _ud, re as _re
+def _norm(x):
+    x = _ud.normalize("NFKD", x).encode("ascii", "ignore").decode().lower().replace("'", "")
+    x = _re.sub(r"[^a-z0-9 ]", " ", x)
+    stop = {"fc", "afc", "cf", "sc", "ac", "fk", "sk", "the", "club", "de", "calcio", "cd", "ud", "rc", "sd", "ca", "ss", "as", "us", "1", "sv", "vfl", "vfb", "tsg", "fsv"}
+    return " ".join(w for w in x.split() if w not in stop)
+def fd_teams(lg):
+    names = set()
+    for f in files:
+        if not (f.startswith(lg + "_") or f == lg + ".csv"): continue
+        try:
+            rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, f), encoding="utf-8").read())))
+            h = rd[0]; ih = h.index("HomeTeam") if "HomeTeam" in h else h.index("Home"); ia = h.index("AwayTeam") if "AwayTeam" in h else h.index("Away")
+            for r in rd[1:]:
+                if len(r) > max(ih, ia): names.update([r[ih].strip(), r[ia].strip()])
+        except Exception: pass
+    names.discard(""); return names
+FIX_ALIAS = {"Sheffield Wednesday": "Sheffield Weds", "Queens Park Rangers": "QPR", "West Bromwich Albion": "West Brom", "Wolverhampton Wanderers": "Wolves",
+             "Nottingham Forest": "Nott'm Forest", "Milton Keynes Dons": "MK Dons", "Peterborough United": "Peterboro", "Oxford United": "Oxford",
+             "Manchester City": "Man City", "Manchester United": "Man United", "Sheffield United": "Sheffield United", "Newcastle United": "Newcastle"}
+def to_fd(lg, name, pool):
+    if name in pool: return name
+    a = ALIAS.get(lg, {}).get(name) or FIX_ALIAS.get(name)
+    if a: return a
+    n = _norm(name); byn = {_norm(t): t for t in pool}
+    if n in byn: return byn[n]
+    cand = [t for k, t in byn.items() if k and (k in n or n in k)]
+    if len(cand) == 1: return cand[0]
+    m = difflib.get_close_matches(n, list(byn), n=1, cutoff=0.6)
+    return byn[m[0]] if m else None
 rows = ["Div,Date,Time,HomeTeam,AwayTeam,Round"]
 unknown = set()
 for lg, slug in FD_SLUGS.items():
+    pool = fd_teams(lg)
     try:
-        data = json.loads(get(f"https://fixturedownload.com/feed/json/{slug}-{cur}"))
+        data = json.loads(get(f"https://fixturedownload.com/feed/json/{slug}-{today.year if lg in CAL_YEAR else cur}"))
     except Exception as e:
         print("skip calendario", lg, e)
         continue
@@ -106,9 +153,9 @@ for lg, slug in FD_SLUGS.items():
         loc = dt.astimezone(ROME)
         # 00:00Z o 23:00Z = solo data, orario non ancora ufficiale
         tm = "" if dt.strftime("%H:%M") in ("00:00", "23:00") else loc.strftime("%H:%M")
-        h = ALIAS[lg].get(m["HomeTeam"], m["HomeTeam"]); a = ALIAS[lg].get(m["AwayTeam"], m["AwayTeam"])
-        if h == m["HomeTeam"] and h not in ALIAS[lg].values(): unknown.add((lg, h))
-        if a == m["AwayTeam"] and a not in ALIAS[lg].values(): unknown.add((lg, a))
+        h = to_fd(lg, m["HomeTeam"], pool); a = to_fd(lg, m["AwayTeam"], pool)
+        if h is None: unknown.add((lg, m["HomeTeam"])); h = m["HomeTeam"]
+        if a is None: unknown.add((lg, m["AwayTeam"])); a = m["AwayTeam"]
         rows.append(",".join([lg, loc.strftime("%d/%m/%Y"), tm, h.replace(",", " "), a.replace(",", " "), str(m.get("RoundNumber", ""))]))
 save("next_fixtures.csv", "\n".join(rows))
 files.append("next_fixtures.csv")
