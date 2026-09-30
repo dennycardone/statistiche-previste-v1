@@ -1989,3 +1989,1743 @@ P1,16/05/2027,,Guimaraes,Famalicao,34
 P1,16/05/2027,,Gil Vicente,Nacional,34
 P1,16/05/2027,,Moreirense,Rio Ave,34
 P1,16/05/2027,,Santa Clara,Sp Lisbon,34
+E1,20/10/2026,20:45,Wolves,Portsmouth,6
+E1,09/10/2026,21:00,West Ham,QPR,9
+E1,10/10/2026,13:30,Charlton,Bristol City,9
+E1,10/10/2026,13:30,Swansea,Norwich,9
+E1,10/10/2026,13:30,West Brom,Birmingham,9
+E1,10/10/2026,16:00,Blackburn,Cardiff,9
+E1,10/10/2026,16:00,Bolton,Stoke,9
+E1,10/10/2026,16:00,Derby,Wrexham,9
+E1,10/10/2026,16:00,Middlesbrough,Wolves,9
+E1,10/10/2026,16:00,Preston,Millwall,9
+E1,10/10/2026,16:00,Sheffield United,Lincoln,9
+E1,10/10/2026,16:00,Watford,Burnley,9
+E1,11/10/2026,13:00,Southampton,Portsmouth,9
+E1,13/10/2026,20:45,Bristol City,Blackburn,10
+E1,13/10/2026,20:45,Burnley,Charlton,10
+E1,13/10/2026,20:45,Cardiff,Watford,10
+E1,13/10/2026,20:45,Millwall,Swansea,10
+E1,13/10/2026,20:45,Wolves,Bolton,10
+E1,13/10/2026,20:45,Wrexham,West Brom,10
+E1,13/10/2026,21:00,Birmingham,Preston,10
+E1,13/10/2026,21:00,Stoke,Middlesbrough,10
+E1,14/10/2026,20:45,Norwich,Southampton,10
+E1,14/10/2026,20:45,Portsmouth,Sheffield United,10
+E1,14/10/2026,20:45,QPR,Derby,10
+E1,14/10/2026,21:00,Lincoln,West Ham,10
+E1,16/10/2026,21:00,Burnley,Wolves,11
+E1,17/10/2026,13:30,Middlesbrough,Cardiff,11
+E1,17/10/2026,13:30,Millwall,Lincoln,11
+E1,17/10/2026,13:30,Watford,Charlton,11
+E1,17/10/2026,16:00,Birmingham,QPR,11
+E1,17/10/2026,16:00,Bristol City,Sheffield United,11
+E1,17/10/2026,16:00,Derby,Stoke,11
+E1,17/10/2026,16:00,Norwich,Portsmouth,11
+E1,17/10/2026,16:00,Southampton,Bolton,11
+E1,17/10/2026,16:00,Swansea,West Ham,11
+E1,17/10/2026,16:00,West Brom,Blackburn,11
+E1,17/10/2026,16:00,Wrexham,Preston,11
+E1,23/10/2026,21:00,Bolton,Middlesbrough,12
+E1,24/10/2026,13:30,Charlton,Norwich,12
+E1,24/10/2026,13:30,Portsmouth,Millwall,12
+E1,24/10/2026,13:30,Sheffield United,Derby,12
+E1,24/10/2026,16:00,Blackburn,Wrexham,12
+E1,24/10/2026,16:00,Cardiff,Birmingham,12
+E1,24/10/2026,16:00,Lincoln,Burnley,12
+E1,24/10/2026,16:00,Preston,West Brom,12
+E1,24/10/2026,16:00,QPR,Swansea,12
+E1,24/10/2026,16:00,Stoke,Bristol City,12
+E1,24/10/2026,16:00,West Ham,Southampton,12
+E1,24/10/2026,16:00,Wolves,Watford,12
+E1,30/10/2026,21:00,Sheffield United,Wrexham,13
+E1,31/10/2026,13:30,Lincoln,Birmingham,13
+E1,31/10/2026,13:30,Norwich,Watford,13
+E1,31/10/2026,13:30,Stoke,Preston,13
+E1,31/10/2026,16:00,Bolton,Bristol City,13
+E1,31/10/2026,16:00,Burnley,Portsmouth,13
+E1,31/10/2026,16:00,Middlesbrough,Charlton,13
+E1,31/10/2026,16:00,Millwall,Derby,13
+E1,31/10/2026,16:00,Southampton,QPR,13
+E1,31/10/2026,16:00,Swansea,Blackburn,13
+E1,31/10/2026,16:00,West Ham,West Brom,13
+E1,31/10/2026,16:00,Wolves,Cardiff,13
+E1,03/11/2026,20:45,Blackburn,Stoke,14
+E1,03/11/2026,20:45,Derby,Norwich,14
+E1,03/11/2026,20:45,Portsmouth,Swansea,14
+E1,03/11/2026,20:45,Preston,Sheffield United,14
+E1,03/11/2026,20:45,QPR,Burnley,14
+E1,03/11/2026,20:45,Watford,Lincoln,14
+E1,03/11/2026,20:45,Charlton,Bolton,14
+E1,03/11/2026,21:00,Birmingham,Millwall,14
+E1,03/11/2026,21:00,West Brom,Southampton,14
+E1,04/11/2026,20:45,Cardiff,West Ham,14
+E1,04/11/2026,20:45,Wrexham,Middlesbrough,14
+E1,04/11/2026,21:00,Bristol City,Wolves,14
+E1,06/11/2026,21:00,Derby,Bolton,15
+E1,07/11/2026,13:30,Bristol City,Norwich,15
+E1,07/11/2026,13:30,Portsmouth,Stoke,15
+E1,07/11/2026,13:30,Wrexham,Wolves,15
+E1,07/11/2026,16:00,Birmingham,Swansea,15
+E1,07/11/2026,16:00,Blackburn,West Ham,15
+E1,07/11/2026,16:00,Cardiff,Burnley,15
+E1,07/11/2026,16:00,Charlton,Sheffield United,15
+E1,07/11/2026,16:00,Preston,Southampton,15
+E1,07/11/2026,16:00,QPR,Lincoln,15
+E1,07/11/2026,16:00,Watford,Middlesbrough,15
+E1,07/11/2026,16:00,West Brom,Millwall,15
+E1,21/11/2026,13:30,Millwall,QPR,16
+E1,21/11/2026,13:30,Norwich,Cardiff,16
+E1,21/11/2026,13:30,Southampton,Derby,16
+E1,21/11/2026,16:00,Bolton,Portsmouth,16
+E1,21/11/2026,16:00,Lincoln,Wrexham,16
+E1,21/11/2026,16:00,Middlesbrough,Bristol City,16
+E1,21/11/2026,16:00,Sheffield United,Watford,16
+E1,21/11/2026,16:00,Stoke,Birmingham,16
+E1,21/11/2026,16:00,Swansea,West Brom,16
+E1,21/11/2026,16:00,West Ham,Preston,16
+E1,21/11/2026,16:00,Wolves,Charlton,16
+E1,22/11/2026,13:00,Burnley,Blackburn,16
+E1,24/11/2026,20:45,Bristol City,Wrexham,17
+E1,24/11/2026,20:45,Cardiff,Preston,17
+E1,24/11/2026,20:45,Charlton,Lincoln,17
+E1,24/11/2026,20:45,Middlesbrough,Swansea,17
+E1,24/11/2026,20:45,Norwich,QPR,17
+E1,24/11/2026,20:45,Portsmouth,West Ham,17
+E1,24/11/2026,20:45,Sheffield United,Southampton,17
+E1,24/11/2026,21:00,Wolves,Derby,17
+E1,25/11/2026,20:45,Bolton,West Brom,17
+E1,25/11/2026,20:45,Burnley,Birmingham,17
+E1,25/11/2026,20:45,Watford,Blackburn,17
+E1,25/11/2026,21:00,Stoke,Millwall,17
+E1,27/11/2026,21:00,Southampton,Middlesbrough,18
+E1,28/11/2026,13:30,Blackburn,Charlton,18
+E1,28/11/2026,13:30,Lincoln,Wolves,18
+E1,28/11/2026,13:30,Preston,Norwich,18
+E1,28/11/2026,16:00,Birmingham,Bolton,18
+E1,28/11/2026,16:00,Derby,Watford,18
+E1,28/11/2026,16:00,Millwall,Burnley,18
+E1,28/11/2026,16:00,QPR,Sheffield United,18
+E1,28/11/2026,16:00,West Brom,Bristol City,18
+E1,28/11/2026,16:00,West Ham,Stoke,18
+E1,28/11/2026,16:00,Wrexham,Portsmouth,18
+E1,29/11/2026,13:00,Swansea,Cardiff,18
+E1,04/12/2026,21:00,Sheffield United,West Ham,19
+E1,05/12/2026,13:30,Bolton,Blackburn,19
+E1,05/12/2026,13:30,Bristol City,Swansea,19
+E1,05/12/2026,13:30,Middlesbrough,Derby,19
+E1,05/12/2026,13:30,Watford,Millwall,19
+E1,05/12/2026,16:00,Cardiff,Lincoln,19
+E1,05/12/2026,16:00,Charlton,Birmingham,19
+E1,05/12/2026,16:00,Norwich,Wrexham,19
+E1,05/12/2026,16:00,Portsmouth,West Brom,19
+E1,05/12/2026,16:00,Stoke,QPR,19
+E1,05/12/2026,16:00,Wolves,Southampton,19
+E1,06/12/2026,13:00,Burnley,Preston,19
+E1,08/12/2026,20:45,Blackburn,Norwich,20
+E1,08/12/2026,20:45,Millwall,Sheffield United,20
+E1,08/12/2026,20:45,QPR,Wolves,20
+E1,08/12/2026,20:45,Swansea,Bolton,20
+E1,08/12/2026,20:45,West Brom,Cardiff,20
+E1,08/12/2026,20:45,Wrexham,Charlton,20
+E1,08/12/2026,21:00,Birmingham,Watford,20
+E1,08/12/2026,21:00,West Ham,Middlesbrough,20
+E1,09/12/2026,20:45,Derby,Bristol City,20
+E1,09/12/2026,20:45,Lincoln,Stoke,20
+E1,09/12/2026,20:45,Preston,Portsmouth,20
+E1,09/12/2026,21:00,Southampton,Burnley,20
+E1,11/12/2026,21:00,Bolton,Wrexham,21
+E1,12/12/2026,13:30,Preston,Middlesbrough,21
+E1,12/12/2026,13:30,QPR,Watford,21
+E1,12/12/2026,13:30,Stoke,West Brom,21
+E1,12/12/2026,16:00,Blackburn,Derby,21
+E1,12/12/2026,16:00,Cardiff,Southampton,21
+E1,12/12/2026,16:00,Charlton,Swansea,21
+E1,12/12/2026,16:00,Portsmouth,Birmingham,21
+E1,12/12/2026,16:00,Sheffield United,Burnley,21
+E1,12/12/2026,16:00,West Ham,Bristol City,21
+E1,12/12/2026,16:00,Wolves,Millwall,21
+E1,13/12/2026,15:00,Lincoln,Norwich,21
+E1,18/12/2026,21:00,West Brom,Sheffield United,22
+E1,19/12/2026,13:30,Birmingham,West Ham,22
+E1,19/12/2026,13:30,Bristol City,Cardiff,22
+E1,19/12/2026,13:30,Millwall,Charlton,22
+E1,19/12/2026,13:30,Swansea,Preston,22
+E1,19/12/2026,13:30,Watford,Bolton,22
+E1,19/12/2026,16:00,Burnley,Stoke,22
+E1,19/12/2026,16:00,Derby,Lincoln,22
+E1,19/12/2026,16:00,Middlesbrough,Portsmouth,22
+E1,19/12/2026,16:00,Norwich,Wolves,22
+E1,19/12/2026,16:00,Southampton,Blackburn,22
+E1,19/12/2026,16:00,Wrexham,QPR,22
+E1,26/12/2026,13:30,Bolton,Burnley,23
+E1,26/12/2026,13:30,Sheffield United,Middlesbrough,23
+E1,26/12/2026,16:00,Blackburn,Birmingham,23
+E1,26/12/2026,16:00,Cardiff,Millwall,23
+E1,26/12/2026,16:00,Charlton,Southampton,23
+E1,26/12/2026,16:00,Lincoln,West Brom,23
+E1,26/12/2026,16:00,Portsmouth,Watford,23
+E1,26/12/2026,16:00,Preston,Derby,23
+E1,26/12/2026,16:00,QPR,Bristol City,23
+E1,26/12/2026,16:00,Stoke,Wrexham,23
+E1,26/12/2026,16:00,West Ham,Norwich,23
+E1,26/12/2026,16:00,Wolves,Swansea,23
+E1,29/12/2026,19:00,Wrexham,Blackburn,24
+E1,29/12/2026,20:45,Bristol City,Stoke,24
+E1,29/12/2026,20:45,Burnley,Lincoln,24
+E1,29/12/2026,20:45,Derby,Sheffield United,24
+E1,29/12/2026,20:45,Middlesbrough,Bolton,24
+E1,29/12/2026,20:45,Millwall,Portsmouth,24
+E1,29/12/2026,20:45,Norwich,Charlton,24
+E1,29/12/2026,20:45,Swansea,QPR,24
+E1,29/12/2026,20:45,Watford,Wolves,24
+E1,29/12/2026,20:45,West Brom,Preston,24
+E1,29/12/2026,21:00,Birmingham,Cardiff,24
+E1,29/12/2026,21:15,Southampton,West Ham,24
+E1,01/01/2027,13:30,Millwall,Wolves,25
+E1,01/01/2027,16:00,Birmingham,Portsmouth,25
+E1,01/01/2027,16:00,Bristol City,West Ham,25
+E1,01/01/2027,16:00,Derby,Blackburn,25
+E1,01/01/2027,16:00,Middlesbrough,Preston,25
+E1,01/01/2027,16:00,Norwich,Lincoln,25
+E1,01/01/2027,16:00,Southampton,Cardiff,25
+E1,01/01/2027,16:00,Swansea,Charlton,25
+E1,01/01/2027,16:00,Watford,QPR,25
+E1,01/01/2027,16:00,West Brom,Stoke,25
+E1,01/01/2027,16:00,Wrexham,Bolton,25
+E1,01/01/2027,18:30,Burnley,Sheffield United,25
+E1,16/01/2027,16:00,Blackburn,West Brom,26
+E1,16/01/2027,16:00,Bolton,Southampton,26
+E1,16/01/2027,16:00,Cardiff,Middlesbrough,26
+E1,16/01/2027,16:00,Charlton,Watford,26
+E1,16/01/2027,16:00,Lincoln,Millwall,26
+E1,16/01/2027,16:00,Portsmouth,Norwich,26
+E1,16/01/2027,16:00,Preston,Wrexham,26
+E1,16/01/2027,16:00,QPR,Birmingham,26
+E1,16/01/2027,16:00,Sheffield United,Bristol City,26
+E1,16/01/2027,16:00,Stoke,Derby,26
+E1,16/01/2027,16:00,West Ham,Swansea,26
+E1,16/01/2027,16:00,Wolves,Burnley,26
+E1,23/01/2027,16:00,Birmingham,Lincoln,27
+E1,23/01/2027,16:00,Blackburn,Swansea,27
+E1,23/01/2027,16:00,Bristol City,Bolton,27
+E1,23/01/2027,16:00,Cardiff,Wolves,27
+E1,23/01/2027,16:00,Charlton,Middlesbrough,27
+E1,23/01/2027,16:00,Derby,Millwall,27
+E1,23/01/2027,16:00,Portsmouth,Burnley,27
+E1,23/01/2027,16:00,Preston,Stoke,27
+E1,23/01/2027,16:00,QPR,Southampton,27
+E1,23/01/2027,16:00,Watford,Norwich,27
+E1,23/01/2027,16:00,West Brom,West Ham,27
+E1,23/01/2027,16:00,Wrexham,Sheffield United,27
+E1,26/01/2027,20:45,Bolton,Charlton,28
+E1,26/01/2027,20:45,Burnley,QPR,28
+E1,26/01/2027,20:45,Lincoln,Watford,28
+E1,26/01/2027,20:45,Millwall,Birmingham,28
+E1,26/01/2027,20:45,Norwich,Derby,28
+E1,26/01/2027,20:45,Sheffield United,Preston,28
+E1,26/01/2027,20:45,Southampton,West Brom,28
+E1,26/01/2027,20:45,Stoke,Blackburn,28
+E1,27/01/2027,20:45,Middlesbrough,Wrexham,28
+E1,27/01/2027,20:45,Swansea,Portsmouth,28
+E1,27/01/2027,20:45,West Ham,Cardiff,28
+E1,27/01/2027,20:45,Wolves,Bristol City,28
+E1,30/01/2027,16:00,Bolton,Derby,29
+E1,30/01/2027,16:00,Burnley,Cardiff,29
+E1,30/01/2027,16:00,Lincoln,QPR,29
+E1,30/01/2027,16:00,Middlesbrough,Watford,29
+E1,30/01/2027,16:00,Millwall,West Brom,29
+E1,30/01/2027,16:00,Norwich,Bristol City,29
+E1,30/01/2027,16:00,Sheffield United,Charlton,29
+E1,30/01/2027,16:00,Southampton,Preston,29
+E1,30/01/2027,16:00,Stoke,Portsmouth,29
+E1,30/01/2027,16:00,Swansea,Birmingham,29
+E1,30/01/2027,16:00,West Ham,Blackburn,29
+E1,30/01/2027,16:00,Wolves,Wrexham,29
+E1,06/02/2027,16:00,Birmingham,Stoke,30
+E1,06/02/2027,16:00,Blackburn,Burnley,30
+E1,06/02/2027,16:00,Bristol City,Middlesbrough,30
+E1,06/02/2027,16:00,Cardiff,Norwich,30
+E1,06/02/2027,16:00,Charlton,Wolves,30
+E1,06/02/2027,16:00,Derby,Southampton,30
+E1,06/02/2027,16:00,Portsmouth,Bolton,30
+E1,06/02/2027,16:00,Preston,West Ham,30
+E1,06/02/2027,16:00,QPR,Millwall,30
+E1,06/02/2027,16:00,Watford,Sheffield United,30
+E1,06/02/2027,16:00,West Brom,Swansea,30
+E1,06/02/2027,16:00,Wrexham,Lincoln,30
+E1,13/02/2027,16:00,Birmingham,Derby,31
+E1,13/02/2027,16:00,Bristol City,Southampton,31
+E1,13/02/2027,16:00,Burnley,Swansea,31
+E1,13/02/2027,16:00,Cardiff,Bolton,31
+E1,13/02/2027,16:00,Lincoln,Preston,31
+E1,13/02/2027,16:00,Millwall,Blackburn,31
+E1,13/02/2027,16:00,Norwich,Middlesbrough,31
+E1,13/02/2027,16:00,Portsmouth,Charlton,31
+E1,13/02/2027,16:00,QPR,West Brom,31
+E1,13/02/2027,16:00,Stoke,Watford,31
+E1,13/02/2027,16:00,Wolves,Sheffield United,31
+E1,13/02/2027,16:00,Wrexham,West Ham,31
+E1,16/02/2027,20:45,Blackburn,Bristol City,32
+E1,16/02/2027,20:45,Charlton,Burnley,32
+E1,16/02/2027,20:45,Derby,QPR,32
+E1,16/02/2027,20:45,Preston,Birmingham,32
+E1,16/02/2027,20:45,Sheffield United,Portsmouth,32
+E1,16/02/2027,20:45,Watford,Cardiff,32
+E1,16/02/2027,20:45,West Brom,Wrexham,32
+E1,16/02/2027,20:45,West Ham,Lincoln,32
+E1,17/02/2027,20:45,Bolton,Wolves,32
+E1,17/02/2027,20:45,Middlesbrough,Stoke,32
+E1,17/02/2027,20:45,Southampton,Norwich,32
+E1,17/02/2027,20:45,Swansea,Millwall,32
+E1,20/02/2027,16:00,Blackburn,Portsmouth,33
+E1,20/02/2027,16:00,Bolton,Norwich,33
+E1,20/02/2027,16:00,Charlton,Cardiff,33
+E1,20/02/2027,16:00,Derby,Burnley,33
+E1,20/02/2027,16:00,Middlesbrough,Birmingham,33
+E1,20/02/2027,16:00,Preston,QPR,33
+E1,20/02/2027,16:00,Sheffield United,Stoke,33
+E1,20/02/2027,16:00,Southampton,Wrexham,33
+E1,20/02/2027,16:00,Swansea,Lincoln,33
+E1,20/02/2027,16:00,Watford,Bristol City,33
+E1,20/02/2027,16:00,West Brom,Wolves,33
+E1,21/02/2027,13:00,West Ham,Millwall,33
+E1,27/02/2027,16:00,Birmingham,West Brom,34
+E1,27/02/2027,16:00,Bristol City,Charlton,34
+E1,27/02/2027,16:00,Burnley,Watford,34
+E1,27/02/2027,16:00,Cardiff,Blackburn,34
+E1,27/02/2027,16:00,Lincoln,Sheffield United,34
+E1,27/02/2027,16:00,Millwall,Preston,34
+E1,27/02/2027,16:00,Norwich,Swansea,34
+E1,27/02/2027,16:00,QPR,West Ham,34
+E1,27/02/2027,16:00,Stoke,Bolton,34
+E1,27/02/2027,16:00,Wolves,Middlesbrough,34
+E1,27/02/2027,16:00,Wrexham,Derby,34
+E1,28/02/2027,13:00,Portsmouth,Southampton,34
+E1,02/03/2027,20:45,Bolton,QPR,35
+E1,02/03/2027,20:45,Bristol City,Birmingham,35
+E1,02/03/2027,20:45,Burnley,West Brom,35
+E1,02/03/2027,20:45,Cardiff,Derby,35
+E1,02/03/2027,20:45,Charlton,West Ham,35
+E1,02/03/2027,20:45,Middlesbrough,Blackburn,35
+E1,02/03/2027,20:45,Norwich,Millwall,35
+E1,02/03/2027,20:45,Watford,Wrexham,35
+E1,03/03/2027,20:45,Portsmouth,Lincoln,35
+E1,03/03/2027,20:45,Sheffield United,Swansea,35
+E1,03/03/2027,20:45,Stoke,Southampton,35
+E1,03/03/2027,20:45,Wolves,Preston,35
+E1,06/03/2027,16:00,Birmingham,Sheffield United,36
+E1,06/03/2027,16:00,Blackburn,Wolves,36
+E1,06/03/2027,16:00,Derby,Charlton,36
+E1,06/03/2027,16:00,Lincoln,Middlesbrough,36
+E1,06/03/2027,16:00,Millwall,Bristol City,36
+E1,06/03/2027,16:00,Preston,Bolton,36
+E1,06/03/2027,16:00,QPR,Portsmouth,36
+E1,06/03/2027,16:00,Southampton,Watford,36
+E1,06/03/2027,16:00,Swansea,Stoke,36
+E1,06/03/2027,16:00,West Brom,Norwich,36
+E1,06/03/2027,16:00,West Ham,Burnley,36
+E1,06/03/2027,16:00,Wrexham,Cardiff,36
+E1,13/03/2027,16:00,Bolton,Birmingham,37
+E1,13/03/2027,16:00,Bristol City,West Brom,37
+E1,13/03/2027,16:00,Burnley,Millwall,37
+E1,13/03/2027,16:00,Cardiff,Swansea,37
+E1,13/03/2027,16:00,Charlton,Blackburn,37
+E1,13/03/2027,16:00,Middlesbrough,Southampton,37
+E1,13/03/2027,16:00,Norwich,Preston,37
+E1,13/03/2027,16:00,Portsmouth,Wrexham,37
+E1,13/03/2027,16:00,Sheffield United,QPR,37
+E1,13/03/2027,16:00,Stoke,West Ham,37
+E1,13/03/2027,16:00,Watford,Derby,37
+E1,13/03/2027,16:00,Wolves,Lincoln,37
+E1,16/03/2027,20:45,Derby,Middlesbrough,38
+E1,16/03/2027,20:45,Lincoln,Cardiff,38
+E1,16/03/2027,20:45,Preston,Burnley,38
+E1,16/03/2027,20:45,QPR,Stoke,38
+E1,16/03/2027,20:45,Southampton,Wolves,38
+E1,16/03/2027,20:45,Swansea,Bristol City,38
+E1,16/03/2027,20:45,West Brom,Portsmouth,38
+E1,16/03/2027,20:45,Wrexham,Norwich,38
+E1,17/03/2027,20:45,Blackburn,Bolton,38
+E1,17/03/2027,20:45,Millwall,Watford,38
+E1,17/03/2027,20:45,West Ham,Sheffield United,38
+E1,17/03/2027,21:00,Birmingham,Charlton,38
+E1,20/03/2027,16:00,Birmingham,Blackburn,39
+E1,20/03/2027,16:00,Bristol City,QPR,39
+E1,20/03/2027,16:00,Burnley,Bolton,39
+E1,20/03/2027,16:00,Derby,Preston,39
+E1,20/03/2027,16:00,Middlesbrough,Sheffield United,39
+E1,20/03/2027,16:00,Millwall,Cardiff,39
+E1,20/03/2027,16:00,Norwich,West Ham,39
+E1,20/03/2027,16:00,Southampton,Charlton,39
+E1,20/03/2027,16:00,Swansea,Wolves,39
+E1,20/03/2027,16:00,Watford,Portsmouth,39
+E1,20/03/2027,16:00,West Brom,Lincoln,39
+E1,20/03/2027,16:00,Wrexham,Stoke,39
+E1,03/04/2027,13:30,Charlton,Millwall,40
+E1,03/04/2027,16:00,Blackburn,Southampton,40
+E1,03/04/2027,16:00,Bolton,Watford,40
+E1,03/04/2027,16:00,Cardiff,Bristol City,40
+E1,03/04/2027,16:00,Lincoln,Derby,40
+E1,03/04/2027,16:00,Portsmouth,Middlesbrough,40
+E1,03/04/2027,16:00,Preston,Swansea,40
+E1,03/04/2027,16:00,QPR,Wrexham,40
+E1,03/04/2027,16:00,Sheffield United,West Brom,40
+E1,03/04/2027,16:00,Stoke,Burnley,40
+E1,03/04/2027,16:00,West Ham,Birmingham,40
+E1,03/04/2027,16:00,Wolves,Norwich,40
+E1,06/04/2027,20:45,Burnley,Wrexham,41
+E1,06/04/2027,20:45,Lincoln,Bristol City,41
+E1,06/04/2027,20:45,Millwall,Middlesbrough,41
+E1,06/04/2027,20:45,Portsmouth,Wolves,41
+E1,06/04/2027,20:45,QPR,Charlton,41
+E1,06/04/2027,20:45,Stoke,Cardiff,41
+E1,06/04/2027,20:45,Swansea,Southampton,41
+E1,06/04/2027,20:45,West Ham,Bolton,41
+E1,07/04/2027,20:45,Preston,Watford,41
+E1,07/04/2027,20:45,Sheffield United,Blackburn,41
+E1,07/04/2027,20:45,West Brom,Derby,41
+E1,07/04/2027,21:00,Birmingham,Norwich,41
+E1,10/04/2027,16:00,Blackburn,Preston,42
+E1,10/04/2027,16:00,Bolton,Millwall,42
+E1,10/04/2027,16:00,Bristol City,Burnley,42
+E1,10/04/2027,16:00,Cardiff,Portsmouth,42
+E1,10/04/2027,16:00,Charlton,Stoke,42
+E1,10/04/2027,16:00,Derby,West Ham,42
+E1,10/04/2027,16:00,Middlesbrough,QPR,42
+E1,10/04/2027,16:00,Norwich,Sheffield United,42
+E1,10/04/2027,16:00,Southampton,Lincoln,42
+E1,10/04/2027,16:00,Watford,West Brom,42
+E1,10/04/2027,16:00,Wolves,Birmingham,42
+E1,10/04/2027,16:00,Wrexham,Swansea,42
+E1,17/04/2027,16:00,Birmingham,Wrexham,43
+E1,17/04/2027,16:00,Burnley,Norwich,43
+E1,17/04/2027,16:00,Lincoln,Bolton,43
+E1,17/04/2027,16:00,Millwall,Southampton,43
+E1,17/04/2027,16:00,Portsmouth,Bristol City,43
+E1,17/04/2027,16:00,Preston,Charlton,43
+E1,17/04/2027,16:00,QPR,Blackburn,43
+E1,17/04/2027,16:00,Sheffield United,Cardiff,43
+E1,17/04/2027,16:00,Stoke,Wolves,43
+E1,17/04/2027,16:00,Swansea,Derby,43
+E1,17/04/2027,16:00,West Brom,Middlesbrough,43
+E1,17/04/2027,16:00,West Ham,Watford,43
+E1,20/04/2027,20:45,Bolton,Sheffield United,44
+E1,20/04/2027,20:45,Charlton,West Brom,44
+E1,20/04/2027,20:45,Derby,Portsmouth,44
+E1,20/04/2027,20:45,Middlesbrough,Burnley,44
+E1,20/04/2027,20:45,Norwich,Stoke,44
+E1,20/04/2027,20:45,Southampton,Birmingham,44
+E1,20/04/2027,20:45,Wolves,West Ham,44
+E1,20/04/2027,20:45,Wrexham,Millwall,44
+E1,21/04/2027,20:45,Blackburn,Lincoln,44
+E1,21/04/2027,20:45,Bristol City,Preston,44
+E1,21/04/2027,20:45,Cardiff,QPR,44
+E1,21/04/2027,20:45,Watford,Swansea,44
+E1,24/04/2027,16:00,Bolton,Swansea,45
+E1,24/04/2027,16:00,Bristol City,Derby,45
+E1,24/04/2027,16:00,Burnley,Southampton,45
+E1,24/04/2027,16:00,Cardiff,West Brom,45
+E1,24/04/2027,16:00,Charlton,Wrexham,45
+E1,24/04/2027,16:00,Middlesbrough,West Ham,45
+E1,24/04/2027,16:00,Norwich,Blackburn,45
+E1,24/04/2027,16:00,Portsmouth,Preston,45
+E1,24/04/2027,16:00,Sheffield United,Millwall,45
+E1,24/04/2027,16:00,Stoke,Lincoln,45
+E1,24/04/2027,16:00,Watford,Birmingham,45
+E1,24/04/2027,16:00,Wolves,QPR,45
+E1,01/05/2027,13:30,Birmingham,Burnley,46
+E1,01/05/2027,13:30,Blackburn,Watford,46
+E1,01/05/2027,13:30,Derby,Wolves,46
+E1,01/05/2027,13:30,Lincoln,Charlton,46
+E1,01/05/2027,13:30,Millwall,Stoke,46
+E1,01/05/2027,13:30,Preston,Cardiff,46
+E1,01/05/2027,13:30,QPR,Norwich,46
+E1,01/05/2027,13:30,Southampton,Sheffield United,46
+E1,01/05/2027,13:30,Swansea,Middlesbrough,46
+E1,01/05/2027,13:30,West Brom,Bolton,46
+E1,01/05/2027,13:30,West Ham,Portsmouth,46
+E1,01/05/2027,13:30,Wrexham,Bristol City,46
+E2,04/11/2026,20:45,Oxford,Reading,3
+E2,26/09/2026,16:00,Bradford,Barnsley,8
+E2,26/09/2026,16:00,Mansfield,Leyton Orient,8
+E2,26/09/2026,16:00,MK Dons,Bromley,8
+E2,26/09/2026,16:00,Notts County,Blackpool,8
+E2,27/10/2026,20:45,Leicester,Wigan,8
+E2,03/11/2026,20:45,Huddersfield,Luton,8
+E2,24/11/2026,20:45,Stevenage,Sheffield Weds,8
+E2,15/12/2026,20:45,Doncaster,Oxford,8
+E2,03/10/2026,16:00,AFC Wimbledon,Stevenage,9
+E2,03/10/2026,16:00,Barnsley,MK Dons,9
+E2,03/10/2026,16:00,Bromley,Wycombe,9
+E2,03/10/2026,16:00,Burton,Huddersfield,9
+E2,03/10/2026,16:00,Leyton Orient,Plymouth,9
+E2,03/10/2026,16:00,Luton,Doncaster,9
+E2,03/10/2026,16:00,Peterboro,Notts County,9
+E2,03/10/2026,16:00,Reading,Bradford,9
+E2,03/10/2026,16:00,Wigan,Mansfield,9
+E2,27/10/2026,20:45,Oxford,Stockport,9
+E2,27/10/2026,20:45,Sheffield Weds,Cambridge,9
+E2,24/11/2026,20:45,Blackpool,Leicester,9
+E2,10/10/2026,13:30,Notts County,Oxford,10
+E2,10/10/2026,13:30,Plymouth,AFC Wimbledon,10
+E2,10/10/2026,16:00,Bradford,Leyton Orient,10
+E2,10/10/2026,16:00,Cambridge,Blackpool,10
+E2,10/10/2026,16:00,Doncaster,Burton,10
+E2,10/10/2026,16:00,Huddersfield,Sheffield Weds,10
+E2,10/10/2026,16:00,Leicester,Peterboro,10
+E2,10/10/2026,16:00,Mansfield,Bromley,10
+E2,10/10/2026,16:00,MK Dons,Reading,10
+E2,10/10/2026,16:00,Stevenage,Wigan,10
+E2,10/10/2026,16:00,Stockport,Barnsley,10
+E2,10/10/2026,16:00,Wycombe,Luton,10
+E2,15/10/2026,21:00,Mansfield,Oxford,11
+E2,17/10/2026,13:30,MK Dons,Luton,11
+E2,17/10/2026,13:30,Peterboro,Burton,11
+E2,17/10/2026,16:00,Barnsley,Cambridge,11
+E2,17/10/2026,16:00,Bradford,Stevenage,11
+E2,17/10/2026,16:00,Leicester,Doncaster,11
+E2,17/10/2026,16:00,Leyton Orient,Blackpool,11
+E2,17/10/2026,16:00,Plymouth,Huddersfield,11
+E2,17/10/2026,16:00,Sheffield Weds,AFC Wimbledon,11
+E2,17/10/2026,16:00,Stockport,Bromley,11
+E2,17/10/2026,16:00,Wigan,Reading,11
+E2,17/10/2026,16:00,Wycombe,Notts County,11
+E2,20/10/2026,20:45,AFC Wimbledon,Mansfield,12
+E2,20/10/2026,20:45,Blackpool,MK Dons,12
+E2,20/10/2026,20:45,Bromley,Leicester,12
+E2,20/10/2026,20:45,Burton,Bradford,12
+E2,20/10/2026,20:45,Cambridge,Wycombe,12
+E2,20/10/2026,20:45,Doncaster,Stockport,12
+E2,20/10/2026,20:45,Huddersfield,Peterboro,12
+E2,20/10/2026,20:45,Luton,Barnsley,12
+E2,20/10/2026,20:45,Notts County,Sheffield Weds,12
+E2,20/10/2026,20:45,Oxford,Wigan,12
+E2,20/10/2026,20:45,Stevenage,Plymouth,12
+E2,21/10/2026,21:00,Reading,Leyton Orient,12
+E2,24/10/2026,13:30,Huddersfield,Wigan,13
+E2,24/10/2026,13:30,Luton,Leicester,13
+E2,24/10/2026,16:00,AFC Wimbledon,Wycombe,13
+E2,24/10/2026,16:00,Blackpool,Mansfield,13
+E2,24/10/2026,16:00,Bromley,Peterboro,13
+E2,24/10/2026,16:00,Burton,Leyton Orient,13
+E2,24/10/2026,16:00,Cambridge,Plymouth,13
+E2,24/10/2026,16:00,Doncaster,Sheffield Weds,13
+E2,24/10/2026,16:00,Notts County,Stockport,13
+E2,24/10/2026,16:00,Oxford,Bradford,13
+E2,24/10/2026,16:00,Reading,Barnsley,13
+E2,24/10/2026,16:00,Stevenage,MK Dons,13
+E2,31/10/2026,13:30,Bradford,Huddersfield,14
+E2,31/10/2026,13:30,Leyton Orient,Cambridge,14
+E2,31/10/2026,13:30,Plymouth,Reading,14
+E2,31/10/2026,16:00,Barnsley,Oxford,14
+E2,31/10/2026,16:00,Leicester,Stevenage,14
+E2,31/10/2026,16:00,Mansfield,Notts County,14
+E2,31/10/2026,16:00,MK Dons,Doncaster,14
+E2,31/10/2026,16:00,Peterboro,Luton,14
+E2,31/10/2026,16:00,Stockport,AFC Wimbledon,14
+E2,31/10/2026,16:00,Wigan,Bromley,14
+E2,31/10/2026,16:00,Wycombe,Burton,14
+E2,01/11/2026,15:00,Sheffield Weds,Blackpool,14
+E2,14/11/2026,16:00,AFC Wimbledon,Blackpool,15
+E2,14/11/2026,16:00,Bromley,Notts County,15
+E2,14/11/2026,16:00,Doncaster,Leyton Orient,15
+E2,14/11/2026,16:00,Leicester,Bradford,15
+E2,14/11/2026,16:00,Luton,Cambridge,15
+E2,14/11/2026,16:00,MK Dons,Burton,15
+E2,14/11/2026,16:00,Peterboro,Oxford,15
+E2,14/11/2026,16:00,Sheffield Weds,Plymouth,15
+E2,14/11/2026,16:00,Stevenage,Mansfield,15
+E2,14/11/2026,16:00,Stockport,Reading,15
+E2,14/11/2026,16:00,Wigan,Barnsley,15
+E2,14/11/2026,16:00,Wycombe,Huddersfield,15
+E2,20/11/2026,21:00,Barnsley,Sheffield Weds,16
+E2,21/11/2026,13:30,Blackpool,Wigan,16
+E2,21/11/2026,13:30,Reading,Bromley,16
+E2,21/11/2026,16:00,Bradford,Doncaster,16
+E2,21/11/2026,16:00,Burton,Luton,16
+E2,21/11/2026,16:00,Cambridge,Stockport,16
+E2,21/11/2026,16:00,Huddersfield,Leicester,16
+E2,21/11/2026,16:00,Leyton Orient,AFC Wimbledon,16
+E2,21/11/2026,16:00,Mansfield,MK Dons,16
+E2,21/11/2026,16:00,Notts County,Stevenage,16
+E2,21/11/2026,16:00,Oxford,Wycombe,16
+E2,21/11/2026,16:00,Plymouth,Peterboro,16
+E2,26/11/2026,21:00,Doncaster,Huddersfield,17
+E2,28/11/2026,13:30,MK Dons,Notts County,17
+E2,28/11/2026,13:30,Peterboro,Cambridge,17
+E2,28/11/2026,16:00,AFC Wimbledon,Barnsley,17
+E2,28/11/2026,16:00,Bromley,Burton,17
+E2,28/11/2026,16:00,Leicester,Mansfield,17
+E2,28/11/2026,16:00,Luton,Oxford,17
+E2,28/11/2026,16:00,Sheffield Weds,Reading,17
+E2,28/11/2026,16:00,Stevenage,Blackpool,17
+E2,28/11/2026,16:00,Stockport,Leyton Orient,17
+E2,28/11/2026,16:00,Wigan,Plymouth,17
+E2,28/11/2026,16:00,Wycombe,Bradford,17
+E2,01/12/2026,20:45,Barnsley,Wycombe,18
+E2,01/12/2026,20:45,Blackpool,Luton,18
+E2,01/12/2026,20:45,Bradford,MK Dons,18
+E2,01/12/2026,20:45,Burton,Wigan,18
+E2,01/12/2026,20:45,Cambridge,Leicester,18
+E2,01/12/2026,20:45,Huddersfield,Stevenage,18
+E2,01/12/2026,20:45,Leyton Orient,Peterboro,18
+E2,01/12/2026,20:45,Mansfield,Stockport,18
+E2,01/12/2026,20:45,Notts County,AFC Wimbledon,18
+E2,01/12/2026,20:45,Oxford,Sheffield Weds,18
+E2,01/12/2026,20:45,Plymouth,Bromley,18
+E2,01/12/2026,21:00,Reading,Doncaster,18
+E2,10/12/2026,21:00,Leicester,Sheffield Weds,19
+E2,12/12/2026,13:30,Burton,Reading,19
+E2,12/12/2026,13:30,Stevenage,Stockport,19
+E2,12/12/2026,16:00,Bradford,AFC Wimbledon,19
+E2,12/12/2026,16:00,Doncaster,Bromley,19
+E2,12/12/2026,16:00,Huddersfield,Leyton Orient,19
+E2,12/12/2026,16:00,Luton,Wigan,19
+E2,12/12/2026,16:00,Mansfield,Wycombe,19
+E2,12/12/2026,16:00,MK Dons,Cambridge,19
+E2,12/12/2026,16:00,Notts County,Plymouth,19
+E2,12/12/2026,16:00,Oxford,Blackpool,19
+E2,12/12/2026,16:00,Peterboro,Barnsley,19
+E2,18/12/2026,20:45,Cambridge,Stevenage,20
+E2,19/12/2026,13:30,Barnsley,Huddersfield,20
+E2,19/12/2026,13:30,Sheffield Weds,Luton,20
+E2,19/12/2026,16:00,AFC Wimbledon,Oxford,20
+E2,19/12/2026,16:00,Blackpool,Burton,20
+E2,19/12/2026,16:00,Bromley,Bradford,20
+E2,19/12/2026,16:00,Leyton Orient,Notts County,20
+E2,19/12/2026,16:00,Plymouth,Mansfield,20
+E2,19/12/2026,16:00,Reading,Leicester,20
+E2,19/12/2026,16:00,Stockport,MK Dons,20
+E2,19/12/2026,16:00,Wigan,Peterboro,20
+E2,19/12/2026,16:00,Wycombe,Doncaster,20
+E2,26/12/2026,16:00,Bradford,Stockport,21
+E2,26/12/2026,16:00,Burton,Sheffield Weds,21
+E2,26/12/2026,16:00,Doncaster,Wigan,21
+E2,26/12/2026,16:00,Huddersfield,Blackpool,21
+E2,26/12/2026,16:00,Leicester,AFC Wimbledon,21
+E2,26/12/2026,16:00,Luton,Bromley,21
+E2,26/12/2026,16:00,Mansfield,Barnsley,21
+E2,26/12/2026,16:00,MK Dons,Leyton Orient,21
+E2,26/12/2026,16:00,Notts County,Cambridge,21
+E2,26/12/2026,16:00,Oxford,Plymouth,21
+E2,26/12/2026,16:00,Peterboro,Wycombe,21
+E2,26/12/2026,16:00,Stevenage,Reading,21
+E2,29/12/2026,20:45,AFC Wimbledon,Luton,22
+E2,29/12/2026,20:45,Barnsley,Burton,22
+E2,29/12/2026,20:45,Blackpool,Bradford,22
+E2,29/12/2026,20:45,Bromley,Oxford,22
+E2,29/12/2026,20:45,Cambridge,Doncaster,22
+E2,29/12/2026,20:45,Leyton Orient,Leicester,22
+E2,29/12/2026,20:45,Plymouth,MK Dons,22
+E2,29/12/2026,20:45,Sheffield Weds,Mansfield,22
+E2,29/12/2026,20:45,Stockport,Huddersfield,22
+E2,29/12/2026,20:45,Wigan,Notts County,22
+E2,29/12/2026,20:45,Wycombe,Stevenage,22
+E2,29/12/2026,21:00,Reading,Peterboro,22
+E2,01/01/2027,16:00,AFC Wimbledon,Peterboro,23
+E2,01/01/2027,16:00,Barnsley,Notts County,23
+E2,01/01/2027,16:00,Blackpool,Doncaster,23
+E2,01/01/2027,16:00,Bromley,Stevenage,23
+E2,01/01/2027,16:00,Leyton Orient,Oxford,23
+E2,01/01/2027,16:00,Reading,MK Dons,23
+E2,01/01/2027,16:00,Sheffield Weds,Huddersfield,23
+E2,01/01/2027,16:00,Wigan,Bradford,23
+E2,01/01/2027,16:00,Wycombe,Leicester,23
+E2,02/01/2027,16:00,Cambridge,Mansfield,23
+E2,02/01/2027,16:00,Plymouth,Luton,23
+E2,02/01/2027,16:00,Stockport,Burton,23
+E2,08/01/2027,21:00,Burton,Blackpool,24
+E2,09/01/2027,13:30,Oxford,AFC Wimbledon,24
+E2,09/01/2027,13:30,Stevenage,Cambridge,24
+E2,09/01/2027,16:00,Bradford,Bromley,24
+E2,09/01/2027,16:00,Doncaster,Wycombe,24
+E2,09/01/2027,16:00,Huddersfield,Barnsley,24
+E2,09/01/2027,16:00,Leicester,Reading,24
+E2,09/01/2027,16:00,Luton,Sheffield Weds,24
+E2,09/01/2027,16:00,Mansfield,Plymouth,24
+E2,09/01/2027,16:00,MK Dons,Stockport,24
+E2,09/01/2027,16:00,Notts County,Leyton Orient,24
+E2,09/01/2027,16:00,Peterboro,Wigan,24
+E2,16/01/2027,16:00,AFC Wimbledon,Sheffield Weds,25
+E2,16/01/2027,16:00,Blackpool,Leyton Orient,25
+E2,16/01/2027,16:00,Bromley,Stockport,25
+E2,16/01/2027,16:00,Burton,Peterboro,25
+E2,16/01/2027,16:00,Cambridge,Barnsley,25
+E2,16/01/2027,16:00,Doncaster,Leicester,25
+E2,16/01/2027,16:00,Huddersfield,Plymouth,25
+E2,16/01/2027,16:00,Luton,MK Dons,25
+E2,16/01/2027,16:00,Notts County,Wycombe,25
+E2,16/01/2027,16:00,Oxford,Mansfield,25
+E2,16/01/2027,16:00,Reading,Wigan,25
+E2,16/01/2027,16:00,Stevenage,Bradford,25
+E2,19/01/2027,20:45,Barnsley,Luton,26
+E2,19/01/2027,20:45,Bradford,Burton,26
+E2,19/01/2027,20:45,Leicester,Bromley,26
+E2,19/01/2027,20:45,Leyton Orient,Reading,26
+E2,19/01/2027,20:45,Mansfield,AFC Wimbledon,26
+E2,19/01/2027,20:45,MK Dons,Blackpool,26
+E2,19/01/2027,20:45,Peterboro,Huddersfield,26
+E2,19/01/2027,20:45,Plymouth,Stevenage,26
+E2,19/01/2027,20:45,Sheffield Weds,Notts County,26
+E2,19/01/2027,20:45,Stockport,Doncaster,26
+E2,19/01/2027,20:45,Wigan,Oxford,26
+E2,19/01/2027,20:45,Wycombe,Cambridge,26
+E2,23/01/2027,16:00,Barnsley,Reading,27
+E2,23/01/2027,16:00,Bradford,Oxford,27
+E2,23/01/2027,16:00,Leicester,Luton,27
+E2,23/01/2027,16:00,Leyton Orient,Burton,27
+E2,23/01/2027,16:00,Mansfield,Blackpool,27
+E2,23/01/2027,16:00,MK Dons,Stevenage,27
+E2,23/01/2027,16:00,Peterboro,Bromley,27
+E2,23/01/2027,16:00,Plymouth,Cambridge,27
+E2,23/01/2027,16:00,Sheffield Weds,Doncaster,27
+E2,23/01/2027,16:00,Stockport,Notts County,27
+E2,23/01/2027,16:00,Wigan,Huddersfield,27
+E2,23/01/2027,16:00,Wycombe,AFC Wimbledon,27
+E2,30/01/2027,13:30,Huddersfield,Bradford,28
+E2,30/01/2027,16:00,AFC Wimbledon,Stockport,28
+E2,30/01/2027,16:00,Blackpool,Sheffield Weds,28
+E2,30/01/2027,16:00,Bromley,Wigan,28
+E2,30/01/2027,16:00,Burton,Wycombe,28
+E2,30/01/2027,16:00,Cambridge,Leyton Orient,28
+E2,30/01/2027,16:00,Doncaster,MK Dons,28
+E2,30/01/2027,16:00,Luton,Peterboro,28
+E2,30/01/2027,16:00,Notts County,Mansfield,28
+E2,30/01/2027,16:00,Oxford,Barnsley,28
+E2,30/01/2027,16:00,Reading,Plymouth,28
+E2,30/01/2027,16:00,Stevenage,Leicester,28
+E2,06/02/2027,16:00,Barnsley,Leyton Orient,29
+E2,06/02/2027,16:00,Bradford,Plymouth,29
+E2,06/02/2027,16:00,Bromley,Sheffield Weds,29
+E2,06/02/2027,16:00,Burton,Notts County,29
+E2,06/02/2027,16:00,Doncaster,Stevenage,29
+E2,06/02/2027,16:00,Huddersfield,Cambridge,29
+E2,06/02/2027,16:00,Leicester,MK Dons,29
+E2,06/02/2027,16:00,Luton,Mansfield,29
+E2,06/02/2027,16:00,Peterboro,Blackpool,29
+E2,06/02/2027,16:00,Reading,Oxford,29
+E2,06/02/2027,16:00,Wigan,AFC Wimbledon,29
+E2,06/02/2027,16:00,Wycombe,Stockport,29
+E2,09/02/2027,20:45,AFC Wimbledon,Burton,30
+E2,09/02/2027,20:45,Blackpool,Barnsley,30
+E2,09/02/2027,20:45,Cambridge,Bradford,30
+E2,09/02/2027,20:45,Leyton Orient,Bromley,30
+E2,09/02/2027,20:45,Mansfield,Reading,30
+E2,09/02/2027,20:45,MK Dons,Wigan,30
+E2,09/02/2027,20:45,Notts County,Doncaster,30
+E2,09/02/2027,20:45,Oxford,Huddersfield,30
+E2,09/02/2027,20:45,Plymouth,Leicester,30
+E2,09/02/2027,20:45,Sheffield Weds,Wycombe,30
+E2,09/02/2027,20:45,Stevenage,Peterboro,30
+E2,09/02/2027,20:45,Stockport,Luton,30
+E2,13/02/2027,16:00,AFC Wimbledon,Bromley,31
+E2,13/02/2027,16:00,Blackpool,Reading,31
+E2,13/02/2027,16:00,Cambridge,Burton,31
+E2,13/02/2027,16:00,Leyton Orient,Luton,31
+E2,13/02/2027,16:00,Mansfield,Bradford,31
+E2,13/02/2027,16:00,MK Dons,Wycombe,31
+E2,13/02/2027,16:00,Notts County,Huddersfield,31
+E2,13/02/2027,16:00,Oxford,Leicester,31
+E2,13/02/2027,16:00,Plymouth,Doncaster,31
+E2,13/02/2027,16:00,Sheffield Weds,Peterboro,31
+E2,13/02/2027,16:00,Stevenage,Barnsley,31
+E2,13/02/2027,16:00,Stockport,Wigan,31
+E2,20/02/2027,16:00,Barnsley,Plymouth,32
+E2,20/02/2027,16:00,Bradford,Notts County,32
+E2,20/02/2027,16:00,Bromley,Blackpool,32
+E2,20/02/2027,16:00,Burton,Oxford,32
+E2,20/02/2027,16:00,Doncaster,AFC Wimbledon,32
+E2,20/02/2027,16:00,Huddersfield,Mansfield,32
+E2,20/02/2027,16:00,Leicester,Stockport,32
+E2,20/02/2027,16:00,Luton,Stevenage,32
+E2,20/02/2027,16:00,Peterboro,MK Dons,32
+E2,20/02/2027,16:00,Reading,Cambridge,32
+E2,20/02/2027,16:00,Wigan,Sheffield Weds,32
+E2,20/02/2027,16:00,Wycombe,Leyton Orient,32
+E2,27/02/2027,13:30,Cambridge,Peterboro,33
+E2,27/02/2027,16:00,Barnsley,Wigan,33
+E2,27/02/2027,16:00,Blackpool,AFC Wimbledon,33
+E2,27/02/2027,16:00,Bradford,Leicester,33
+E2,27/02/2027,16:00,Burton,MK Dons,33
+E2,27/02/2027,16:00,Huddersfield,Wycombe,33
+E2,27/02/2027,16:00,Leyton Orient,Doncaster,33
+E2,27/02/2027,16:00,Mansfield,Stevenage,33
+E2,27/02/2027,16:00,Notts County,Bromley,33
+E2,27/02/2027,16:00,Oxford,Luton,33
+E2,27/02/2027,16:00,Plymouth,Sheffield Weds,33
+E2,27/02/2027,16:00,Reading,Stockport,33
+E2,06/03/2027,16:00,AFC Wimbledon,Huddersfield,34
+E2,06/03/2027,16:00,Bromley,Barnsley,34
+E2,06/03/2027,16:00,Doncaster,Mansfield,34
+E2,06/03/2027,16:00,Leicester,Notts County,34
+E2,06/03/2027,16:00,Luton,Reading,34
+E2,06/03/2027,16:00,MK Dons,Oxford,34
+E2,06/03/2027,16:00,Peterboro,Bradford,34
+E2,06/03/2027,16:00,Sheffield Weds,Leyton Orient,34
+E2,06/03/2027,16:00,Stevenage,Burton,34
+E2,06/03/2027,16:00,Stockport,Plymouth,34
+E2,06/03/2027,16:00,Wigan,Cambridge,34
+E2,06/03/2027,16:00,Wycombe,Blackpool,34
+E2,13/03/2027,16:00,Barnsley,Doncaster,35
+E2,13/03/2027,16:00,Blackpool,Stockport,35
+E2,13/03/2027,16:00,Bradford,Sheffield Weds,35
+E2,13/03/2027,16:00,Burton,Leicester,35
+E2,13/03/2027,16:00,Cambridge,Bromley,35
+E2,13/03/2027,16:00,Huddersfield,MK Dons,35
+E2,13/03/2027,16:00,Leyton Orient,Wigan,35
+E2,13/03/2027,16:00,Mansfield,Peterboro,35
+E2,13/03/2027,16:00,Notts County,Luton,35
+E2,13/03/2027,16:00,Oxford,Stevenage,35
+E2,13/03/2027,16:00,Plymouth,Wycombe,35
+E2,13/03/2027,16:00,Reading,AFC Wimbledon,35
+E2,20/03/2027,16:00,AFC Wimbledon,Leyton Orient,36
+E2,20/03/2027,16:00,Bromley,Reading,36
+E2,20/03/2027,16:00,Doncaster,Bradford,36
+E2,20/03/2027,16:00,Leicester,Huddersfield,36
+E2,20/03/2027,16:00,Luton,Burton,36
+E2,20/03/2027,16:00,MK Dons,Mansfield,36
+E2,20/03/2027,16:00,Peterboro,Plymouth,36
+E2,20/03/2027,16:00,Sheffield Weds,Barnsley,36
+E2,20/03/2027,16:00,Stevenage,Notts County,36
+E2,20/03/2027,16:00,Stockport,Cambridge,36
+E2,20/03/2027,16:00,Wigan,Blackpool,36
+E2,20/03/2027,16:00,Wycombe,Oxford,36
+E2,26/03/2027,16:00,Bradford,Wigan,37
+E2,26/03/2027,16:00,Burton,Stockport,37
+E2,26/03/2027,16:00,Doncaster,Blackpool,37
+E2,26/03/2027,16:00,Huddersfield,Reading,37
+E2,26/03/2027,16:00,Leicester,Wycombe,37
+E2,26/03/2027,16:00,Luton,Plymouth,37
+E2,26/03/2027,16:00,Mansfield,Cambridge,37
+E2,26/03/2027,16:00,MK Dons,Sheffield Weds,37
+E2,26/03/2027,16:00,Notts County,Barnsley,37
+E2,26/03/2027,16:00,Oxford,Leyton Orient,37
+E2,26/03/2027,16:00,Peterboro,AFC Wimbledon,37
+E2,26/03/2027,16:00,Stevenage,Bromley,37
+E2,29/03/2027,16:00,AFC Wimbledon,Leicester,38
+E2,29/03/2027,16:00,Barnsley,Mansfield,38
+E2,29/03/2027,16:00,Blackpool,Oxford,38
+E2,29/03/2027,16:00,Bromley,Doncaster,38
+E2,29/03/2027,16:00,Cambridge,MK Dons,38
+E2,29/03/2027,16:00,Leyton Orient,Huddersfield,38
+E2,29/03/2027,16:00,Plymouth,Notts County,38
+E2,29/03/2027,16:00,Reading,Stevenage,38
+E2,29/03/2027,16:00,Sheffield Weds,Burton,38
+E2,29/03/2027,16:00,Stockport,Bradford,38
+E2,29/03/2027,16:00,Wigan,Luton,38
+E2,29/03/2027,16:00,Wycombe,Peterboro,38
+E2,03/04/2027,16:00,Bradford,Blackpool,39
+E2,03/04/2027,16:00,Burton,Barnsley,39
+E2,03/04/2027,16:00,Doncaster,Cambridge,39
+E2,03/04/2027,16:00,Huddersfield,Stockport,39
+E2,03/04/2027,16:00,Leicester,Leyton Orient,39
+E2,03/04/2027,16:00,Luton,AFC Wimbledon,39
+E2,03/04/2027,16:00,Mansfield,Sheffield Weds,39
+E2,03/04/2027,16:00,MK Dons,Plymouth,39
+E2,03/04/2027,16:00,Notts County,Wigan,39
+E2,03/04/2027,16:00,Oxford,Bromley,39
+E2,03/04/2027,16:00,Peterboro,Reading,39
+E2,03/04/2027,16:00,Stevenage,Wycombe,39
+E2,10/04/2027,16:00,AFC Wimbledon,Bradford,40
+E2,10/04/2027,16:00,Barnsley,Peterboro,40
+E2,10/04/2027,16:00,Blackpool,Huddersfield,40
+E2,10/04/2027,16:00,Bromley,Luton,40
+E2,10/04/2027,16:00,Cambridge,Notts County,40
+E2,10/04/2027,16:00,Leyton Orient,MK Dons,40
+E2,10/04/2027,16:00,Plymouth,Oxford,40
+E2,10/04/2027,16:00,Reading,Burton,40
+E2,10/04/2027,16:00,Sheffield Weds,Leicester,40
+E2,10/04/2027,16:00,Stockport,Stevenage,40
+E2,10/04/2027,16:00,Wigan,Doncaster,40
+E2,10/04/2027,16:00,Wycombe,Mansfield,40
+E2,13/04/2027,20:45,AFC Wimbledon,Cambridge,41
+E2,13/04/2027,20:45,Barnsley,Bradford,41
+E2,13/04/2027,20:45,Blackpool,Notts County,41
+E2,13/04/2027,20:45,Bromley,MK Dons,41
+E2,13/04/2027,20:45,Burton,Plymouth,41
+E2,13/04/2027,20:45,Leyton Orient,Mansfield,41
+E2,13/04/2027,20:45,Luton,Huddersfield,41
+E2,13/04/2027,20:45,Oxford,Doncaster,41
+E2,13/04/2027,20:45,Peterboro,Stockport,41
+E2,13/04/2027,20:45,Sheffield Weds,Stevenage,41
+E2,13/04/2027,20:45,Wigan,Leicester,41
+E2,13/04/2027,21:00,Reading,Wycombe,41
+E2,17/04/2027,13:30,MK Dons,AFC Wimbledon,42
+E2,17/04/2027,16:00,Bradford,Luton,42
+E2,17/04/2027,16:00,Cambridge,Oxford,42
+E2,17/04/2027,16:00,Doncaster,Peterboro,42
+E2,17/04/2027,16:00,Huddersfield,Bromley,42
+E2,17/04/2027,16:00,Leicester,Barnsley,42
+E2,17/04/2027,16:00,Mansfield,Burton,42
+E2,17/04/2027,16:00,Notts County,Reading,42
+E2,17/04/2027,16:00,Plymouth,Blackpool,42
+E2,17/04/2027,16:00,Stevenage,Leyton Orient,42
+E2,17/04/2027,16:00,Stockport,Sheffield Weds,42
+E2,17/04/2027,16:00,Wycombe,Wigan,42
+E2,24/04/2027,16:00,AFC Wimbledon,Plymouth,43
+E2,24/04/2027,16:00,Barnsley,Stockport,43
+E2,24/04/2027,16:00,Blackpool,Cambridge,43
+E2,24/04/2027,16:00,Bromley,Mansfield,43
+E2,24/04/2027,16:00,Burton,Doncaster,43
+E2,24/04/2027,16:00,Leyton Orient,Bradford,43
+E2,24/04/2027,16:00,Luton,Wycombe,43
+E2,24/04/2027,16:00,Oxford,Notts County,43
+E2,24/04/2027,16:00,Peterboro,Leicester,43
+E2,24/04/2027,16:00,Reading,Huddersfield,43
+E2,24/04/2027,16:00,Sheffield Weds,MK Dons,43
+E2,24/04/2027,16:00,Wigan,Stevenage,43
+E2,27/04/2027,20:45,Bradford,Reading,44
+E2,27/04/2027,20:45,Cambridge,Sheffield Weds,44
+E2,27/04/2027,20:45,Doncaster,Luton,44
+E2,27/04/2027,20:45,Huddersfield,Burton,44
+E2,27/04/2027,20:45,Leicester,Blackpool,44
+E2,27/04/2027,20:45,Mansfield,Wigan,44
+E2,27/04/2027,20:45,MK Dons,Barnsley,44
+E2,27/04/2027,20:45,Notts County,Peterboro,44
+E2,27/04/2027,20:45,Plymouth,Leyton Orient,44
+E2,27/04/2027,20:45,Stevenage,AFC Wimbledon,44
+E2,27/04/2027,20:45,Stockport,Oxford,44
+E2,27/04/2027,20:45,Wycombe,Bromley,44
+E2,01/05/2027,16:00,Barnsley,AFC Wimbledon,45
+E2,01/05/2027,16:00,Blackpool,Stevenage,45
+E2,01/05/2027,16:00,Bradford,Wycombe,45
+E2,01/05/2027,16:00,Burton,Bromley,45
+E2,01/05/2027,16:00,Cambridge,Luton,45
+E2,01/05/2027,16:00,Huddersfield,Doncaster,45
+E2,01/05/2027,16:00,Leyton Orient,Stockport,45
+E2,01/05/2027,16:00,Mansfield,Leicester,45
+E2,01/05/2027,16:00,Notts County,MK Dons,45
+E2,01/05/2027,16:00,Oxford,Peterboro,45
+E2,01/05/2027,16:00,Plymouth,Wigan,45
+E2,01/05/2027,16:00,Reading,Sheffield Weds,45
+E2,08/05/2027,13:30,AFC Wimbledon,Notts County,46
+E2,08/05/2027,13:30,Bromley,Plymouth,46
+E2,08/05/2027,13:30,Doncaster,Reading,46
+E2,08/05/2027,13:30,Leicester,Cambridge,46
+E2,08/05/2027,13:30,Luton,Blackpool,46
+E2,08/05/2027,13:30,MK Dons,Bradford,46
+E2,08/05/2027,13:30,Peterboro,Leyton Orient,46
+E2,08/05/2027,13:30,Sheffield Weds,Oxford,46
+E2,08/05/2027,13:30,Stevenage,Huddersfield,46
+E2,08/05/2027,13:30,Stockport,Mansfield,46
+E2,08/05/2027,13:30,Wigan,Burton,46
+E2,08/05/2027,13:30,Wycombe,Barnsley,46
+E3,26/09/2026,13:30,Crawley Town,Barnet,8
+E3,26/09/2026,16:00,Port Vale,Northampton,8
+E3,03/10/2026,13:30,Chesterfield,Tranmere,9
+E3,03/10/2026,16:00,Accrington,Cheltenham,9
+E3,03/10/2026,16:00,Colchester,Port Vale,9
+E3,03/10/2026,16:00,Crewe,Bristol Rvs,9
+E3,03/10/2026,16:00,Exeter,Rotherham,9
+E3,03/10/2026,16:00,Gillingham,Newport County,9
+E3,03/10/2026,16:00,Grimsby,Shrewsbury,9
+E3,03/10/2026,16:00,Northampton,Oldham,9
+E3,03/10/2026,16:00,Rochdale,Swindon,9
+E3,03/10/2026,16:00,Salford,Fleetwood Town,9
+E3,03/10/2026,16:00,Walsall,Crawley Town,9
+E3,27/10/2026,20:45,Barnet,York,9
+E3,10/10/2026,13:30,Oldham,Accrington,10
+E3,10/10/2026,13:30,Swindon,Crewe,10
+E3,10/10/2026,16:00,Bristol Rvs,Barnet,10
+E3,10/10/2026,16:00,Cheltenham,Salford,10
+E3,10/10/2026,16:00,Crawley Town,Chesterfield,10
+E3,10/10/2026,16:00,Fleetwood Town,Walsall,10
+E3,10/10/2026,16:00,Newport County,Colchester,10
+E3,10/10/2026,16:00,Port Vale,Grimsby,10
+E3,10/10/2026,16:00,Rotherham,Gillingham,10
+E3,10/10/2026,16:00,Shrewsbury,Exeter,10
+E3,10/10/2026,16:00,Tranmere,Rochdale,10
+E3,10/10/2026,16:00,York,Northampton,10
+E3,17/10/2026,13:30,Fleetwood Town,Rotherham,11
+E3,17/10/2026,13:30,Shrewsbury,Bristol Rvs,11
+E3,17/10/2026,16:00,Accrington,Gillingham,11
+E3,17/10/2026,16:00,Colchester,Exeter,11
+E3,17/10/2026,16:00,Crewe,Rochdale,11
+E3,17/10/2026,16:00,Grimsby,Northampton,11
+E3,17/10/2026,16:00,Newport County,York,11
+E3,17/10/2026,16:00,Oldham,Cheltenham,11
+E3,17/10/2026,16:00,Port Vale,Chesterfield,11
+E3,17/10/2026,16:00,Salford,Crawley Town,11
+E3,17/10/2026,16:00,Swindon,Walsall,11
+E3,17/10/2026,16:00,Tranmere,Barnet,11
+E3,20/10/2026,20:45,Barnet,Swindon,12
+E3,20/10/2026,20:45,Bristol Rvs,Salford,12
+E3,20/10/2026,20:45,Cheltenham,Fleetwood Town,12
+E3,20/10/2026,20:45,Chesterfield,Colchester,12
+E3,20/10/2026,20:45,Crawley Town,Shrewsbury,12
+E3,20/10/2026,20:45,Exeter,Crewe,12
+E3,20/10/2026,20:45,Northampton,Tranmere,12
+E3,20/10/2026,20:45,Rochdale,Grimsby,12
+E3,20/10/2026,20:45,Rotherham,Newport County,12
+E3,20/10/2026,20:45,Walsall,Oldham,12
+E3,20/10/2026,20:45,York,Accrington,12
+E3,20/10/2026,21:00,Gillingham,Port Vale,12
+E3,24/10/2026,13:30,Bristol Rvs,Swindon,13
+E3,24/10/2026,13:30,Cheltenham,Newport County,13
+E3,24/10/2026,13:30,Northampton,Colchester,13
+E3,24/10/2026,16:00,Barnet,Oldham,13
+E3,24/10/2026,16:00,Chesterfield,Crewe,13
+E3,24/10/2026,16:00,Crawley Town,Tranmere,13
+E3,24/10/2026,16:00,Exeter,Fleetwood Town,13
+E3,24/10/2026,16:00,Gillingham,Grimsby,13
+E3,24/10/2026,16:00,Rochdale,Accrington,13
+E3,24/10/2026,16:00,Rotherham,Shrewsbury,13
+E3,24/10/2026,16:00,York,Port Vale,13
+E3,26/10/2026,21:00,Walsall,Salford,13
+E3,30/10/2026,20:45,Newport County,Chesterfield,14
+E3,31/10/2026,13:30,Grimsby,York,14
+E3,31/10/2026,13:30,Port Vale,Rochdale,14
+E3,31/10/2026,16:00,Accrington,Northampton,14
+E3,31/10/2026,16:00,Colchester,Walsall,14
+E3,31/10/2026,16:00,Crewe,Barnet,14
+E3,31/10/2026,16:00,Fleetwood Town,Bristol Rvs,14
+E3,31/10/2026,16:00,Oldham,Crawley Town,14
+E3,31/10/2026,16:00,Salford,Exeter,14
+E3,31/10/2026,16:00,Shrewsbury,Gillingham,14
+E3,31/10/2026,16:00,Swindon,Rotherham,14
+E3,31/10/2026,16:00,Tranmere,Cheltenham,14
+E3,14/11/2026,13:30,Exeter,Cheltenham,15
+E3,14/11/2026,16:00,Bristol Rvs,Chesterfield,15
+E3,14/11/2026,16:00,Colchester,Gillingham,15
+E3,14/11/2026,16:00,Crewe,Newport County,15
+E3,14/11/2026,16:00,Port Vale,Accrington,15
+E3,14/11/2026,16:00,Rochdale,York,15
+E3,14/11/2026,16:00,Rotherham,Crawley Town,15
+E3,14/11/2026,16:00,Salford,Northampton,15
+E3,14/11/2026,16:00,Shrewsbury,Oldham,15
+E3,14/11/2026,16:00,Swindon,Grimsby,15
+E3,14/11/2026,16:00,Walsall,Barnet,15
+E3,14/11/2026,18:30,Fleetwood Town,Tranmere,15
+E3,21/11/2026,13:30,Gillingham,Crewe,16
+E3,21/11/2026,13:30,Newport County,Swindon,16
+E3,21/11/2026,16:00,Accrington,Salford,16
+E3,21/11/2026,16:00,Barnet,Port Vale,16
+E3,21/11/2026,16:00,Cheltenham,Bristol Rvs,16
+E3,21/11/2026,16:00,Chesterfield,Shrewsbury,16
+E3,21/11/2026,16:00,Crawley Town,Fleetwood Town,16
+E3,21/11/2026,16:00,Grimsby,Rotherham,16
+E3,21/11/2026,16:00,Northampton,Rochdale,16
+E3,21/11/2026,16:00,Oldham,Exeter,16
+E3,21/11/2026,16:00,Tranmere,Colchester,16
+E3,21/11/2026,16:00,York,Walsall,16
+E3,28/11/2026,13:30,Bristol Rvs,Tranmere,17
+E3,28/11/2026,13:30,Exeter,Crawley Town,17
+E3,28/11/2026,16:00,Colchester,York,17
+E3,28/11/2026,16:00,Crewe,Grimsby,17
+E3,28/11/2026,16:00,Fleetwood Town,Accrington,17
+E3,28/11/2026,16:00,Port Vale,Newport County,17
+E3,28/11/2026,16:00,Rochdale,Barnet,17
+E3,28/11/2026,16:00,Rotherham,Oldham,17
+E3,28/11/2026,16:00,Salford,Gillingham,17
+E3,28/11/2026,16:00,Shrewsbury,Cheltenham,17
+E3,28/11/2026,16:00,Swindon,Chesterfield,17
+E3,28/11/2026,16:00,Walsall,Northampton,17
+E3,01/12/2026,20:45,Accrington,Crewe,18
+E3,01/12/2026,20:45,Barnet,Rotherham,18
+E3,01/12/2026,20:45,Cheltenham,Rochdale,18
+E3,01/12/2026,20:45,Chesterfield,Exeter,18
+E3,01/12/2026,20:45,Crawley Town,Port Vale,18
+E3,01/12/2026,20:45,Gillingham,Swindon,18
+E3,01/12/2026,20:45,Grimsby,Colchester,18
+E3,01/12/2026,20:45,Newport County,Walsall,18
+E3,01/12/2026,20:45,Northampton,Fleetwood Town,18
+E3,01/12/2026,20:45,Oldham,Bristol Rvs,18
+E3,01/12/2026,20:45,Tranmere,Salford,18
+E3,01/12/2026,20:45,York,Shrewsbury,18
+E3,12/12/2026,13:30,Chesterfield,Grimsby,19
+E3,12/12/2026,13:30,Tranmere,York,19
+E3,12/12/2026,16:00,Barnet,Northampton,19
+E3,12/12/2026,16:00,Bristol Rvs,Accrington,19
+E3,12/12/2026,16:00,Cheltenham,Crewe,19
+E3,12/12/2026,16:00,Crawley Town,Newport County,19
+E3,12/12/2026,16:00,Exeter,Rochdale,19
+E3,12/12/2026,16:00,Fleetwood Town,Swindon,19
+E3,12/12/2026,16:00,Oldham,Gillingham,19
+E3,12/12/2026,16:00,Rotherham,Walsall,19
+E3,12/12/2026,16:00,Salford,Colchester,19
+E3,12/12/2026,16:00,Shrewsbury,Port Vale,19
+E3,17/12/2026,21:00,Crewe,Salford,20
+E3,19/12/2026,13:30,Colchester,Fleetwood Town,20
+E3,19/12/2026,13:30,Northampton,Exeter,20
+E3,19/12/2026,16:00,Accrington,Chesterfield,20
+E3,19/12/2026,16:00,Gillingham,Cheltenham,20
+E3,19/12/2026,16:00,Grimsby,Barnet,20
+E3,19/12/2026,16:00,Newport County,Oldham,20
+E3,19/12/2026,16:00,Port Vale,Rotherham,20
+E3,19/12/2026,16:00,Rochdale,Bristol Rvs,20
+E3,19/12/2026,16:00,Swindon,Tranmere,20
+E3,19/12/2026,16:00,Walsall,Shrewsbury,20
+E3,19/12/2026,16:00,York,Crawley Town,20
+E3,26/12/2026,16:00,Barnet,Colchester,21
+E3,26/12/2026,16:00,Bristol Rvs,Walsall,21
+E3,26/12/2026,16:00,Cheltenham,Port Vale,21
+E3,26/12/2026,16:00,Chesterfield,Northampton,21
+E3,26/12/2026,16:00,Crawley Town,Gillingham,21
+E3,26/12/2026,16:00,Exeter,Newport County,21
+E3,26/12/2026,16:00,Fleetwood Town,Crewe,21
+E3,26/12/2026,16:00,Oldham,York,21
+E3,26/12/2026,16:00,Rotherham,Rochdale,21
+E3,26/12/2026,16:00,Salford,Grimsby,21
+E3,26/12/2026,16:00,Shrewsbury,Swindon,21
+E3,26/12/2026,16:00,Tranmere,Accrington,21
+E3,29/12/2026,20:45,Accrington,Rotherham,22
+E3,29/12/2026,20:45,Colchester,Crawley Town,22
+E3,29/12/2026,20:45,Crewe,Tranmere,22
+E3,29/12/2026,20:45,Gillingham,Barnet,22
+E3,29/12/2026,20:45,Grimsby,Oldham,22
+E3,29/12/2026,20:45,Newport County,Shrewsbury,22
+E3,29/12/2026,20:45,Northampton,Cheltenham,22
+E3,29/12/2026,20:45,Port Vale,Bristol Rvs,22
+E3,29/12/2026,20:45,Rochdale,Salford,22
+E3,29/12/2026,20:45,Swindon,Exeter,22
+E3,29/12/2026,20:45,Walsall,Chesterfield,22
+E3,29/12/2026,20:45,York,Fleetwood Town,22
+E3,01/01/2027,16:00,Accrington,Shrewsbury,23
+E3,01/01/2027,16:00,Colchester,Rotherham,23
+E3,01/01/2027,16:00,Crewe,Oldham,23
+E3,01/01/2027,16:00,Grimsby,Tranmere,23
+E3,01/01/2027,16:00,Newport County,Barnet,23
+E3,01/01/2027,16:00,Port Vale,Fleetwood Town,23
+E3,01/01/2027,16:00,Rochdale,Chesterfield,23
+E3,01/01/2027,16:00,Swindon,Crawley Town,23
+E3,01/01/2027,16:00,Walsall,Cheltenham,23
+E3,01/01/2027,16:00,York,Salford,23
+E3,02/01/2027,16:00,Gillingham,Exeter,23
+E3,02/01/2027,16:00,Northampton,Bristol Rvs,23
+E3,09/01/2027,13:30,Barnet,Grimsby,24
+E3,09/01/2027,13:30,Chesterfield,Accrington,24
+E3,09/01/2027,13:30,Shrewsbury,Walsall,24
+E3,09/01/2027,16:00,Bristol Rvs,Rochdale,24
+E3,09/01/2027,16:00,Cheltenham,Gillingham,24
+E3,09/01/2027,16:00,Crawley Town,York,24
+E3,09/01/2027,16:00,Exeter,Northampton,24
+E3,09/01/2027,16:00,Fleetwood Town,Colchester,24
+E3,09/01/2027,16:00,Oldham,Newport County,24
+E3,09/01/2027,16:00,Rotherham,Port Vale,24
+E3,09/01/2027,16:00,Salford,Crewe,24
+E3,09/01/2027,16:00,Tranmere,Swindon,24
+E3,16/01/2027,16:00,Barnet,Tranmere,25
+E3,16/01/2027,16:00,Bristol Rvs,Shrewsbury,25
+E3,16/01/2027,16:00,Cheltenham,Oldham,25
+E3,16/01/2027,16:00,Chesterfield,Port Vale,25
+E3,16/01/2027,16:00,Crawley Town,Salford,25
+E3,16/01/2027,16:00,Exeter,Colchester,25
+E3,16/01/2027,16:00,Gillingham,Accrington,25
+E3,16/01/2027,16:00,Northampton,Grimsby,25
+E3,16/01/2027,16:00,Rochdale,Crewe,25
+E3,16/01/2027,16:00,Rotherham,Fleetwood Town,25
+E3,16/01/2027,16:00,Walsall,Swindon,25
+E3,16/01/2027,16:00,York,Newport County,25
+E3,19/01/2027,20:45,Accrington,York,26
+E3,19/01/2027,20:45,Colchester,Chesterfield,26
+E3,19/01/2027,20:45,Crewe,Exeter,26
+E3,19/01/2027,20:45,Fleetwood Town,Cheltenham,26
+E3,19/01/2027,20:45,Grimsby,Rochdale,26
+E3,19/01/2027,20:45,Newport County,Rotherham,26
+E3,19/01/2027,20:45,Oldham,Walsall,26
+E3,19/01/2027,20:45,Port Vale,Gillingham,26
+E3,19/01/2027,20:45,Salford,Bristol Rvs,26
+E3,19/01/2027,20:45,Shrewsbury,Crawley Town,26
+E3,19/01/2027,20:45,Swindon,Barnet,26
+E3,19/01/2027,20:45,Tranmere,Northampton,26
+E3,23/01/2027,16:00,Accrington,Rochdale,27
+E3,23/01/2027,16:00,Colchester,Northampton,27
+E3,23/01/2027,16:00,Crewe,Chesterfield,27
+E3,23/01/2027,16:00,Fleetwood Town,Exeter,27
+E3,23/01/2027,16:00,Grimsby,Gillingham,27
+E3,23/01/2027,16:00,Newport County,Cheltenham,27
+E3,23/01/2027,16:00,Oldham,Barnet,27
+E3,23/01/2027,16:00,Port Vale,York,27
+E3,23/01/2027,16:00,Salford,Walsall,27
+E3,23/01/2027,16:00,Shrewsbury,Rotherham,27
+E3,23/01/2027,16:00,Swindon,Bristol Rvs,27
+E3,23/01/2027,16:00,Tranmere,Crawley Town,27
+E3,30/01/2027,16:00,Barnet,Crewe,28
+E3,30/01/2027,16:00,Bristol Rvs,Fleetwood Town,28
+E3,30/01/2027,16:00,Cheltenham,Tranmere,28
+E3,30/01/2027,16:00,Chesterfield,Newport County,28
+E3,30/01/2027,16:00,Crawley Town,Oldham,28
+E3,30/01/2027,16:00,Exeter,Salford,28
+E3,30/01/2027,16:00,Gillingham,Shrewsbury,28
+E3,30/01/2027,16:00,Northampton,Accrington,28
+E3,30/01/2027,16:00,Rochdale,Port Vale,28
+E3,30/01/2027,16:00,Rotherham,Swindon,28
+E3,30/01/2027,16:00,Walsall,Colchester,28
+E3,30/01/2027,16:00,York,Grimsby,28
+E3,06/02/2027,16:00,Accrington,Walsall,29
+E3,06/02/2027,16:00,Bristol Rvs,Crawley Town,29
+E3,06/02/2027,16:00,Cheltenham,Barnet,29
+E3,06/02/2027,16:00,Chesterfield,Rotherham,29
+E3,06/02/2027,16:00,Crewe,Port Vale,29
+E3,06/02/2027,16:00,Exeter,York,29
+E3,06/02/2027,16:00,Fleetwood Town,Grimsby,29
+E3,06/02/2027,16:00,Northampton,Gillingham,29
+E3,06/02/2027,16:00,Rochdale,Colchester,29
+E3,06/02/2027,16:00,Salford,Shrewsbury,29
+E3,06/02/2027,16:00,Swindon,Oldham,29
+E3,06/02/2027,16:00,Tranmere,Newport County,29
+E3,09/02/2027,20:45,Barnet,Exeter,30
+E3,09/02/2027,20:45,Colchester,Bristol Rvs,30
+E3,09/02/2027,20:45,Crawley Town,Northampton,30
+E3,09/02/2027,20:45,Gillingham,Chesterfield,30
+E3,09/02/2027,20:45,Grimsby,Accrington,30
+E3,09/02/2027,20:45,Newport County,Salford,30
+E3,09/02/2027,20:45,Oldham,Fleetwood Town,30
+E3,09/02/2027,20:45,Port Vale,Swindon,30
+E3,09/02/2027,20:45,Rotherham,Tranmere,30
+E3,09/02/2027,20:45,Shrewsbury,Rochdale,30
+E3,09/02/2027,20:45,Walsall,Crewe,30
+E3,09/02/2027,20:45,York,Cheltenham,30
+E3,13/02/2027,16:00,Barnet,Chesterfield,31
+E3,13/02/2027,16:00,Colchester,Swindon,31
+E3,13/02/2027,16:00,Crawley Town,Accrington,31
+E3,13/02/2027,16:00,Gillingham,Rochdale,31
+E3,13/02/2027,16:00,Grimsby,Cheltenham,31
+E3,13/02/2027,16:00,Newport County,Northampton,31
+E3,13/02/2027,16:00,Oldham,Tranmere,31
+E3,13/02/2027,16:00,Port Vale,Salford,31
+E3,13/02/2027,16:00,Rotherham,Bristol Rvs,31
+E3,13/02/2027,16:00,Shrewsbury,Fleetwood Town,31
+E3,13/02/2027,16:00,Walsall,Exeter,31
+E3,13/02/2027,16:00,York,Crewe,31
+E3,20/02/2027,16:00,Accrington,Barnet,32
+E3,20/02/2027,16:00,Bristol Rvs,Grimsby,32
+E3,20/02/2027,16:00,Cheltenham,Crawley Town,32
+E3,20/02/2027,16:00,Chesterfield,Oldham,32
+E3,20/02/2027,16:00,Crewe,Colchester,32
+E3,20/02/2027,16:00,Exeter,Port Vale,32
+E3,20/02/2027,16:00,Fleetwood Town,Newport County,32
+E3,20/02/2027,16:00,Northampton,Shrewsbury,32
+E3,20/02/2027,16:00,Rochdale,Walsall,32
+E3,20/02/2027,16:00,Salford,Rotherham,32
+E3,20/02/2027,16:00,Swindon,York,32
+E3,20/02/2027,16:00,Tranmere,Gillingham,32
+E3,27/02/2027,16:00,Accrington,Port Vale,33
+E3,27/02/2027,16:00,Barnet,Walsall,33
+E3,27/02/2027,16:00,Cheltenham,Exeter,33
+E3,27/02/2027,16:00,Chesterfield,Bristol Rvs,33
+E3,27/02/2027,16:00,Crawley Town,Rotherham,33
+E3,27/02/2027,16:00,Gillingham,Colchester,33
+E3,27/02/2027,16:00,Grimsby,Swindon,33
+E3,27/02/2027,16:00,Newport County,Crewe,33
+E3,27/02/2027,16:00,Northampton,Salford,33
+E3,27/02/2027,16:00,Oldham,Shrewsbury,33
+E3,27/02/2027,16:00,Tranmere,Fleetwood Town,33
+E3,27/02/2027,16:00,York,Rochdale,33
+E3,06/03/2027,16:00,Bristol Rvs,York,34
+E3,06/03/2027,16:00,Colchester,Accrington,34
+E3,06/03/2027,16:00,Crewe,Crawley Town,34
+E3,06/03/2027,16:00,Exeter,Grimsby,34
+E3,06/03/2027,16:00,Fleetwood Town,Chesterfield,34
+E3,06/03/2027,16:00,Port Vale,Oldham,34
+E3,06/03/2027,16:00,Rochdale,Newport County,34
+E3,06/03/2027,16:00,Rotherham,Cheltenham,34
+E3,06/03/2027,16:00,Salford,Barnet,34
+E3,06/03/2027,16:00,Shrewsbury,Tranmere,34
+E3,06/03/2027,16:00,Swindon,Northampton,34
+E3,06/03/2027,16:00,Walsall,Gillingham,34
+E3,13/03/2027,16:00,Accrington,Exeter,35
+E3,13/03/2027,16:00,Barnet,Shrewsbury,35
+E3,13/03/2027,16:00,Cheltenham,Swindon,35
+E3,13/03/2027,16:00,Chesterfield,Salford,35
+E3,13/03/2027,16:00,Crawley Town,Rochdale,35
+E3,13/03/2027,16:00,Gillingham,Fleetwood Town,35
+E3,13/03/2027,16:00,Grimsby,Walsall,35
+E3,13/03/2027,16:00,Newport County,Bristol Rvs,35
+E3,13/03/2027,16:00,Northampton,Crewe,35
+E3,13/03/2027,16:00,Oldham,Colchester,35
+E3,13/03/2027,16:00,Tranmere,Port Vale,35
+E3,13/03/2027,16:00,York,Rotherham,35
+E3,20/03/2027,16:00,Bristol Rvs,Cheltenham,36
+E3,20/03/2027,16:00,Colchester,Tranmere,36
+E3,20/03/2027,16:00,Crewe,Gillingham,36
+E3,20/03/2027,16:00,Exeter,Oldham,36
+E3,20/03/2027,16:00,Fleetwood Town,Crawley Town,36
+E3,20/03/2027,16:00,Port Vale,Barnet,36
+E3,20/03/2027,16:00,Rochdale,Northampton,36
+E3,20/03/2027,16:00,Rotherham,Grimsby,36
+E3,20/03/2027,16:00,Salford,Accrington,36
+E3,20/03/2027,16:00,Shrewsbury,Chesterfield,36
+E3,20/03/2027,16:00,Swindon,Newport County,36
+E3,20/03/2027,16:00,Walsall,York,36
+E3,26/03/2027,16:00,Barnet,Newport County,37
+E3,26/03/2027,16:00,Bristol Rvs,Northampton,37
+E3,26/03/2027,16:00,Cheltenham,Walsall,37
+E3,26/03/2027,16:00,Chesterfield,Rochdale,37
+E3,26/03/2027,16:00,Crawley Town,Swindon,37
+E3,26/03/2027,16:00,Exeter,Gillingham,37
+E3,26/03/2027,16:00,Fleetwood Town,Port Vale,37
+E3,26/03/2027,16:00,Oldham,Crewe,37
+E3,26/03/2027,16:00,Rotherham,Colchester,37
+E3,26/03/2027,16:00,Salford,York,37
+E3,26/03/2027,16:00,Shrewsbury,Accrington,37
+E3,26/03/2027,16:00,Tranmere,Grimsby,37
+E3,29/03/2027,16:00,Accrington,Tranmere,38
+E3,29/03/2027,16:00,Colchester,Barnet,38
+E3,29/03/2027,16:00,Crewe,Fleetwood Town,38
+E3,29/03/2027,16:00,Gillingham,Crawley Town,38
+E3,29/03/2027,16:00,Grimsby,Salford,38
+E3,29/03/2027,16:00,Newport County,Exeter,38
+E3,29/03/2027,16:00,Northampton,Chesterfield,38
+E3,29/03/2027,16:00,Port Vale,Cheltenham,38
+E3,29/03/2027,16:00,Rochdale,Rotherham,38
+E3,29/03/2027,16:00,Swindon,Shrewsbury,38
+E3,29/03/2027,16:00,Walsall,Bristol Rvs,38
+E3,29/03/2027,16:00,York,Oldham,38
+E3,03/04/2027,16:00,Barnet,Gillingham,39
+E3,03/04/2027,16:00,Bristol Rvs,Port Vale,39
+E3,03/04/2027,16:00,Cheltenham,Northampton,39
+E3,03/04/2027,16:00,Chesterfield,Walsall,39
+E3,03/04/2027,16:00,Crawley Town,Colchester,39
+E3,03/04/2027,16:00,Exeter,Swindon,39
+E3,03/04/2027,16:00,Fleetwood Town,York,39
+E3,03/04/2027,16:00,Oldham,Grimsby,39
+E3,03/04/2027,16:00,Rotherham,Accrington,39
+E3,03/04/2027,16:00,Salford,Rochdale,39
+E3,03/04/2027,16:00,Shrewsbury,Newport County,39
+E3,03/04/2027,16:00,Tranmere,Crewe,39
+E3,10/04/2027,16:00,Accrington,Bristol Rvs,40
+E3,10/04/2027,16:00,Colchester,Salford,40
+E3,10/04/2027,16:00,Crewe,Cheltenham,40
+E3,10/04/2027,16:00,Gillingham,Oldham,40
+E3,10/04/2027,16:00,Grimsby,Chesterfield,40
+E3,10/04/2027,16:00,Newport County,Crawley Town,40
+E3,10/04/2027,16:00,Northampton,Barnet,40
+E3,10/04/2027,16:00,Port Vale,Shrewsbury,40
+E3,10/04/2027,16:00,Rochdale,Exeter,40
+E3,10/04/2027,16:00,Swindon,Fleetwood Town,40
+E3,10/04/2027,16:00,Walsall,Rotherham,40
+E3,10/04/2027,16:00,York,Tranmere,40
+E3,13/04/2027,20:45,Accrington,Oldham,41
+E3,13/04/2027,20:45,Barnet,Bristol Rvs,41
+E3,13/04/2027,20:45,Chesterfield,Crawley Town,41
+E3,13/04/2027,20:45,Colchester,Newport County,41
+E3,13/04/2027,20:45,Crewe,Swindon,41
+E3,13/04/2027,20:45,Exeter,Shrewsbury,41
+E3,13/04/2027,20:45,Gillingham,Rotherham,41
+E3,13/04/2027,20:45,Grimsby,Port Vale,41
+E3,13/04/2027,20:45,Northampton,York,41
+E3,13/04/2027,20:45,Rochdale,Tranmere,41
+E3,13/04/2027,20:45,Salford,Cheltenham,41
+E3,13/04/2027,20:45,Walsall,Fleetwood Town,41
+E3,17/04/2027,13:30,Oldham,Rochdale,42
+E3,17/04/2027,16:00,Bristol Rvs,Gillingham,42
+E3,17/04/2027,16:00,Cheltenham,Colchester,42
+E3,17/04/2027,16:00,Crawley Town,Grimsby,42
+E3,17/04/2027,16:00,Fleetwood Town,Barnet,42
+E3,17/04/2027,16:00,Newport County,Accrington,42
+E3,17/04/2027,16:00,Port Vale,Walsall,42
+E3,17/04/2027,16:00,Rotherham,Northampton,42
+E3,17/04/2027,16:00,Shrewsbury,Crewe,42
+E3,17/04/2027,16:00,Swindon,Salford,42
+E3,17/04/2027,16:00,Tranmere,Exeter,42
+E3,17/04/2027,16:00,York,Chesterfield,42
+E3,24/04/2027,16:00,Accrington,Swindon,43
+E3,24/04/2027,16:00,Barnet,Crawley Town,43
+E3,24/04/2027,16:00,Chesterfield,Cheltenham,43
+E3,24/04/2027,16:00,Colchester,Shrewsbury,43
+E3,24/04/2027,16:00,Crewe,Rotherham,43
+E3,24/04/2027,16:00,Exeter,Bristol Rvs,43
+E3,24/04/2027,16:00,Gillingham,York,43
+E3,24/04/2027,16:00,Grimsby,Newport County,43
+E3,24/04/2027,16:00,Northampton,Port Vale,43
+E3,24/04/2027,16:00,Rochdale,Fleetwood Town,43
+E3,24/04/2027,16:00,Salford,Oldham,43
+E3,24/04/2027,16:00,Walsall,Tranmere,43
+E3,27/04/2027,20:45,Bristol Rvs,Crewe,44
+E3,27/04/2027,20:45,Cheltenham,Accrington,44
+E3,27/04/2027,20:45,Crawley Town,Walsall,44
+E3,27/04/2027,20:45,Fleetwood Town,Salford,44
+E3,27/04/2027,20:45,Newport County,Gillingham,44
+E3,27/04/2027,20:45,Oldham,Northampton,44
+E3,27/04/2027,20:45,Port Vale,Colchester,44
+E3,27/04/2027,20:45,Rotherham,Exeter,44
+E3,27/04/2027,20:45,Shrewsbury,Grimsby,44
+E3,27/04/2027,20:45,Swindon,Rochdale,44
+E3,27/04/2027,20:45,Tranmere,Chesterfield,44
+E3,27/04/2027,20:45,York,Barnet,44
+E3,01/05/2027,16:00,Accrington,Fleetwood Town,45
+E3,01/05/2027,16:00,Barnet,Rochdale,45
+E3,01/05/2027,16:00,Cheltenham,Shrewsbury,45
+E3,01/05/2027,16:00,Chesterfield,Swindon,45
+E3,01/05/2027,16:00,Crawley Town,Exeter,45
+E3,01/05/2027,16:00,Gillingham,Salford,45
+E3,01/05/2027,16:00,Grimsby,Crewe,45
+E3,01/05/2027,16:00,Newport County,Port Vale,45
+E3,01/05/2027,16:00,Northampton,Walsall,45
+E3,01/05/2027,16:00,Oldham,Rotherham,45
+E3,01/05/2027,16:00,Tranmere,Bristol Rvs,45
+E3,01/05/2027,16:00,York,Colchester,45
+E3,08/05/2027,16:00,Bristol Rvs,Oldham,46
+E3,08/05/2027,16:00,Colchester,Grimsby,46
+E3,08/05/2027,16:00,Crewe,Accrington,46
+E3,08/05/2027,16:00,Exeter,Chesterfield,46
+E3,08/05/2027,16:00,Fleetwood Town,Northampton,46
+E3,08/05/2027,16:00,Port Vale,Crawley Town,46
+E3,08/05/2027,16:00,Rochdale,Cheltenham,46
+E3,08/05/2027,16:00,Rotherham,Barnet,46
+E3,08/05/2027,16:00,Salford,Tranmere,46
+E3,08/05/2027,16:00,Shrewsbury,York,46
+E3,08/05/2027,16:00,Swindon,Gillingham,46
+E3,08/05/2027,16:00,Walsall,Newport County,46
+T1,09/10/2026,19:00,Galatasaray,Kasimpasa,7
+T1,10/10/2026,12:30,Genclerbirligi,Amedspor,7
+T1,10/10/2026,15:00,Alanyaspor,Erzurumspor,7
+T1,10/10/2026,15:00,Samsunspor,Trabzonspor,7
+T1,10/10/2026,18:00,Rizespor,Fenerbahce,7
+T1,11/10/2026,12:30,Konyaspor,Istanbulspor,7
+T1,11/10/2026,15:00,Gaziantep,Corum,7
+T1,11/10/2026,18:00,Besiktas,Kocaelispor,7
+T1,12/10/2026,19:00,Eyupspor,Goztep,7
+T1,16/10/2026,19:00,Corum,Rizespor,8
+T1,17/10/2026,12:30,Erzurumspor,Eyupspor,8
+T1,17/10/2026,15:00,Amedspor,Konyaspor,8
+T1,17/10/2026,15:00,Genclerbirligi,Galatasaray,8
+T1,17/10/2026,18:00,Fenerbahce,Alanyaspor,8
+T1,18/10/2026,12:30,Kasimpasa,Samsunspor,8
+T1,18/10/2026,15:00,Kocaelispor,Goztep,8
+T1,18/10/2026,18:00,Istanbulspor,Gaziantep,8
+T1,19/10/2026,19:00,Trabzonspor,Besiktas,8
+T1,23/10/2026,19:00,Alanyaspor,Kocaelispor,9
+T1,24/10/2026,12:30,Eyupspor,Kasimpasa,9
+T1,24/10/2026,15:00,Gaziantep,Erzurumspor,9
+T1,24/10/2026,18:00,Samsunspor,Amedspor,9
+T1,25/10/2026,14:00,Konyaspor,Genclerbirligi,9
+T1,25/10/2026,17:00,Goztep,Corum,9
+T1,26/10/2026,17:00,Rizespor,Trabzonspor,9
+T1,26/10/2026,17:00,Besiktas,Istanbulspor,9
+T1,26/10/2026,19:30,Galatasaray,Fenerbahce,9
+T1,30/10/2026,18:00,Konyaspor,Galatasaray,10
+T1,31/10/2026,11:30,Erzurumspor,Corum,10
+T1,31/10/2026,14:00,Kocaelispor,Rizespor,10
+T1,31/10/2026,17:00,Fenerbahce,Goztep,10
+T1,01/11/2026,11:30,Amedspor,Eyupspor,10
+T1,01/11/2026,14:00,Trabzonspor,Gaziantep,10
+T1,01/11/2026,14:00,Istanbulspor,Samsunspor,10
+T1,01/11/2026,17:00,Kasimpasa,Besiktas,10
+T1,02/11/2026,18:00,Genclerbirligi,Alanyaspor,10
+T1,06/11/2026,18:00,Gaziantep,Kasimpasa,11
+T1,07/11/2026,11:30,Eyupspor,Kocaelispor,11
+T1,07/11/2026,14:00,Samsunspor,Konyaspor,11
+T1,07/11/2026,17:00,Goztep,Istanbulspor,11
+T1,07/11/2026,17:00,Galatasaray,Amedspor,11
+T1,08/11/2026,11:30,Rizespor,Erzurumspor,11
+T1,08/11/2026,14:00,Corum,Fenerbahce,11
+T1,08/11/2026,16:30,Alanyaspor,Trabzonspor,11
+T1,08/11/2026,19:00,Besiktas,Genclerbirligi,11
+T1,21/11/2026,11:30,Genclerbirligi,Gaziantep,12
+T1,21/11/2026,14:00,Amedspor,Rizespor,12
+T1,21/11/2026,14:00,Galatasaray,Samsunspor,12
+T1,21/11/2026,17:00,Kocaelispor,Fenerbahce,12
+T1,22/11/2026,11:30,Erzurumspor,Goztep,12
+T1,22/11/2026,14:00,Kasimpasa,Alanyaspor,12
+T1,22/11/2026,14:00,Konyaspor,Besiktas,12
+T1,22/11/2026,17:00,Trabzonspor,Eyupspor,12
+T1,23/11/2026,18:00,Istanbulspor,Corum,12
+T1,27/11/2026,18:00,Alanyaspor,Konyaspor,13
+T1,27/11/2026,18:00,Rizespor,Kasimpasa,13
+T1,28/11/2026,14:00,Samsunspor,Genclerbirligi,13
+T1,28/11/2026,17:00,Gaziantep,Amedspor,13
+T1,29/11/2026,11:30,Corum,Kocaelispor,13
+T1,29/11/2026,14:00,Eyupspor,Istanbulspor,13
+T1,29/11/2026,17:00,Fenerbahce,Erzurumspor,13
+T1,30/11/2026,17:00,Goztep,Trabzonspor,13
+T1,30/11/2026,19:00,Besiktas,Galatasaray,13
+T1,04/12/2026,18:00,Galatasaray,Rizespor,14
+T1,05/12/2026,11:30,Konyaspor,Gaziantep,14
+T1,05/12/2026,14:00,Amedspor,Alanyaspor,14
+T1,05/12/2026,17:00,Istanbulspor,Fenerbahce,14
+T1,06/12/2026,11:30,Erzurumspor,Kocaelispor,14
+T1,06/12/2026,14:00,Genclerbirligi,Eyupspor,14
+T1,06/12/2026,14:00,Besiktas,Samsunspor,14
+T1,06/12/2026,17:00,Trabzonspor,Corum,14
+T1,07/12/2026,18:00,Kasimpasa,Goztep,14
+T1,11/12/2026,18:00,Corum,Amedspor,15
+T1,12/12/2026,11:30,Erzurumspor,Kasimpasa,15
+T1,12/12/2026,14:00,Alanyaspor,Samsunspor,15
+T1,12/12/2026,17:00,Eyupspor,Galatasaray,15
+T1,13/12/2026,11:30,Kocaelispor,Genclerbirligi,15
+T1,13/12/2026,14:00,Rizespor,Istanbulspor,15
+T1,13/12/2026,14:00,Goztep,Konyaspor,15
+T1,13/12/2026,17:00,Fenerbahce,Trabzonspor,15
+T1,14/12/2026,18:00,Gaziantep,Besiktas,15
+T1,18/12/2026,18:00,Kasimpasa,Fenerbahce,16
+T1,18/12/2026,18:00,Amedspor,Goztep,16
+T1,19/12/2026,11:30,Konyaspor,Eyupspor,16
+T1,19/12/2026,14:00,Istanbulspor,Erzurumspor,16
+T1,19/12/2026,17:00,Galatasaray,Alanyaspor,16
+T1,20/12/2026,11:30,Genclerbirligi,Corum,16
+T1,20/12/2026,14:00,Samsunspor,Gaziantep,16
+T1,20/12/2026,17:00,Besiktas,Rizespor,16
+T1,21/12/2026,18:00,Trabzonspor,Kocaelispor,16
+T1,16/01/2027,22:00,Gaziantep,Galatasaray,17
+T1,16/01/2027,22:00,Eyupspor,Samsunspor,17
+T1,16/01/2027,22:00,Alanyaspor,Istanbulspor,17
+T1,16/01/2027,22:00,Rizespor,Genclerbirligi,17
+T1,16/01/2027,22:00,Goztep,Besiktas,17
+T1,16/01/2027,22:00,Corum,Konyaspor,17
+T1,16/01/2027,22:00,Fenerbahce,Amedspor,17
+T1,16/01/2027,22:00,Kocaelispor,Kasimpasa,17
+T1,16/01/2027,22:00,Erzurumspor,Trabzonspor,17
+T1,23/01/2027,22:00,Alanyaspor,Gaziantep,18
+T1,23/01/2027,22:00,Trabzonspor,Kasimpasa,18
+T1,23/01/2027,22:00,Kocaelispor,Istanbulspor,18
+T1,23/01/2027,22:00,Erzurumspor,Amedspor,18
+T1,23/01/2027,22:00,Fenerbahce,Genclerbirligi,18
+T1,23/01/2027,22:00,Rizespor,Konyaspor,18
+T1,23/01/2027,22:00,Corum,Galatasaray,18
+T1,23/01/2027,22:00,Eyupspor,Besiktas,18
+T1,23/01/2027,22:00,Goztep,Samsunspor,18
+T1,30/01/2027,22:00,Istanbulspor,Trabzonspor,19
+T1,30/01/2027,22:00,Gaziantep,Eyupspor,19
+T1,30/01/2027,22:00,Besiktas,Alanyaspor,19
+T1,30/01/2027,22:00,Samsunspor,Rizespor,19
+T1,30/01/2027,22:00,Genclerbirligi,Goztep,19
+T1,30/01/2027,22:00,Kasimpasa,Corum,19
+T1,30/01/2027,22:00,Konyaspor,Fenerbahce,19
+T1,30/01/2027,22:00,Amedspor,Kocaelispor,19
+T1,30/01/2027,22:00,Galatasaray,Erzurumspor,19
+T1,06/02/2027,22:00,Rizespor,Gaziantep,20
+T1,06/02/2027,22:00,Alanyaspor,Eyupspor,20
+T1,06/02/2027,22:00,Kasimpasa,Istanbulspor,20
+T1,06/02/2027,22:00,Trabzonspor,Amedspor,20
+T1,06/02/2027,22:00,Erzurumspor,Genclerbirligi,20
+T1,06/02/2027,22:00,Kocaelispor,Konyaspor,20
+T1,06/02/2027,22:00,Goztep,Galatasaray,20
+T1,06/02/2027,22:00,Corum,Besiktas,20
+T1,06/02/2027,22:00,Fenerbahce,Samsunspor,20
+T1,13/02/2027,22:00,Genclerbirligi,Trabzonspor,21
+T1,13/02/2027,22:00,Amedspor,Kasimpasa,21
+T1,13/02/2027,22:00,Galatasaray,Istanbulspor,21
+T1,13/02/2027,22:00,Alanyaspor,Rizespor,21
+T1,13/02/2027,22:00,Gaziantep,Goztep,21
+T1,13/02/2027,22:00,Eyupspor,Corum,21
+T1,13/02/2027,22:00,Besiktas,Fenerbahce,21
+T1,13/02/2027,22:00,Samsunspor,Kocaelispor,21
+T1,13/02/2027,22:00,Konyaspor,Erzurumspor,21
+T1,20/02/2027,22:00,Fenerbahce,Gaziantep,22
+T1,20/02/2027,22:00,Rizespor,Eyupspor,22
+T1,20/02/2027,22:00,Goztep,Alanyaspor,22
+T1,20/02/2027,22:00,Istanbulspor,Amedspor,22
+T1,20/02/2027,22:00,Kasimpasa,Genclerbirligi,22
+T1,20/02/2027,22:00,Trabzonspor,Konyaspor,22
+T1,20/02/2027,22:00,Kocaelispor,Galatasaray,22
+T1,20/02/2027,22:00,Erzurumspor,Besiktas,22
+T1,20/02/2027,22:00,Corum,Samsunspor,22
+T1,27/02/2027,22:00,Galatasaray,Trabzonspor,23
+T1,27/02/2027,22:00,Konyaspor,Kasimpasa,23
+T1,27/02/2027,22:00,Genclerbirligi,Istanbulspor,23
+T1,27/02/2027,22:00,Besiktas,Amedspor,23
+T1,27/02/2027,22:00,Rizespor,Goztep,23
+T1,27/02/2027,22:00,Alanyaspor,Corum,23
+T1,27/02/2027,22:00,Eyupspor,Fenerbahce,23
+T1,27/02/2027,22:00,Gaziantep,Kocaelispor,23
+T1,27/02/2027,22:00,Samsunspor,Erzurumspor,23
+T1,06/03/2027,22:00,Corum,Gaziantep,24
+T1,06/03/2027,22:00,Goztep,Eyupspor,24
+T1,06/03/2027,22:00,Erzurumspor,Alanyaspor,24
+T1,06/03/2027,22:00,Fenerbahce,Rizespor,24
+T1,06/03/2027,22:00,Amedspor,Genclerbirligi,24
+T1,06/03/2027,22:00,Istanbulspor,Konyaspor,24
+T1,06/03/2027,22:00,Kasimpasa,Galatasaray,24
+T1,06/03/2027,22:00,Kocaelispor,Besiktas,24
+T1,06/03/2027,22:00,Trabzonspor,Samsunspor,24
+T1,13/03/2027,22:00,Besiktas,Trabzonspor,25
+T1,13/03/2027,22:00,Samsunspor,Kasimpasa,25
+T1,13/03/2027,22:00,Gaziantep,Istanbulspor,25
+T1,13/03/2027,22:00,Konyaspor,Amedspor,25
+T1,13/03/2027,22:00,Galatasaray,Genclerbirligi,25
+T1,13/03/2027,22:00,Rizespor,Corum,25
+T1,13/03/2027,22:00,Alanyaspor,Fenerbahce,25
+T1,13/03/2027,22:00,Goztep,Kocaelispor,25
+T1,13/03/2027,22:00,Eyupspor,Erzurumspor,25
+T1,20/03/2027,22:00,Erzurumspor,Gaziantep,26
+T1,20/03/2027,22:00,Kasimpasa,Eyupspor,26
+T1,20/03/2027,22:00,Kocaelispor,Alanyaspor,26
+T1,20/03/2027,22:00,Trabzonspor,Rizespor,26
+T1,20/03/2027,22:00,Corum,Goztep,26
+T1,20/03/2027,22:00,Genclerbirligi,Konyaspor,26
+T1,20/03/2027,22:00,Fenerbahce,Galatasaray,26
+T1,20/03/2027,22:00,Istanbulspor,Besiktas,26
+T1,20/03/2027,22:00,Amedspor,Samsunspor,26
+T1,03/04/2027,23:00,Gaziantep,Trabzonspor,27
+T1,03/04/2027,23:00,Besiktas,Kasimpasa,27
+T1,03/04/2027,23:00,Samsunspor,Istanbulspor,27
+T1,03/04/2027,23:00,Eyupspor,Amedspor,27
+T1,03/04/2027,23:00,Alanyaspor,Genclerbirligi,27
+T1,03/04/2027,23:00,Galatasaray,Konyaspor,27
+T1,03/04/2027,23:00,Goztep,Fenerbahce,27
+T1,03/04/2027,23:00,Rizespor,Kocaelispor,27
+T1,03/04/2027,23:00,Corum,Erzurumspor,27
+T1,10/04/2027,23:00,Kasimpasa,Gaziantep,28
+T1,10/04/2027,23:00,Kocaelispor,Eyupspor,28
+T1,10/04/2027,23:00,Trabzonspor,Alanyaspor,28
+T1,10/04/2027,23:00,Erzurumspor,Rizespor,28
+T1,10/04/2027,23:00,Istanbulspor,Goztep,28
+T1,10/04/2027,23:00,Fenerbahce,Corum,28
+T1,10/04/2027,23:00,Amedspor,Galatasaray,28
+T1,10/04/2027,23:00,Genclerbirligi,Besiktas,28
+T1,10/04/2027,23:00,Konyaspor,Samsunspor,28
+T1,17/04/2027,23:00,Eyupspor,Trabzonspor,29
+T1,17/04/2027,23:00,Alanyaspor,Kasimpasa,29
+T1,17/04/2027,23:00,Corum,Istanbulspor,29
+T1,17/04/2027,23:00,Rizespor,Amedspor,29
+T1,17/04/2027,23:00,Gaziantep,Genclerbirligi,29
+T1,17/04/2027,23:00,Besiktas,Konyaspor,29
+T1,17/04/2027,23:00,Samsunspor,Galatasaray,29
+T1,17/04/2027,23:00,Fenerbahce,Kocaelispor,29
+T1,17/04/2027,23:00,Goztep,Erzurumspor,29
+T1,24/04/2027,23:00,Amedspor,Gaziantep,30
+T1,24/04/2027,23:00,Istanbulspor,Eyupspor,30
+T1,24/04/2027,23:00,Konyaspor,Alanyaspor,30
+T1,24/04/2027,23:00,Kasimpasa,Rizespor,30
+T1,24/04/2027,23:00,Trabzonspor,Goztep,30
+T1,24/04/2027,23:00,Kocaelispor,Corum,30
+T1,24/04/2027,23:00,Erzurumspor,Fenerbahce,30
+T1,24/04/2027,23:00,Galatasaray,Besiktas,30
+T1,24/04/2027,23:00,Genclerbirligi,Samsunspor,30
+T1,01/05/2027,23:00,Corum,Trabzonspor,31
+T1,01/05/2027,23:00,Goztep,Kasimpasa,31
+T1,01/05/2027,23:00,Fenerbahce,Istanbulspor,31
+T1,01/05/2027,23:00,Alanyaspor,Amedspor,31
+T1,01/05/2027,23:00,Eyupspor,Genclerbirligi,31
+T1,01/05/2027,23:00,Gaziantep,Konyaspor,31
+T1,01/05/2027,23:00,Rizespor,Galatasaray,31
+T1,01/05/2027,23:00,Samsunspor,Besiktas,31
+T1,01/05/2027,23:00,Kocaelispor,Erzurumspor,31
+T1,08/05/2027,23:00,Besiktas,Gaziantep,32
+T1,08/05/2027,23:00,Galatasaray,Eyupspor,32
+T1,08/05/2027,23:00,Samsunspor,Alanyaspor,32
+T1,08/05/2027,23:00,Istanbulspor,Rizespor,32
+T1,08/05/2027,23:00,Konyaspor,Goztep,32
+T1,08/05/2027,23:00,Amedspor,Corum,32
+T1,08/05/2027,23:00,Trabzonspor,Fenerbahce,32
+T1,08/05/2027,23:00,Genclerbirligi,Kocaelispor,32
+T1,08/05/2027,23:00,Kasimpasa,Erzurumspor,32
+T1,15/05/2027,23:00,Kocaelispor,Trabzonspor,33
+T1,15/05/2027,23:00,Fenerbahce,Kasimpasa,33
+T1,15/05/2027,23:00,Erzurumspor,Istanbulspor,33
+T1,15/05/2027,23:00,Goztep,Amedspor,33
+T1,15/05/2027,23:00,Corum,Genclerbirligi,33
+T1,15/05/2027,23:00,Eyupspor,Konyaspor,33
+T1,15/05/2027,23:00,Alanyaspor,Galatasaray,33
+T1,15/05/2027,23:00,Rizespor,Besiktas,33
+T1,15/05/2027,23:00,Gaziantep,Samsunspor,33
+T1,22/05/2027,23:00,Galatasaray,Gaziantep,34
+T1,22/05/2027,23:00,Samsunspor,Eyupspor,34
+T1,22/05/2027,23:00,Istanbulspor,Alanyaspor,34
+T1,22/05/2027,23:00,Genclerbirligi,Rizespor,34
+T1,22/05/2027,23:00,Besiktas,Goztep,34
+T1,22/05/2027,23:00,Konyaspor,Corum,34
+T1,22/05/2027,23:00,Amedspor,Fenerbahce,34
+T1,22/05/2027,23:00,Kasimpasa,Kocaelispor,34
+T1,22/05/2027,23:00,Trabzonspor,Erzurumspor,34
+USA,01/10/2026,01:30,Red Bull New York,St. Louis City,28
+USA,02/10/2026,03:30,Seattle Sounders,Sporting Kansas City,28
+USA,07/10/2026,02:30,Chicago Fire,Vancouver Whitecaps,28
+USA,10/10/2026,19:00,Toronto FC,CF Montreal,29
+USA,10/10/2026,20:30,Chicago Fire,New York City,29
+USA,11/10/2026,01:30,Atlanta Utd,FC Cincinnati,29
+USA,11/10/2026,01:30,Charlotte,FC Dallas,29
+USA,11/10/2026,01:30,Inter Miami,DC United,29
+USA,11/10/2026,01:30,New England Revolution,Seattle Sounders,29
+USA,11/10/2026,01:30,Red Bull New York,San Diego FC,29
+USA,11/10/2026,01:30,Orlando City,Columbus Crew,29
+USA,11/10/2026,01:30,Philadelphia Union,Real Salt Lake,29
+USA,11/10/2026,02:30,Austin FC,Nashville SC,29
+USA,11/10/2026,02:30,Sporting Kansas City,Portland Timbers,29
+USA,11/10/2026,02:30,Minnesota United,Houston Dynamo,29
+USA,11/10/2026,03:30,Colorado Rapids,San Jose Earthquakes,29
+USA,11/10/2026,04:30,Los Angeles FC,Vancouver Whitecaps,29
+USA,12/10/2026,,St. Louis City,Los Angeles Galaxy,29
+USA,15/10/2026,01:30,FC Cincinnati,New England Revolution,30
+USA,15/10/2026,01:30,Columbus Crew,Charlotte,30
+USA,15/10/2026,01:30,DC United,Red Bull New York,30
+USA,15/10/2026,01:30,Inter Miami,New York City,30
+USA,15/10/2026,01:30,CF Montreal,Atlanta Utd,30
+USA,15/10/2026,01:30,Toronto FC,Orlando City,30
+USA,15/10/2026,02:30,Chicago Fire,Philadelphia Union,30
+USA,15/10/2026,02:30,FC Dallas,Seattle Sounders,30
+USA,15/10/2026,02:30,Nashville SC,Sporting Kansas City,30
+USA,15/10/2026,02:30,St. Louis City,Vancouver Whitecaps,30
+USA,15/10/2026,03:30,Colorado Rapids,Minnesota United,30
+USA,15/10/2026,03:30,Real Salt Lake,San Jose Earthquakes,30
+USA,15/10/2026,04:30,Los Angeles Galaxy,Portland Timbers,30
+USA,15/10/2026,04:30,Los Angeles FC,Austin FC,30
+USA,15/10/2026,04:30,San Diego FC,Houston Dynamo,30
+USA,17/10/2026,20:30,Philadelphia Union,Charlotte,31
+USA,17/10/2026,22:30,Minnesota United,St. Louis City,31
+USA,18/10/2026,01:30,Atlanta Utd,Inter Miami,31
+USA,18/10/2026,01:30,New England Revolution,Chicago Fire,31
+USA,18/10/2026,01:30,New York City,Los Angeles FC,31
+USA,18/10/2026,01:30,Red Bull New York,Toronto FC,31
+USA,18/10/2026,01:30,Orlando City,DC United,31
+USA,18/10/2026,02:30,Austin FC,Vancouver Whitecaps,31
+USA,18/10/2026,02:30,Houston Dynamo,FC Dallas,31
+USA,18/10/2026,02:30,Sporting Kansas City,Real Salt Lake,31
+USA,18/10/2026,04:30,Los Angeles Galaxy,San Diego FC,31
+USA,18/10/2026,04:30,Portland Timbers,Colorado Rapids,31
+USA,18/10/2026,04:30,San Jose Earthquakes,Nashville SC,31
+USA,18/10/2026,04:30,Seattle Sounders,CF Montreal,31
+USA,19/10/2026,,FC Cincinnati,Columbus Crew,31
+USA,22/10/2026,,FC Cincinnati,DC United,31
+USA,24/10/2026,19:30,CF Montreal,Nashville SC,32
+USA,24/10/2026,21:30,Columbus Crew,Toronto FC,32
+USA,24/10/2026,23:30,Red Bull New York,Inter Miami,32
+USA,25/10/2026,01:30,Atlanta Utd,Chicago Fire,32
+USA,25/10/2026,01:30,DC United,FC Cincinnati,32
+USA,25/10/2026,01:30,Orlando City,New York City,32
+USA,25/10/2026,01:30,Philadelphia Union,New England Revolution,32
+USA,25/10/2026,02:30,FC Dallas,San Jose Earthquakes,32
+USA,25/10/2026,02:30,Houston Dynamo,Minnesota United,32
+USA,25/10/2026,02:30,Sporting Kansas City,Austin FC,32
+USA,25/10/2026,02:30,Colorado Rapids,Vancouver Whitecaps,32
+USA,25/10/2026,02:30,Real Salt Lake,St. Louis City,32
+USA,25/10/2026,03:30,Portland Timbers,Charlotte,32
+USA,25/10/2026,03:30,San Diego FC,Seattle Sounders,32
+USA,26/10/2026,02:00,Los Angeles FC,Los Angeles Galaxy,32
+USA,29/10/2026,00:30,Charlotte,CF Montreal,33
+USA,29/10/2026,00:30,Inter Miami,FC Cincinnati,33
+USA,29/10/2026,00:30,New England Revolution,Red Bull New York,33
+USA,29/10/2026,00:30,New York City,Atlanta Utd,33
+USA,29/10/2026,00:30,Toronto FC,DC United,33
+USA,29/10/2026,01:30,Austin FC,Real Salt Lake,33
+USA,29/10/2026,01:30,Chicago Fire,Orlando City,33
+USA,29/10/2026,01:30,FC Dallas,Columbus Crew,33
+USA,29/10/2026,01:30,Minnesota United,Sporting Kansas City,33
+USA,29/10/2026,01:30,Nashville SC,Philadelphia Union,33
+USA,29/10/2026,01:30,St. Louis City,Portland Timbers,33
+USA,29/10/2026,03:30,San Jose Earthquakes,Colorado Rapids,33
+USA,29/10/2026,03:30,Seattle Sounders,Houston Dynamo,33
+USA,29/10/2026,03:30,Vancouver Whitecaps,San Diego FC,33
+USA,31/10/2026,18:00,Charlotte,Orlando City,34
+USA,31/10/2026,19:00,FC Cincinnati,Philadelphia Union,34
+USA,31/10/2026,19:00,Columbus Crew,DC United,34
+USA,31/10/2026,19:00,New York City,CF Montreal,34
+USA,31/10/2026,20:00,Sporting Kansas City,FC Dallas,34
+USA,31/10/2026,20:00,St. Louis City,San Diego FC,34
+USA,31/10/2026,22:00,Los Angeles Galaxy,Austin FC,34
+USA,31/10/2026,22:00,San Jose Earthquakes,Real Salt Lake,34
+USA,01/11/2026,02:30,Colorado Rapids,Chicago Fire,34
+USA,01/11/2026,22:30,Nashville SC,Red Bull New York,34
+USA,01/11/2026,22:30,Vancouver Whitecaps,Seattle Sounders,34
+USA,01/11/2026,22:30,Atlanta Utd,Toronto FC,34
+USA,02/11/2026,,New England Revolution,Inter Miami,34
+USA,02/11/2026,02:30,Los Angeles FC,Minnesota United,34
+USA,02/11/2026,03:30,Portland Timbers,Houston Dynamo,34
+USA,07/11/2026,22:00,Chicago Fire,Columbus Crew,35
+USA,07/11/2026,22:00,FC Cincinnati,Nashville SC,35
+USA,07/11/2026,22:00,DC United,New York City,35
+USA,07/11/2026,22:00,Inter Miami,Charlotte,35
+USA,07/11/2026,22:00,CF Montreal,Vancouver Whitecaps,35
+USA,07/11/2026,22:00,Red Bull New York,Atlanta Utd,35
+USA,07/11/2026,22:00,Orlando City,New England Revolution,35
+USA,07/11/2026,22:00,Philadelphia Union,Toronto FC,35
+USA,08/11/2026,,Austin FC,Portland Timbers,35
+USA,08/11/2026,,FC Dallas,Colorado Rapids,35
+USA,08/11/2026,,Houston Dynamo,St. Louis City,35
+USA,08/11/2026,,Minnesota United,San Jose Earthquakes,35
+USA,08/11/2026,,Real Salt Lake,Los Angeles Galaxy,35
+USA,08/11/2026,,San Diego FC,Sporting Kansas City,35
+USA,08/11/2026,,Seattle Sounders,Los Angeles FC,35
