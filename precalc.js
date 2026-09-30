@@ -1,7 +1,7 @@
 /* Previsioni della home calcolate su GitHub (Actions), dopo update_data.py.
    Usa lo stesso modello dell'app (la parte di index.html sopra "FINE MODELLO") e gli stessi dati di data/.
    Scrive data/precalc.json: per ogni partita da 11 giorni fa a 15 giorni avanti e per ogni metodo,
-   Over 2,5 %, Gol %, pallini 3/3 e pronostici presi; per le partite da giocare anche tutti gli Over e corner/falli/tiri. L'app lo usa solo se è stato fatto con i suoi stessi dati. */
+   Over 2,5 %, Gol %, pallini 3/3 e pronostici presi; per le partite da giocare anche tutti gli Over, corner/falli/tiri e il Confidence Score. L'app lo usa solo se è stato fatto con i suoi stessi dati. */
 const fs = require("fs"), path = require("path"), vm = require("vm");
 const DIR = __dirname, DATA = path.join(DIR, "data");
 const html = fs.readFileSync(path.join(DIR, "index.html"), "utf8");
@@ -10,7 +10,7 @@ const noop = () => {};
 const ctx = vm.createContext({ console, Math, Date, JSON, Intl, Map, Set, Number, String, Object, Array, isFinite, isNaN, parseFloat, parseInt, Infinity, NaN, Float64Array, WeakMap,
   document: { addEventListener: noop, querySelector: () => null, querySelectorAll: () => [] },
   localStorage: { getItem: () => null, setItem: noop, removeItem: noop }, matchMedia: () => ({ matches: false }) });
-vm.runInContext(html.slice(start, end) + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, rowCompute, isoD, addDays };", ctx);
+vm.runInContext(html.slice(start, end) + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, rowCompute, isoD, addDays, withLeague, confMatch, confPack, CONF_COEF };", ctx);
 const A = ctx.API;
 // impostazioni predefinite delle segnalazioni, lette dalla pagina (mercati accesi e probabilità minima)
 const markets = [...html.matchAll(/class="chip sstat" data-k="([a-z0-9]+)" aria-pressed="true"/g)].map(m => m[1]);
@@ -33,6 +33,11 @@ for (const mode of ["season", "last5", "dyn", "classic"]) {
         row.push(R.G ? R.G.over.map(r4) : null);
         const st = {}; for (const [k, v] of Object.entries(R.stats || {})) st[k] = v.map(r4); row.push(st);
         row.push(R.G ? [r4(R.G.lh), r4(R.G.la)] : null);   // gol attesi casa/ospite (segnalazioni)
+        // Confidence Score di tutte le previsioni della partita (sezione Selezione)
+        if (Object.keys(A.CONF_COEF).length) {
+          const fx = A.S.fixtures.find(x => x.div === e.lg.code && x.home === e.home && x.away === e.away && A.isoD(x.date) === e.d);
+          row.push(A.withLeague(e.lg.code, () => { A.S.cutoff = null; return A.confMatch(e.home, e.away, e.date, fx && fx.odds || null, mode).map(A.confPack); }));
+        }
       }
       rows[e.id + "|" + mode] = row;
     } catch (err) { console.log("errore", e.id, mode, err.message); }

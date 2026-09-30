@@ -350,6 +350,39 @@ select{border-radius:10px}
 .gnext em{font-style:normal;font-weight:700;color:var(--accent)}
 .genmore{width:100%;padding:12px;border-radius:12px;font-weight:600;background:var(--surface);box-shadow:var(--shadow)}
 @media (prefers-reduced-motion:reduce){.day{transition:none}}
+
+.tabbar{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:460px){.tabbar button{font-size:11.5px;letter-spacing:0;padding:9px 0}}
+/* Confidence Score */
+.selhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.info{background:none;border:1px solid var(--line);border-radius:999px;width:28px;height:28px;padding:0;font-size:15px;color:var(--accent);flex:none;cursor:pointer}
+.self{display:flex;flex-wrap:wrap;gap:6px}
+.cbar{position:relative;flex:1 1 auto;min-width:60px;height:10px;border-radius:999px;background:var(--surface-2);overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.cfill{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--ink-3)}
+.cbar.c-ap .cfill{background:linear-gradient(90deg,var(--gold),#e8563a)}.cbar.c-a .cfill{background:var(--good)}.cbar.c-b .cfill{background:var(--accent)}.cbar.c-c .cfill{background:var(--dot-y)}
+.cnum{font-size:18px;font-family:var(--display);white-space:nowrap}.cnum small{font-size:11px;color:var(--ink-3);font-weight:500}
+.ccls{display:inline-grid;place-items:center;min-width:30px;height:22px;padding:0 6px;border-radius:6px;font-weight:800;font-size:12px;background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+.ccls.c-ap{background:linear-gradient(135deg,var(--gold),#e8563a);color:#fff;border-color:transparent}.ccls.c-a{background:var(--good);color:#fff;border-color:transparent}.ccls.c-b{background:var(--accent);color:#fff;border-color:transparent}
+.cbarw{display:flex;align-items:center;gap:8px}
+.ctop{display:grid;gap:6px}.ctop>b{font-size:17px}
+.ctop .cbar,.apcard .cbar{height:12px}
+.cmods{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}.cmods b{margin-left:auto;letter-spacing:.04em}
+.cd{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;color:var(--ink-2)}.cd .info{width:24px;height:24px;font-size:13px;margin-left:auto}
+.st-aplus{font-weight:800;color:#e8563a}.st-watch{font-weight:700;color:var(--good)}.st-none{color:var(--ink-3)}
+.crow{display:grid;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.cl{display:flex;justify-content:space-between;gap:8px;font-weight:700}.cp{color:var(--ink-2)}
+.call summary{cursor:pointer;font-weight:700;color:var(--accent);padding:6px 0}
+.confinfo{display:grid;gap:8px}.cfac{list-style:none;margin:0;padding:0;display:grid;gap:4px}.cfac li{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.aplus{border:1px solid color-mix(in srgb,var(--gold) 55%,var(--line))}
+.aplist{display:grid;gap:10px}
+.apcard{display:grid;gap:6px;text-align:left;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer;font:inherit}
+.aptag{font-weight:800;font-size:12px;letter-spacing:.06em;color:#e8563a}.apm{font-weight:800;font-size:17px}.apmk{font-weight:700;font-size:16px;color:var(--accent)}
+.apgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 12px;color:var(--ink-2)}
+.apnone{margin:0;padding:18px 8px;text-align:center;font-weight:800;letter-spacing:.05em;color:var(--ink-3);border:1px dashed var(--line);border-radius:12px}
+.selm{display:grid;gap:4px;width:100%;text-align:left;padding:10px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}
+.selt{display:flex;flex-direction:column}
+.selp{display:grid;grid-template-columns:minmax(0,1fr) 44px 34px 34px;gap:6px;align-items:center;font-size:14px}
+.selp>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp .num{text-align:right}
 </style>
 </head>
 <body>
@@ -368,6 +401,7 @@ select{border-radius:10px}
   </div>
   <nav class="tabbar" aria-label="Sezioni">
   <button id="navStats" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" /></svg>Partite</button>
+  <button id="navSel" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" /></svg>Selezione</button>
   <button id="navSig" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-6 4 3 7-9" /><circle cx="20" cy="6" r="1.6" /></svg>Segnalazioni</button>
   <button id="navGen" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7" /></svg>Generali</button>
 </nav>
@@ -395,6 +429,21 @@ select{border-radius:10px}
       </div>
     </section>
     <section class="card" id="histOut" aria-label="Risultati bilancio"><p class="muted" style="margin:0">Calcolo in corso…</p></section>
+  </div>
+
+  <div class="view" id="viewSel" hidden>
+    <section class="card aplus" id="selAplus" aria-label="A+ Opportunities"></section>
+    <section class="card" aria-label="Prossime 72 ore">
+      <div class="selhead"><h2>📅 Prossime 72 ore</h2><button class="info" data-conf-info aria-label="Cos'è il Confidence Score">ⓘ</button></div>
+      <div class="self" role="group" aria-label="Filtri" id="selF">
+        <button class="chip" data-sf="all" aria-pressed="true">Tutte</button><button class="chip" data-sf="aplus" aria-pressed="false">A+</button>
+        <button class="chip" data-sf="a" aria-pressed="false">A</button><button class="chip" data-sf="b" aria-pressed="false">B</button>
+        <button class="chip" data-sf="hp" aria-pressed="false">Alta probabilità</button><button class="chip" data-sf="c3" aria-pressed="false">3/3 concordi</button>
+      </div>
+      <div id="selList"></div>
+    </section>
+    <div class="confinfo card" id="confInfo" hidden></div>
+    <p class="small muted" style="margin:0" id="selNote"></p>
   </div>
 
   <div class="view" id="viewGen" hidden>
@@ -477,6 +526,7 @@ select{border-radius:10px}
       <span class="tag" id="seasonTag">Stagione —</span>
     </div>
     <section class="mhead" id="mhead" aria-label="Partita"></section>
+    <section class="card mconf" id="mconf" aria-label="Confidence Score" hidden></section>
     <div class="mtabs" role="tablist" aria-label="Sezioni della partita">
       <button class="mtab" data-mt="prev" aria-pressed="true">Previsioni</button>
       <button class="mtab" data-mt="sig" aria-pressed="false">Segnalazioni</button>
@@ -2448,7 +2498,7 @@ function markNext() {
 }
 
 function refreshAll() {
-  try { ROWC.clear(); GEN_NEXT.clear(); } catch (e) {}   // i dati sono cambiati: le righe della home vanno ricalcolate
+  try { ROWC.clear(); GEN_NEXT.clear(); CONF_C.clear(); } catch (e) {}   // i dati sono cambiati: le righe della home vanno ricalcolate
   let saved = null; try { saved = JSON.parse(lsGet(PICK_KEY) || "null"); } catch (e) {}
   if (saved && saved.league && LG[saved.league] && !refreshAll.started) S.league = saved.league;
   refreshAll.started = true;
@@ -2643,6 +2693,165 @@ function rowCompute(e, cfg, st) {
   return r;
 }
 
+
+/* ===== Confidence Score: un livello SOPRA le previsioni già prodotte (non cambia modelli, pesi o dati) =====
+   Per ogni previsione (mercato + esito più probabile secondo il metodo scelto) misura con i dati dell'app:
+   - concordanza: quanti metodi su 3 (ponderata, dinamica, classica) danno lo stesso esito, e quanto distano le loro probabilità (stabilità);
+   - campione: partite giocate in stagione, in totale e nella sede (casa per chi gioca in casa, trasferta per l'ospite);
+   - frequenza reale dell'esito nelle partite delle due squadre: stagione, ultime 10, ultime 5, casa/trasferta (confrontata con la probabilità);
+   - forza degli avversari: differenza Elo; mercato (solo Over/Under 2,5, se football-data ha la quota): la probabilità del mercato rispetto al modello.
+   Questi fattori entrano in una regressione logistica i cui pesi (CONF_COEF) sono stimati sulle stagioni passate in walk-forward
+   (script conf_bt.js + conf_fit.py): un fattore che non migliora le previsioni sulle stagioni di prova ha peso 0.
+   Il punteggio 0-100 è il percentile di questa stima tra le segnalazioni passate dello stesso mercato (CONF_Q):
+   93 = più solida del 93% delle segnalazioni storiche di quel mercato (previsioni dal 60%). Non è la probabilità di vincita e non usa quote per EV. */
+const CONF_MKS = ["g15", "g25", "g35", "gg", "c", "f", "s", "st"];
+const CONF_MNAME = { g15: "Over/Under 1,5", g25: "Over/Under 2,5", g35: "Over/Under 3,5", gg: "Gol/No gol", c: "1X2 corner", f: "1X2 falli", s: "1X2 tiri", st: "1X2 tiri in porta" };
+/* probabilità dei 3 metodi per tutti i mercati di una partita (dentro withLeague, con S.cutoff già impostato) */
+function confModes(home, away) {
+  const out = {};
+  for (const mk of C3_MODES) {
+    const cfg = MODES[mk], G = modelGoals(home, away, cfg), R = { G, st: {} };
+    const T = modelShots(home, away, cfg);
+    for (const [k, M] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
+      if (!M || !isFinite(M.lh) || !isFinite(M.la)) continue;
+      const P = headToHeadProb(M.lh, M.la, M.r, M.rTeam); R.st[k] = { p1: P.home, px: P.draw, p2: P.away };
+    }
+    out[mk] = R;
+  }
+  return out;
+}
+/* probabilità di un esito ("side") da un risultato di confModes/matchStats */
+function confSideP(R, mk, side) {
+  if (!R) return null;
+  if (mk in GOAL_LINE) { if (!R.G) return null; const p = R.G.over[THG.indexOf(GOAL_LINE[mk])]; return side === "U" ? 1 - p : p; }
+  if (mk === "gg") { if (!R.G) return null; return side === "N" ? 1 - R.G.btts : R.G.btts; }
+  const x = R.st[mk]; if (!x) return null; return side === "1" ? x.p1 : x.p2;
+}
+function confFavSide(R, mk) {
+  if (mk in GOAL_LINE || mk === "gg") { const p = confSideP(R, mk, mk === "gg" ? "G" : "O"); return p == null ? null : p >= 0.5 ? (mk === "gg" ? "G" : "O") : (mk === "gg" ? "N" : "U"); }
+  const x = R && R.st[mk]; if (!x) return null; return x.p1 >= x.p2 ? "1" : "2";
+}
+const CONF_SIDE_LAB = (mk, side) => mk in GOAL_LINE ? (side === "U" ? "Under " : "Over ") + th1(GOAL_LINE[mk]) : mk === "gg" ? (side === "N" ? "No gol" : "Gol") : `${SIG_LABEL[mk]} ${side}`;
+/* l'esito si è verificato in una partita m, dal punto di vista della squadra t che "ha" l'esito (per 1X2: chi ne fa di più) */
+function confHit(m, mk, side, t) {
+  if (mk in GOAL_LINE) { if (m.hg == null) return null; const g = m.hg + m.ag, L = GOAL_LINE[mk]; return side === "U" ? g < L : g > L; }
+  if (mk === "gg") { if (m.hg == null) return null; const b = m.hg > 0 && m.ag > 0; return side === "N" ? !b : b; }
+  const { h: kh, a: ka } = MET[mk]; if (m[kh] == null || m[ka] == null) return null;
+  const mine = m.home === t ? m[kh] : m[ka], opp = m.home === t ? m[ka] : m[kh];
+  return mine > opp;
+}
+/* frequenza reale dell'esito nelle partite delle due squadre (per 1X2: X ne fa di più nelle sue, Y ne fa di meno nelle sue) */
+function confFreq(listX, listY, mk, side, X, Y) {
+  let h = 0, n = 0;
+  for (const m of listX) { const r = confHit(m, mk, side, X); if (r == null) continue; n++; h += r ? 1 : 0; }
+  for (const m of listY) { let r = confHit(m, mk, side, Y); if (r == null) continue; if (!(mk in GOAL_LINE) && mk !== "gg") { const { h: kh, a: ka } = MET[mk]; const mine = m.home === Y ? m[kh] : m[ka], opp = m.home === Y ? m[ka] : m[kh]; r = mine < opp; } n++; h += r ? 1 : 0; }
+  return n ? { e: h / n, n } : { e: null, n: 0 };
+}
+const CONF_CTX = new Map();
+const clampP = p => Math.min(0.995, Math.max(0.005, p)), logit = p => Math.log(clampP(p) / (1 - clampP(p)));
+/* fattori di una previsione. home/away/date/odds della partita, base = metodo scelto, MR = confModes(...) (+ base se non è tra i 3) */
+function confFeatures(home, away, date, odds, mk, base, MR, opts = {}) {
+  const RB = MR[base]; const side = confFavSide(RB, mk); if (!side) return null;
+  if (opts.overOnly && side === "U") return null;   // nell'app: come le segnalazioni, per i gol solo gli Over (gli Under non sono previsioni dell'app)
+  const p = confSideP(RB, mk, side); if (p == null) return null;
+  const ps = C3_MODES.map(k => confSideP(MR[k], mk, side)).filter(x => x != null);
+  const agreeBy = C3_MODES.map(k => confFavSide(MR[k], mk) === side), agreeN = agreeBy.filter(Boolean).length;
+  const spread = ps.length ? Math.max(...ps) - Math.min(...ps) : 0;
+  const isStat = !(mk in GOAL_LINE) && mk !== "gg";
+  const X = isStat ? (side === "1" ? home : away) : home, Y = isStat ? (side === "1" ? away : home) : away;
+  const k = isStat ? mk : "g", { h: kh, a: ka } = MET[k];
+  const cut = S.cutoff ? +S.cutoff : Infinity, ck = `${S.league}|${S.season}|${cut}|${k}|${S.matches.size}`;
+  let CX = CONF_CTX.get(ck);
+  if (!CX) {
+    if (CONF_CTX.size > 60) CONF_CTX.clear();
+    CX = { sm: seasonMatches().filter(m => m[kh] != null && m[ka] != null),
+           allM: leagueMatches().filter(m => +m.date < cut && m[kh] != null && m[ka] != null).sort((a, b) => a.date - b.date) };
+    CONF_CTX.set(ck, CX);
+  }
+  const { sm, allM } = CX;
+  const of = (list, t) => list.filter(m => m.home === t || m.away === t);
+  const fS = confFreq(of(sm, X), of(sm, Y), mk, side, X, Y);
+  const f10 = confFreq(of(allM, X).slice(-10), of(allM, Y).slice(-10), mk, side, X, Y);
+  const f5 = confFreq(of(allM, X).slice(-5), of(allM, Y).slice(-5), mk, side, X, Y);
+  const vH = sm.filter(m => m.home === home), vA = sm.filter(m => m.away === away);
+  const fV = isStat ? confFreq(X === home ? vH : vA, Y === home ? vH : vA, mk, side, X, Y) : confFreq(vH, vA, mk, side, home, away);
+  const nH = of(sm, home).length, nA = of(sm, away).length;
+  const eH = eloAt(S.league, home, +date), eA = eloAt(S.league, away, +date);
+  const dElo = eH && eA ? (eH.elo - eA.elo) / 100 : 0;
+  let mkt = null;
+  if (mk === "g25" && odds && odds.o > 1 && odds.u > 1) { const io = 1 / odds.o, iu = 1 / odds.u, po = io / (io + iu); mkt = side === "U" ? 1 - po : po; }
+  const d = e => e == null ? 0 : e - p;   // frequenza reale meno probabilità del modello
+  return {
+    mk, side, p, agreeN, agreeBy, spread, ps,
+    n: { tot: Math.min(nH, nA), venue: Math.min(vH.length, vA.length), s: fS.n },
+    e: { s: fS.e, l10: f10.e, l5: f5.e, v: fV.e }, mkt,
+    x: {   // variabili della regressione (stessi nomi di conf_fit.py)
+      lp: logit(p), side2: side === "U" || side === "N" || side === "2" ? 1 : 0,
+      agree: (agreeN - 1) / 2, spread,
+      ln_tot: Math.log1p(Math.min(nH, nA)), ln_ven: Math.log1p(Math.min(vH.length, vA.length)),
+      d_s: d(fS.e), d_10: d(f10.e), d_5: d(f5.e), d_v: d(fV.e),
+      elo: isStat ? (side === "1" ? dElo : -dElo) : Math.abs(dElo),
+      mkt: mkt == null ? 0 : logit(mkt) - logit(p), has_mkt: mkt == null ? 0 : 1
+    }
+  };
+}
+
+
+/* Pesi della regressione, percentili e verifica per mercato: stimati da conf_fit.py sul backtest walk-forward (vedi sopra). */
+const CONF_COEF = {"g15":{"b0":0.47348380100321696,"w":{"lp":0.4475742787714905,"side2":-1.552726938064583,"elo":0.17719328223770534,"d_10":0.7835404407400701},"mean":{"lp":1.0864940206871894,"side2":0.021809081158383984,"elo":0.8594824689014091,"d_10":0.0036296352002761585}},"g25":{"b0":-0.007308116568320706,"w":{"lp":1.1408344892112612,"mkt":1.1725531984828501},"mean":{"lp":0.3726402845413189,"mkt":-0.1950848236410933}},"g35":{"b0":0.06015421181128152,"w":{"lp":0.3786912195569535,"side2":0.7031427444742063,"elo":-0.14181777285184496,"d_s":0.9115862479291628,"spread":-1.194695837666631},"mean":{"lp":1.0144484928433175,"side2":0.9686240183447783,"elo":0.8594824689014091,"d_s":-0.0061252018788603545,"spread":0.08288919778580499}},"gg":{"b0":0.05233223700159803,"w":{"lp":0.03925945853788988,"side2":-0.19966156382185712,"agree":0.19144532611507686},"mean":{"lp":0.31414222627692234,"side2":0.4326926633215391,"agree":0.7491524169985082}},"c":{"b0":0.1993814952260925,"w":{"lp":0.4848690706108034,"elo":0.34834322270593937,"side2":-0.5679353425009103,"d_10":1.1671419551737519},"mean":{"lp":0.36118509270002713,"elo":0.42719094230626803,"side2":0.22997259732885675,"d_10":-0.08197061742414892}},"f":{"b0":-0.3146575425843239,"w":{"lp":0.8088237738297838,"agree":0.3921021268239238,"d_10":1.1759511931545437,"side2":0.13659339446036506,"d_v":-0.5991196549791609},"mean":{"lp":0.2716951107216037,"agree":0.8244377514997407,"d_10":-0.02887557088898215,"side2":0.5661614042017429,"d_v":-0.0014298775520280446}},"s":{"b0":0.10409986621285701,"w":{"lp":0.720384193221592,"elo":0.3340233752816298,"agree":0.2931149197507962,"d_5":0.6106123421769878,"side2":-0.5797551397098603,"d_s":1.2501225307746755},"mean":{"lp":0.7339273273755154,"elo":0.4471220085417335,"agree":0.8595674821635767,"d_5":-0.1254585009998272,"side2":0.21048213888957465,"d_s":-0.11831508875009258}},"st":{"b0":0.026641248590638617,"w":{"lp":0.6123939883533988,"elo":0.37657358523532786,"side2":-0.5315953912056501,"d_s":1.076389638441892,"agree":0.20695580213709172},"mean":{"lp":0.3622863875379564,"elo":0.5061503271039574,"side2":0.24458735527192832,"d_s":-0.07422725207988742,"agree":0.8432986891154616}}};   // mk -> { b0, w: {variabile: peso}, mean: {variabile: media} }
+const CONF_Q = {"g15":[0.5692041149417044,0.6678426306855623,0.6760146252568973,0.6816958235937196,0.6860565345125644,0.6895427990790947,0.6925612137672891,0.6951553530725347,0.6975128828888107,0.6996923416848593,0.7016743275446061,0.7035316197884245,0.7052856020575609,0.7070062281127194,0.7085638654338466,0.7100407563477245,0.7115687824047897,0.7129846365165284,0.7144758452929686,0.7158684075912791,0.7172520298766377,0.7186147194008601,0.719866638245927,0.7211783802617919,0.7224072720086328,0.7236376837964741,0.7248014265589183,0.7259931702341323,0.7271483359984634,0.7283188443788626,0.7294799613589168,0.7305736845509649,0.7316149045450732,0.7326446023385358,0.7337826506836342,0.7348253158888116,0.7359098615964734,0.7370090353152516,0.7381087424456784,0.7392323716310106,0.7403166414069409,0.7414817382179429,0.7425984325364016,0.7436856313651079,0.7447689573180755,0.7457989570002835,0.7469067716515195,0.7479453410439258,0.7489944520248989,0.7500589064084805,0.7510920067604537,0.7521179182101736,0.7532358695230497,0.7542899068248238,0.7553414338408548,0.7564807397673424,0.7576212246374568,0.7587371749846283,0.7598819215893539,0.7610632955115706,0.762203194699577,0.7634012982768159,0.7646240060202614,0.7659154031254721,0.7671369899931864,0.7684735949109088,0.769842627948273,0.7711877395490759,0.7724393800455511,0.773732649648375,0.7750411952739688,0.7763965596966671,0.7778182866114027,0.779394375639649,0.7809783589133311,0.7825323347355909,0.7841873844822834,0.7860093192340578,0.7877156665424677,0.7895171941264063,0.7913609977861774,0.7932845843557803,0.7952909323309013,0.7975289498238276,0.7998801227739398,0.8021751860310772,0.8046610831226481,0.8072822677775188,0.8100337033937216,0.8130175109400763,0.8160693793952429,0.8195675114634984,0.8234891440373198,0.8277202678103815,0.8322230541362003,0.8373754173886963,0.8431304306649494,0.8498985611255458,0.8587316321340503,0.8728114970750828,0.9505024320584572],"g25":[0.3049611992500947,0.3788353615202082,0.40557420605502054,0.42005374403221474,0.430729041173917,0.4399573869387918,0.4486062131206045,0.4561596481902277,0.46431503334737906,0.4697335597990547,0.4750778658367057,0.47990193719888957,0.484973432244923,0.48930536491765775,0.49419577733475484,0.49799306470499877,0.50249794822529,0.5072994319174172,0.5100993423435095,0.5136012531195704,0.5173637280021808,0.5207804363684103,0.5233921837480596,0.5251332373745191,0.5271651855528424,0.5307576692037814,0.5341661645643198,0.5376990047316278,0.540596092685025,0.5435622118038987,0.5466266330061674,0.5483171063497513,0.5500693861209416,0.551846100424254,0.5544930272977304,0.5564312457425266,0.5589833160143832,0.5616989828085682,0.5647603268708455,0.567082316686515,0.569078685590662,0.5714702588606697,0.573991680996755,0.5759695628289144,0.5781445502242334,0.5808089629244616,0.583457442713389,0.5863059172731425,0.5886738100502115,0.5903680066990752,0.593495140860544,0.5958790239515322,0.5979877335195499,0.6000531248382093,0.6034027800353481,0.6062287353347231,0.6081063022305097,0.6099992560906449,0.6119654754011946,0.613598437967577,0.6155850134998918,0.6185752528099042,0.6206286982175274,0.6231646961242266,0.6248718262188506,0.6286007457123829,0.6317019046383981,0.6341771304696008,0.6363591406127695,0.6387382322322785,0.6412838338062766,0.645778518843929,0.6491268096787662,0.6523651707064619,0.6541328967425067,0.6573233994067551,0.6611487928725523,0.6648093377076235,0.6678979723745504,0.6707173399816541,0.6734477047101722,0.6754445680891988,0.6784126056198291,0.682840706101481,0.6892079981432893,0.6931271786857625,0.6962334128445242,0.7012062031481371,0.706920171061199,0.7151034681781648,0.7197577263321109,0.72544061015561,0.7304431149869945,0.7397387140233636,0.7443125884634915,0.750840962543095,0.7602702940826771,0.7766088303250716,0.7916546689341991,0.808644227337705,0.8715018521905791],"g35":[0.2611076094403891,0.29601150256421893,0.30813737380683504,0.32074779147755134,0.3303129938038493,0.3343582000268294,0.3367552414539614,0.3399883426525212,0.34307303562050323,0.3450472083066727,0.3466722406015482,0.34938336773845813,0.3528735790209306,0.35547202394149896,0.35716061143018984,0.3586275900340016,0.36063565475221965,0.3618883066781072,0.36462747479432894,0.3673055047512116,0.36993072299587804,0.3729006228473948,0.37427526543833434,0.3754973246820174,0.37796004116492926,0.3796907632516977,0.3823992609488667,0.38427421024797426,0.38635310909185794,0.3878393962316795,0.3889024269178114,0.3905896791274167,0.39228163748769146,0.3930553143989418,0.3934926014290234,0.394119084465612,0.39549177124516605,0.3969941207443718,0.39807052523203096,0.39950274005812625,0.40117141591144007,0.40213532001465796,0.4030412926336397,0.40329244651755064,0.4050470304854922,0.406406668820186,0.40751190297929984,0.4085780823030287,0.4095597275741772,0.41001038262329054,0.41123756998945576,0.4131044937026616,0.4148215341420301,0.4157742510987576,0.41654358498501065,0.41775433057727035,0.41828830202234274,0.4200218411055611,0.4206302985280951,0.42224006891627064,0.42407488470001786,0.4251901929861934,0.42646156050706185,0.42946963185780707,0.4307654849529159,0.4328589269968241,0.434920338344063,0.43754817844634003,0.43912695871061413,0.4402218081989481,0.4417509246902685,0.4436777399364514,0.44533776613943576,0.44874691361190444,0.45092262683869383,0.45218155522826825,0.45345438650341385,0.4549971906470598,0.45635511736591766,0.4584044253074427,0.460713141112975,0.46287549517812443,0.4645012136580379,0.4654082617143735,0.46689596944957973,0.47076587345273735,0.4725984050409602,0.47382278434285613,0.4756923039745032,0.4802150192881862,0.4826549377587269,0.4857059207317428,0.48910454225372846,0.4921437964548145,0.49620035543840413,0.5011687284337117,0.5062122767615744,0.5106215972869586,0.5240557112867057,0.5341374244287113,0.5500841641965193],"gg":[0.46719479035173217,0.4911553280989684,0.49144420984248527,0.49179915305017585,0.4920841223014975,0.4924840220180463,0.4929233791604465,0.4935285605017946,0.493893468487465,0.4944911130286369,0.49515060106964276,0.4963896580430411,0.49794867842190876,0.5017990305453298,0.5150025186484706,0.5150675225558232,0.5151903804097664,0.5153025188360221,0.5154221471475456,0.5155427542298756,0.5156929712493268,0.515826124697133,0.5159729634777528,0.5161143873245544,0.5163065172464003,0.5165291136716078,0.5167310762137954,0.5169085242301056,0.5171341221420518,0.5173559585069814,0.5175689655646566,0.5178113735284935,0.5180520871529313,0.5184081773557491,0.5188450481563258,0.5191767716137418,0.5198727112796578,0.5206467242122391,0.5217772912003074,0.5225539626576887,0.5249571280616293,0.5283613921029872,0.5389721454329283,0.5409273947027682,0.5411606622537923,0.5414987355729696,0.5419369593969317,0.5425082818573491,0.5433095505186494,0.5442419640702517,0.5475297041643276,0.5626510128057833,0.5645869664933644,0.5646384736886901,0.5646834749923672,0.5647056712540881,0.564763573324458,0.5648195436465586,0.5648813020845216,0.5649334092004218,0.5649990235277585,0.5650607761087066,0.5651225266707235,0.565183570904012,0.5652479512766581,0.5653085862550868,0.5653772263583855,0.5654538514135684,0.5655325376426599,0.5656000602767136,0.565677226020128,0.5657669271951851,0.5658410769143244,0.5659088680888377,0.5659916434686852,0.5660945891856191,0.5661874813484703,0.566279009282953,0.5663763949772473,0.5664938488026912,0.5666243678574211,0.5667350386146689,0.5668406516411736,0.5669789149368962,0.5671257648891443,0.5672931108785232,0.5674492249455285,0.5675561842608307,0.5677171317039377,0.5679096447604293,0.5681014822793784,0.568336506923502,0.5685917242409061,0.5689008254810131,0.569276547088528,0.5696638633035878,0.5702464142738719,0.5708076977850467,0.5717427393333213,0.5736287175112621,0.5843017494176519],"c":[0.18499566031534953,0.3897861278453031,0.42829230513151806,0.45086631483992423,0.46715238939094517,0.48022370342231124,0.49148030390678965,0.5004253451883501,0.5095553255449262,0.5175978371416181,0.5243107343213215,0.5308083794358934,0.5368555802343976,0.5420421463109633,0.5466858542285096,0.5510004259806189,0.5553526637412314,0.5598740977063051,0.5643728086819375,0.5681797257655277,0.5719042512892202,0.5754964460564035,0.5790453465317206,0.5820031328494757,0.5854266828020916,0.5885159025255629,0.5915846539455285,0.5943648434881947,0.596921770639792,0.6000014744944338,0.6025594397590142,0.6049328388059353,0.6072356935434461,0.60954573678975,0.6118502408623324,0.6143065889653233,0.616716980980386,0.6190743481865225,0.6216982703442693,0.6239871288707353,0.6266221560871995,0.62885806540977,0.6312028833833127,0.6336329933795226,0.6358485753209973,0.6382731697114344,0.6405228754090679,0.6426403591302913,0.6449068736774055,0.6473697714973732,0.6496684288616396,0.6520511641309072,0.6546824656309231,0.6570912340750227,0.6598460404709284,0.6622572170564213,0.6650746100591436,0.6676235437534974,0.6701530254913703,0.6725720073677424,0.6752314567146903,0.6777853990871289,0.6805463517736206,0.6831267990786943,0.6861549410077812,0.6893804456279333,0.6922497114353229,0.6950016703954772,0.6980924256782484,0.7012863301591155,0.7042555861395402,0.7072405014961654,0.7105905115329298,0.7135689656353997,0.7171210917586323,0.7208491335192282,0.7242755892255016,0.7279141902232485,0.7321008807251357,0.7363205360164833,0.7404630241087116,0.7453593414469725,0.7496221381490802,0.7544876289501381,0.7595807995072958,0.7648966657716882,0.7705626009792456,0.7767587996177441,0.7827151483201744,0.7893049196749419,0.7961386746683159,0.8035047259505785,0.8110435389393703,0.8191819808081112,0.8274625483524752,0.8365365763199548,0.8474806334300287,0.8606116759296253,0.874791726898872,0.8938219942011124,0.9671796286028999],"f":[0.35504121701416047,0.5033667615531773,0.5315763787751057,0.5465946459200939,0.557139617397498,0.565687499993411,0.5714363527254559,0.5765168043209388,0.5807160015206771,0.5844933759777674,0.5879862033982076,0.5909989624025414,0.5935142940949081,0.5961123445352075,0.5983394558496358,0.6005522519822442,0.6028099678988484,0.6052917892599198,0.6073093620181111,0.6089549800118981,0.6107017006869045,0.6124000831350749,0.6139483366139644,0.6155705880941795,0.6169996723462614,0.6187297897601265,0.6202863054092174,0.6216238070992574,0.6229943070251868,0.6244414009333711,0.6256819429873434,0.6269917871363361,0.6283714249452496,0.6298496935718024,0.6311973699034106,0.6323654573475994,0.6335049071751888,0.634835162661105,0.6360763764097561,0.6373019583456424,0.6386121468611722,0.6398589457841178,0.6410315457931278,0.6423047808489843,0.6435298392294997,0.6449708173634204,0.6461974223317933,0.6474299588983239,0.6487035762311927,0.6500099493720675,0.651355182201211,0.6526664676044843,0.6538798645187239,0.6550698160113567,0.6563132289561038,0.6574713588640664,0.6587042229158915,0.6599802845488272,0.6612465747672266,0.662601084947507,0.6641676940163538,0.6654652670259186,0.6668106516380605,0.6682988806608895,0.6697127246982206,0.6711213537269813,0.672608691579117,0.6740915792319444,0.6757038263931207,0.6772482936264689,0.6788475609276242,0.68038982956684,0.6822555122115384,0.6841047849718686,0.6860699694675519,0.6882817328088844,0.6903020551113415,0.6923818264184706,0.6945039939451197,0.6968466764186977,0.6990875346131091,0.7014656074428869,0.7035152297825755,0.7059641363312122,0.70844502883786,0.7109964439029804,0.7139835996809911,0.7169918240857956,0.7203614221569192,0.723979047564328,0.7279468689689239,0.7323137666556349,0.7370593115276408,0.7419744406660644,0.7481172051628086,0.7558630032519609,0.7652010114472253,0.7761308285245244,0.7909914439934207,0.8138127656274705,0.9599420950225863],"s":[0.15874630101184564,0.43122049138374163,0.4782428350979074,0.5042041700668801,0.5205333689457633,0.5342200760940982,0.5453029352552922,0.5541980344764847,0.5622861550221653,0.5695764797610123,0.5759490840008258,0.5821591843836771,0.5872834083567207,0.591807157798704,0.5963843691560307,0.6009407128279141,0.6053582886659257,0.6096153300527358,0.613230533259619,0.6171571622270532,0.6206280243985172,0.6241215975105896,0.6277064576667829,0.6312399932265402,0.6348317432500036,0.6380122481375414,0.6413280590804099,0.644452346064815,0.6473765660909268,0.6504602157019563,0.6536922594029496,0.656735258947746,0.6597789585457232,0.6626960681368873,0.6655635127344688,0.6684757165236548,0.6711280757189596,0.6740493291674015,0.6770804726153624,0.679729321978256,0.6826676529659547,0.6855038533320299,0.6884875982494579,0.6913459476716924,0.6940854459316729,0.6969245302190071,0.6998680090086148,0.7027281168170181,0.7055883602574217,0.708330878098584,0.7112424652584033,0.7141317946251108,0.7170825390569249,0.719883409292182,0.7229551070263002,0.7257200272019682,0.7288751854262125,0.7319815723645481,0.7351183084343302,0.7379777079833167,0.7409628775763605,0.7442579059655814,0.7473758519459386,0.7505522300940185,0.7537487283784615,0.7571842297081443,0.7604728687400065,0.7639828999004314,0.7672739118477573,0.7710420412665253,0.7747555842181241,0.7783968312147505,0.782387737638432,0.7862342420874738,0.7901073736007536,0.7944410126733836,0.7986898720362868,0.8031657362878333,0.8077932468754012,0.8120147696952448,0.8166479967554829,0.8213061883632647,0.8264530067130632,0.8310654474383519,0.8362529881002959,0.8419569391293661,0.8479399031750408,0.8535427899922502,0.8595369430184517,0.8663131485860297,0.8733861559244877,0.8807674769326437,0.8883103384596145,0.8968835968168345,0.9059255154361383,0.9148950517367962,0.9254327133689366,0.9374839909287351,0.9509565192782357,0.9677482878748884,0.9964361513520493],"st":[0.23523477665963907,0.4497363017956225,0.489911745481422,0.5140530727032931,0.5295057969868355,0.5408138253007877,0.5502917512609733,0.5586534293420744,0.5661689223279137,0.5725624380620387,0.5775381071909355,0.5826339076112911,0.587554434855848,0.5916967755492156,0.5957697855868189,0.6000956641185483,0.6041895146647261,0.6080634959571534,0.6119614943269907,0.6154116893339119,0.6189878666126858,0.6221647727418925,0.6253991275278771,0.6282621668477527,0.631280918149569,0.6340427767034722,0.6368568909776915,0.6395022356069273,0.6425943239751718,0.6452110271228336,0.6477970204337226,0.6504605610887084,0.652769119192906,0.6553265603638766,0.6578061324282056,0.6606514196624892,0.6630756399229089,0.6654818472006645,0.6680796876280529,0.6705329335394747,0.6730056627980042,0.6754770767698345,0.678017291941102,0.6805940210698674,0.6829456883202041,0.6854089562146408,0.6879717599133395,0.6903658324337031,0.6930927432175378,0.695906359160597,0.6986620275477565,0.701387435605953,0.704024900751698,0.7065020673470112,0.7093024177702433,0.711841794792086,0.7146660535785127,0.7174002933008674,0.7199745529947991,0.7227526242780399,0.725642533706376,0.7285070836913462,0.7315398065562105,0.734759107947454,0.7377492783269983,0.7406486041296506,0.7439165501053713,0.7473548571682911,0.7507780929265581,0.754299392797434,0.757601295919575,0.7610303039077575,0.7648193016457128,0.7686792495866411,0.7724605312643567,0.7763065311453307,0.7803833976476768,0.7843541920214968,0.7884667145266409,0.7926417332598841,0.7974286850977255,0.8020439337198842,0.8069304747989549,0.8119456834211057,0.8177782277186917,0.8224842645053089,0.8278019063609291,0.8337424920509158,0.8395834684377339,0.8454170938264429,0.8523253075777986,0.8591293156038965,0.8667767500000948,0.8739389409479433,0.8820982788059917,0.8903145432917375,0.8999559421350918,0.910645311944349,0.9239956589921505,0.9422570733092462,0.9816473656971142]};      // mk -> 101 percentili della stima sulle previsioni passate
+const CONF_VAL = {"g15":{"cls":{"A+":[1708,2031],"A":[2002,2457],"B":[1589,2036],"C":[1429,1855],"D":[6953,9593]},"seasons":"stagioni 2023-24 \u2013 2025-26, 21 campionati, segnalazioni dal 60% con la Media ponderata"},"g25":{"cls":{"A+":[277,364],"A":[271,397],"B":[263,384],"C":[280,431],"D":[1320,2504]},"seasons":"stagioni 2023-24 \u2013 2025-26, 21 campionati, segnalazioni dal 60% con la Media ponderata"},"g35":{"cls":{"A+":[0,2],"A":[12,27],"B":[13,20],"C":[3,16],"D":[85,218]},"seasons":"stagioni 2023-24 \u2013 2025-26, 21 campionati, segnalazioni dal 60% con la Media ponderata"},"gg":{"cls":{"A+":[318,494],"A":[624,1080],"B":[417,707],"C":[401,666],"D":[1925,3707]},"seasons":"stagioni 2023-24 \u2013 2025-26, 21 campionati, segnalazioni dal 60% con la Media ponderata"},"c":{"cls":{"A+":[568,673],"A":[598,786],"B":[418,569],"C":[382,558],"D":[2498,4288]},"seasons":"stagioni 2023-24 \u2013 2025-26, 21 campionati, segnalazioni dal 60% con la Media ponderata"},"f":{"cls":{"A+":[228,292],"A":[447,593],"B":[372,485],"C":[365,510],"D":[1867,2912]},"seasons":"stagioni 2023-24 \u2013 2025-26, 21 campionati, segnalazioni dal 60% con la Media ponderata"},"s":{"cls":{"A+":[754,806],"A":[1130,1306],"B":[868,1053],"C":[842,1138],"D":[4696,7317]},"seasons":"stagioni 2023-24 \u2013 2025-26, 21 campionati, segnalazioni dal 60% con la Media ponderata"},"st":{"cls":{"A+":[504,552],"A":[595,697],"B":[449,565],"C":[437,564],"D":[2147,3447]},"seasons":"stagioni 2023-24 \u2013 2025-26, 21 campionati, segnalazioni dal 60% con la Media ponderata"}};    // mk -> { cls: { "A+": [prese, totale], ... }, seasons: "..." } verifica sulle stagioni di prova
+const CONF_FACT = [     // fattori mostrati all'utente e variabili che li compongono
+  ["Probabilità del modello", ["lp", "side2"]], ["Modelli concordi", ["agree"]], ["Stabilità tra i metodi", ["spread"]],
+  ["Campione", ["ln_tot", "ln_ven"]], ["Stagione", ["d_s"]], ["Forma recente (ultime 10 e 5)", ["d_10", "d_5"]],
+  ["Casa/trasferta", ["d_v"]], ["Avversario (Elo)", ["elo"]], ["Mercato (quote Over/Under 2,5)", ["mkt", "has_mkt"]]];
+const confClass = sc => sc >= 90 ? "A+" : sc >= 80 ? "A" : sc >= 70 ? "B" : sc >= 60 ? "C" : "D";
+/* punteggio di una previsione (F = confFeatures). Regole fisse, scritte qui:
+   - score = percentile della stima tra le segnalazioni passate dello stesso mercato (previsioni dal 60%, niente Under) (0-100);
+   - classe dal punteggio (90 A+, 80 A, 70 B, 60 C, sotto D), ma A+ solo se: è una segnalazione (almeno 60%, non Under), almeno 2/3 metodi concordi,
+     campione sufficiente (almeno 5 partite in stagione e 3 nella sede per entrambe) e nessuna forte contraddizione;
+     altrimenti resta A e si dice perché;
+   - contraddizione: una frequenza reale (stagione, ultime 10, ultime 5, casa/trasferta) dice il contrario (esito uscito meno di metà delle volte);
+     forte = almeno 2 su 4;
+   - stato: A+ OPPORTUNITY se classe A+; WATCH se punteggio almeno 70 senza forte contraddizione; altrimenti NO SIGNAL. */
+function confScore(F) {
+  const C = CONF_COEF[F.mk], Q = CONF_Q[F.mk]; if (!C || !Q) return null;
+  let z = C.b0; const contrib = {};
+  for (const [k, w] of Object.entries(C.w)) { const v = F.x[k]; z += w * v; contrib[k] = w * (v - (C.mean[k] || 0)); }
+  const q = 1 / (1 + Math.exp(-z));
+  let i = 0; while (i < Q.length && Q[i] <= q) i++;
+  let score;
+  if (i === 0) score = 0; else if (i >= Q.length) score = 100;
+  else score = (i - 1 + (q - Q[i - 1]) / Math.max(1e-9, Q[i] - Q[i - 1])) * 100 / (Q.length - 1);
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const contra = ["s", "l10", "l5", "v"].filter(k => F.e[k] != null && F.e[k] < 0.5).length;
+  const gates = { sig: F.p >= 0.6 && F.side !== "U", agree: F.agreeN >= 2, sample: F.n.tot >= 5 && F.n.venue >= 3, contra: contra < 2 };
+  let cls = confClass(score), why = [];
+  if (cls === "A+") { if (!gates.sig) why.push(F.side === "U" ? "gli Under non sono tra le segnalazioni" : "probabilità sotto il 60%"); if (!gates.agree) why.push("solo 1 metodo su 3"); if (!gates.sample) why.push("campione piccolo"); if (!gates.contra) why.push("dati contrastanti"); if (why.length) cls = "A"; }
+  const status = cls === "A+" ? "aplus" : score >= 70 && gates.contra ? "watch" : "none";
+  const stab = F.spread < 0.05 ? "Alta" : F.spread < 0.10 ? "Media" : "Bassa";
+  const samp = F.n.venue >= 6 && F.n.tot >= 10 ? "Alto" : gates.sample ? "Medio" : "Basso";
+  return { q, score, cls, status, why, contra, gates, stab, samp, contrib };
+}
+/* tutte le previsioni di una partita con il loro punteggio (dentro withLeague, con S.cutoff impostato), dalla più solida */
+const CONF_MR = new Map();   // probabilità dei 3 metodi per partita (uguali per ogni metodo scelto: si calcolano una volta)
+function confMatch(home, away, date, odds, baseKey) {
+  const mrk = `${S.league}|${S.season}|${home}|${away}|${+date}|${S.cutoff ? +S.cutoff : 0}|${S.matches.size}`;
+  if (!CONF_MR.has(mrk)) { if (CONF_MR.size > 3000) CONF_MR.clear(); CONF_MR.set(mrk, confModes(home, away)); }
+  const MR = { ...CONF_MR.get(mrk) };
+  if (!MR[baseKey]) { const cfg = MODES[baseKey], G = modelGoals(home, away, cfg), R = { G, st: {} }, st = matchStats(home, away, cfg); for (const k in st) R.st[k] = { p1: st[k][2], px: st[k][3], p2: st[k][4] }; MR[baseKey] = R; }
+  const out = [];
+  for (const mk of CONF_MKS) {
+    const F = confFeatures(home, away, date, odds, mk, baseKey, MR, { overOnly: true }); if (!F) continue;
+    const Sc = confScore(F); if (!Sc) continue;
+    out.push({ ...F, ...Sc });
+  }
+  return out.sort((a, b) => b.score - a.score || b.p - a.p);
+}
+/* forma compatta (precalc.json): [mk, side, p, score, classe, stato, concordi, spread, n tot, n sede, stab, campione, contraddizioni] */
+const confPack = r => [r.mk, r.side, Math.round(r.p * 1e4) / 1e4, r.score, r.cls, r.status, r.agreeN, Math.round(r.spread * 1e3) / 1e3, r.n.tot, r.n.venue, r.stab, r.samp, r.contra];
+const confUnpack = a => ({ mk: a[0], side: a[1], p: a[2], score: a[3], cls: a[4], status: a[5], agreeN: a[6], spread: a[7], n: { tot: a[8], venue: a[9] }, stab: a[10], samp: a[11], contra: a[12], packed: true });
+
 /* ===== FINE MODELLO: tutto ciò che sta sopra è usato anche da storico.js su GitHub ===== */
 
 /* ===== Caricamento dati ===== */
@@ -2699,7 +2908,7 @@ $("#file").addEventListener("change", async e => {
 $("#resetBtn").addEventListener("click", () => { lsDel(STORE_KEY); loadEmbedded(); $("#importMsg").hidden = true; refreshAll(); });
 $("#swap").addEventListener("click", () => { CUR = null; S.cutoff = null; const h = $("#home").value; $("#home").value = $("#away").value; $("#away").value = h; render(); });
 ["#home", "#away"].forEach(s => $(s).addEventListener("change", () => { CUR = null; S.cutoff = null; render(); }));
-$("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; if (!$("#viewMatch").hidden) render(); renderNext(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewGen").hidden) renderGen(); });
+$("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; if (!$("#viewMatch").hidden) render(); renderNext(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewGen").hidden) renderGen(); if (!$("#viewSel").hidden) renderSel(); });
 $("#league").innerHTML = LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 $("#league").addEventListener("change", e => { CUR = null; S.cutoff = null; S.league = e.target.value; let sv = {}; try { sv = JSON.parse(lsGet(PICK_KEY) || "{}") || {}; } catch (x) {} sv.league = S.league; lsSet(PICK_KEY, JSON.stringify(sv)); refreshAll(); });
 
@@ -2723,7 +2932,7 @@ function sigCardsHTML(rows, pref, withMatch = true, played = null) {
     return `<div class="sig">
       <button class="sigopen" data-lg="${r.lg.code}" data-h="${esc(r.f.home)}" data-a="${esc(r.f.away)}" data-d="${isoD(r.f.date)}"${withMatch ? "" : " disabled"}>
         ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}
-        <span class="p num">${pc(r.p)}<small>quota equa ${f2(1 / r.p)}</small></span>
+        <span class="p num">${pc(r.p)}</span>
         <span class="d">${r.c3 ? `<span class="stag c3" title="Stesso esito con tutte e 3 le medie">3/3</span>` : ""}<span class="stag">${MK_TAG[r.mk]}</span><b>${esc(r.fav)}</b> · ${detail}</span>
         ${withMatch ? `<span class="w">${esc(r.lg.name)} · ${DAYS_SHORT[r.f.date.getUTCDay()]} ${dstr(r.f.date)}${r.f.time ? " · " + esc(r.f.time) : ""}</span>` : ""}
       </button>
@@ -3014,6 +3223,7 @@ function renderMatchExtras(home, away) {
     <span class="team">${crest(S.league, away, "crl") || `<i style="background:var(--s2)"></i>`}${esc(away || "—")}</span>
     ${c3HTML(home, away, e, cfg)}
     <span class="kp"><span>Gol attesi <b>${G ? f2(G.tot) : "N/D"}</b></span><span>Over 2,5 <b>${G ? pc(G.over[1]) : "N/D"}</b></span><span>Gol/No gol <b>${G ? pc(G.btts) : "N/D"}</b></span></span>`;
+  renderMatchConf(home, away, e, cfg);
   // confronto previsione / partita giocata
   const cmp = $("#mcmp");
   if (m && G) {
@@ -3276,13 +3486,111 @@ $("#genLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAG
 ["#genMk", "#genLg", "#genSoon"].forEach(id => $(id).addEventListener("change", () => { GEN.shown = 10; renderGen(); }));
 document.querySelectorAll("#genVenue .segb").forEach(b => b.addEventListener("click", () => { GEN.venue = b.dataset.gv; GEN.shown = 10; document.querySelectorAll("#genVenue .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
 document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("click", () => { GEN.per = b.dataset.gp; GEN.shown = 10; document.querySelectorAll("#genPer .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
+
+/* ===== Confidence Score: interfaccia (Selezione, scheda partita) ===== */
+const CONF_C = new Map();   // previsioni con punteggio per partita e metodo (sessione)
+const CONF_STATUS = { aplus: "🔥 A+ OPPORTUNITY", watch: "🟢 WATCH", none: "⚪ NO SIGNAL" };
+const SEL = { f: "all" };
+function entryOdds(e) {
+  if (e.m) return e.m.odds || null;
+  const f = S.fixtures.find(x => x.div === e.lg.code && x.home === e.home && x.away === e.away && isoD(x.date) === e.d);
+  return f && f.odds || null;
+}
+function confEntry(e, cfg, peek) {   // lista delle previsioni con punteggio; peek = non calcolare
+  const key = e.id + "|" + cfg.key;
+  if (CONF_C.has(key)) return CONF_C.get(key);
+  const P = PRECALC, x = P && P.updated === S.meta.fetched ? P.rows[key] : null;
+  if (x && x[8]) { const L = x[8].map(confUnpack); CONF_C.set(key, L); return L; }
+  if (peek) return undefined;
+  let L = [];
+  withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = e.m ? e.date : null;
+    try { if (e.m) S.season = e.m.season; L = confMatch(e.home, e.away, e.date, entryOdds(e), cfg.key); } finally { S.cutoff = c0; } });
+  CONF_C.set(key, L); return L;
+}
+const confLab = r => CONF_SIDE_LAB(r.mk, r.side) + (r.h && (r.side === "1" || r.side === "2") ? ` (${r.side === "1" ? r.h : r.a})` : "");
+function confBar(score, cls) {
+  return `<span class="cbarw"><span class="cbar c-${cls === "A+" ? "ap" : cls.toLowerCase()}"><span class="cfill" style="width:${score}%"></span></span><b class="cnum num">${score}<small>/100</small></b><span class="ccls c-${cls === "A+" ? "ap" : cls.toLowerCase()}">${cls}</span></span>`;
+}
+function confInfoHTML(r) {
+  const base = `<p style="margin:0"><b>Il Confidence Score misura quanto sono coerenti e solide le evidenze statistiche alla base della previsione. Non rappresenta la probabilità di vincita e non tiene conto delle quote dei bookmaker.</b></p>
+    <p class="small" style="margin:0">Come si calcola: per ogni previsione l'app misura concordanza dei 3 metodi, stabilità delle loro probabilità, campione, frequenza reale dell'esito (stagione, ultime 10, ultime 5, casa/trasferta), forza degli avversari e, solo per Over/Under 2,5, se il mercato è d'accordo. I pesi di questi fattori sono stati stimati sulle stagioni passate, usando ogni volta solo le partite giocate prima (walk-forward). Il punteggio dice quanto la previsione è solida rispetto alle segnalazioni passate dello stesso mercato (previsioni dal 60%): 93 = più solida del 93% di quelle. Le previsioni sotto il 60% hanno di solito punteggi bassi.</p>
+    <p class="small" style="margin:0">Classi: 90-100 A+ · 80-89 A · 70-79 B · 60-69 C · sotto 60 D. A+ solo per le segnalazioni (almeno 60%, niente Under), con almeno 2 metodi su 3 concordi, almeno 5 partite in stagione e 3 nella sede per entrambe le squadre e senza dati fortemente contrastanti. I fattori che sulle stagioni passate non miglioravano le previsioni hanno peso 0 e non compaiono tra i contributi.</p>`;
+  if (!r) return base;
+  const V = CONF_VAL[r.mk];
+  const val = V ? `<p class="small muted" style="margin:0">Verifica (${esc(V.seasons)}, ${esc(CONF_MNAME[r.mk])}): ${["A+", "A", "B", "C", "D"].filter(c => V.cls[c] && V.cls[c][1]).map(c => `${c} presa ${Math.round(V.cls[c][0] / V.cls[c][1] * 100)}% (${V.cls[c][1]})`).join(" · ")}.</p>` : "";
+  let fac = "";
+  if (r.contrib) {
+    const lab = v => v > 0.15 ? ["molto forte", "good"] : v > 0.05 ? ["forte", "good"] : v >= -0.05 ? ["neutro", "muted"] : v >= -0.15 ? ["contro", "bad"] : ["molto contro", "bad"];
+    fac = `<ul class="cfac">${CONF_FACT.map(([n, ks]) => { const ks2 = ks.filter(k => k in r.contrib); if (!ks2.length) return ""; const v = ks2.reduce((a, k) => a + r.contrib[k], 0); const [t, c] = lab(v); return `<li><span>${v >= -0.05 ? "✓" : "✗"} ${esc(n)}</span><b class="${c}">${t}</b></li>`; }).join("")}</ul>`;
+  }
+  return `<p style="margin:0"><b>${esc(confLab(r))}</b> · Confidence ${r.score}/100 · ${r.cls}</p>${fac}${val}${base}`;
+}
+function confRowHTML(r, i, withInfo) {
+  return `<div class="crow">
+    <div class="cl"><span class="cmk">${esc(confLab(r))}</span><span class="cp num">${pc1(r.p)}</span></div>
+    <div class="cm">${confBar(r.score, r.cls)}</div>
+    <div class="cd small"><span>Modelli <b>${r.agreeN}/3</b></span><span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
+  </div>`;
+}
+function renderMatchConf(home, away, e, cfg) {
+  const box = $("#mconf"); if (!box) return;
+  if (!e || !home || !away || !Object.keys(CONF_COEF).length) { box.hidden = true; return; }
+  let L; try { L = withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = e.m ? e.date : null; try { if (e.m) S.season = e.m.season; return confMatch(home, away, e.date, entryOdds(e), cfg.key); } finally { S.cutoff = c0; } }); } catch (x) { L = []; }
+  if (!L.length) { box.hidden = true; return; }
+  L = L.map(r => ({ ...r, h: home, a: away }));
+  const top = L[0];
+  box.hidden = false;
+  box.innerHTML = `<div class="selhead"><h2>Confidence Score</h2><button class="info" data-ci="0" aria-label="Cos'è il Confidence Score">ⓘ</button></div>
+    <div class="ctop"><span class="small muted">Previsione più solida</span><b>${esc(confLab(top))} · ${pc1(top.p)}</b>${confBar(top.score, top.cls)}
+      <span class="cmods small">${C3_MODES.map((k, j) => `<span class="${top.agreeBy[j] ? "good" : "bad"}">${top.agreeBy[j] ? "✓" : "✗"} ${{ season: "Ponderato", dyn: "Dinamico", classic: "Classico" }[k]}</span>`).join("")}<b>${top.agreeN}/3 CONCORDI</b></span><span class="cd small"><span>Stabilità <b>${top.stab}</b></span><span>Campione <b>${top.samp}</b></span><span class="st-${top.status}">${CONF_STATUS[top.status]}</span>${top.why.length ? `<span class="muted">A+ non confermato: ${esc(top.why.join(", "))}</span>` : top.contra >= 2 ? `<span class="muted">${top.contra} frequenze reali su 4 dicono il contrario</span>` : ""}</span></div>
+    <details class="call"><summary>Tutti i mercati (${L.length})</summary>${L.map((r, i) => confRowHTML(r, i, true)).join("")}</details>
+    <div class="confinfo" id="mconfInfo" hidden></div>
+    ${e.m ? `<p class="small muted" style="margin:0">Partita giocata: punteggi calcolati solo con le partite precedenti.</p>` : ""}`;
+  box.querySelectorAll("[data-ci]").forEach(b => b.addEventListener("click", () => { const P = $("#mconfInfo"); const same = !P.hidden && P.dataset.i === b.dataset.ci; P.hidden = same; P.dataset.i = b.dataset.ci; if (!same) P.innerHTML = confInfoHTML(L[+b.dataset.ci]); }));
+}
+function selEntries() {
+  const t0 = localIso(), lim = isoD(new Date(Date.now() + 72 * 36e5));
+  return allEntries().filter(e => !e.m && e.d >= t0 && e.d <= lim);
+}
+let SEL_T = 0;
+function renderSel() {
+  const cfg = MODES[$("#decay").value] || MODES.season, ents = selEntries();
+  const noModel = !Object.keys(CONF_COEF).length;
+  const aBox = $("#selAplus"), list = $("#selList");
+  if (noModel) { aBox.innerHTML = `<h2>🔥 A+ Opportunities</h2><p class="muted" style="margin:0">Confidence Score non disponibile.</p>`; list.innerHTML = ""; return; }
+  const got = [], todo = [];
+  for (const e of ents) { const L = confEntry(e, cfg, true); if (L === undefined) todo.push(e); else got.push([e, L]); }
+  const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "hp" ? r.p >= 0.7 : SEL.f === "c3" ? r.agreeN === 3 : true;
+  const aplus = got.flatMap(([e, L]) => L.filter(r => r.status === "aplus").map(r => [e, { ...r, h: e.home, a: e.away }])).sort((a, b) => b[1].score - a[1].score || b[1].p - a[1].p);
+  const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
+  aBox.innerHTML = `<div class="selhead"><h2>🔥 A+ Opportunities</h2><span class="small muted" style="white-space:nowrap">72 ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
+    aplus.length ? `<div class="aplist">${aplus.map(([e, r]) => `<button class="apcard" data-id="${esc(e.id)}">
+      <span class="aptag">🔥 A+ OPPORTUNITY</span>
+      <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
+      <span class="apmk">${esc(confLab(r))}</span>
+      <span class="apgrid small"><span>Probabilità <b>${pc1(r.p)}</b></span><span>Confidence <b>${r.score}/100</b></span><span>Classe <b>${r.cls}</b></span><span>Modelli <b>${r.agreeN}/3 concordi</b></span><span>Campione <b>${r.samp}</b></span><span>Stabilità <b>${r.stab}</b></span></span>
+      ${confBar(r.score, r.cls)}</button>`).join("")}</div>` : `<p class="apnone">NESSUNA OPPORTUNITÀ A+ DISPONIBILE</p>`);
+  const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
+  list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime 72 ore.</p>` :
+    (rows.length ? rows.map(([e, L]) => `<button class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
+      ${L.slice(0, 3).map(r => `<span class="selp"><span>${esc(confLab(r))}</span><span class="num">${pc(r.p)}</span><span class="num">${r.score}</span><span class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</span></span>`).join("")}</button>`).join("")
+      : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
+  document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
+  $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}). Per ogni partita le 3 previsioni più solide; colonne: esito · probabilità · Confidence · classe. Alta probabilità = almeno 70%.`;
+  clearTimeout(SEL_T);
+  if (todo.length) SEL_T = setTimeout(() => { const t = performance.now(); for (const e of todo) { try { confEntry(e, cfg); } catch (x) { CONF_C.set(e.id + "|" + cfg.key, []); } if (performance.now() - t > 250) break; } if (!$("#viewSel").hidden) renderSel(); }, 20);
+}
+document.querySelectorAll("#selF .chip").forEach(b => b.addEventListener("click", () => { SEL.f = b.dataset.sf; document.querySelectorAll("#selF .chip").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderSel(); }));
+document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null); P.scrollIntoView({ block: "nearest" }); } }));
+
 function showView(v) {
-  $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewHist").hidden = true; $("#viewGen").hidden = v !== "gen"; $("#viewMatch").hidden = v !== "match";
-  $("#navStats").setAttribute("aria-pressed", String(v === "stats" || v === "match")); $("#navSig").setAttribute("aria-pressed", String(v === "sig")); $("#navGen").setAttribute("aria-pressed", String(v === "gen"));
+  $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewHist").hidden = true; $("#viewGen").hidden = v !== "gen"; $("#viewSel").hidden = v !== "sel"; $("#viewMatch").hidden = v !== "match";
+  $("#navStats").setAttribute("aria-pressed", String(v === "stats" || v === "match")); $("#navSig").setAttribute("aria-pressed", String(v === "sig")); $("#navGen").setAttribute("aria-pressed", String(v === "gen")); $("#navSel").setAttribute("aria-pressed", String(v === "sel"));
   if (v !== "match") { S.cutoff = null; lsSet("statPreviste.view", v); }
   if (v === "stats") renderSched();
   if (v === "sig") renderSignals();
   if (v === "gen") renderGen();
+  if (v === "sel") renderSel();
 }
 $("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#sigLeague", "#sigGames", "#sigStale", "#sigC3"].forEach(id => $(id).addEventListener("change", renderSignals));
@@ -3294,6 +3602,7 @@ $("#navStats").addEventListener("click", () => { showView("stats"); scrollTo({ t
 $("#back").addEventListener("click", () => { showView("stats"); });
 $("#navSig").addEventListener("click", () => showView("sig"));
 $("#navGen").addEventListener("click", () => showView("gen"));
+$("#navSel").addEventListener("click", () => showView("sel"));
 
 /* tooltip */
 const tip = $("#tip");
