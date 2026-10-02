@@ -1,0 +1,135 @@
+{
+ "quando": "2026-10-02 11:56:11.140911",
+ "espn": {
+  "E0": {
+   "codice": "eng.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "I2": {
+   "codice": "ita.2",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "SC0": {
+   "codice": "sco.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "SC1": {
+   "codice": "sco.2",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "SC2": {
+   "codice": "sco.3",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "SC3": {
+   "codice": "sco.4",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "D2": {
+   "codice": "ger.2",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "F2": {
+   "codice": "fra.2",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "SP2": {
+   "codice": "esp.2",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "B1": {
+   "codice": "bel.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "G1": {
+   "codice": "gre.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "EC": {
+   "codice": "eng.5",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "ARG": {
+   "codice": "arg.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "AUT": {
+   "codice": "aut.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "BRA": {
+   "codice": "bra.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "CHN": {
+   "codice": "chn.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "DNK": {
+   "codice": "den.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "FIN": {
+   "codice": "fin.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "IRL": {
+   "codice": "irl.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "JPN": {
+   "codice": "jpn.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "MEX": {
+   "codice": "mex.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "NOR": {
+   "codice": "nor.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "POL": {
+   "codice": "pol.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "ROU": {
+   "codice": "rou.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "RUS": {
+   "codice": "rus.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "SWE": {
+   "codice": "swe.1",
+   "errore": "HTTP Error 400: Bad Request"
+  },
+  "SWZ": {
+   "codice": "sui.1",
+   "errore": "HTTP Error 400: Bad Request"
+  }
+ },
+ "fd": {
+  "BSA": {
+   "partite": 102,
+   "esempi": [
+    [
+     "2026-10-02T23:00:00Z",
+     "São Paulo",
+     "Santos"
+    ],
+    [
+     "2026-10-03T21:30:00Z",
+     "Mineiro",
+     "Bragantino"
+    ],
+    [
+     "2026-10-07T22:30:00Z",
+     "Bragantino",
+     "Mirassol"
+    ]
+   ]
+  }
+ }
+}
