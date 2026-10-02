@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { ref: main }   # sempre l'ultima versione (non quella di quando il giro è stato messo in coda)
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - uses: actions/setup-node@v4
@@ -32,5 +33,5 @@ jobs:
           git add data
           git diff --cached --quiet -- data/*.csv data/crests.json data/espn_stats.json && exit 0
           git commit -m "Aggiornamento dati $(date -u +%F)"
-          git pull --rebase origin main
+          git pull --rebase -X theirs origin main   # se nel frattempo è arrivato un altro aggiornamento, valgono i dati appena scaricati
           git push
