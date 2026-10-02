@@ -113,16 +113,14 @@
    "nomi_non_riconosciuti": []
   },
   "USA": {
-   "partite_con_statistiche": 2476,
+   "partite_con_statistiche": 2880,
    "partite_totali": 3272,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": [
     "Arsenal",
-    "LAFC",
     "Liga MX All-Stars",
-    "MLS All-Stars",
-    "Red Bull New York"
+    "MLS All-Stars"
    ]
   },
   "MEX": {
@@ -140,21 +138,21 @@
    "nomi_non_riconosciuti": []
   },
   "CHN": {
-   "partite_con_statistiche": 1044,
+   "partite_con_statistiche": 1398,
    "partite_totali": 1576,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   },
   "AUT": {
-   "partite_con_statistiche": 0,
+   "partite_con_statistiche": 355,
    "partite_totali": 1208,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   },
   "DNK": {
-   "partite_con_statistiche": 0,
+   "partite_con_statistiche": 438,
    "partite_totali": 1210,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
@@ -182,5 +180,5 @@
    "nomi_non_riconosciuti": []
   }
  },
- "statistiche_aggiornate": "2026-10-02 17:53 UTC"
+ "statistiche_aggiornate": "2026-10-02 18:26 UTC"
 }
