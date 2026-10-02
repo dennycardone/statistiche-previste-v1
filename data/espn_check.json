@@ -106,7 +106,7 @@
    "nomi_non_riconosciuti": []
   },
   "ARG": {
-   "partite_con_statistiche": 2312,
+   "partite_con_statistiche": 2332,
    "partite_totali": 3293,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
@@ -126,14 +126,14 @@
    ]
   },
   "MEX": {
-   "partite_con_statistiche": 992,
+   "partite_con_statistiche": 1824,
    "partite_totali": 2130,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   },
   "JPN": {
-   "partite_con_statistiche": 0,
+   "partite_con_statistiche": 623,
    "partite_totali": 2142,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
@@ -182,5 +182,5 @@
    "nomi_non_riconosciuti": []
   }
  },
- "statistiche_aggiornate": "2026-10-02 15:53 UTC"
+ "statistiche_aggiornate": "2026-10-02 16:44 UTC"
 }
