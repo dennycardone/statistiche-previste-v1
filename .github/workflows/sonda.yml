@@ -15,29 +15,28 @@ jobs:
           FD_TOKEN: ${{ secrets.FD_TOKEN }}
         run: |
           python3 - <<'PY'
-          import json, urllib.request, datetime, time
-          def get(u):
-              r = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
+          import json, urllib.request, datetime, time, os
+          def get(u, h={}):
+              r = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", **h})
               return json.loads(urllib.request.urlopen(r, timeout=30).read().decode())
           B = "https://site.api.espn.com/apis/site/v2/sports/soccer/"
-          t = datetime.date.today(); out = {"quando": str(datetime.datetime.utcnow()), "range": {}, "giorni": {}}
-          for n in (2, 3, 6, 9):
-              u = f"{B}eng.1/scoreboard?dates={t:%Y%m%d}-{t+datetime.timedelta(days=n):%Y%m%d}"
-              try: out["range"][n] = len(get(u).get("events", []))
-              except Exception as x: out["range"][n] = str(x)[:60]
           codes = {"I2":"ita.2","SC0":"sco.1","SC1":"sco.2","SC2":"sco.3","SC3":"sco.4","D2":"ger.2","F2":"fra.2","SP2":"esp.2","B1":"bel.1","G1":"gre.1",
                    "EC":"eng.5","ARG":"arg.1","AUT":"aut.1","BRA":"bra.1","CHN":"chn.1","DNK":"den.1","FIN":"fin.1","IRL":"irl.1","JPN":"jpn.1","MEX":"mex.1",
-                   "NOR":"nor.1","POL":"pol.1","ROU":"rou.1","RUS":"rus.1","SWE":"swe.1","SWZ":"sui.1"}
+                   "NOR":"nor.1","ROU":"rou.1","RUS":"rus.1","SWE":"swe.1","SWZ":"sui.1"}
+          out = {"teams": {}, "sample": {}, "fd_bsa": []}
           for lg, c in codes.items():
-              tot, ex = 0, []
-              for k in range(0, 10):
-                  d = t + datetime.timedelta(days=k)
-                  try:
-                      ev = get(f"{B}{c}/scoreboard?dates={d:%Y%m%d}").get("events", [])
-                      tot += len(ev); ex += [[e.get("date"), e.get("name")] for e in ev[:1]]
-                  except Exception as x: ex.append(["err", str(x)[:40]])
-                  time.sleep(0.25)
-              out["giorni"][lg] = {"codice": c, "partite_10_giorni": tot, "esempi": ex[:4]}
+              try:
+                  d = get(f"{B}{c}/teams")
+                  T = [x["team"] for x in d["sports"][0]["leagues"][0]["teams"]]
+                  out["teams"][lg] = [[t.get("displayName"), t.get("shortDisplayName"), t.get("name"), t.get("abbreviation"), t.get("location")] for t in T]
+              except Exception as x: out["teams"][lg] = str(x)[:80]
+              time.sleep(0.3)
+          d = get(f"{B}ita.2/scoreboard?dates=20261010")
+          out["sample"] = d.get("events", [])[:1]
+          try:
+              d = get("https://api.football-data.org/v4/competitions/BSA/teams", {"X-Auth-Token": os.environ.get("FD_TOKEN", "")})
+              out["fd_bsa"] = [[t["name"], t["shortName"], t["tla"]] for t in d["teams"]]
+          except Exception as x: out["fd_bsa"] = str(x)[:80]
           json.dump(out, open("sonda.json", "w"), indent=1, ensure_ascii=False)
           PY
       - name: Salva il risultato
