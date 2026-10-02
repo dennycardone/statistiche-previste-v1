@@ -1,0 +1,41 @@
+name: Sonda statistiche (temporanea)
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/sonda.yml]
+permissions:
+  contents: write
+jobs:
+  sonda:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prova statistiche partita ESPN
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, time
+          def get(u):
+              r = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
+              return json.loads(urllib.request.urlopen(r, timeout=30).read().decode())
+          B = "https://site.api.espn.com/apis/site/v2/sports/soccer/"
+          out = {}
+          for lg, days in {"bra.1": ["20260920", "20250920", "20240921", "20230923", "20220917", "20210918"],
+                           "arg.1": ["20260921", "20250921", "20240922", "20230923", "20220918"],
+                           "ita.1": ["20260927", "20260928"]}.items():
+              for d in days:
+                  try:
+                      ev = get(f"{B}{lg}/scoreboard?dates={d}").get("events", [])
+                      if not ev: out[f"{lg} {d}"] = "nessuna partita"; continue
+                      e = ev[0]; s = get(f"{B}{lg}/summary?event={e['id']}")
+                      teams = s.get("boxscore", {}).get("teams", [])
+                      out[f"{lg} {d}"] = {"partite_giorno": len(ev), "match": e.get("name"),
+                          "stats": [{t["team"]["displayName"]: {x["name"]: x.get("displayValue") for x in t.get("statistics", [])}} for t in teams]}
+                  except Exception as x:
+                      out[f"{lg} {d}"] = "errore " + str(x)[:80]
+                  time.sleep(0.4)
+          json.dump(out, open("sonda.json", "w"), indent=1, ensure_ascii=False)
+          PY
+      - name: Salva
+        run: |
+          git config user.name "corner-bot"; git config user.email "corner-bot@users.noreply.github.com"
+          git add -f sonda.json; git commit -m "Sonda statistiche (temporanea)"; git pull --rebase origin main; git push
