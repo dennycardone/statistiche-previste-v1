@@ -159,14 +159,14 @@
    "nomi_non_riconosciuti": []
   },
   "NOR": {
-   "partite_con_statistiche": 0,
+   "partite_con_statistiche": 519,
    "partite_totali": 1615,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   },
   "SWE": {
-   "partite_con_statistiche": 0,
+   "partite_con_statistiche": 2,
    "partite_totali": 1624,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
@@ -180,5 +180,5 @@
    "nomi_non_riconosciuti": []
   }
  },
- "statistiche_aggiornate": "2026-10-02 18:26 UTC"
+ "statistiche_aggiornate": "2026-10-02 18:56 UTC"
 }
