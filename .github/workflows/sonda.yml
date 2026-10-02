@@ -18,21 +18,15 @@ jobs:
               r = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
               return json.loads(urllib.request.urlopen(r, timeout=30).read().decode())
           B = "https://site.api.espn.com/apis/site/v2/sports/soccer/"
-          out = []
-          days = ["20260201","20260202","20260207","20260208","20260214","20260215","20260221","20260222","20260228","20260301","20260307","20260308"]
-          for lg in ["ita.1", "eng.1"]:
-              for d in days:
-                  try: ev = get(f"{B}{lg}/scoreboard?dates={d}").get("events", [])
-                  except Exception: continue
-                  for e in ev:
-                      try:
-                          s = get(f"{B}{lg}/summary?event={e['id']}"); c = e["competitions"][0]
-                          side = {x["homeAway"]: x["team"]["displayName"] for x in c["competitors"]}
-                          st = {t["team"]["displayName"]: {x["name"]: x.get("displayValue") for x in t.get("statistics", [])} for t in s.get("boxscore", {}).get("teams", [])}
-                          out.append({"lg": lg, "date": e["date"], "home": side["home"], "away": side["away"], "stats": st})
-                      except Exception: pass
-                      time.sleep(0.25)
-          json.dump(out, open("sonda.json", "w"), ensure_ascii=False)
+          out = {}
+          for q in ["dates=2025", "dates=202509", "dates=20250901-20250907", "season=2025", "dates=20250920&limit=100"]:
+              try:
+                  d = get(f"{B}bra.1/scoreboard?{q}"); L = (d.get("leagues") or [{}])[0]
+                  cal = L.get("calendar") or []
+                  out[q] = {"eventi": len(d.get("events", [])), "calendario": len(cal), "cal_esempio": cal[:3] if isinstance(cal, list) else str(cal)[:200],
+                            "stagione": L.get("season", {}).get("year"), "prima_data": (d.get("events") or [{}])[0].get("date")}
+              except Exception as x: out[q] = str(x)[:80]
+          json.dump(out, open("sonda.json", "w"), indent=1, ensure_ascii=False)
           PY
       - name: Salva
         run: |
