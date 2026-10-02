@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { ref: main }   # sempre l'ultima versione (non quella di quando il giro è stato messo in coda)
-      - name: Dati precedenti dal ramo pages (se c'è)
+      - name: Dati precedenti dal ramo pages (il sito pubblicato; il ramo main non contiene dati)
         run: |
           if git ls-remote --exit-code origin pages >/dev/null 2>&1; then
             git fetch -q --depth 1 origin pages
@@ -32,15 +32,6 @@ jobs:
           FD_TOKEN: ${{ secrets.FD_TOKEN }}
       - name: Previsioni della home
         run: node precalc.js
-      - name: Commit se ci sono novità
-        run: |
-          git config user.name "corner-bot"
-          git config user.email "corner-bot@users.noreply.github.com"
-          git add data
-          git diff --cached --quiet -- data/*.csv data/crests.json data/espn_stats.json && exit 0
-          git commit -m "Aggiornamento dati $(date -u +%F)"
-          git pull --rebase -X theirs origin main   # se nel frattempo è arrivato un altro aggiornamento, valgono i dati appena scaricati
-          git push
       - name: Pubblica sul ramo pages (un solo commit, la cronologia non cresce)
         env:
           GH_TOKEN: ${{ github.token }}
