@@ -1173,21 +1173,21 @@ const LEAGUES = [
   { code: "T1", name: "Süper Lig", country: "Turchia", file: "mmz4281/2627/T1.csv" },
   { code: "G1", name: "Super League", country: "Grecia", file: "mmz4281/2627/G1.csv" },
   { code: "ARG", name: "Liga Profesional", country: "Argentina", file: "new/ARG.csv", newCountry: "Argentina", cal: true },
-  { code: "AUT", name: "Bundesliga", country: "Austria", file: "new/AUT.csv", newCountry: "Austria", noStats: true },
+  { code: "AUT", name: "Bundesliga", country: "Austria", file: "new/AUT.csv", newCountry: "Austria" },
   { code: "BRA", name: "Série A", country: "Brasile", file: "new/BRA.csv", newCountry: "Brazil", cal: true },
-  { code: "CHN", name: "Super League", country: "Cina", file: "new/CHN.csv", newCountry: "China", noStats: true, cal: true },
-  { code: "DNK", name: "Superliga", country: "Danimarca", file: "new/DNK.csv", newCountry: "Denmark", noStats: true },
+  { code: "CHN", name: "Super League", country: "Cina", file: "new/CHN.csv", newCountry: "China", cal: true },
+  { code: "DNK", name: "Superliga", country: "Danimarca", file: "new/DNK.csv", newCountry: "Denmark" },
   { code: "FIN", name: "Veikkausliiga", country: "Finlandia", file: "new/FIN.csv", newCountry: "Finland", noStats: true, cal: true },
   { code: "IRL", name: "Premier Division", country: "Irlanda", file: "new/IRL.csv", newCountry: "Ireland", noStats: true, cal: true },
-  { code: "JPN", name: "J1 League", country: "Giappone", file: "new/JPN.csv", newCountry: "Japan", noStats: true, cal: true },
-  { code: "MEX", name: "Liga MX", country: "Messico", file: "new/MEX.csv", newCountry: "Mexico", noStats: true },
-  { code: "NOR", name: "Eliteserien", country: "Norvegia", file: "new/NOR.csv", newCountry: "Norway", noStats: true, cal: true },
+  { code: "JPN", name: "J1 League", country: "Giappone", file: "new/JPN.csv", newCountry: "Japan", cal: true },
+  { code: "MEX", name: "Liga MX", country: "Messico", file: "new/MEX.csv", newCountry: "Mexico" },
+  { code: "NOR", name: "Eliteserien", country: "Norvegia", file: "new/NOR.csv", newCountry: "Norway", cal: true },
   { code: "POL", name: "Ekstraklasa", country: "Polonia", file: "new/POL.csv", newCountry: "Poland", noStats: true },
   { code: "ROU", name: "Liga I", country: "Romania", file: "new/ROU.csv", newCountry: "Romania", noStats: true },
-  { code: "RUS", name: "Premier League", country: "Russia", file: "new/RUS.csv", newCountry: "Russia", noStats: true },
-  { code: "SWE", name: "Allsvenskan", country: "Svezia", file: "new/SWE.csv", newCountry: "Sweden", noStats: true, cal: true },
+  { code: "RUS", name: "Premier League", country: "Russia", file: "new/RUS.csv", newCountry: "Russia" },
+  { code: "SWE", name: "Allsvenskan", country: "Svezia", file: "new/SWE.csv", newCountry: "Sweden", cal: true },
   { code: "SWZ", name: "Super League", country: "Svizzera", file: "new/SWZ.csv", newCountry: "Switzerland", noStats: true },
-  { code: "USA", name: "MLS", country: "USA", file: "new/USA.csv", newCountry: "USA", noStats: true, cal: true }
+  { code: "USA", name: "MLS", country: "USA", file: "new/USA.csv", newCountry: "USA", cal: true }
 ];
 const LG = Object.fromEntries(LEAGUES.map(l => [l.code, l]));
 const lgName = l => `${l.country} · ${l.name}`;   // prima la nazione, poi il campionato
