@@ -167,7 +167,7 @@ files.append("next_fixtures.csv")
 ESPN = {"I2": "ita.2", "SC0": "sco.1", "SC1": "sco.2", "D2": "ger.2", "F2": "fra.2", "SP2": "esp.2", "B1": "bel.1", "G1": "gre.1",
         "EC": "eng.5", "ARG": "arg.1", "AUT": "aut.1", "BRA": "bra.1", "CHN": "chn.1", "DNK": "den.1", "JPN": "jpn.1", "MEX": "mex.1",
         "NOR": "nor.1", "RUS": "rus.1", "SWE": "swe.1"}
-ESPN_ALIAS = {"DNK": {"AGF": "Aarhus", "F.C. København": "FC Copenhagen"}}
+ESPN_ALIAS = {"DNK": {"AGF": "Aarhus", "F.C. København": "FC Copenhagen"}, "NOR": {"Hamarkameratene": "HamKam"}}
 import time
 def espn_get(url):
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (statistiche-previste)"})
@@ -224,7 +224,7 @@ if not espn_old or datetime.datetime.utcnow().hour % 3 == 2 or os.environ.get("E
                 side = {c["homeAway"]: c["team"] for c in comp["competitors"]}
                 tm = {}
                 for hw in ("home", "away"):
-                    t = side[hw]; nm = [t.get("displayName"), t.get("shortDisplayName"), t.get("name"), t.get("location")]
+                    t = side[hw]; nm = [t.get("displayName"), t.get("shortDisplayName"), t.get("name"), t.get("abbreviation"), t.get("location")]
                     tm[hw] = espn_match(lg, nm, pool)
                     if tm[hw] is None: bad.add(nm[0])
                     else: maps.setdefault(tm[hw], set()).add(nm[0])
