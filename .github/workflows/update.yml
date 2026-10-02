@@ -17,6 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { ref: main }   # sempre l'ultima versione (non quella di quando il giro è stato messo in coda)
+      - name: Dati precedenti dal ramo pages (se c'è)
+        run: |
+          if git ls-remote --exit-code origin pages >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin pages
+            rm -rf data && git checkout FETCH_HEAD -- data && git reset -q -- data
+          fi
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - uses: actions/setup-node@v4
@@ -35,3 +41,17 @@ jobs:
           git commit -m "Aggiornamento dati $(date -u +%F)"
           git pull --rebase -X theirs origin main   # se nel frattempo è arrivato un altro aggiornamento, valgono i dati appena scaricati
           git push
+      - name: Pubblica sul ramo pages (un solo commit, la cronologia non cresce)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf _site && mkdir _site
+          cp -r index.html manifest.webmanifest icon.svg data _site/
+          touch _site/.nojekyll
+          cd _site
+          git init -q -b pages
+          git config user.name "corner-bot"
+          git config user.email "corner-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Sito $(date -u '+%F %H:%M')"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages
