@@ -246,23 +246,24 @@ if os.path.exists(espn_path): files.append("espn_fixtures.csv")
 # Verificato (ottobre 2026) su 73 partite di Serie A e Premier: stessi numeri di football-data (stesso fornitore).
 # Cache in data/espn_stats.json; a ogni giro al massimo ESPN_BUDGET partite nuove (il passato si riempie in pochi giri).
 # Una partita riceve le statistiche solo se squadre, giorno (±1) e risultato coincidono con la riga di football-data.
-ESPN_STATS = {"BRA": "bra.1", "ARG": "arg.1"}
+ESPN_STATS = {"BRA": "bra.1", "ARG": "arg.1", "USA": "usa.1", "MEX": "mex.1", "JPN": "jpn.1", "CHN": "chn.1", "AUT": "aut.1",
+              "DNK": "den.1", "NOR": "nor.1", "SWE": "swe.1", "RUS": "rus.1"}
 ESPN_BUDGET = 2000
 STAT_COLS = ["HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC"]
 cache_path = os.path.join(OUT, "espn_stats.json")
 try: SC = json.load(open(cache_path))
 except Exception: SC = {}
-SC.setdefault("v", 1); SC.setdefault("months", {}); SC.setdefault("ev", {})
+SC.setdefault("v", 1); SC.setdefault("months", {}); SC.setdefault("ev", {}); SC.setdefault("teams", {})
 budget = ESPN_BUDGET
 def _tn(t): return [t.get("displayName"), t.get("shortDisplayName"), t.get("name"), t.get("abbreviation"), t.get("location")]
 for lg, code_ in ESPN_STATS.items():
-    done = set(SC["months"].setdefault(lg, [])); EV = SC["ev"].setdefault(lg, {})
+    done = set(SC["months"].setdefault(lg, [])); EV = SC["ev"].setdefault(lg, {}); TM = SC["teams"].setdefault(lg, {})
     months, y, m = [], today.year - 5, 1
     while (y, m) <= (today.year, today.month):
         months.append(f"{y}{m:02d}"); m += 1
         if m > 12: y, m = y + 1, 1
     recent = set(months[-2:])
-    for ym in months:
+    for ym in reversed(months):   # dal più recente: i risultati nuovi hanno la precedenza sul recupero del passato
         if ym in done and ym not in recent: continue
         try:
             evs = json.loads(espn_get(f"https://site.api.espn.com/apis/site/v2/sports/soccer/{code_}/scoreboard?dates={ym}&limit=300")).get("events", [])
@@ -287,7 +288,8 @@ for lg, code_ in ESPN_STATS.items():
                 vals = [num(H, "totalShots"), num(A, "totalShots"), num(H, "shotsOnTarget"), num(A, "shotsOnTarget"),
                         num(H, "foulsCommitted"), num(A, "foulsCommitted"), num(H, "wonCorners"), num(A, "wonCorners")]
                 if None in vals or sum(vals) == 0: vals = None   # statistiche mancanti (ESPN a volte mette tutti zeri)
-                EV[eid] = [ev["date"], _tn(side["home"]["team"]), _tn(side["away"]["team"]), int(float(side["home"].get("score", -1))),
+                for hw in ("home", "away"): TM[side[hw]["team"]["id"]] = _tn(side[hw]["team"])
+                EV[eid] = [ev["date"], side["home"]["team"]["id"], side["away"]["team"]["id"], int(float(side["home"].get("score", -1))),
                            int(float(side["away"].get("score", -1))), vals]
             except Exception as e:
                 print("ESPN stats partita", lg, eid, e)
@@ -305,35 +307,63 @@ for lg in ESPN_STATS:
     if "HS" in hdr: continue
     iD, iH, iA, iG1, iG2 = hdr.index("Date"), hdr.index("Home"), hdr.index("Away"), hdr.index("HG"), hdr.index("AG")
     pool = {x for r in body if len(r) > iA for x in (r[iH].strip(), r[iA].strip())} - {""}
+    TMl = SC["teams"].get(lg, {})
+    def names_of(x): return x if isinstance(x, list) else TMl.get(x, [None])
+    for e in SC["ev"].get(lg, {}).values():
+        e[1], e[2] = names_of(e[1]), names_of(e[2])
     nmap, used = {}, {}
     for e in SC["ev"].get(lg, {}).values():
         for names in (e[1], e[2]):
             k = names[0]
+            if not k: continue
             if k in nmap: continue
             t = espn_match(lg, names, pool); nmap[k] = t
             if t: used.setdefault(t, set()).add(k)
     dup = {t for t, v in used.items() if len(v) > 1}
-    idx = {}
+    idx, allev = {}, []
     for e in SC["ev"].get(lg, {}).values():
-        if e[5] is None: continue
         h, a = nmap.get(e[1][0]), nmap.get(e[2][0])
-        if not h or not a or h in dup or a in dup: continue
-        d = datetime.datetime.strptime(e[0], "%Y-%m-%dT%H:%MZ").date()
-        idx.setdefault((h, a), []).append((d, e[3], e[4], e[5]))
+        if not h or not a or h in dup or a in dup or e[3] < 0 or e[4] < 0: continue
+        dt = datetime.datetime.strptime(e[0], "%Y-%m-%dT%H:%MZ").replace(tzinfo=datetime.timezone.utc)
+        allev.append((dt, h, a, e[3], e[4], e[5]))
+        if e[5] is not None: idx.setdefault((h, a), []).append((dt.date(), e[3], e[4], e[5]))
     n_ok = 0
     out = [hdr + STAT_COLS]
+    fd_dates, pairs = [], {}
     for r in body:
         add = [""] * 8
         try:
-            d = datetime.datetime.strptime(r[iD].strip(), "%d/%m/%Y").date()
+            d = datetime.datetime.strptime(r[iD].strip(), "%d/%m/%Y").date(); fd_dates.append(d)
+            pairs.setdefault((r[iH].strip(), r[iA].strip()), []).append(d)
             for (ed, g1, g2, vals) in idx.get((r[iH].strip(), r[iA].strip()), []):
                 if abs((ed - d).days) <= 1 and str(g1) == r[iG1].strip() and str(g2) == r[iG2].strip():
                     add = [str(v) for v in vals]; n_ok += 1; break
         except Exception:
             pass
         out.append(r + add)
+    # partite giocate che football-data non ha ancora pubblicato: risultato (e statistiche) da ESPN.
+    # Solo dopo l'ultima partita presente nel file di football-data e se la stessa sfida non c'è già entro 3 giorni.
+    n_add = 0
+    if fd_dates and body:
+        last = max(fd_dates)
+        iS, iT, iR = hdr.index("Season"), (hdr.index("Time") if "Time" in hdr else -1), (hdr.index("Res") if "Res" in hdr else -1)
+        lastrow = max(body, key=lambda r: datetime.datetime.strptime(r[iD].strip(), "%d/%m/%Y").date() if r[iD].strip() else datetime.date.min)
+        try: UK = ZoneInfo("Europe/London")
+        except Exception: UK = datetime.timezone.utc
+        for (dt, h, a, g1, g2, vals) in sorted(allev):
+            loc = dt.astimezone(UK); d = loc.date()
+            if d <= last or d > today: continue
+            if any(abs((x - d).days) <= 3 for x in pairs.get((h, a), [])): continue
+            r = [""] * len(hdr)
+            r[0] = lg; r[1] = lastrow[1]; season = lastrow[iS]
+            if season.strip().isdigit() and loc.year != int(season): season = str(loc.year)   # campionati per anno solare: nuova stagione
+            r[iS] = season; r[iD] = loc.strftime("%d/%m/%Y")
+            if iT >= 0: r[iT] = loc.strftime("%H:%M")
+            r[iH], r[iA], r[iG1], r[iG2] = h, a, str(g1), str(g2)
+            if iR >= 0: r[iR] = "H" if g1 > g2 else "A" if g2 > g1 else "D"
+            out.append(r + ([str(v) for v in vals] if vals else [""] * 8)); pairs.setdefault((h, a), []).append(d); n_add += 1
     buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(out); save(f"{lg}.csv", buf.getvalue())
-    espn_stats_check[lg] = {"partite_con_statistiche": n_ok, "partite_totali": len(body), "squadre_doppie": sorted(dup),
+    espn_stats_check[lg] = {"partite_con_statistiche": n_ok, "partite_totali": len(body), "partite_aggiunte_da_espn": n_add, "squadre_doppie": sorted(dup),
                             "nomi_non_riconosciuti": sorted(k for k, v in nmap.items() if v is None)}
 try:
     J = json.load(open(os.path.join(OUT, "espn_check.json")))
