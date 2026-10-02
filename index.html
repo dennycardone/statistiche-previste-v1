@@ -3044,7 +3044,7 @@ function renderSched() {
   }).join("");
   $("#days").querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { SCHED.day = b.dataset.d; renderSched(); }));
   const strip = $("#days"), sel = strip.querySelector('[aria-selected="true"]');
-  if (SCHED.day === t0 && sel) strip.scrollLeft += sel.getBoundingClientRect().left - strip.getBoundingClientRect().left - 4;   // oggi come primo giorno visibile
+  if (SCHED.day === t0 && sel) { const r = sel.getBoundingClientRect(), b = strip.getBoundingClientRect(); strip.scrollLeft += (r.left + r.width / 2) - (b.left + b.width / 2); }   // oggi al centro: prima i giorni passati, dopo i prossimi
   else if (sel) sel.scrollIntoView({ block: "nearest", inline: "nearest" });
   const today = all.filter(e => e.d === SCHED.day);
   const lgs = LEAGUES.filter(L => today.some(e => e.lg.code === L.code));
