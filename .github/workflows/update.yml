@@ -3,6 +3,12 @@ on:
   schedule:
     - cron: "17 5,17 * * *"   # due volte al giorno (UTC)
   workflow_dispatch: {}
+  push:   # parte da solo anche quando cambiano l'app o gli script che preparano i dati
+    branches: [main]
+    paths: [index.html, precalc.js, update_data.py]
+concurrency:   # mai due aggiornamenti insieme
+  group: aggiorna-dati
+  cancel-in-progress: false
 permissions:
   contents: write
 jobs:
@@ -26,4 +32,5 @@ jobs:
           git add data
           git diff --cached --quiet -- data/*.csv data/crests.json && exit 0
           git commit -m "Aggiornamento dati $(date -u +%F)"
+          git pull --rebase origin main
           git push
