@@ -18,22 +18,21 @@ jobs:
               r = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
               return json.loads(urllib.request.urlopen(r, timeout=30).read().decode())
           B = "https://site.api.espn.com/apis/site/v2/sports/soccer/"
-          out = {}
-          for lg, days in {"bra.1": ["20260920", "20250920", "20240921", "20230923", "20220917", "20210918"],
-                           "arg.1": ["20260921", "20250921", "20240922", "20230923", "20220918"],
-                           "ita.1": ["20260927", "20260928"]}.items():
+          out = []
+          days = ["20260201","20260202","20260207","20260208","20260214","20260215","20260221","20260222","20260228","20260301","20260307","20260308"]
+          for lg in ["ita.1", "eng.1"]:
               for d in days:
-                  try:
-                      ev = get(f"{B}{lg}/scoreboard?dates={d}").get("events", [])
-                      if not ev: out[f"{lg} {d}"] = "nessuna partita"; continue
-                      e = ev[0]; s = get(f"{B}{lg}/summary?event={e['id']}")
-                      teams = s.get("boxscore", {}).get("teams", [])
-                      out[f"{lg} {d}"] = {"partite_giorno": len(ev), "match": e.get("name"),
-                          "stats": [{t["team"]["displayName"]: {x["name"]: x.get("displayValue") for x in t.get("statistics", [])}} for t in teams]}
-                  except Exception as x:
-                      out[f"{lg} {d}"] = "errore " + str(x)[:80]
-                  time.sleep(0.4)
-          json.dump(out, open("sonda.json", "w"), indent=1, ensure_ascii=False)
+                  try: ev = get(f"{B}{lg}/scoreboard?dates={d}").get("events", [])
+                  except Exception: continue
+                  for e in ev:
+                      try:
+                          s = get(f"{B}{lg}/summary?event={e['id']}"); c = e["competitions"][0]
+                          side = {x["homeAway"]: x["team"]["displayName"] for x in c["competitors"]}
+                          st = {t["team"]["displayName"]: {x["name"]: x.get("displayValue") for x in t.get("statistics", [])} for t in s.get("boxscore", {}).get("teams", [])}
+                          out.append({"lg": lg, "date": e["date"], "home": side["home"], "away": side["away"], "stats": st})
+                      except Exception: pass
+                      time.sleep(0.25)
+          json.dump(out, open("sonda.json", "w"), ensure_ascii=False)
           PY
       - name: Salva
         run: |
