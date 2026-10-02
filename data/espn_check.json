@@ -101,15 +101,86 @@
   "BRA": {
    "partite_con_statistiche": 2130,
    "partite_totali": 2557,
+   "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   },
   "ARG": {
    "partite_con_statistiche": 2312,
    "partite_totali": 3293,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "USA": {
+   "partite_con_statistiche": 1699,
+   "partite_totali": 3272,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": [
+    "Arsenal",
+    "LAFC",
+    "Liga MX All-Stars",
+    "MLS All-Stars",
+    "Red Bull New York"
+   ]
+  },
+  "MEX": {
+   "partite_con_statistiche": 0,
+   "partite_totali": 2130,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "JPN": {
+   "partite_con_statistiche": 0,
+   "partite_totali": 2142,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "CHN": {
+   "partite_con_statistiche": 0,
+   "partite_totali": 1576,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "AUT": {
+   "partite_con_statistiche": 0,
+   "partite_totali": 1208,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "DNK": {
+   "partite_con_statistiche": 0,
+   "partite_totali": 1210,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "NOR": {
+   "partite_con_statistiche": 0,
+   "partite_totali": 1615,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "SWE": {
+   "partite_con_statistiche": 0,
+   "partite_totali": 1624,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "RUS": {
+   "partite_con_statistiche": 0,
+   "partite_totali": 1468,
+   "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   }
  },
- "statistiche_aggiornate": "2026-10-02 14:51 UTC"
+ "statistiche_aggiornate": "2026-10-02 15:25 UTC"
 }
