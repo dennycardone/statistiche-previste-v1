@@ -241,6 +241,106 @@ if not espn_old or datetime.datetime.utcnow().hour % 3 == 2 or os.environ.get("E
     save("espn_fixtures.csv", "\n".join(erows))
     json.dump({"aggiornato": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), "campionati": check}, open(os.path.join(OUT, "espn_check.json"), "w"), indent=1, ensure_ascii=False)
 if os.path.exists(espn_path): files.append("espn_fixtures.csv")
+
+# Corner, falli, tiri e tiri in porta per i campionati che football-data dà solo con risultati: dalle statistiche partita di ESPN.
+# Verificato (ottobre 2026) su 73 partite di Serie A e Premier: stessi numeri di football-data (stesso fornitore).
+# Cache in data/espn_stats.json; a ogni giro al massimo ESPN_BUDGET partite nuove (il passato si riempie in pochi giri).
+# Una partita riceve le statistiche solo se squadre, giorno (±1) e risultato coincidono con la riga di football-data.
+ESPN_STATS = {"BRA": "bra.1", "ARG": "arg.1"}
+ESPN_BUDGET = 700
+STAT_COLS = ["HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC"]
+cache_path = os.path.join(OUT, "espn_stats.json")
+try: SC = json.load(open(cache_path))
+except Exception: SC = {}
+SC.setdefault("v", 1); SC.setdefault("months", {}); SC.setdefault("ev", {})
+budget = ESPN_BUDGET
+def _tn(t): return [t.get("displayName"), t.get("shortDisplayName"), t.get("name"), t.get("abbreviation"), t.get("location")]
+for lg, code_ in ESPN_STATS.items():
+    done = set(SC["months"].setdefault(lg, [])); EV = SC["ev"].setdefault(lg, {})
+    months, y, m = [], today.year - 5, 1
+    while (y, m) <= (today.year, today.month):
+        months.append(f"{y}{m:02d}"); m += 1
+        if m > 12: y, m = y + 1, 1
+    recent = set(months[-2:])
+    for ym in months:
+        if ym in done and ym not in recent: continue
+        try:
+            evs = json.loads(espn_get(f"https://site.api.espn.com/apis/site/v2/sports/soccer/{code_}/scoreboard?dates={ym}&limit=300")).get("events", [])
+        except Exception as e:
+            print("ESPN stats mese", lg, ym, e); continue
+        time.sleep(0.2)
+        ok = True
+        for ev in evs:
+            if not ev.get("status", {}).get("type", {}).get("completed"): continue
+            eid = ev["id"]; old = EV.get(eid)
+            if old and (old[5] is not None or ev["date"][:10] < str(today - datetime.timedelta(days=7))): continue
+            if budget <= 0: ok = False; break
+            budget -= 1
+            try:
+                sm = json.loads(espn_get(f"https://site.api.espn.com/apis/site/v2/sports/soccer/{code_}/summary?event={eid}"))
+                comp = ev["competitions"][0]; side = {c["homeAway"]: c for c in comp["competitors"]}
+                st = {t["team"]["id"]: {x["name"]: x.get("displayValue") for x in t.get("statistics", [])} for t in sm.get("boxscore", {}).get("teams", [])}
+                H, A = st.get(side["home"]["team"]["id"], {}), st.get(side["away"]["team"]["id"], {})
+                def num(d, k):
+                    try: return int(float(d.get(k)))
+                    except Exception: return None
+                vals = [num(H, "totalShots"), num(A, "totalShots"), num(H, "shotsOnTarget"), num(A, "shotsOnTarget"),
+                        num(H, "foulsCommitted"), num(A, "foulsCommitted"), num(H, "wonCorners"), num(A, "wonCorners")]
+                if None in vals or sum(vals) == 0: vals = None   # statistiche mancanti (ESPN a volte mette tutti zeri)
+                EV[eid] = [ev["date"], _tn(side["home"]["team"]), _tn(side["away"]["team"]), int(float(side["home"].get("score", -1))),
+                           int(float(side["away"].get("score", -1))), vals]
+            except Exception as e:
+                print("ESPN stats partita", lg, eid, e)
+            time.sleep(0.2)
+        if ok and ym not in recent: done.add(ym)
+    SC["months"][lg] = sorted(done)
+json.dump(SC, open(cache_path, "w"), separators=(",", ":"), ensure_ascii=False)
+# unione con i file di football-data
+espn_stats_check = {}
+for lg in ESPN_STATS:
+    path = os.path.join(OUT, f"{lg}.csv")
+    if not os.path.exists(path): continue
+    rd = list(csv.reader(io.StringIO(open(path, encoding="utf-8").read())))
+    hdr, body = rd[0], rd[1:]
+    if "HS" in hdr: continue
+    iD, iH, iA, iG1, iG2 = hdr.index("Date"), hdr.index("Home"), hdr.index("Away"), hdr.index("HG"), hdr.index("AG")
+    pool = {x for r in body if len(r) > iA for x in (r[iH].strip(), r[iA].strip())} - {""}
+    nmap, used = {}, {}
+    for e in SC["ev"].get(lg, {}).values():
+        for names in (e[1], e[2]):
+            k = names[0]
+            if k in nmap: continue
+            t = espn_match(lg, names, pool); nmap[k] = t
+            if t: used.setdefault(t, set()).add(k)
+    dup = {t for t, v in used.items() if len(v) > 1}
+    idx = {}
+    for e in SC["ev"].get(lg, {}).values():
+        if e[5] is None: continue
+        h, a = nmap.get(e[1][0]), nmap.get(e[2][0])
+        if not h or not a or h in dup or a in dup: continue
+        d = datetime.datetime.strptime(e[0], "%Y-%m-%dT%H:%MZ").date()
+        idx.setdefault((h, a), []).append((d, e[3], e[4], e[5]))
+    n_ok = 0
+    out = [hdr + STAT_COLS]
+    for r in body:
+        add = [""] * 8
+        try:
+            d = datetime.datetime.strptime(r[iD].strip(), "%d/%m/%Y").date()
+            for (ed, g1, g2, vals) in idx.get((r[iH].strip(), r[iA].strip()), []):
+                if abs((ed - d).days) <= 1 and str(g1) == r[iG1].strip() and str(g2) == r[iG2].strip():
+                    add = [str(v) for v in vals]; n_ok += 1; break
+        except Exception:
+            pass
+        out.append(r + add)
+    buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(out); save(f"{lg}.csv", buf.getvalue())
+    espn_stats_check[lg] = {"partite_con_statistiche": n_ok, "partite_totali": len(body), "squadre_doppie": sorted(dup),
+                            "nomi_non_riconosciuti": sorted(k for k, v in nmap.items() if v is None)}
+try:
+    J = json.load(open(os.path.join(OUT, "espn_check.json")))
+except Exception:
+    J = {}
+J["statistiche"] = espn_stats_check; J["statistiche_aggiornate"] = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+json.dump(J, open(os.path.join(OUT, "espn_check.json"), "w"), indent=1, ensure_ascii=False)
 if unknown:
     print("Nomi non convertiti (verificare ALIAS se non coincidono con football-data):", sorted(unknown))
 

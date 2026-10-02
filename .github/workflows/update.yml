@@ -30,7 +30,7 @@ jobs:
           git config user.name "corner-bot"
           git config user.email "corner-bot@users.noreply.github.com"
           git add data
-          git diff --cached --quiet -- data/*.csv data/crests.json && exit 0
+          git diff --cached --quiet -- data/*.csv data/crests.json data/espn_stats.json && exit 0
           git commit -m "Aggiornamento dati $(date -u +%F)"
           git pull --rebase origin main
           git push
