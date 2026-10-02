@@ -16,36 +16,29 @@ jobs:
         run: |
           python3 - <<'PY'
           import json, urllib.request, datetime, time
-          def get(u, h={}):
-              r = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", **h})
+          def get(u):
+              r = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
               return json.loads(urllib.request.urlopen(r, timeout=30).read().decode())
-          t = datetime.date.today(); rng = f"{t:%Y%m%d}-{t+datetime.timedelta(days=14):%Y%m%d}"
-          codes = {"E0":"eng.1","I2":"ita.2","SC0":"sco.1","SC1":"sco.2","SC2":"sco.3","SC3":"sco.4","D2":"ger.2","F2":"fra.2","SP2":"esp.2",
-                   "B1":"bel.1","G1":"gre.1","EC":"eng.5","ARG":"arg.1","AUT":"aut.1","BRA":"bra.1","CHN":"chn.1","DNK":"den.1","FIN":"fin.1",
-                   "IRL":"irl.1","JPN":"jpn.1","MEX":"mex.1","NOR":"nor.1","POL":"pol.1","ROU":"rou.1","RUS":"rus.1","SWE":"swe.1","SWZ":"sui.1"}
-          out = {"quando": str(datetime.datetime.utcnow()), "espn": {}, "fd": {}}
+          B = "https://site.api.espn.com/apis/site/v2/sports/soccer/"
+          t = datetime.date.today(); out = {"quando": str(datetime.datetime.utcnow()), "range": {}, "giorni": {}}
+          for n in (2, 3, 6, 9):
+              u = f"{B}eng.1/scoreboard?dates={t:%Y%m%d}-{t+datetime.timedelta(days=n):%Y%m%d}"
+              try: out["range"][n] = len(get(u).get("events", []))
+              except Exception as x: out["range"][n] = str(x)[:60]
+          codes = {"I2":"ita.2","SC0":"sco.1","SC1":"sco.2","SC2":"sco.3","SC3":"sco.4","D2":"ger.2","F2":"fra.2","SP2":"esp.2","B1":"bel.1","G1":"gre.1",
+                   "EC":"eng.5","ARG":"arg.1","AUT":"aut.1","BRA":"bra.1","CHN":"chn.1","DNK":"den.1","FIN":"fin.1","IRL":"irl.1","JPN":"jpn.1","MEX":"mex.1",
+                   "NOR":"nor.1","POL":"pol.1","ROU":"rou.1","RUS":"rus.1","SWE":"swe.1","SWZ":"sui.1"}
           for lg, c in codes.items():
-              try:
-                  d = get(f"https://site.api.espn.com/apis/site/v2/sports/soccer/{c}/scoreboard?dates={rng}")
-                  ev = d.get("events", [])
-                  out["espn"][lg] = {"codice": c, "nome": (d.get("leagues") or [{}])[0].get("name"), "partite": len(ev),
-                      "esempi": [[e.get("date"), e.get("name"), e.get("status",{}).get("type",{}).get("name")] for e in ev[:3]],
-                      "ultima": ev[-1].get("date") if ev else None}
-              except Exception as x:
+              tot, ex = 0, []
+              for k in range(0, 10):
+                  d = t + datetime.timedelta(days=k)
                   try:
-                      d = get(f"https://site.api.espn.com/apis/site/v2/sports/soccer/{c}/scoreboard"); ev = d.get("events", [])
-                      out["espn"][lg] = {"codice": c, "senza_date": True, "nome": (d.get("leagues") or [{}])[0].get("name"), "partite": len(ev), "esempi": [[e.get("date"), e.get("name")] for e in ev[:3]], "errore_range": str(x)[:80]}
-                  except Exception as y:
-                      out["espn"][lg] = {"codice": c, "errore": str(y)[:120]}
-              time.sleep(0.5)
-          for comp in []:
-              try:
-                  d = get(f"https://api.football-data.org/v4/competitions/{comp}/matches?status=SCHEDULED,TIMED", {"X-Auth-Token": __import__("os").environ.get("FD_TOKEN","")})
-                  m = d.get("matches", []); out["fd"][comp] = {"partite": len(m), "esempi": [[x["utcDate"], x["homeTeam"]["shortName"], x["awayTeam"]["shortName"]] for x in m[:3]]}
-              except Exception as x:
-                  out["fd"][comp] = {"errore": str(x)[:120]}
+                      ev = get(f"{B}{c}/scoreboard?dates={d:%Y%m%d}").get("events", [])
+                      tot += len(ev); ex += [[e.get("date"), e.get("name")] for e in ev[:1]]
+                  except Exception as x: ex.append(["err", str(x)[:40]])
+                  time.sleep(0.25)
+              out["giorni"][lg] = {"codice": c, "partite_10_giorni": tot, "esempi": ex[:4]}
           json.dump(out, open("sonda.json", "w"), indent=1, ensure_ascii=False)
-          print(json.dumps(out, ensure_ascii=False)[:3000])
           PY
       - name: Salva il risultato
         run: |
