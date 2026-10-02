@@ -159,6 +159,88 @@ for lg, slug in FD_SLUGS.items():
         rows.append(",".join([lg, loc.strftime("%d/%m/%Y"), tm, h.replace(",", " "), a.replace(",", " "), str(m.get("RoundNumber", ""))]))
 save("next_fixtures.csv", "\n".join(rows))
 files.append("next_fixtures.csv")
+
+# Calendario degli altri campionati: ESPN (gratuito, senza chiave; interfaccia pubblica ma non ufficiale).
+# Solo i campionati che ESPN tiene aggiornati (verificato a ottobre 2026). Una richiesta per giorno e campionato,
+# prossimi 14 giorni; si riscarica ogni 3 ore (negli altri giri resta il file precedente). Partite già giocate, rinviate
+# o con una squadra non riconosciuta vengono scartate: mai abbinamenti incerti.
+ESPN = {"I2": "ita.2", "SC0": "sco.1", "SC1": "sco.2", "D2": "ger.2", "F2": "fra.2", "SP2": "esp.2", "B1": "bel.1", "G1": "gre.1",
+        "EC": "eng.5", "ARG": "arg.1", "AUT": "aut.1", "BRA": "bra.1", "CHN": "chn.1", "DNK": "den.1", "JPN": "jpn.1", "MEX": "mex.1",
+        "NOR": "nor.1", "RUS": "rus.1", "SWE": "swe.1"}
+ESPN_ALIAS = {"DNK": {"AGF": "Aarhus", "F.C. København": "FC Copenhagen"}}
+import time
+def espn_get(url):
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (statistiche-previste)"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return r.read().decode("utf-8", errors="replace")
+def cur_teams(lg):   # squadre della stagione in corso nei nostri file (se il file è vuoto: tutte)
+    fs = sorted(f for f in files if f.startswith(lg + "_"))
+    try:
+        if fs:
+            rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, fs[-1]), encoding="utf-8").read()))); h = rd[0]
+            ih, ia = h.index("HomeTeam"), h.index("AwayTeam"); P = {x.strip() for r in rd[1:] if len(r) > ia for x in (r[ih], r[ia])}
+        else:
+            rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, lg + ".csv"), encoding="utf-8").read()))); h = rd[0]
+            iS, ih, ia = h.index("Season"), h.index("Home"), h.index("Away"); ss = max(r[iS] for r in rd[1:] if len(r) > iS)
+            P = {x.strip() for r in rd[1:] if len(r) > ia and r[iS] == ss for x in (r[ih], r[ia])}
+        P.discard("")
+        return P or fd_teams(lg)
+    except Exception:
+        return fd_teams(lg)
+def espn_match(lg, names, pool):
+    names = [n for n in names if n]
+    for n in names:
+        a = ESPN_ALIAS.get(lg, {}).get(n)
+        if a and a in pool: return a
+    byn = {_norm(t): t for t in pool}
+    for n in names:
+        if n in pool: return n
+        if _norm(n) in byn: return byn[_norm(n)]
+    for n in names:
+        k = _norm(n); cand = [t for kk, t in byn.items() if kk and k and (kk in k or k in kk)]
+        if len(cand) == 1: return cand[0]
+    for n in names[:3]:
+        m = difflib.get_close_matches(_norm(n), list(byn), n=1, cutoff=0.6)
+        if m: return byn[m[0]]
+    return None
+espn_path = os.path.join(OUT, "espn_fixtures.csv")
+espn_old = os.path.exists(espn_path)
+if not espn_old or datetime.datetime.utcnow().hour % 3 == 2 or os.environ.get("ESPN_FORCE"):
+    erows, check = ["Div,Date,Time,HomeTeam,AwayTeam,Round"], {}
+    for lg, code_ in ESPN.items():
+        pool, seen, maps, evs = cur_teams(lg), set(), {}, []
+        for k in range(14):
+            d = today + datetime.timedelta(days=k)
+            try:
+                evs += json.loads(espn_get(f"https://site.api.espn.com/apis/site/v2/sports/soccer/{code_}/scoreboard?dates={d:%Y%m%d}")).get("events", [])
+            except Exception as e:
+                print("ESPN", lg, d, e)
+            time.sleep(0.2)
+        out_lg, bad = [], set()
+        for ev in evs:
+            try:
+                comp = ev["competitions"][0]; st = ev.get("status", {}).get("type", {})
+                if st.get("completed") or st.get("name") in ("STATUS_POSTPONED", "STATUS_CANCELED", "STATUS_ABANDONED"): continue
+                side = {c["homeAway"]: c["team"] for c in comp["competitors"]}
+                tm = {}
+                for hw in ("home", "away"):
+                    t = side[hw]; nm = [t.get("displayName"), t.get("shortDisplayName"), t.get("name"), t.get("location")]
+                    tm[hw] = espn_match(lg, nm, pool)
+                    if tm[hw] is None: bad.add(nm[0])
+                    else: maps.setdefault(tm[hw], set()).add(nm[0])
+                if None in tm.values(): continue
+                dt = datetime.datetime.strptime(ev["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=datetime.timezone.utc).astimezone(ROME)
+                out_lg.append((tm["home"], tm["away"], dt.strftime("%d/%m/%Y"), dt.strftime("%H:%M") if comp.get("timeValid", True) else ""))
+            except Exception as e:
+                print("ESPN evento", lg, e)
+        dup = {t for t, v in maps.items() if len(v) > 1}   # due squadre ESPN sulla stessa nostra: scarto quelle partite
+        for h, a, dd, tt in out_lg:
+            if h in dup or a in dup or (h, a, dd) in seen: continue
+            seen.add((h, a, dd)); erows.append(",".join([lg, dd, tt, h.replace(",", " "), a.replace(",", " "), ""]))
+        check[lg] = {"partite": len(seen), "non_riconosciute": sorted(bad), "doppi": sorted(dup)}
+    save("espn_fixtures.csv", "\n".join(erows))
+    json.dump({"aggiornato": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), "campionati": check}, open(os.path.join(OUT, "espn_check.json"), "w"), indent=1, ensure_ascii=False)
+if os.path.exists(espn_path): files.append("espn_fixtures.csv")
 if unknown:
     print("Nomi non convertiti (verificare ALIAS se non coincidono con football-data):", sorted(unknown))
 
