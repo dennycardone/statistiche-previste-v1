@@ -101,17 +101,17 @@
  },
  "statistiche": {
   "BRA": {
-   "partite_con_statistiche": 618,
+   "partite_con_statistiche": 2130,
    "partite_totali": 2557,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   },
   "ARG": {
-   "partite_con_statistiche": 0,
+   "partite_con_statistiche": 369,
    "partite_totali": 3293,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   }
  },
- "statistiche_aggiornate": "2026-10-02 13:33 UTC"
+ "statistiche_aggiornate": "2026-10-02 14:18 UTC"
 }
