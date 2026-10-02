@@ -50,4 +50,4 @@ jobs:
       - name: Salva il risultato
         run: |
           git config user.name "corner-bot"; git config user.email "corner-bot@users.noreply.github.com"
-          git rm -q --cached sonda.json 2>/dev/null; git add -f sonda.json; git commit -m "Sonda calendari (temporanea)"; git pull --rebase origin main; git push
+          git add -f sonda.json; git commit -m "Sonda calendari (temporanea)"; git pull --rebase origin main; git push
