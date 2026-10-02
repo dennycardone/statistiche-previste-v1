@@ -1,7 +1,7 @@
 name: Aggiorna dati corner
 on:
   schedule:
-    - cron: "17 5,17 * * *"   # due volte al giorno (UTC)
+    - cron: "17 5-23 * * *"   # ogni ora dalle 7:17 all'1:17 ora italiana (in UTC; con l'ora solare dalle 6:17 alle 0:17)
   workflow_dispatch: {}
   push:   # parte da solo anche quando cambiano l'app o gli script che preparano i dati
     branches: [main]
