@@ -247,7 +247,7 @@ if os.path.exists(espn_path): files.append("espn_fixtures.csv")
 # Cache in data/espn_stats.json; a ogni giro al massimo ESPN_BUDGET partite nuove (il passato si riempie in pochi giri).
 # Una partita riceve le statistiche solo se squadre, giorno (±1) e risultato coincidono con la riga di football-data.
 ESPN_STATS = {"BRA": "bra.1", "ARG": "arg.1"}
-ESPN_BUDGET = 700
+ESPN_BUDGET = 2000
 STAT_COLS = ["HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC"]
 cache_path = os.path.join(OUT, "espn_stats.json")
 try: SC = json.load(open(cache_path))
