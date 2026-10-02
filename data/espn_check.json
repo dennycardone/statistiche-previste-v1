@@ -1,0 +1,102 @@
+{
+ "aggiornato": "2026-10-02 12:25 UTC",
+ "campionati": {
+  "I2": {
+   "partite": 10,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "SC0": {
+   "partite": 6,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "SC1": {
+   "partite": 9,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "D2": {
+   "partite": 9,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "F2": {
+   "partite": 9,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "SP2": {
+   "partite": 22,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "B1": {
+   "partite": 9,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "G1": {
+   "partite": 7,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "EC": {
+   "partite": 23,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "ARG": {
+   "partite": 30,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "AUT": {
+   "partite": 6,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "BRA": {
+   "partite": 22,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "CHN": {
+   "partite": 8,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "DNK": {
+   "partite": 6,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "JPN": {
+   "partite": 10,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "MEX": {
+   "partite": 9,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "NOR": {
+   "partite": 7,
+   "non_riconosciute": [
+    "Hamarkameratene"
+   ],
+   "doppi": []
+  },
+  "RUS": {
+   "partite": 8,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "SWE": {
+   "partite": 8,
+   "non_riconosciute": [],
+   "doppi": []
+  }
+ }
+}
