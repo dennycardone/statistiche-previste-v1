@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-10-02 12:25 UTC",
+ "aggiornato": "2026-10-02 14:34 UTC",
  "campionati": {
   "I2": {
    "partite": 10,
@@ -82,10 +82,8 @@
    "doppi": []
   },
   "NOR": {
-   "partite": 7,
-   "non_riconosciute": [
-    "Hamarkameratene"
-   ],
+   "partite": 8,
+   "non_riconosciute": [],
    "doppi": []
   },
   "RUS": {
@@ -107,11 +105,11 @@
    "nomi_non_riconosciuti": []
   },
   "ARG": {
-   "partite_con_statistiche": 369,
+   "partite_con_statistiche": 2312,
    "partite_totali": 3293,
    "squadre_doppie": [],
    "nomi_non_riconosciuti": []
   }
  },
- "statistiche_aggiornate": "2026-10-02 14:18 UTC"
+ "statistiche_aggiornate": "2026-10-02 14:51 UTC"
 }
