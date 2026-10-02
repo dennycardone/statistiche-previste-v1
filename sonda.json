@@ -1,0 +1,43 @@
+{
+ "dates=2025": {
+  "eventi": 100,
+  "calendario": 0,
+  "cal_esempio": [],
+  "stagione": 2026,
+  "prima_data": "2025-03-29T21:30Z"
+ },
+ "dates=202509": {
+  "eventi": 34,
+  "calendario": 110,
+  "cal_esempio": [
+   "2025-03-29T07:00Z",
+   "2025-03-30T07:00Z",
+   "2025-03-31T07:00Z"
+  ],
+  "stagione": 2025,
+  "prima_data": "2025-09-13T19:00Z"
+ },
+ "dates=20250901-20250907": "HTTP Error 400: Bad Request",
+ "season=2025": {
+  "eventi": 1,
+  "calendario": 99,
+  "cal_esempio": [
+   "2026-01-28T08:00Z",
+   "2026-01-29T08:00Z",
+   "2026-02-04T08:00Z"
+  ],
+  "stagione": 2026,
+  "prima_data": "2026-10-02T23:00Z"
+ },
+ "dates=20250920&limit=100": {
+  "eventi": 4,
+  "calendario": 110,
+  "cal_esempio": [
+   "2025-03-29T07:00Z",
+   "2025-03-30T07:00Z",
+   "2025-03-31T07:00Z"
+  ],
+  "stagione": 2025,
+  "prima_data": "2025-09-20T19:00Z"
+ }
+}
