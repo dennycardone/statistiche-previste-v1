@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-10-02 14:34 UTC",
+ "aggiornato": "2026-10-02 17:32 UTC",
  "campionati": {
   "I2": {
    "partite": 10,
@@ -140,7 +140,7 @@
    "nomi_non_riconosciuti": []
   },
   "CHN": {
-   "partite_con_statistiche": 0,
+   "partite_con_statistiche": 1044,
    "partite_totali": 1576,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
@@ -182,5 +182,5 @@
    "nomi_non_riconosciuti": []
   }
  },
- "statistiche_aggiornate": "2026-10-02 16:44 UTC"
+ "statistiche_aggiornate": "2026-10-02 17:53 UTC"
 }
