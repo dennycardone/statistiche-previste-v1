@@ -353,6 +353,12 @@ select{border-radius:10px}
 
 .tabbar{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:460px){.tabbar button{font-size:11.5px;letter-spacing:0;padding:9px 0}}
+.pick .pk{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap}
+.pick .ccls{min-width:22px;height:16px;font-size:10px;padding:0 3px;border-radius:4px}
+.pick.weak{opacity:.55}
+.aprow{display:grid;grid-template-columns:minmax(0,1fr) auto 34px;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.aprow .apmk{font-size:15px}.apv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}.apv b{font-size:17px}.apv small{font-size:11px;color:var(--ink-3)}
+.apsc{font-weight:800;text-align:right;color:#e8563a}
 /* Confidence Score */
 .selhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .info{background:none;border:1px solid var(--line);border-radius:999px;width:28px;height:28px;padding:0;font-size:15px;color:var(--accent);flex:none;cursor:pointer}
@@ -438,7 +444,7 @@ select{border-radius:10px}
       <div class="self" role="group" aria-label="Filtri" id="selF">
         <button class="chip" data-sf="all" aria-pressed="true">Tutte</button><button class="chip" data-sf="aplus" aria-pressed="false">A+</button>
         <button class="chip" data-sf="a" aria-pressed="false">A</button><button class="chip" data-sf="b" aria-pressed="false">B</button>
-        <button class="chip" data-sf="hp" aria-pressed="false">Alta probabilità</button><button class="chip" data-sf="c3" aria-pressed="false">Metodi concordi</button>
+        <button class="chip" data-sf="hp" aria-pressed="false">Alta probabilità</button>
       </div>
       <div id="selList"></div>
     </section>
@@ -495,7 +501,7 @@ select{border-radius:10px}
         <label for="sigMin">Probabilità minima: <b id="sigMinVal">60%</b><input type="range" id="sigMin" min="60" max="95" step="5" value="60"></label>
         <label class="chk" for="sigGames"><input type="checkbox" id="sigGames" checked> Almeno 3 partite per sede (casa per chi gioca in casa, trasferta per l'ospite)</label>
         <label class="chk" for="sigStale"><input type="checkbox" id="sigStale" checked> Escludi campionati con dati vecchi</label>
-        <label class="chk" for="sigC3"><input type="checkbox" id="sigC3"> Solo concordi (stesso esito con Media dinamica e Media classica)</label>
+        <input type="checkbox" id="sigC3" hidden>
         <label for="sigMode">Statistica richiesta<select id="sigMode">
           <option value="dyn" selected>Media dinamica</option>
           <option value="classic">Media classica</option>
@@ -515,7 +521,7 @@ select{border-radius:10px}
     <div class="daystrip" id="days" role="tablist" aria-label="Giorni"></div>
     <div class="lgchips" id="lgChips" role="group" aria-label="Campionati" hidden></div>
     <div id="sched" class="sched"></div>
-    <p class="small muted schedlegend">Pallini <i class="ldot" style="background:var(--dot-g)"></i> = segnalazioni con lo stesso esito con Media dinamica e Media classica, uno per ognuna. Sotto: C corner · F falli · T tiri · TP tiri in porta, con 1 o 2 = chi ne fa di più. Probabilità nella scheda della partita. Partite finite: pronostici giusti sugli 8 mercati (Over/Under 1,5 · 2,5 · 3,5, Gol/No gol e 1X2 di corner, falli, tiri, tiri in porta), prendendo sempre l'esito più probabile. O2,5 e GG in verde se il lato più probabile è uscito. <span id="dataStamp"></span></p>
+    <p class="small muted schedlegend">A destra la previsione più solida della partita (fino a 2, classe B o migliore) con la sua classe di Confidence: O1,5 / O2,5 / O3,5 = Over, GG / NG = Gol / No gol, C corner · F falli · T tiri · TP tiri in porta con 1 o 2 = chi ne fa di più. In grigio quando nessuna arriva a B. Partite finite: pronostici giusti sugli 8 mercati, prendendo sempre l'esito più probabile. O2,5 e GG in verde se il lato più probabile è uscito. <span id="dataStamp"></span></p>
   </div>
 
   <div class="view" id="viewMatch" hidden>
@@ -2142,6 +2148,8 @@ function leagueRho() {
   const n = list.length; return { rho: Math.round(best * n / (n + 300) * 1000) / 1000, raw: Math.round(best * 100) / 100, n };
 }
 function modelGoals(home, away, cfg) {
+  // ottobre 2026: per i gol la Media classica prevedeva peggio di una percentuale fissa (backtest 2023-26): gol sempre dalla Media dinamica
+  if (cfg.classic) cfg = MODES.dyn;
   const M = cfg.classic ? model(home, away, cfg, "g") : model(home, away, cfg, "gm");
   if (!M) return null;
   const lh = M.lh, la = M.la, rho = 0, N = 10;
@@ -2420,7 +2428,7 @@ ${esc(home)} = (${f2(R.parts.hF)} + ${f2(R.parts.aA)}) / 2 = ${f2(R.lh)}
 ${esc(away)} = (${f2(R.parts.aF)} + ${f2(R.parts.hA)}) / 2 = ${f2(R.la)}
 Totale = ${f2(R.tot)}`;
     $("#methodLive").innerHTML = `<p class="small muted" style="margin:0">Statistica richiesta: <b>Media classica</b>. Nessuna ponderazione, nessuno shrinkage, nessun H2H. Le probabilità usano la stessa distribuzione del modello con questa media. Formula: squadra di casa = (media fatti in casa + media concessi in trasferta dall'ospite) / 2; ospite = (media fatti in trasferta + media concessi in casa dalla squadra di casa) / 2.</p>
-    <div class="formula">${[cl("GOL (reali, senza xG)", G && G.M), cl("CORNER", M), cl("FALLI (commessi / subiti)", MF), cl("TIRI", MT && MT.MS), cl("TIRI IN PORTA", MT && MT.MD)].join("\n\n")}</div>`;
+    <div class="formula">${["GOL: calcolati sempre con la Media dinamica (la classica sui gol prevedeva peggio di una percentuale fissa)", cl("CORNER", M), cl("FALLI (commessi / subiti)", MF), cl("TIRI", MT && MT.MS), cl("TIRI IN PORTA", MT && MT.MD)].join("\n\n")}</div>`;
     return;
   }
   const blk = (name, R) => {
@@ -2800,14 +2808,15 @@ const CONF_FACT = [     // fattori mostrati all'utente e variabili che li compon
 const confClass = sc => sc >= 90 ? "A+" : sc >= 80 ? "A" : sc >= 70 ? "B" : sc >= 60 ? "C" : "D";
 /* punteggio di una previsione (F = confFeatures). Regole fisse, scritte qui:
    - score = percentile della stima tra le segnalazioni passate dello stesso mercato (previsioni dal 60%, niente Under) (0-100);
-   - classe dal punteggio (90 A+, 80 A, 70 B, 60 C, sotto D), ma A+ solo se: è una segnalazione (almeno 60%, non Under), dinamica e classica concordi,
+   - classe dal punteggio (90 A+, 80 A, 70 B, 60 C, sotto D), ma A+ solo se: è una segnalazione (almeno 60%, non Under),
      campione sufficiente (almeno 5 partite in stagione e 3 nella sede per entrambe) e nessuna forte contraddizione;
      altrimenti resta A e si dice perché;
    - contraddizione: una frequenza reale (stagione, ultime 10, ultime 5, casa/trasferta) dice il contrario (esito uscito meno di metà delle volte);
      forte = almeno 2 su 4;
    - stato: A+ OPPORTUNITY se classe A+; WATCH se punteggio almeno 70 senza forte contraddizione; altrimenti NO SIGNAL. */
+const confBase = (base, mk) => (mk in GOAL_LINE || mk === "gg") || !CONF_COEF[base] ? "dyn" : base;   // gol: sempre Dinamica
 function confScore(F, base) {   // pesi stimati separatamente per metodo (la Dinamica contiene già l'Elo); Ultime 5 usa quelli della Ponderata
-  const b = CONF_COEF[base] ? base : "dyn";
+  const b = confBase(base, F.mk);
   const C = (CONF_COEF[b] || {})[F.mk], Q = (CONF_Q[b] || {})[F.mk]; if (!C || !Q) return null;
   let z = C.b0; const contrib = {};
   for (const [k, w] of Object.entries(C.w)) { const v = F.x[k]; z += w * v; contrib[k] = w * (v - (C.mean[k] || 0)); }
@@ -2818,9 +2827,10 @@ function confScore(F, base) {   // pesi stimati separatamente per metodo (la Din
   else score = (i - 1 + (q - Q[i - 1]) / Math.max(1e-9, Q[i] - Q[i - 1])) * 100 / (Q.length - 1);
   score = Math.max(0, Math.min(100, Math.round(score)));
   const contra = ["s", "l10", "l5", "v"].filter(k => F.e[k] != null && F.e[k] < 0.5).length;
-  const gates = { sig: F.p >= 0.6 && F.side !== "U", agree: F.agreeN >= 2, sample: F.n.tot >= 5 && F.n.venue >= 3, contra: contra < 2 };
+  const gates = { sig: F.p >= 0.6 && F.side !== "U", agree: true,   // concordanza tolta: nel backtest non cambiava gli A+
+ sample: F.n.tot >= 5 && F.n.venue >= 3, contra: contra < 2 };
   let cls = confClass(score), why = [];
-  if (cls === "A+") { if (!gates.sig) why.push(F.side === "U" ? "gli Under non sono tra le segnalazioni" : "probabilità sotto il 60%"); if (!gates.agree) why.push("dinamica e classica non concordano"); if (!gates.sample) why.push("campione piccolo"); if (!gates.contra) why.push("dati contrastanti"); if (why.length) cls = "A"; }
+  if (cls === "A+") { if (!gates.sig) why.push(F.side === "U" ? "gli Under non sono tra le segnalazioni" : "probabilità sotto il 60%"); if (!gates.sample) why.push("campione piccolo"); if (!gates.contra) why.push("dati contrastanti"); if (why.length) cls = "A"; }
   const status = cls === "A+" ? "aplus" : score >= 70 && gates.contra ? "watch" : "none";
   const stab = F.spread < 0.05 ? "Alta" : F.spread < 0.10 ? "Media" : "Bassa";
   const samp = F.n.venue >= 6 && F.n.tot >= 10 ? "Alto" : gates.sample ? "Medio" : "Basso";
@@ -2926,7 +2936,7 @@ function sigCardsHTML(rows, pref, withMatch = true, played = null) {
       <button class="sigopen" data-lg="${r.lg.code}" data-h="${esc(r.f.home)}" data-a="${esc(r.f.away)}" data-d="${isoD(r.f.date)}"${withMatch ? "" : " disabled"}>
         ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}
         <span class="p num">${pc(r.p)}</span>
-        <span class="d">${r.c3 ? `<span class="stag c3" title="Stesso esito con Media dinamica e Media classica">2/2</span>` : ""}<span class="stag">${MK_TAG[r.mk]}</span><b>${esc(r.fav)}</b> · ${detail}</span>
+        <span class="d"><span class="stag">${MK_TAG[r.mk]}</span><b>${esc(r.fav)}</b> · ${detail}</span>
         ${withMatch ? `<span class="w">${esc(r.lg.name)} · ${DAYS_SHORT[r.f.date.getUTCDay()]} ${dstr(r.f.date)}${r.f.time ? " · " + esc(r.f.time) : ""}</span>` : ""}
       </button>
       ${played ? (() => { const o = sigOutcome(r, played); return o ? `<span class="esito ${o.ok ? "good" : "bad"}">${o.ok ? "✓ Preso" : "✗ Non preso"} · ${o.txt}</span>` : ""; })() : ""}
@@ -3016,6 +3026,15 @@ function dotsHTML(sig) {
   if (!sig.length) return `<span class="dots" title="${esc(lab)}" aria-label="${esc(lab)}"><span class="dotx"></span><small>–</small></span>`;
   return `<span class="dots" title="${esc(lab)}" aria-label="${esc(lab)}"><span class="dotrow">${sig.map(() => `<span class="dotx g"></span>`).join("")}</span><em>${sig.map(t => `${SH[t.mk]}${t.fav}`).join(" ")}</em></span>`;
 }
+const PICK_SH = (mk, side) => mk in GOAL_LINE ? (side === "U" ? "U" : "O") + th1(GOAL_LINE[mk]) : mk === "gg" ? (side === "N" ? "NG" : "GG") : ({ c: "C", f: "F", s: "T", st: "TP" }[mk] + side);
+function pickHTML(L) {   // le previsioni più solide della partita (classe B o meglio, al massimo 2), con cosa giocare
+  if (L === undefined) return `<span class="dots pick"><small>…</small></span>`;
+  if (!L || !L.length) return `<span class="dots pick" title="Nessuna previsione"><small>–</small></span>`;
+  let top = L.filter(r => r.cls === "A+" || r.cls === "A" || r.cls === "B").slice(0, 2), weak = false;
+  if (!top.length) { top = L.slice(0, 1); weak = true; }
+  const lab = top.map(r => `${CONF_SIDE_LAB(r.mk, r.side)}: classe ${r.cls}, probabilità corretta ${pc(r.q)}`).join(" · ");
+  return `<span class="dots pick${weak ? " weak" : ""}" title="${esc(lab)}" aria-label="${esc(lab)}">${top.map(r => `<span class="pk"><b class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</b>${esc(PICK_SH(r.mk, r.side))}</span>`).join("")}</span>`;
+}
 function presiHTML(R) {
   const n = R.done ? R.done.length : 0;
   if (!n) return `<span class="dots presi" title="Dati insufficienti"><small>–</small></span>`;
@@ -3053,7 +3072,7 @@ function renderSched() {
   const rowHTML = (e, R) => {
     const m = e.m, G = R ? R.G : null, o25 = G ? G.over[1] : null, gg = G ? G.btts : null;
     const hitO = m && o25 != null ? (o25 >= 0.5) === (m.hg + m.ag > 2.5) : null, hitG = m && gg != null ? (gg >= 0.5) === (m.hg > 0 && m.ag > 0) : null;
-    const vals = R ? `${pv("O2,5 %", o25, hitO)}${pv("GG %", gg, hitG)}${m ? presiHTML(R) : dotsHTML(R.sig)}` : `<span class="pv"><small>O2,5 %</small><b>…</b></span><span class="pv"><small>GG %</small><b>…</b></span>`;
+    const vals = R ? `${pv("O2,5 %", o25, hitO)}${pv("GG %", gg, hitG)}${m ? presiHTML(R) : pickHTML(confEntry(e, MODES[$("#decay").value] || MODES.dyn, true))}` : `<span class="pv"><small>O2,5 %</small><b>…</b></span><span class="pv"><small>GG %</small><b>…</b></span>`;
     return `<button class="mrow" data-id="${esc(e.id)}">
           <span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>
           <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}</span><b>${m ? m.ag : ""}</b></span>
@@ -3065,7 +3084,8 @@ function renderSched() {
     return dayTot ? `<div class="daysum"><span>Pronostici giusti in questo giorno</span><b class="${dayHit / dayTot >= 0.5 ? "good" : "bad"}">${Math.round(dayHit / dayTot * 100)}%</b><small>${dayHit} su ${dayTot} · 8 mercati per partita</small></div>` : "";
   };
   const rows = shown.flatMap(L => today.filter(e => e.lg.code === L.code));
-  const todo = rows.filter(e => !rowCached(e));
+  const ccfg = MODES[$("#decay").value] || MODES.dyn;
+  const todo = rows.filter(e => !rowCached(e) || (!e.m && confEntry(e, ccfg, true) === undefined));
   box.innerHTML = `<div id="daysumBox">${todo.length ? "" : daySum()}</div>` + shown.map(L => `<section class="lgblock" aria-label="${esc(L.name)}">
       <div class="lghead"><small>${esc(L.country)}</small><span>${esc(L.name)}</span></div>
       ${today.filter(e => e.lg.code === L.code).map(e => rowHTML(e, rowCached(e))).join("")}
@@ -3075,7 +3095,8 @@ function renderSched() {
   const step = () => {
     if (renderSched.job !== job) return;                     // la pagina è cambiata: questo calcolo non serve più
     const e = todo.shift(); if (!e) { const d = box.querySelector("#daysumBox"); if (d) d.innerHTML = daySum(); return; }
-    const R = rowCalc(e), el = [...box.querySelectorAll(".mrow")].find(b => b.dataset.id === e.id);
+    const R = rowCalc(e); if (!e.m) { try { confEntry(e, ccfg); } catch (x) {} }
+    const el = [...box.querySelectorAll(".mrow")].find(b => b.dataset.id === e.id);
     if (el) { el.insertAdjacentHTML("afterend", rowHTML(e, R)); const nb = el.nextElementSibling; el.remove(); bind(nb); }
     setTimeout(step, 0);
   };
@@ -3214,7 +3235,6 @@ function renderMatchExtras(home, away) {
     <span class="team">${crest(S.league, home, "crl") || `<i style="background:var(--s1)"></i>`}${esc(home || "—")}</span>
     <span class="sc">${m ? `${m.hg} – ${m.ag}<small>Finale</small>` : `<small>${e && e.time ? esc(e.time) : "vs"}</small>`}</span>
     <span class="team">${crest(S.league, away, "crl") || `<i style="background:var(--s2)"></i>`}${esc(away || "—")}</span>
-    ${c3HTML(home, away, e, cfg)}
     <span class="kp"><span>Gol attesi <b>${G ? f2(G.tot) : "N/D"}</b></span><span>Over 2,5 <b>${G ? pc(G.over[1]) : "N/D"}</b></span><span>Gol/No gol <b>${G ? pc(G.btts) : "N/D"}</b></span></span>`;
   renderMatchConf(home, away, e, cfg);
   // confronto previsione / partita giocata
@@ -3507,9 +3527,9 @@ function confBar(score, cls) {
 function confInfoHTML(r) {
   const base = `<p style="margin:0"><b>Il Confidence Score misura quanto sono coerenti e solide le evidenze statistiche alla base della previsione. Non rappresenta la probabilità di vincita e non tiene conto delle quote dei bookmaker.</b></p>
     <p class="small" style="margin:0">Come si calcola: per ogni previsione l'app misura concordanza tra Media dinamica e Media classica, distanza tra le loro probabilità, campione, frequenza reale dell'esito (stagione, ultime 10, ultime 5, casa/trasferta), forza degli avversari e, solo per Over/Under 2,5, se il mercato è d'accordo. I pesi di questi fattori sono stati stimati sulle stagioni passate, usando ogni volta solo le partite giocate prima (walk-forward). La "probabilità corretta" è la stima di quanto previsioni come questa sono uscite davvero: è quella da guardare, più della probabilità del modello. Il punteggio dice quanto la previsione è solida rispetto alle segnalazioni passate dello stesso mercato (previsioni dal 60%): 93 = più solida del 93% di quelle. Le previsioni sotto il 60% hanno di solito punteggi bassi.</p>
-    <p class="small" style="margin:0">Classi: 90-100 A+ · 80-89 A · 70-79 B · 60-69 C · sotto 60 D. A+ solo per le segnalazioni (almeno 60%, niente Under), con Media dinamica e Media classica concordi, almeno 5 partite in stagione e 3 nella sede per entrambe le squadre e senza dati fortemente contrastanti. I fattori che sulle stagioni passate non miglioravano le previsioni hanno peso 0 e non compaiono tra i contributi.</p>`;
+    <p class="small" style="margin:0">Classi: 90-100 A+ · 80-89 A · 70-79 B · 60-69 C · sotto 60 D. A+ solo per le segnalazioni (almeno 60%, niente Under), almeno 5 partite in stagione e 3 nella sede per entrambe le squadre e senza dati fortemente contrastanti. I fattori che sulle stagioni passate non miglioravano le previsioni hanno peso 0 e non compaiono tra i contributi.</p>`;
   if (!r) return base;
-  const V = (CONF_VAL[CONF_VAL[r.base] ? r.base : "dyn"] || {})[r.mk];
+  const V = (CONF_VAL[confBase(r.base, r.mk)] || {})[r.mk];
   const val = V ? `<p class="small muted" style="margin:0">Verifica (${esc(V.seasons)}, ${esc(CONF_MNAME[r.mk])}): ${["A+", "A", "B", "C", "D"].filter(c => V.cls[c] && V.cls[c][1]).map(c => `${c} presa ${Math.round(V.cls[c][0] / V.cls[c][1] * 100)}% (${V.cls[c][1]})`).join(" · ")}.</p>` : "";
   let fac = "";
   if (r.contrib) {
@@ -3522,7 +3542,7 @@ function confRowHTML(r, i, withInfo) {
   return `<div class="crow">
     <div class="cl"><span class="cmk">${esc(confLab(r))}</span><span class="cp num">${pc(r.q)}<small> modello ${pc(r.p)}</small></span></div>
     <div class="cm">${confBar(r.score, r.cls)}</div>
-    <div class="cd small"><span>Metodi <b>${r.agreeN}/2</b></span><span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
+    <div class="cd small"><span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
   </div>`;
 }
 function renderMatchConf(home, away, e, cfg) {
@@ -3535,7 +3555,7 @@ function renderMatchConf(home, away, e, cfg) {
   box.hidden = false;
   box.innerHTML = `<div class="selhead"><h2>Confidence Score</h2><button class="info" data-ci="0" aria-label="Cos'è il Confidence Score">ⓘ</button></div>
     <div class="ctop"><span class="small muted">Previsione più solida</span><b>${esc(confLab(top))} · ${pc(top.q)} <small class="muted">(modello ${pc(top.p)})</small></b>${confBar(top.score, top.cls)}
-      <span class="cmods small">${C3_MODES.map((k, j) => `<span class="${top.agreeBy[j] ? "good" : "bad"}">${top.agreeBy[j] ? "✓" : "✗"} ${{ dyn: "Dinamica", classic: "Classica" }[k]}</span>`).join("")}<b>${top.agreeN}/2 CONCORDI</b></span><span class="cd small"><span>Stabilità <b>${top.stab}</b></span><span>Campione <b>${top.samp}</b></span><span class="st-${top.status}">${CONF_STATUS[top.status]}</span>${top.why.length ? `<span class="muted">A+ non confermato: ${esc(top.why.join(", "))}</span>` : top.contra >= 2 ? `<span class="muted">${top.contra} frequenze reali su 4 dicono il contrario</span>` : ""}</span></div>
+      <span class="cd small"><span>Stabilità <b>${top.stab}</b></span><span>Campione <b>${top.samp}</b></span><span class="st-${top.status}">${CONF_STATUS[top.status]}</span>${top.why.length ? `<span class="muted">A+ non confermato: ${esc(top.why.join(", "))}</span>` : top.contra >= 2 ? `<span class="muted">${top.contra} frequenze reali su 4 dicono il contrario</span>` : ""}</span></div>
     <details class="call"><summary>Tutti i mercati (${L.length})</summary>${L.map((r, i) => confRowHTML(r, i, true)).join("")}</details>
     <div class="confinfo" id="mconfInfo" hidden></div>
     ${e.m ? `<p class="small muted" style="margin:0">Partita giocata: punteggi calcolati solo con le partite precedenti.</p>` : ""}`;
@@ -3559,15 +3579,17 @@ function renderSel() {
   const got = [], todo = [];
   for (const e of ents) { const L = confEntry(e, cfg, true); if (L === undefined) todo.push(e); else got.push([e, L]); }
   const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "hp" ? r.q >= 0.7 : SEL.f === "c3" ? r.agreeN === C3_MODES.length : true;
-  const aplus = got.flatMap(([e, L]) => L.filter(r => r.status === "aplus").map(r => [e, { ...r, h: e.home, a: e.away }])).sort((a, b) => b[1].score - a[1].score || b[1].q - a[1].q);
+  // A+ raggruppati per partita: le previsioni della stessa partita sono legate tra loro (es. tiri e tiri in porta), non sono occasioni indipendenti
+  const apm = got.map(([e, L]) => [e, L.filter(r => r.status === "aplus").map(r => ({ ...r, h: e.home, a: e.away })).sort((a, b) => b.q - a.q)]).filter(([, L]) => L.length)
+    .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
   aBox.innerHTML = `<div class="selhead"><h2>🔥 A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
-    aplus.length ? `<div class="aplist">${aplus.map(([e, r]) => `<button class="apcard" data-id="${esc(e.id)}">
-      <span class="aptag">🔥 A+ OPPORTUNITY</span>
+    apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button class="apcard" data-id="${esc(e.id)}">
+      <span class="aptag">🔥 A+ OPPORTUNITY${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
-      <span class="apmk">${esc(confLab(r))}</span>
-      <span class="apgrid small"><span>Prob. corretta <b>${pc(r.q)}</b></span><span>Modello <b>${pc(r.p)}</b></span><span>Confidence <b>${r.score}/100</b></span><span>Classe <b>${r.cls}</b></span><span>Metodi <b>${r.agreeN}/2 concordi</b></span><span>Campione <b>${r.samp}</b></span><span>Stabilità <b>${r.stab}</b></span></span>
-      ${confBar(r.score, r.cls)}</button>`).join("")}</div>` : `<p class="apnone">NESSUNA OPPORTUNITÀ A+ DISPONIBILE</p>`);
+      ${L.map(r => `<span class="aprow"><span class="apmk">${esc(confLab(r))}</span><span class="apv"><b>${pc(r.q)}</b><small>modello ${pc(r.p)}</small></span><span class="apsc num">${r.score}</span></span>`).join("")}
+      <span class="small muted">Prob. corretta · probabilità del modello · Confidence. Campione ${L[0].samp.toLowerCase()}, stabilità ${L[0].stab.toLowerCase()}.</span>
+      </button>`).join("")}</div>` : `<p class="apnone">NESSUNA OPPORTUNITÀ A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
   list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime ${SEL.h} ore.</p>` :
     (rows.length ? rows.map(([e, L]) => `<button class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
