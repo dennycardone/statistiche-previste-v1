@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-10-02 17:32 UTC",
+ "aggiornato": "2026-10-02 20:30 UTC",
  "campionati": {
   "I2": {
    "partite": 10,
@@ -27,7 +27,7 @@
    "doppi": []
   },
   "SP2": {
-   "partite": 22,
+   "partite": 21,
    "non_riconosciute": [],
    "doppi": []
   },
@@ -106,7 +106,7 @@
    "nomi_non_riconosciuti": []
   },
   "ARG": {
-   "partite_con_statistiche": 2332,
+   "partite_con_statistiche": 2312,
    "partite_totali": 3293,
    "partite_aggiunte_da_espn": 0,
    "squadre_doppie": [],
@@ -182,5 +182,5 @@
    ]
   }
  },
- "statistiche_aggiornate": "2026-10-02 19:39 UTC"
+ "statistiche_aggiornate": "2026-10-02 20:30 UTC"
 }
