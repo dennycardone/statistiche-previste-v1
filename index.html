@@ -359,6 +359,7 @@ select{border-radius:10px}
 .aprow{display:grid;grid-template-columns:minmax(0,1fr) auto 34px;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
 .aprow .apmk{font-size:15px}.apv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}.apv b{font-size:17px}.apv small{font-size:11px;color:var(--ink-3)}
 .apsc{font-weight:800;text-align:right;color:#e8563a}
+.aprow2{display:grid;gap:4px;padding:8px 0;border-top:1px solid var(--line)}.aprow2 .apmk{font-size:16px}.aplab{color:var(--ink-3);margin-top:2px}
 /* Confidence Score */
 .selhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .info{background:none;border:1px solid var(--line);border-radius:999px;width:28px;height:28px;padding:0;font-size:15px;color:var(--accent);flex:none;cursor:pointer}
@@ -3587,8 +3588,9 @@ function renderSel() {
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button class="apcard" data-id="${esc(e.id)}">
       <span class="aptag">🔥 A+ OPPORTUNITY${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
-      ${L.map(r => `<span class="aprow"><span class="apmk">${esc(confLab(r))}</span><span class="apv"><b>${pc(r.q)}</b><small>modello ${pc(r.p)}</small></span><span class="apsc num">${r.score}</span></span>`).join("")}
-      <span class="small muted">Prob. corretta · probabilità del modello · Confidence. Campione ${L[0].samp.toLowerCase()}, stabilità ${L[0].stab.toLowerCase()}.</span>
+      ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(confLab(r))}</span>
+        <span class="small">Probabilità <b>${pc(r.q)}</b> <span class="muted">(modello ${pc(r.p)})</span></span>
+        <span class="aplab small">Confidence</span>${confBar(r.score, r.cls)}</span>`).join("")}
       </button>`).join("")}</div>` : `<p class="apnone">NESSUNA OPPORTUNITÀ A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
   list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime ${SEL.h} ore.</p>` :
