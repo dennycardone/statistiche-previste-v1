@@ -1,7 +1,8 @@
 name: Aggiorna dati corner
 on:
   schedule:
-    - cron: "17 5-23 * * *"   # ogni ora dalle 7:17 all'1:17 ora italiana (in UTC; con l'ora solare dalle 6:17 alle 0:17)
+    - cron: "17 5-23 * * *"
+    - cron: "47 5-22 * * *"   # secondo orario di riserva: GitHub salta spesso i giri programmati, così ne arrivano di più (due giri insieme non partono mai: il secondo aspetta)   # ogni ora dalle 7:17 all'1:17 ora italiana (in UTC; con l'ora solare dalle 6:17 alle 0:17)
   workflow_dispatch: {}
   push:   # parte da solo anche quando cambiano l'app o gli script che preparano i dati
     branches: [main]
@@ -39,6 +40,7 @@ jobs:
           rm -rf _site && mkdir _site
           cp -r index.html manifest.webmanifest icon.svg data _site/
           touch _site/.nojekyll
+          mkdir _site/docs && cp -r index.html manifest.webmanifest icon.svg data _site/docs/ && touch _site/docs/.nojekyll   # copia identica in docs/: il sito funziona sia con la cartella "/ (root)" sia con "/docs" nelle impostazioni di Pages (stessi file, git non occupa spazio in più)
           cd _site
           git init -q -b pages
           git config user.name "corner-bot"
