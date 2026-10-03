@@ -167,7 +167,7 @@ files.append("next_fixtures.csv")
 ESPN = {"I2": "ita.2", "SC0": "sco.1", "SC1": "sco.2", "D2": "ger.2", "F2": "fra.2", "SP2": "esp.2", "B1": "bel.1", "G1": "gre.1",
         "EC": "eng.5", "ARG": "arg.1", "AUT": "aut.1", "BRA": "bra.1", "CHN": "chn.1", "DNK": "den.1", "JPN": "jpn.1", "MEX": "mex.1",
         "NOR": "nor.1", "RUS": "rus.1", "SWE": "swe.1"}
-ESPN_ALIAS = {"DNK": {"AGF": "Aarhus", "F.C. København": "FC Copenhagen"}, "NOR": {"Hamarkameratene": "HamKam"},
+ESPN_ALIAS = {"DNK": {"AGF": "Aarhus", "F.C. København": "FC Copenhagen"}, "NOR": {"Hamarkameratene": "HamKam"}, "RUS": {"Nizhny Novgorod": "Pari NN"},
               "USA": {"LAFC": "Los Angeles FC", "Red Bull New York": "New York Red Bulls"}}
 import time
 def espn_get(url):
