@@ -29,8 +29,8 @@ for (const mode of ["dyn", "classic"]) {   // i due metodi dell'app
     try {
       const R = A.rowCompute(e, cfg, { markets, minP });
       const row = [R.G ? r4(R.G.over[1]) : null, R.G ? r4(R.G.btts) : null, R.sig.map(x => [x.mk, x.fav, r4(x.p)]), R.done ? R.done.length : null, R.done ? R.hit : null];
-      if (!e.m) {   // partite da giocare: anche tutti gli Over e corner/falli/tiri (servono alla sezione Generali)
-        row.push(R.G ? R.G.over.map(r4) : null);
+      row.push(R.G ? R.G.over.map(r4) : null);   // tutti gli Over (lista partite: O1,5 · O2,5 · O3,5)
+      if (!e.m) {   // partite da giocare: anche corner/falli/tiri (Generali) e Confidence
         const st = {}; for (const [k, v] of Object.entries(R.stats || {})) st[k] = v.map(r4); row.push(st);
         row.push(R.G ? [r4(R.G.lh), r4(R.G.la)] : null);   // gol attesi casa/ospite (segnalazioni)
         // Confidence Score di tutte le previsioni della partita (sezione Selezione)
