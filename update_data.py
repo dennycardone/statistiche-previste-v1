@@ -570,7 +570,7 @@ odds_path = os.path.join(OUT, "odds.json")
 try: OD = json.load(open(odds_path))
 except Exception: OD = {}
 rome_now = datetime.datetime.now(ROME)
-if AF_KEY and OD.get("giorno") != rome_now.strftime("%Y-%m-%d") and (rome_now.hour >= 7 or os.environ.get("ODDS_FORCE")):
+if AF_KEY and (OD.get("giorno") != rome_now.strftime("%Y-%m-%d") or (OD.get("errore") and not OD.get("partite"))) and (rome_now.hour >= 7 or os.environ.get("ODDS_FORCE")):
     af_used = [0]
     def af(path, **q):
         af_used[0] += 1
@@ -610,44 +610,59 @@ if AF_KEY and OD.get("giorno") != rome_now.strftime("%Y-%m-%d") and (rome_now.ho
         xs = [x for x in xs if x and x > 1]
         return round(statistics.median(xs), 2) if xs else None
     res, nomatch, err = {}, [], None
+    def take(e, f):   # quote mediane di una partita
+        lg = BY_ID[f["league"]["id"]]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
+        m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
+        if not m: nomatch.append(f"{lg} {f['teams']['home']['name']} - {f['teams']['away']['name']}"); return
+        acc = {}
+        for b in e.get("bookmakers", []):
+            for bet in b.get("bets", []):
+                for v in bet.get("values", []):
+                    try: o = float(v["odd"])
+                    except Exception: continue
+                    nm, val = bet["name"], str(v["value"])
+                    if nm == "Match Winner": key = "1x2:" + {"Home": "1", "Draw": "X", "Away": "2"}.get(val, "")
+                    elif nm == "Goals Over/Under" and val.split(" ")[-1] in ("1.5", "2.5", "3.5"): key = "ou" + val.split(" ")[-1] + ":" + val.split(" ")[0][0]
+                    elif nm == "Both Teams Score": key = "gg:" + {"Yes": "S", "No": "N"}.get(val, "")
+                    elif nm == "Corners 1x2": key = "c1x2:" + {"Home": "1", "Draw": "X", "Away": "2", "1": "1", "X": "X", "2": "2"}.get(val, "")
+                    else: continue
+                    if key.endswith(":"): continue
+                    acc.setdefault(key, {})[b["name"]] = o
+        q = {kk: [med(list(v.values())), len(v)] for kk, v in acc.items()}
+        q = {kk: v for kk, v in q.items() if v[0]}
+        if q: res[f"{lg}|{m[0]}|{m[1]}|{m[2]}"] = {"q": q, "nb": len(e.get("bookmakers", [])), "agg": e.get("update", "")[:16]}
     try:
+        # richieste rimaste oggi (la chiamata status non conta); ne lascio 5 di margine
+        req = urllib.request.Request("https://v3.football.api-sports.io/status", headers={"x-apisports-key": AF_KEY})
+        with urllib.request.urlopen(req, timeout=60) as r: stt = json.loads(r.read().decode()).get("response", {}).get("requests", {})
+        budget = int(stt.get("limit_day", 100)) - int(stt.get("current", 0)) - 5
+        # Il piano gratuito non accetta la stagione in corso come parametro: quote chieste per data (tutte le partite, 10 per pagina)
+        # oppure per singola partita, scegliendo la via con meno richieste.
         for k in range(3):
+            if budget < 2: break
             dd = rome_now.date() + datetime.timedelta(days=k)
-            F = af("fixtures", date=str(dd), timezone="Europe/Rome").get("response", [])
+            F = af("fixtures", date=str(dd), timezone="Europe/Rome").get("response", []); budget -= 1
             fx = {f["fixture"]["id"]: f for f in F if f["league"]["id"] in BY_ID and f["fixture"]["status"]["short"] in ("NS", "TBD")}
-            per_lg = {}
-            for f in fx.values(): per_lg.setdefault((f["league"]["id"], f["league"]["season"]), []).append(f)
-            for (lid, season), lst in per_lg.items():
-                page, pages = 1, 1
-                while page <= pages:
-                    O = af("odds", league=lid, season=season, date=str(dd), timezone="Europe/Rome", page=page)
-                    pages = (O.get("paging") or {}).get("total", 1) or 1; page += 1
-                    for e in O.get("response", []):
-                        f = fx.get(e["fixture"]["id"])
-                        if not f: continue
-                        lg = BY_ID[lid]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
-                        m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
-                        if not m: nomatch.append(f"{lg} {f['teams']['home']['name']} - {f['teams']['away']['name']}"); continue
-                        acc = {}
-                        for b in e.get("bookmakers", []):
-                            for bet in b.get("bets", []):
-                                for v in bet.get("values", []):
-                                    try: o = float(v["odd"])
-                                    except Exception: continue
-                                    nm, val = bet["name"], str(v["value"])
-                                    if nm == "Match Winner": key = "1x2:" + {"Home": "1", "Draw": "X", "Away": "2"}.get(val, "")
-                                    elif nm == "Goals Over/Under" and val.split(" ")[-1] in ("1.5", "2.5", "3.5"): key = "ou" + val.split(" ")[-1] + ":" + val.split(" ")[0][0]
-                                    elif nm == "Both Teams Score": key = "gg:" + {"Yes": "S", "No": "N"}.get(val, "")
-                                    elif nm == "Corners 1x2": key = "c1x2:" + {"Home": "1", "Draw": "X", "Away": "2", "1": "1", "X": "X", "2": "2"}.get(val, "")
-                                    else: continue
-                                    if key.endswith(":"): continue
-                                    acc.setdefault(key, {})[b["name"]] = o
-                        q = {kk: [med(list(v.values())), len(v)] for kk, v in acc.items()}
-                        q = {kk: v for kk, v in q.items() if v[0]}
-                        if q: res[f"{lg}|{m[0]}|{m[1]}|{m[2]}"] = {"q": q, "nb": len(e.get("bookmakers", [])), "agg": e.get("update", "")[:16]}
+            if not fx: continue
+            O = af("odds", date=str(dd), timezone="Europe/Rome", page=1); budget -= 1
+            pages, seen = (O.get("paging") or {}).get("total", 1) or 1, set()
+            for e in O.get("response", []):
+                if e["fixture"]["id"] in fx: take(e, fx[e["fixture"]["id"]]); seen.add(e["fixture"]["id"])
+            todo = [i for i in fx if i not in seen]
+            if len(todo) <= pages - 1:
+                for i in todo:
+                    if budget < 1: break
+                    for e in af("odds", fixture=i).get("response", []): take(e, fx[i])
+                    budget -= 1
+            else:
+                for pg in range(2, pages + 1):
+                    if budget < 1: break
+                    for e in af("odds", date=str(dd), timezone="Europe/Rome", page=pg).get("response", []):
+                        if e["fixture"]["id"] in fx: take(e, fx[e["fixture"]["id"]])
+                    budget -= 1
     except Exception as e:
         err = str(e); print("quote API-Football:", e)
-    if res or not OD:
+    if res or not err:   # con un errore e nessuna quota: si riprova al giro dopo (il file precedente resta)
         OD = {"giorno": rome_now.strftime("%Y-%m-%d"), "aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "API-Football (quota mediana tra i bookmaker)",
               "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "partite": res}
         json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
