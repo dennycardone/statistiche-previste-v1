@@ -168,7 +168,8 @@ ESPN = {"I2": "ita.2", "SC0": "sco.1", "SC1": "sco.2", "D2": "ger.2", "F2": "fra
         "EC": "eng.5", "ARG": "arg.1", "AUT": "aut.1", "BRA": "bra.1", "CHN": "chn.1", "DNK": "den.1", "JPN": "jpn.1", "MEX": "mex.1",
         "NOR": "nor.1", "RUS": "rus.1", "SWE": "swe.1"}
 ESPN_ALIAS = {"DNK": {"AGF": "Aarhus", "F.C. København": "FC Copenhagen"}, "NOR": {"Hamarkameratene": "HamKam"}, "RUS": {"Nizhny Novgorod": "Pari NN"},
-              "USA": {"LAFC": "Los Angeles FC", "Red Bull New York": "New York Red Bulls"}}
+              "USA": {"LAFC": "Los Angeles FC", "Red Bull New York": "New York Red Bulls"},
+              "SP1": {"Deportivo": "La Coruna"}, "D1": {"FC Cologne": "FC Koln"}, "T1": {"Istanbul Basaksehir": "Buyuksehyr"}}
 import time
 def espn_get(url):
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (statistiche-previste)"})
@@ -381,8 +382,8 @@ if unknown:
 # l'ultima data presente nel file di football-data, con entrambe le squadre riconosciute e senza la stessa sfida entro 3 giorni.
 # Cache in data/espn_results.json: un giorno già concluso da più di 2 giorni non si riscarica.
 ESPN_RES = {"I1": "ita.1", "I2": "ita.2", "E0": "eng.1", "E1": "eng.2", "E2": "eng.3", "E3": "eng.4", "EC": "eng.5",
-            "SP1": "esp.1", "SP2": "esp.2", "F1": "fra.1", "F2": "fra.2", "D1": "ger.1", "D2": "ger.2", "N1": "ned.1",
-            "P1": "por.1", "SC0": "sco.1", "SC1": "sco.2", "SC2": "sco.3", "SC3": "sco.4", "B1": "bel.1", "T1": "tur.1", "G1": "gre.1"}
+            "SP1": "esp.1", "SP2": "esp.2", "F1": "fra.1", "F2": "fra.2", "D1": "ger.1", "D2": "ger.2", "N1": "ned.1",   # (Scozia League One e Two: ESPN non le copre)
+            "P1": "por.1", "SC0": "sco.1", "SC1": "sco.2", "B1": "bel.1", "T1": "tur.1", "G1": "gre.1"}
 res_path = os.path.join(OUT, "espn_results.json")
 try: RC = json.load(open(res_path))
 except Exception: RC = {}
