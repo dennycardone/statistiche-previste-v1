@@ -1,0 +1,30 @@
+name: Arbitri API-Football
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "40 7 * * *"   # una volta al giorno finché non sono tutti scaricati (poi non fa più richieste)
+permissions:
+  contents: write
+jobs:
+  ref:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Arbitri già scaricati (ramo arbitri)
+        run: |
+          if git ls-remote --exit-code origin arbitri >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin arbitri && mkdir -p referees && git show FETCH_HEAD:referees.json > referees/referees.json
+          fi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python tools/referees_apifootball.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Salva sul ramo arbitri
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir _r && cp referees/referees.json _r/ && cd _r
+          git init -q -b arbitri && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Arbitri $(date -u '+%F %H:%M')"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" arbitri
