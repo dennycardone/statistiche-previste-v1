@@ -2483,8 +2483,8 @@ function fillTeams(keep) {
 function nextRound() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const t = new Set(teams());
-  const played = new Set(seasonMatches().map(m => m.home + "|" + m.away));
-  const up = S.fixtures.filter(f => f.div === S.league && f.date >= today && t.has(f.home) && t.has(f.away) && !played.has(f.home + "|" + f.away))
+  const played = seasonMatches().map(m => [m.home + "|" + m.away, +m.date]);   // la stessa sfida può ripetersi nella stagione
+  const up = S.fixtures.filter(f => f.div === S.league && f.date >= today && t.has(f.home) && t.has(f.away) && !played.some(([k, d]) => k === f.home + "|" + f.away && Math.abs(d - f.date) <= 4 * DAYMS))
     .sort((a, b) => a.date - b.date || (a.time || "").localeCompare(b.time || ""));
   if (!up.length) return [];
   const withRound = up.filter(f => f.round != null);
@@ -2628,12 +2628,13 @@ function allEntries(t0 = localIso()) {
   const c0 = S.cutoff; S.cutoff = null;
   try {
     for (const L of LEAGUES) withLeague(L.code, () => {
-      const sm = seasonMatches(), tset = new Set(teams()), done = new Set(sm.map(m => m.home + "|" + m.away));
+      const sm = seasonMatches(), tset = new Set(teams()), done = new Map();   // sfide giocate → date (una sfida può ripetersi nella stagione: Argentina, Scozia, playoff)
+      for (const m of sm) { const k = m.home + "|" + m.away; if (!done.has(k)) done.set(k, []); done.get(k).push(+m.date); }
       for (const m of sm) { const d = isoD(m.date); if (d >= lo && d <= hi) out.push({ id: `${L.code}|${d}|${m.home}|${m.away}`, lg: L, date: m.date, d, time: m.time || "", home: m.home, away: m.away, m }); }
       const seen = new Set();
       for (const f of S.fixtures.filter(f => f.div === L.code).sort((a, b) => a.date - b.date)) {
         const pair = f.home + "|" + f.away, d = isoD(f.date);
-        if (!tset.has(f.home) || !tset.has(f.away) || done.has(pair) || seen.has(pair) || d < lo || d > hi) continue;
+        if (!tset.has(f.home) || !tset.has(f.away) || (done.get(pair) || []).some(t => Math.abs(t - f.date) <= 4 * DAYMS) || seen.has(pair) || d < lo || d > hi) continue;
         seen.add(pair); out.push({ id: `${L.code}|${d}|${f.home}|${f.away}`, lg: L, date: f.date, d, time: f.time || "", home: f.home, away: f.away, m: null });
       }
     });

@@ -556,6 +556,35 @@ elif not token:
     print("FD_TOKEN non impostato: stemmi saltati")
 
 
+# Pulizia dei calendari: niente partite con data passata (rinviate o mai giocate: in app sembrerebbero "da giocare" nei giorni scorsi)
+# e, se ESPN (aggiornato ogni 3 ore) dà la stessa sfida in un altro giorno vicino, vale la data di ESPN (partita spostata).
+try:
+    _today = datetime.datetime.now(ROME).date()
+    def _rd(fn):
+        try: return list(csv.reader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8").read())))
+        except Exception: return []
+    def _d(x):
+        try: return datetime.datetime.strptime(x.strip(), "%d/%m/%Y").date()
+        except Exception: return None
+    E_ = _rd("espn_fixtures.csv"); espn_dates = {}
+    for r in E_[1:]:
+        if len(r) > 4 and _d(r[1]): espn_dates.setdefault((r[0], r[3].strip(), r[4].strip()), []).append(_d(r[1]))
+    for fn in ("fixtures.csv", "next_fixtures.csv", "espn_fixtures.csv"):
+        rd = _rd(fn)
+        if not rd: continue
+        keep, drop = [rd[0]], 0
+        for r in rd[1:]:
+            d = _d(r[1]) if len(r) > 4 else None
+            if d is None: keep.append(r); continue
+            if d < _today: drop += 1; continue
+            ed = espn_dates.get((r[0], r[3].strip(), r[4].strip()))
+            if fn != "espn_fixtures.csv" and ed and d not in ed and any(abs((x - d).days) <= 10 for x in ed): drop += 1; continue
+            keep.append(r)
+        buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(keep); save(fn, buf.getvalue())
+        print("calendario", fn, "tolte", drop)
+except Exception as e:
+    print("pulizia calendari:", e)
+
 # Quote dei bookmaker da API-Football (segreto APIFOOTBALL_KEY; piano gratuito: 100 richieste al giorno, 10 al minuto).
 # Una volta al giorno (dalle 7 italiane): partite di oggi e domani dei nostri campionati, quota mediana tra i bookmaker
 # per Over/Under gol, Gol/No gol, 1X2 e 1X2 corner. Servono solo da mostrare accanto alle nostre probabilità: non entrano
