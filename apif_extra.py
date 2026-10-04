@@ -87,7 +87,20 @@ def compute(rows):
 
 STAT_COLS = ["HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC"]
 API_IDX = {"HS": (7, 0), "AS": (8, 0), "HST": (7, 1), "AST": (8, 1), "HF": (7, 3), "AF": (8, 3), "HC": (7, 2), "AC": (8, 2)}   # (squadra, statistica) nell'archivio
-def fill_stats(rd, lg, api_rows, mp):
+def api_stats_ok(v):
+    """Controllo di plausibilità delle statistiche di API-Football (verifica su fonti indipendenti: API-Football è la più
+    affidabile, ma a volte ha falli impossibili, es. 23-0 o 4-2). Restituisce per gruppo (tiri, porta, falli, corner) se usarlo."""
+    H, A = v[7] if len(v) > 9 else v[6], v[8] if len(v) > 9 else v[7]
+    g = lambda t, k: t[k] if t and t[k] is not None else None
+    hs, as_, hst, ast, hc, ac, hf, af = g(H, 0), g(A, 0), g(H, 1), g(A, 1), g(H, 2), g(A, 2), g(H, 3), g(A, 3)
+    ok = {}
+    ok["s"] = hs is not None and as_ is not None and hs + as_ >= 4
+    ok["st"] = ok["s"] and hst is not None and ast is not None and hst <= hs and ast <= as_
+    ok["f"] = hf is not None and af is not None and hf >= 3 and af >= 3 and hf + af >= 10
+    ok["c"] = hc is not None and ac is not None
+    return ok
+GROUP = {"HS": "s", "AS": "s", "HST": "st", "AST": "st", "HF": "f", "AF": "f", "HC": "c", "AC": "c"}
+def fill_stats(rd, lg, api_rows, mp, override=False):
     """rd: righe CSV (intestazione + righe) di un campionato. Riempie SOLO dove mancano: corner, falli, tiri, tiri in porta
     (colonne di football-data) e cartellini per squadra HK/AK (gialli + rossi, sempre da API-Football), con la partita di
     API-Football che ha stesse squadre, giorno ±1 e stesso risultato. Restituisce (righe, quante partite toccate)."""
@@ -105,7 +118,7 @@ def fill_stats(rd, lg, api_rows, mp):
     n = 0
     for r in body:
         if len(r) < len(hdr): r.extend([""] * (len(hdr) - len(r)))
-        need_s = not all(r[idx[c]].strip() for c in STAT_COLS); need_k = not (r[idx["HK"]].strip() and r[idx["AK"]].strip())
+        need_s = override or not all(r[idx[c]].strip() for c in STAT_COLS); need_k = override or not (r[idx["HK"]].strip() and r[idx["AK"]].strip())
         if not need_s and not need_k: continue
         try:
             dd = r[iD].strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; d = datetime.date(int(y), int(dd[1]), int(dd[0]))
@@ -115,10 +128,11 @@ def fill_stats(rd, lg, api_rows, mp):
             if abs((datetime.date.fromisoformat(v[0][:10]) - d).days) <= 1 and v[4] == g1 and v[5] == g2:
                 done = False
                 vals = {c: v[t][k] for c, (t, k) in API_IDX.items()}
-                if need_s and not any(x is None for x in vals.values()):
-                    for c in STAT_COLS:
-                        if not r[idx[c]].strip(): r[idx[c]] = str(int(vals[c]))
-                    done = True
+                ok = api_stats_ok(v)
+                if need_s:
+                    for c in STAT_COLS:   # API-Football dove plausibile (anche sopra football-data se override), altrimenti resta quello che c'è
+                        if ok[GROUP[c]] and vals[c] is not None and (override or not r[idx[c]].strip()):
+                            r[idx[c]] = str(int(vals[c])); done = True
                 if need_k and v[7][4] is not None and v[8][4] is not None:
                     r[idx["HK"]] = str(int(v[7][4] + (v[7][5] or 0))); r[idx["AK"]] = str(int(v[8][4] + (v[8][5] or 0))); done = True
                 n += done; break

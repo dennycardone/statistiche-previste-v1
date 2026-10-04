@@ -68,9 +68,10 @@ for lg in NEW_LEAGUES:
     if os.path.exists(os.path.join(OUT, name)):
         files.append(name)
 
-# API-Football a pagamento? Se sì è la fonte principale per calendario, risultati, arbitri e cartellini (ESPN non serve più;
-# fixturedownload e football-data restano come riserva). Statistiche: football-data resta la fonte dove c'è (modelli tarati
-# su quei numeri; su 25.000 partite i due fornitori coincidono nell'89-99% dei casi), API-Football riempie i vuoti.
+# API-Football a pagamento? Se sì è la fonte principale per TUTTO: calendario, risultati, statistiche, arbitri e cartellini.
+# Verifica su fonti indipendenti (sito LaLiga, FBref, FotMob…, 12 partite dove i due fornitori differivano): API-Football giusto
+# ~26 volte, football-data 3 (football-data conta meno tiri e ha scambiato partite). football-data resta solo dove il dato di
+# API-Football è impossibile (es. falli 23-0) o manca, e per le quote storiche; ESPN come riserva del calendario.
 AF_PRO = False
 if os.environ.get("APIFOOTBALL_KEY", "").strip():
     try:
@@ -683,9 +684,8 @@ try:
     for lg, L in by_lg.items():
         L.sort(key=lambda v: v[0])
         MAPS[lg] = apif_extra.learn_map([(datetime.date.fromisoformat(v[0][:10]), v[2], v[3], v[4], v[5]) for v in L if v[9] in ("FT", "AET", "PEN")], ours.get(lg, []), lg)
-    # Statistiche del giorno stesso e campionati che football-data dà senza statistiche (Polonia, Romania, Svizzera, Finlandia, Irlanda):
-    # corner, falli, tiri e tiri in porta da API-Football, SOLO dove mancano (football-data, quando pubblica, resta la fonte).
-    # Verificato: stessi numeri di football-data (24 partite su 24); modelli dei 5 campionati nuovi in linea con quelli già presenti.
+    # Statistiche da API-Football su tutte le partite che ha (dal 2022), se plausibili (apif_extra.api_stats_ok); altrimenti
+    # quelle di football-data. Anche i campionati senza statistiche su football-data (Polonia, Romania, Svizzera, Finlandia, Irlanda).
     n_fill = 0
     for fn in files:
         lg = fn.split("_")[0].split(".")[0]
@@ -693,7 +693,7 @@ try:
         try:
             rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8-sig").read())))
             if not rd: continue
-            rd2, k = apif_extra.fill_stats(rd, lg, [v for v in by_lg[lg] if v[9] in ("FT", "AET", "PEN")], MAPS[lg])
+            rd2, k = apif_extra.fill_stats(rd, lg, [v for v in by_lg[lg] if v[9] in ("FT", "AET", "PEN")], MAPS[lg], override=AF_PRO)
             if k:
                 buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(rd2); save(fn, buf.getvalue()); n_fill += k
         except Exception as e:
