@@ -1,0 +1,33 @@
+name: Storico API-Football
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "10 8 * * *"   # riprende ogni giorno finché lo storico non è completo
+permissions:
+  contents: write
+jobs:
+  hist:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Storico già scaricato (ramo storico)
+        run: |
+          mkdir -p storico
+          if git ls-remote --exit-code origin storico >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
+          fi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python tools/history_apifootball.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Salva sul ramo storico
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd storico
+          git init -q -b storico && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Storico $(date -u '+%F %H:%M')"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" storico
