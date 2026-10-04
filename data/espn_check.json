@@ -1,0 +1,184 @@
+{
+ "aggiornato": "2026-10-04 02:59 UTC",
+ "campionati": {
+  "I2": {
+   "partite": 17,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "SC0": {
+   "partite": 11,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "SC1": {
+   "partite": 11,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "D2": {
+   "partite": 15,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "F2": {
+   "partite": 17,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "SP2": {
+   "partite": 22,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "B1": {
+   "partite": 9,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "G1": {
+   "partite": 9,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "EC": {
+   "partite": 12,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "ARG": {
+   "partite": 24,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "AUT": {
+   "partite": 9,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "BRA": {
+   "partite": 25,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "CHN": {
+   "partite": 13,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "DNK": {
+   "partite": 7,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "JPN": {
+   "partite": 18,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "MEX": {
+   "partite": 17,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "NOR": {
+   "partite": 11,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "RUS": {
+   "partite": 11,
+   "non_riconosciute": [],
+   "doppi": []
+  },
+  "SWE": {
+   "partite": 10,
+   "non_riconosciute": [],
+   "doppi": []
+  }
+ },
+ "statistiche": {
+  "BRA": {
+   "partite_con_statistiche": 2130,
+   "partite_totali": 2557,
+   "partite_aggiunte_da_espn": 2,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "ARG": {
+   "partite_con_statistiche": 2332,
+   "partite_totali": 3293,
+   "partite_aggiunte_da_espn": 6,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "USA": {
+   "partite_con_statistiche": 2880,
+   "partite_totali": 3272,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": [
+    "Arsenal",
+    "Liga MX All-Stars",
+    "MLS All-Stars"
+   ]
+  },
+  "MEX": {
+   "partite_con_statistiche": 1824,
+   "partite_totali": 2130,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "JPN": {
+   "partite_con_statistiche": 623,
+   "partite_totali": 2142,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "CHN": {
+   "partite_con_statistiche": 1398,
+   "partite_totali": 1576,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "AUT": {
+   "partite_con_statistiche": 355,
+   "partite_totali": 1208,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "DNK": {
+   "partite_con_statistiche": 438,
+   "partite_totali": 1210,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "NOR": {
+   "partite_con_statistiche": 519,
+   "partite_totali": 1615,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "SWE": {
+   "partite_con_statistiche": 551,
+   "partite_totali": 1624,
+   "partite_aggiunte_da_espn": 0,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  },
+  "RUS": {
+   "partite_con_statistiche": 495,
+   "partite_totali": 1468,
+   "partite_aggiunte_da_espn": 56,
+   "squadre_doppie": [],
+   "nomi_non_riconosciuti": []
+  }
+ },
+ "statistiche_aggiornate": "2026-10-04 03:00 UTC"
+}
