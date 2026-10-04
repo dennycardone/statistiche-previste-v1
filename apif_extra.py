@@ -62,7 +62,7 @@ def compute(rows):
     out = []
     for r in rows:
         th, ta = team[r["h"]], team[r["a"]]
-        res = {"ref": r.get("ref"), "n": 0, "ff": None, "fc": None, "mu": None, "mu0": None}
+        res = {"ref": r.get("ref"), "n": 0, "ff": None, "fc": None, "mu": None, "mu0": None, "mh": None, "ma": None}
         ec = ef = None
         if lg[2] >= 30 and th[4] >= MIN_N and ta[4] >= MIN_N:
             ec = (th[0] / th[4] + ta[1] / ta[4]) / 2 + (ta[0] / ta[4] + th[1] / th[4]) / 2
@@ -71,7 +71,8 @@ def compute(rows):
             rk = refkey(r.get("ref")); R = refs.get(rk) if rk else None
             fc = (R[0] + K * mc) / (R[1] + K * mc) if R and R[4] and R[1] + K * mc > 0 else 1.0
             ff = (R[2] + K * mf) / (R[3] + K * mf) if R and R[4] and R[3] + K * mf > 0 else 1.0
-            res.update(n=R[4] if R else 0, ff=round(ff, 4), fc=round(fc, 4), mu=round(ec * fc, 3), mu0=round(ec, 3))
+            eh = (th[0] / th[4] + ta[1] / ta[4]) / 2; ea = (ta[0] / ta[4] + th[1] / th[4]) / 2   # cartellini attesi per squadra
+            res.update(n=R[4] if R else 0, ff=round(ff, 4), fc=round(fc, 4), mu=round(ec * fc, 3), mu0=round(ec, 3), mh=round(eh * fc, 3), ma=round(ea * fc, 3))
         out.append(res)
         if r.get("hc") is None or r.get("ac") is None: continue
         T = r["hc"] + r["ac"]; F = (r["hf"] + r["af"]) if r.get("hf") is not None and r.get("af") is not None else None

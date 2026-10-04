@@ -2422,7 +2422,8 @@ function render() {
     ${staleNote()}
     ${M && M.nH != null ? `<div class="warnbox">Basato su ${M.nHt} partite di ${esc(home)} (${M.nH} in casa) e ${M.nAt} di ${esc(away)} (${M.nA} in trasferta). ${hl.dyn ? "Media dinamica: normale del campionato × attacco × difesa, con prudenza che cala partita dopo partita; gol, corner, falli e tiri con i modelli verificati. Calcolo completo in Dati e metodo." : `Pesi della Media ponderata: classica 50% · campionato 25% · avversari 20% · totale squadra 5% (falli: classica ${MF && MF.Bp && MF.Bp.W && MF.Bp.W.cl === 0.5 ? "50% · totale squadra 50%" : "20% · totale squadra 80%, dall'11ª partita 50% · 50%"}; gol: 60% xG · 30% gol veri · 10% avversari).${M.nHt > RECENT_FROM || M.nAt > RECENT_FROM ? " Oltre le 10 partite le ultime 5 di ogni squadra contano il doppio." : ""}`}</div>` : ""}
     ${rowsTable(["Statistica", teamHead(home, "--s1"), teamHead(away, "--s2"), "Totale atteso"], [
-      G ? ["🥅 Gol", f2(G.lh), f2(G.la), `<b>${f2(G.tot)}</b>`] : ["🥅 Gol", "N/D", "N/D", "N/D"], sumRow("⚽ Corner", M), sumRow("🟨 Falli", MF), sumRow("🎯 Tiri", MT ? MT.MS : null), sumRow("🎯 Tiri in porta", MT)])}
+      G ? ["🥅 Gol", f2(G.lh), f2(G.la), `<b>${f2(G.tot)}</b>`] : ["🥅 Gol", "N/D", "N/D", "N/D"], sumRow("⚽ Corner", M), sumRow("🟨 Falli", MF), sumRow("🎯 Tiri", MT ? MT.MS : null), sumRow("🎯 Tiri in porta", MT),
+      (() => { const x = extraFor(home, away); return x && x[4] ? ["🟥 Cartellini", x[6] != null ? f1(x[6]) : "—", x[7] != null ? f1(x[7]) : "—", `<b>${f1(x[4])}</b>`] : ["🟥 Cartellini", "N/D", "N/D", "N/D"]; })()])}
   </section>
 
   ${probCard(home, away, { G, M, MF, MT })}

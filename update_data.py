@@ -762,7 +762,7 @@ try:
             if not h or not a or d < lim: continue
             ds = [z for z in pairs.get((lg, h, a), []) if abs((z - d).days) <= 1]
             if not ds: continue
-            EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], (r["hc"] + r["ac"]) if r["hc"] is not None and r["ac"] is not None else None]
+            EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], (r["hc"] + r["ac"]) if r["hc"] is not None and r["ac"] is not None else None, x["mh"], x["ma"]]
     json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "partite": EX}, open(os.path.join(OUT, "extra.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("arbitri e cartellini:", len(EX), "partite abbinate")
 except Exception as e:
