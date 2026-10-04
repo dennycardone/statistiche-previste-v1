@@ -533,7 +533,6 @@ select{border-radius:10px}
     </div>
     <section class="mhead" id="mhead" aria-label="Partita"></section>
     <section class="card mconf" id="mconf" aria-label="Confidence Score" hidden></section>
-    <section class="card" id="modds" aria-label="Quote dei bookmaker" hidden></section>
     <div class="mtabs" role="tablist" aria-label="Sezioni della partita">
       <button class="mtab" data-mt="prev" aria-pressed="true">Previsioni</button>
       <button class="mtab" data-mt="sig" aria-pressed="false">Segnalazioni</button>
@@ -3245,7 +3244,6 @@ function renderMatchExtras(home, away) {
     <span class="team">${crest(S.league, away, "crl") || `<i style="background:var(--s2)"></i>`}${esc(away || "—")}</span>
     <span class="kp"><span>Gol attesi <b>${G ? f2(G.tot) : "N/D"}</b></span><span>Over 2,5 <b>${G ? pc(G.over[1]) : "N/D"}</b></span><span>Gol/No gol <b>${G ? pc(G.btts) : "N/D"}</b></span></span>`;
   renderMatchConf(home, away, e, cfg);
-  renderMatchOdds(home, away, e, cfg, G);
   // confronto previsione / partita giocata
   const cmp = $("#mcmp");
   if (m && G) {
@@ -3561,36 +3559,6 @@ function confRowHTML(r, i, withInfo) {
     <div class="cm">${confBar(r.score, r.cls)}</div>
     <div class="cd small">${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}<span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
   </div>`;
-}
-/* Quote della partita (API-Football, mediana tra i bookmaker) accanto alle nostre probabilità.
-   Nessuna "quota di valore": sulle stagioni 2022-2025 (Over/Under 2,5, quote medie football-data) puntare dove la nostra
-   probabilità batteva la quota avrebbe reso circa −5%, e peggio quanto più grande sembrava il margine. */
-function renderMatchOdds(home, away, e, cfg, G) {
-  const box = $("#modds"); if (!box) return;
-  const P = e && !e.m && ODDS && ODDS.partite && ODDS.partite[e.id];
-  if (!P) { box.hidden = true; return; }
-  let C = null;
-  try { const M = model(home, away, cfg, "c"); if (M && isFinite(M.lh) && isFinite(M.la)) { const h = headToHeadProb(M.lh, M.la, M.r, M.rTeam); C = [h.home, h.draw, h.away]; } } catch (x) {}
-  const q = k => (P.q[k] || [])[0];
-  const groups = [
-    ["Esito finale", [["1", "1x2:1", G && G.p1], ["X", "1x2:X", G && G.px], ["2", "1x2:2", G && G.p2]]],
-    ["Over/Under 1,5", [["Over 1,5", "ou1.5:O", G && G.over[0]], ["Under 1,5", "ou1.5:U", G && 1 - G.over[0]]]],
-    ["Over/Under 2,5", [["Over 2,5", "ou2.5:O", G && G.over[1]], ["Under 2,5", "ou2.5:U", G && 1 - G.over[1]]]],
-    ["Over/Under 3,5", [["Over 3,5", "ou3.5:O", G && G.over[2]], ["Under 3,5", "ou3.5:U", G && 1 - G.over[2]]]],
-    ["Gol/No gol", [["Gol", "gg:S", G && G.btts], ["No gol", "gg:N", G && 1 - G.btts]]],
-    ["Più corner", [["1", "c1x2:1", C && C[0]], ["X", "c1x2:X", C && C[1]], ["2", "c1x2:2", C && C[2]]]],
-  ];
-  const rows = groups.map(([t, L]) => {
-    if (!L.every(([, k]) => q(k) > 1)) return "";
-    const s = L.reduce((a, [, k]) => a + 1 / q(k), 0);   // probabilità del bookmaker senza il suo margine
-    return `<tr class="og"><th colspan="4">${t}</th></tr>` + L.map(([lab, k, p]) => `<tr><td>${lab}</td><td class="num">${p != null ? pc(p) : "N/D"}</td><td class="num">${pc(1 / q(k) / s)}</td><td class="num"><b>${q(k).toFixed(2).replace(".", ",")}</b></td></tr>`).join("");
-  }).join("");
-  if (!rows) { box.hidden = true; return; }
-  box.hidden = false;
-  box.innerHTML = `<h2>💶 Quote</h2>
-    <div style="overflow-x:auto"><table class="otab"><thead><tr><th>Esito</th><th>Noi</th><th>Bookmaker</th><th>Quota</th></tr></thead><tbody>${rows}</tbody></table></div>
-    <p class="small muted" style="margin:0">Quota = mediana tra ${P.nb} bookmaker (API-Football, ${esc(ODDS.aggiornate || "")}). Bookmaker = probabilità della quota senza il margine. Noi = probabilità del modello (gol: Media dinamica).</p>
-    <p class="small muted" style="margin:0"><b>Nessuna quota di valore segnalata:</b> sulle stagioni 2022-2025 puntare l'Over/Under 2,5 quando la nostra probabilità superava quella del bookmaker avrebbe reso circa −5%, e peggio quanto più grande sembrava il vantaggio. Quando siamo in disaccordo con il mercato, finora ha avuto ragione il mercato.</p>`;
 }
 function renderMatchConf(home, away, e, cfg) {
   const box = $("#mconf"); if (!box) return;
