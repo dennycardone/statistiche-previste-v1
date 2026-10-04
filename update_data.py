@@ -375,6 +375,114 @@ json.dump(J, open(os.path.join(OUT, "espn_check.json"), "w"), indent=1, ensure_a
 if unknown:
     print("Nomi non convertiti (verificare ALIAS se non coincidono con football-data):", sorted(unknown))
 
+# Risultati del giorno per i campionati europei: football-data.co.uk li pubblica solo un paio di volte a settimana.
+# Nel frattempo il risultato finale arriva da ESPN (solo gol: corner, falli, tiri e xG restano vuoti finché football-data
+# non pubblica la sua riga, che poi prende il posto di quella di ESPN). Si aggiungono solo partite finite, giocate dopo
+# l'ultima data presente nel file di football-data, con entrambe le squadre riconosciute e senza la stessa sfida entro 3 giorni.
+# Cache in data/espn_results.json: un giorno già concluso da più di 2 giorni non si riscarica.
+ESPN_RES = {"I1": "ita.1", "I2": "ita.2", "E0": "eng.1", "E1": "eng.2", "E2": "eng.3", "E3": "eng.4", "EC": "eng.5",
+            "SP1": "esp.1", "SP2": "esp.2", "F1": "fra.1", "F2": "fra.2", "D1": "ger.1", "D2": "ger.2", "N1": "ned.1",
+            "P1": "por.1", "SC0": "sco.1", "SC1": "sco.2", "SC2": "sco.3", "SC3": "sco.4", "B1": "bel.1", "T1": "tur.1", "G1": "gre.1"}
+res_path = os.path.join(OUT, "espn_results.json")
+try: RC = json.load(open(res_path))
+except Exception: RC = {}
+if RC.get("v") != 1: RC = {"v": 1, "days": {}, "ev": {}}
+try: UKZ = ZoneInfo("Europe/London")
+except Exception: UKZ = datetime.timezone.utc
+res_check = {}
+for lg, code_ in ESPN_RES.items():
+    name = f"{lg}_{code(cur)}.csv"; path = os.path.join(OUT, name)
+    if not os.path.exists(path): continue
+    try:
+        rd = list(csv.reader(io.StringIO(open(path, encoding="utf-8").read())))
+        hdr, body = rd[0], [r for r in rd[1:] if any(x.strip() for x in r)]
+        iD, iH, iA = hdr.index("Date"), hdr.index("HomeTeam"), hdr.index("AwayTeam")
+        iG1, iG2 = hdr.index("FTHG"), hdr.index("FTAG")
+        iR = hdr.index("FTR") if "FTR" in hdr else -1; iT = hdr.index("Time") if "Time" in hdr else -1
+    except Exception as e:
+        print("risultati ESPN: file", name, e); continue
+    def _d(x):
+        x = x.strip()
+        for f in ("%d/%m/%Y", "%d/%m/%y"):
+            try: return datetime.datetime.strptime(x, f).date()
+            except Exception: pass
+        return None
+    pairs, scores = {}, {}
+    for r in body:
+        if len(r) > iA and _d(r[iD]):
+            pr = (r[iH].strip(), r[iA].strip()); pairs.setdefault(pr, []).append(_d(r[iD]))
+            scores.setdefault(pr, []).append((_d(r[iD]), r[iG1].strip(), r[iG2].strip()))
+    dates = [d for v in pairs.values() for d in v]
+    last = max(dates) if dates else today - datetime.timedelta(days=21)
+    start = today - datetime.timedelta(days=21)   # 3 settimane: servono anche partite già in football-data per confermare i nomi
+    days = RC["days"].setdefault(lg, []); EVR = RC["ev"].setdefault(lg, {})
+    d = start
+    while d <= today:
+        ds = d.strftime("%Y%m%d")
+        if ds not in days or d >= today - datetime.timedelta(days=2):
+            try:
+                for ev in json.loads(espn_get(f"https://site.api.espn.com/apis/site/v2/sports/soccer/{code_}/scoreboard?dates={ds}")).get("events", []):
+                    st = ev.get("status", {}).get("type", {})
+                    if not st.get("completed") or st.get("name") in ("STATUS_POSTPONED", "STATUS_CANCELED", "STATUS_ABANDONED", "STATUS_SUSPENDED"): continue
+                    comp = ev["competitions"][0]; side = {c["homeAway"]: c for c in comp["competitors"]}
+                    EVR[ev["id"]] = [ev["date"], _tn(side["home"]["team"]), _tn(side["away"]["team"]),
+                                     int(float(side["home"].get("score"))), int(float(side["away"].get("score")))]
+                if ds not in days and d < today - datetime.timedelta(days=2): days.append(ds)
+            except Exception as e:
+                print("risultati ESPN", lg, ds, e)
+            time.sleep(0.2)
+        d += datetime.timedelta(days=1)
+    # pulizia: solo le ultime 3 settimane
+    lim = str(today - datetime.timedelta(days=21))
+    for k in [k for k, v in EVR.items() if v[0][:10] < lim]: del EVR[k]
+    RC["days"][lg] = sorted(x for x in days if x >= lim.replace("-", ""))
+    pool = {t for pr in pairs for t in pr} or cur_teams(lg)
+    def _m(names):
+        for n in names:
+            a_ = ALIAS.get(lg, {}).get(n) or FIX_ALIAS.get(n)
+            if n in pool: return n
+            if a_ in pool: return a_
+        return espn_match(lg, names, pool)
+    nmap, used, bad = {}, {}, set()
+    for v in EVR.values():
+        for names in (v[1], v[2]):
+            k = names[0]
+            if not k or k in nmap: continue
+            t = _m(names); nmap[k] = t
+            if t: used.setdefault(t, set()).add(k)
+            else: bad.add(k)
+    dup = {t for t, v in used.items() if len(v) > 1}
+    evs_ = []
+    for v in sorted(EVR.values(), key=lambda v: v[0]):
+        loc = datetime.datetime.strptime(v[0], "%Y-%m-%dT%H:%MZ").replace(tzinfo=datetime.timezone.utc).astimezone(UKZ)
+        evs_.append((loc, loc.date(), v[1][0], v[2][0], nmap.get(v[1][0]), nmap.get(v[2][0]), v[3], v[4]))
+    # nome ESPN confermato = almeno una sua partita coincide con football-data (stesse squadre, giorno ±1, stesso risultato)
+    ok_names = set()
+    for loc, dd, kh, ka, h, a, g1, g2 in evs_:
+        if h and a and any(abs((x - dd).days) <= 1 and s1 == str(g1) and s2 == str(g2) for x, s1, s2 in scores.get((h, a), [])):
+            ok_names.update([kh, ka])
+    add, unconf = [], set()
+    for loc, dd, kh, ka, h, a, g1, g2 in evs_:
+        v = [None, None, None, g1, g2]
+        if not h or not a or h in dup or a in dup or h == a: continue
+        if dd <= last or dd > today: continue
+        if kh not in ok_names or ka not in ok_names: unconf.update(x for x in (kh, ka) if x not in ok_names); continue
+        if any(abs((x - dd).days) <= 3 for x in pairs.get((h, a), [])): continue
+        r = [""] * len(hdr)
+        r[0] = lg; r[iD] = dd.strftime("%d/%m/%Y"); r[iH], r[iA], r[iG1], r[iG2] = h, a, str(v[3]), str(v[4])
+        if iT >= 0: r[iT] = loc.strftime("%H:%M")
+        if iR >= 0: r[iR] = "H" if v[3] > v[4] else "A" if v[4] > v[3] else "D"
+        add.append(r); pairs.setdefault((h, a), []).append(dd)
+    if add:
+        buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows([hdr] + body + add); save(name, buf.getvalue())
+    res_check[lg] = {"ultima_data_football_data": str(last), "risultati_aggiunti_da_espn": len(add),
+                     "nomi_non_riconosciuti": sorted(bad), "nomi_non_confermati": sorted(unconf), "squadre_doppie": sorted(dup)}
+json.dump(RC, open(res_path, "w"), separators=(",", ":"), ensure_ascii=False)
+try: J = json.load(open(os.path.join(OUT, "espn_check.json")))
+except Exception: J = {}
+J["risultati"] = res_check; J["risultati_aggiornati"] = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+json.dump(J, open(os.path.join(OUT, "espn_check.json"), "w"), indent=1, ensure_ascii=False)
+
 # calendario: solo i campionati della dashboard
 try:
     fx = get("https://www.football-data.co.uk/fixtures.csv").splitlines()
