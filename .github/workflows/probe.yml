@@ -1,6 +1,8 @@
 name: Prova API-Football
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      script: { description: "script in tools/", default: "probe_apifootball.py" }
 permissions:
   contents: write
 jobs:
@@ -14,7 +16,7 @@ jobs:
           git checkout FETCH_HEAD -- data && git reset -q -- data
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: python tools/probe_apifootball.py
+      - run: python tools/${{ inputs.script || 'probe_apifootball.py' }}
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
       - name: Salva il risultato sul ramo probe
