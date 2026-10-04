@@ -557,7 +557,7 @@ elif not token:
 
 
 # Quote dei bookmaker da API-Football (segreto APIFOOTBALL_KEY; piano gratuito: 100 richieste al giorno, 10 al minuto).
-# Una volta al giorno (dalle 7 italiane): partite dei prossimi 3 giorni dei nostri campionati, quota mediana tra i bookmaker
+# Una volta al giorno (dalle 7 italiane): partite di oggi e domani dei nostri campionati, quota mediana tra i bookmaker
 # per Over/Under gol, Gol/No gol, 1X2 e 1X2 corner. Servono solo da mostrare accanto alle nostre probabilità: non entrano
 # nei modelli né nel Confidence Score (che usa le quote di football-data, con cui sono stati stimati i pesi).
 # Una partita riceve le quote solo se le due squadre corrispondono a una sfida del nostro calendario nello stesso campionato (±1 giorno).
@@ -638,7 +638,7 @@ if AF_KEY and (OD.get("giorno") != rome_now.strftime("%Y-%m-%d") or (OD.get("err
         budget = int(stt.get("limit_day", 100)) - int(stt.get("current", 0)) - 5
         # Il piano gratuito non accetta la stagione in corso come parametro: quote chieste per data (tutte le partite, 10 per pagina)
         # oppure per singola partita, scegliendo la via con meno richieste.
-        for k in range(3):
+        for k in range(2):   # piano gratuito: quote solo da ieri a domani → oggi e domani
             if budget < 2: break
             dd = rome_now.date() + datetime.timedelta(days=k)
             F = af("fixtures", date=str(dd), timezone="Europe/Rome").get("response", []); budget -= 1
