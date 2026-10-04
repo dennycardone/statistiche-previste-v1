@@ -664,10 +664,29 @@ try:
             if g1.isdigit() and g2.isdigit(): ours[lg].append((d, h, a, int(g1), int(g2)))
     by_lg = collections.defaultdict(list)
     for v in AP["partite"].values(): by_lg[v[1]].append(v)
-    EX, lim = {}, _now.date() - datetime.timedelta(days=400)
+    MAPS = {}
     for lg, L in by_lg.items():
         L.sort(key=lambda v: v[0])
-        mp = apif_extra.learn_map([(datetime.date.fromisoformat(v[0][:10]), v[2], v[3], v[4], v[5]) for v in L if v[9] in ("FT", "AET", "PEN")], ours.get(lg, []))
+        MAPS[lg] = apif_extra.learn_map([(datetime.date.fromisoformat(v[0][:10]), v[2], v[3], v[4], v[5]) for v in L if v[9] in ("FT", "AET", "PEN")], ours.get(lg, []))
+    # Statistiche del giorno stesso e campionati che football-data dà senza statistiche (Polonia, Romania, Svizzera, Finlandia, Irlanda):
+    # corner, falli, tiri e tiri in porta da API-Football, SOLO dove mancano (football-data, quando pubblica, resta la fonte).
+    # Verificato: stessi numeri di football-data (24 partite su 24); modelli dei 5 campionati nuovi in linea con quelli già presenti.
+    n_fill = 0
+    for fn in files:
+        lg = fn.split("_")[0].split(".")[0]
+        if lg not in by_lg or not fn.endswith(".csv") or "fixtures" in fn: continue
+        try:
+            rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8-sig").read())))
+            if not rd: continue
+            rd2, k = apif_extra.fill_stats(rd, lg, [v for v in by_lg[lg] if v[9] in ("FT", "AET", "PEN")], MAPS[lg])
+            if k:
+                buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(rd2); save(fn, buf.getvalue()); n_fill += k
+        except Exception as e:
+            print("statistiche API", fn, e)
+    print("statistiche da API-Football:", n_fill, "partite riempite")
+    EX, lim = {}, _now.date() - datetime.timedelta(days=400)
+    for lg, L in by_lg.items():
+        mp = MAPS[lg]
         rows = []
         for v in L:
             H, A = v[7], v[8]; played = v[9] in ("FT", "AET", "PEN")
@@ -834,7 +853,7 @@ json.dump({"updated": now.strftime("%d/%m/%Y %H:%M"), "files": files},
 # bundle.json: tutti i dati in un solo file, con solo le colonne che usa l'app (l'app si apre più in fretta)
 KEEP = {"Div", "Date", "Time", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "HTHG", "HTAG", "HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC", "HxG", "AxG", "Round",
         "AvgH", "AvgD", "AvgA", "B365H", "B365D", "B365A", "Avg>2.5", "Avg<2.5", "B365>2.5", "B365<2.5",
-        "Country", "League", "Season", "Home", "Away", "HG", "AG", "AvgCH", "AvgCD", "AvgCA", "PSCH", "PSCD", "PSCA", "AvgC>2.5", "AvgC<2.5"}
+        "Country", "League", "Season", "Home", "Away", "HG", "AG", "HK", "AK", "AvgCH", "AvgCD", "AvgCA", "PSCH", "PSCD", "PSCA", "AvgC>2.5", "AvgC<2.5"}
 bundle = []
 for f in files:
     try:

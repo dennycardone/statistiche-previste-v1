@@ -69,3 +69,42 @@ def compute(rows):
             x[0] = x[0] * W + oc; x[1] = x[1] * W + pc; x[2] = x[2] * W + of; x[3] = x[3] * W + pf; x[4] = x[4] * W + 1
         lg[0] += T; lg[1] += F if F is not None else lg[1] / max(lg[2], 1); lg[2] += 1
     return out
+
+STAT_COLS = ["HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC"]
+API_IDX = {"HS": (7, 0), "AS": (8, 0), "HST": (7, 1), "AST": (8, 1), "HF": (7, 3), "AF": (8, 3), "HC": (7, 2), "AC": (8, 2)}   # (squadra, statistica) nell'archivio
+def fill_stats(rd, lg, api_rows, mp):
+    """rd: righe CSV (intestazione + righe) di un campionato. Riempie SOLO dove mancano: corner, falli, tiri, tiri in porta
+    (colonne di football-data) e cartellini per squadra HK/AK (gialli + rossi, sempre da API-Football), con la partita di
+    API-Football che ha stesse squadre, giorno ±1 e stesso risultato. Restituisce (righe, quante partite toccate)."""
+    hdr = [h.strip() for h in rd[0]]; body = [list(r) for r in rd[1:]]
+    new = "HomeTeam" not in hdr
+    iD, iH, iA = hdr.index("Date"), hdr.index("Home" if new else "HomeTeam"), hdr.index("Away" if new else "AwayTeam")
+    iG1, iG2 = hdr.index("HG" if new else "FTHG"), hdr.index("AG" if new else "FTAG")
+    for c in STAT_COLS + ["HK", "AK"]:
+        if c not in hdr: hdr.append(c); [r.append("") for r in body]
+    idx = {c: hdr.index(c) for c in STAT_COLS + ["HK", "AK"]}
+    by = collections.defaultdict(list)
+    for v in api_rows:
+        h, a = mp.get(v[2]), mp.get(v[3])
+        if h and a and v[4] is not None: by[(h, a)].append(v)
+    n = 0
+    for r in body:
+        if len(r) < len(hdr): r.extend([""] * (len(hdr) - len(r)))
+        need_s = not all(r[idx[c]].strip() for c in STAT_COLS); need_k = not (r[idx["HK"]].strip() and r[idx["AK"]].strip())
+        if not need_s and not need_k: continue
+        try:
+            dd = r[iD].strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; d = datetime.date(int(y), int(dd[1]), int(dd[0]))
+            g1, g2 = int(r[iG1]), int(r[iG2])
+        except Exception: continue
+        for v in by.get((r[iH].strip(), r[iA].strip()), []):
+            if abs((datetime.date.fromisoformat(v[0][:10]) - d).days) <= 1 and v[4] == g1 and v[5] == g2:
+                done = False
+                vals = {c: v[t][k] for c, (t, k) in API_IDX.items()}
+                if need_s and not any(x is None for x in vals.values()):
+                    for c in STAT_COLS:
+                        if not r[idx[c]].strip(): r[idx[c]] = str(int(vals[c]))
+                    done = True
+                if need_k and v[7][4] is not None and v[8][4] is not None:
+                    r[idx["HK"]] = str(int(v[7][4] + (v[7][5] or 0))); r[idx["AK"]] = str(int(v[8][4] + (v[8][5] or 0))); done = True
+                n += done; break
+    return [hdr] + body, n
