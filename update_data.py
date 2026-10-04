@@ -68,6 +68,19 @@ for lg in NEW_LEAGUES:
     if os.path.exists(os.path.join(OUT, name)):
         files.append(name)
 
+# API-Football a pagamento? Se sì è la fonte principale per calendario, risultati, arbitri e cartellini (ESPN non serve più;
+# fixturedownload e football-data restano come riserva). Statistiche: football-data resta la fonte dove c'è (modelli tarati
+# su quei numeri; su 25.000 partite i due fornitori coincidono nell'89-99% dei casi), API-Football riempie i vuoti.
+AF_PRO = False
+if os.environ.get("APIFOOTBALL_KEY", "").strip():
+    try:
+        _rq = urllib.request.Request("https://v3.football.api-sports.io/status", headers={"x-apisports-key": os.environ["APIFOOTBALL_KEY"].strip()})
+        with urllib.request.urlopen(_rq, timeout=30) as _r:
+            AF_PRO = int(json.loads(_r.read().decode()).get("response", {}).get("requests", {}).get("limit_day", 100)) > 100
+    except Exception as e:
+        print("API-Football non raggiungibile:", e)
+print("API-Football a pagamento:", AF_PRO)
+
 # prossime giornate: calendario completo da fixturedownload.com (gratuito, senza chiave).
 # I nomi delle squadre vengono convertiti in quelli usati da football-data.co.uk.
 FD_SLUGS = {"I1": "serie-a", "E0": "epl", "SP1": "la-liga", "F1": "ligue-1", "D1": "bundesliga", "N1": "eredivisie", "P1": "primeira-liga",
@@ -242,7 +255,7 @@ if not espn_old or datetime.datetime.utcnow().hour % 3 == 2 or os.environ.get("E
         check[lg] = {"partite": len(seen), "non_riconosciute": sorted(bad), "doppi": sorted(dup)}
     save("espn_fixtures.csv", "\n".join(erows))
     json.dump({"aggiornato": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), "campionati": check}, open(os.path.join(OUT, "espn_check.json"), "w"), indent=1, ensure_ascii=False)
-if os.path.exists(espn_path): files.append("espn_fixtures.csv")
+if os.path.exists(espn_path): files.append("espn_fixtures.csv")   # con API-Football: solo per le partite che API-Football non ha (vedi sotto)
 
 # Corner, falli, tiri e tiri in porta per i campionati che football-data dà solo con risultati: dalle statistiche partita di ESPN.
 # Verificato (ottobre 2026) su 73 partite di Serie A e Premier: stessi numeri di football-data (stesso fornitore).
@@ -251,6 +264,7 @@ if os.path.exists(espn_path): files.append("espn_fixtures.csv")
 ESPN_STATS = {"BRA": "bra.1", "ARG": "arg.1", "USA": "usa.1", "MEX": "mex.1", "JPN": "jpn.1", "CHN": "chn.1", "AUT": "aut.1",
               "DNK": "den.1", "NOR": "nor.1", "SWE": "swe.1", "RUS": "rus.1"}
 ESPN_BUDGET = 2000
+if AF_PRO: ESPN_STATS = {}   # statistiche e risultati di questi campionati da API-Football
 STAT_COLS = ["HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC"]
 cache_path = os.path.join(OUT, "espn_stats.json")
 try: SC = json.load(open(cache_path))
@@ -384,6 +398,7 @@ if unknown:
 ESPN_RES = {"I1": "ita.1", "I2": "ita.2", "E0": "eng.1", "E1": "eng.2", "E2": "eng.3", "E3": "eng.4", "EC": "eng.5",
             "SP1": "esp.1", "SP2": "esp.2", "F1": "fra.1", "F2": "fra.2", "D1": "ger.1", "D2": "ger.2", "N1": "ned.1",   # (Scozia League One e Two: ESPN non le copre)
             "P1": "por.1", "SC0": "sco.1", "SC1": "sco.2", "B1": "bel.1", "T1": "tur.1", "G1": "gre.1"}
+if AF_PRO: ESPN_RES = {}   # risultati del giorno da API-Football
 res_path = os.path.join(OUT, "espn_results.json")
 try: RC = json.load(open(res_path))
 except Exception: RC = {}
@@ -611,7 +626,7 @@ try:
         with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
         time.sleep(0.25); return d
     _now = datetime.datetime.now(ROME)
-    try: _due = not AP["agg"] or (_now - datetime.datetime.strptime(AP["agg"], "%Y-%m-%d %H:%M").replace(tzinfo=ROME)).total_seconds() >= 3 * 3600
+    try: _due = not AP["agg"] or (_now - datetime.datetime.strptime(AP["agg"], "%Y-%m-%d %H:%M").replace(tzinfo=ROME)).total_seconds() >= 50 * 60   # ogni giro (circa ogni ora)
     except Exception: _due = True
     if _key and (_due or os.environ.get("APIF_FORCE")):
         st_ = _af("status").get("response", {}).get("requests", {})
@@ -667,7 +682,7 @@ try:
     MAPS = {}
     for lg, L in by_lg.items():
         L.sort(key=lambda v: v[0])
-        MAPS[lg] = apif_extra.learn_map([(datetime.date.fromisoformat(v[0][:10]), v[2], v[3], v[4], v[5]) for v in L if v[9] in ("FT", "AET", "PEN")], ours.get(lg, []))
+        MAPS[lg] = apif_extra.learn_map([(datetime.date.fromisoformat(v[0][:10]), v[2], v[3], v[4], v[5]) for v in L if v[9] in ("FT", "AET", "PEN")], ours.get(lg, []), lg)
     # Statistiche del giorno stesso e campionati che football-data dà senza statistiche (Polonia, Romania, Svizzera, Finlandia, Irlanda):
     # corner, falli, tiri e tiri in porta da API-Football, SOLO dove mancano (football-data, quando pubblica, resta la fonte).
     # Verificato: stessi numeri di football-data (24 partite su 24); modelli dei 5 campionati nuovi in linea con quelli già presenti.
@@ -684,6 +699,55 @@ try:
         except Exception as e:
             print("statistiche API", fn, e)
     print("statistiche da API-Football:", n_fill, "partite riempite")
+    if AF_PRO:
+        # risultati: partite giocate che API-Football ha e i nostri file non ancora (fonte principale per i risultati del giorno)
+        n_res = 0
+        for lg in by_lg:
+            fn = f"{lg}_{code(cur)}.csv" if lg in LEAGUES else f"{lg}.csv"
+            if fn not in files: continue
+            try:
+                rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8-sig").read())))
+                rd2, k = apif_extra.add_results(rd, lg, by_lg[lg], MAPS[lg], _now.date(), ROME)
+                if k:
+                    buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(rd2); save(fn, buf.getvalue()); n_res += k
+            except Exception as e:
+                print("risultati API", fn, e)
+        print("risultati da API-Football:", n_res, "partite aggiunte")
+        # calendario: prossime 3 settimane da API-Football (data e ora italiane); squadre non riconosciute → partita scartata
+        cal, unk = [["Div", "Date", "Time", "HomeTeam", "AwayTeam", "Round"]], set()
+        for lg, L in by_lg.items():
+            for v in L:
+                if v[9] not in ("NS", "TBD"): continue
+                loc = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(ROME)
+                if not (_now.date() <= loc.date() <= _now.date() + datetime.timedelta(days=21)): continue
+                h, a = MAPS[lg].get(v[2]), MAPS[lg].get(v[3])
+                if not h or not a: unk.update(x for x, y in ((v[2], h), (v[3], a)) if not y); continue
+                cal.append([lg, loc.strftime("%d/%m/%Y"), "" if v[9] == "TBD" else loc.strftime("%H:%M"), h, a, ""])
+        api_lg = {r[0] for r in cal[1:]}
+        buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(cal); save("api_fixtures.csv", buf.getvalue())
+        if "api_fixtures.csv" not in files: files.append("api_fixtures.csv")
+        # le altre fonti di calendario restano solo per i campionati che API-Football non copre; da football-data teniamo le
+        # righe con la stessa data (portano le quote), non quelle con la data vecchia
+        api_dates = collections.defaultdict(set)
+        for r in cal[1:]: api_dates[(r[0], r[3], r[4])].add(r[1])
+        api_time = {(r[0], r[1], r[3], r[4]): r[2] for r in cal[1:]}
+        for fn in ("next_fixtures.csv", "fixtures.csv", "espn_fixtures.csv"):
+            try: rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8").read())))
+            except Exception: continue
+            if fn == "espn_fixtures.csv":
+                # ESPN (aggiornato ogni 3 ore) solo per le sfide che API-Football non mette nelle prossime 3 settimane
+                # (es. partita spostata che API-Football ha ancora alla data vecchia)
+                keep = [rd[0]] + [r for r in rd[1:] if len(r) > 4 and not api_dates.get((r[0], r[3].strip(), r[4].strip()))]
+            else:
+                keep = [rd[0]] + [r for r in rd[1:] if len(r) > 4 and (r[0] not in api_lg or (fn == "fixtures.csv" and r[1] in api_dates.get((r[0], r[3].strip(), r[4].strip()), ())))]
+                for r in keep[1:]:   # stessa partita di API-Football: vale l'ora italiana di API-Football
+                    t = api_time.get((r[0], r[1], r[3].strip(), r[4].strip()))
+                    if t is not None and len(r) > 2: r[2] = t
+            buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(keep); save(fn, buf.getvalue())
+        for r in cal[1:]:
+            try: pairs[(r[0], r[3], r[4])].append(datetime.datetime.strptime(r[1], "%d/%m/%Y").date())
+            except Exception: pass
+        print("calendario da API-Football:", len(cal) - 1, "partite,", len(api_lg), "campionati; squadre non riconosciute:", sorted(unk)[:30])
     EX, lim = {}, _now.date() - datetime.timedelta(days=400)
     for lg, L in by_lg.items():
         mp = MAPS[lg]

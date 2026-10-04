@@ -16,7 +16,8 @@ def _sim(a, b):
     if a == b: return 1.0
     if a and b and (a in b or b in a): return 0.9
     return difflib.SequenceMatcher(None, a, b).ratio()
-def learn_map(api, ours):
+MANUAL = {"NOR": {"Ham-Kam": "HamKam"}, "AUT": {"WSG Wattens": "Tirol"}}   # nomi che l'abbinamento automatico non riconosce
+def learn_map(api, ours, lg=None):
     """api: [(date, home, away, hg, ag)], ours: [(date, home, away, hg, ag)] di un campionato -> {nome API: nostro nome}"""
     byd = collections.defaultdict(list)
     for o in ours: byd[o[0]].append(o)
@@ -31,8 +32,22 @@ def learn_map(api, ours):
     for k, c in votes.items():
         (best, n), = c.most_common(1)
         if n >= 2 and n >= 0.8 * sum(c.values()): m[k] = best
-    taken = collections.Counter(m.values())
-    return {k: v for k, v in m.items() if taken[v] == 1}   # due nomi API sulla stessa squadra nostra: scartati
+    # più nomi API sulla stessa squadra nostra: ammessi solo se non compaiono mai nella stessa stagione (API-Football cambia
+    # a volte la grafia tra una stagione e l'altra, es. "Bayern Munich" / "Bayern München"); altrimenti sono squadre diverse → scartati
+    seas = collections.defaultdict(set)
+    for d, h, a, hg, ag in api:
+        sk = d.year if d.month >= 7 else d.year - 1
+        seas[h].add(sk); seas[a].add(sk)
+    by_ours = collections.defaultdict(list)
+    for k, v in m.items(): by_ours[v].append(k)
+    out = {}
+    for v, ks in by_ours.items():
+        ok = all(not (seas[x] & seas[y]) for i, x in enumerate(ks) for y in ks[i + 1:])
+        if ok:
+            for k in ks: out[k] = v
+    for k, v in MANUAL.get(lg, {}).items():
+        out = {x: y for x, y in out.items() if y != v}; out[k] = v
+    return out
 def refkey(name):   # "Daniele Doveri", "D. Doveri", "Doveri, Italy" → "d doveri" (API-Football non scrive sempre allo stesso modo)
     if not name: return None
     w = _norm(name.split(",")[0]).split()
@@ -107,4 +122,55 @@ def fill_stats(rd, lg, api_rows, mp):
                 if need_k and v[7][4] is not None and v[8][4] is not None:
                     r[idx["HK"]] = str(int(v[7][4] + (v[7][5] or 0))); r[idx["AK"]] = str(int(v[8][4] + (v[8][5] or 0))); done = True
                 n += done; break
+    return [hdr] + body, n
+
+def add_results(rd, lg, api_rows, mp, today, tz):
+    """Aggiunge le partite giocate che API-Football ha e il nostro file non ancora (dopo l'ultima data del file e se la stessa
+    sfida non c'è già entro 3 giorni), con gol, statistiche e cartellini. Formati football-data (HomeTeam…) e "new" (Home…)."""
+    hdr = [h.strip() for h in rd[0]]; body = [list(r) for r in rd[1:] if any(x.strip() for x in r)]
+    new = "HomeTeam" not in hdr
+    for c in STAT_COLS + ["HK", "AK"]:
+        if c not in hdr: hdr.append(c); [r.append("") for r in body]
+    ix = {h: i for i, h in enumerate(hdr)}
+    iD, iH, iA = ix["Date"], ix["Home" if new else "HomeTeam"], ix["Away" if new else "AwayTeam"]
+    iG1, iG2 = ix["HG" if new else "FTHG"], ix["AG" if new else "FTAG"]
+    def _d(x):
+        try:
+            dd = x.strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; return datetime.date(int(y), int(dd[1]), int(dd[0]))
+        except Exception: return None
+    pairs = collections.defaultdict(list)
+    for r in body:
+        d = _d(r[iD])
+        if d: pairs[(r[iH].strip(), r[iA].strip())].append(d)
+    dates = [d for v in pairs.values() for d in v]
+    if not dates: return [hdr] + body, 0
+    last = max(dates); lastrow = max(body, key=lambda r: _d(r[iD]) or datetime.date.min)
+    n = 0
+    for v in sorted(api_rows, key=lambda v: v[0]):
+        if v[9] not in ("FT", "AET", "PEN") or v[4] is None: continue
+        h, a = mp.get(v[2]), mp.get(v[3])
+        if not h or not a: continue
+        loc = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(tz); d = loc.date()
+        if d <= last or d > today or any(abs((x - d).days) <= 3 for x in pairs.get((h, a), [])): continue
+        r = [""] * len(hdr)
+        r[iD] = d.strftime("%d/%m/%Y"); r[iH], r[iA], r[iG1], r[iG2] = h, a, str(v[4]), str(v[5])
+        if "Time" in ix: r[ix["Time"]] = loc.strftime("%H:%M")
+        res = "H" if v[4] > v[5] else "A" if v[5] > v[4] else "D"
+        if new:
+            r[ix.get("Country", 0)] = lg
+            if "League" in ix: r[ix["League"]] = lastrow[ix["League"]]
+            if "Season" in ix:
+                ss = lastrow[ix["Season"]]
+                if ss.strip().isdigit() and d.year != int(ss) and d.month <= 6 and int(ss) < d.year: ss = str(d.year)   # campionati per anno solare: nuova stagione
+                r[ix["Season"]] = ss
+            if "Res" in ix: r[ix["Res"]] = res
+        else:
+            r[ix.get("Div", 0)] = lg
+            if "FTR" in ix: r[ix["FTR"]] = res
+        for c, (t, k) in API_IDX.items():
+            x = v[t][k] if v[t] else None
+            if x is not None: r[ix[c]] = str(int(x))
+        if v[7] and v[8] and v[7][4] is not None and v[8][4] is not None:
+            r[ix["HK"]] = str(int(v[7][4] + (v[7][5] or 0))); r[ix["AK"]] = str(int(v[8][4] + (v[8][5] or 0)))
+        body.append(r); pairs[(h, a)].append(d); n += 1
     return [hdr] + body, n
