@@ -599,7 +599,14 @@ odds_path = os.path.join(OUT, "odds.json")
 try: OD = json.load(open(odds_path))
 except Exception: OD = {}
 rome_now = datetime.datetime.now(ROME)
-if AF_KEY and (OD.get("giorno") != rome_now.strftime("%Y-%m-%d") or (OD.get("errore") and not OD.get("partite"))) and (rome_now.hour >= 7 or os.environ.get("ODDS_FORCE")):
+def _odds_due():   # gratis: una volta al giorno dalle 7; a pagamento (OD["pro"]): ogni 3 ore
+    if OD.get("errore") and not OD.get("partite"): return True
+    if OD.get("giorno") != rome_now.strftime("%Y-%m-%d"): return rome_now.hour >= 7
+    if OD.get("pro"):
+        try: return (rome_now - datetime.datetime.strptime(OD["aggiornate"], "%d/%m/%Y %H:%M").replace(tzinfo=ROME)).total_seconds() >= 3 * 3600
+        except Exception: return True
+    return False
+if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
     af_used = [0]
     def af(path, **q):
         af_used[0] += 1
@@ -638,18 +645,22 @@ if AF_KEY and (OD.get("giorno") != rome_now.strftime("%Y-%m-%d") or (OD.get("err
     def med(xs):
         xs = [x for x in xs if x and x > 1]
         return round(statistics.median(xs), 2) if xs else None
-    res, nomatch, err = {}, [], None
+    res, nomatch, err, allq = {}, [], None, {}
+    XBETS = {"Corners Over Under": "cou", "Home Corners Over/Under": "hcou", "Away Corners Over/Under": "acou", "Corners Asian Handicap": "cah",
+             "Cards Over/Under": "kou", "Home Team Total Cards": "hk", "Away Team Total Cards": "ak", "Total ShotOnGoal": "sot",
+             "Home Total ShotOnGoal": "hsot", "Away Total ShotOnGoal": "asot", "Asian Handicap": "ah", "Double Chance": "dc"}
     def take(e, f):   # quote mediane di una partita
         lg = BY_ID[f["league"]["id"]]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
         m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
         if not m: nomatch.append(f"{lg} {f['teams']['home']['name']} - {f['teams']['away']['name']}"); return
-        acc = {}
+        acc, xacc = {}, {}
         for b in e.get("bookmakers", []):
             for bet in b.get("bets", []):
                 for v in bet.get("values", []):
                     try: o = float(v["odd"])
                     except Exception: continue
                     nm, val = bet["name"], str(v["value"])
+                    if nm in XBETS: xacc.setdefault(XBETS[nm] + ":" + val, {})[b["name"]] = o   # mercati secondari: solo archivio
                     if nm == "Match Winner": key = "1x2:" + {"Home": "1", "Draw": "X", "Away": "2"}.get(val, "")
                     elif nm == "Goals Over/Under" and val.split(" ")[-1] in ("1.5", "2.5", "3.5"): key = "ou" + val.split(" ")[-1] + ":" + val.split(" ")[0][0]
                     elif nm == "Both Teams Score": key = "gg:" + {"Yes": "S", "No": "N"}.get(val, "")
@@ -660,14 +671,18 @@ if AF_KEY and (OD.get("giorno") != rome_now.strftime("%Y-%m-%d") or (OD.get("err
         q = {kk: [med(list(v.values())), len(v)] for kk, v in acc.items()}
         q = {kk: v for kk, v in q.items() if v[0]}
         if q: res[f"{lg}|{m[0]}|{m[1]}|{m[2]}"] = {"q": q, "nb": len(e.get("bookmakers", [])), "agg": e.get("update", "")[:16]}
+        xq = {kk: [med(list(v.values())), len(v)] for kk, v in xacc.items()}
+        xq = {kk: v for kk, v in xq.items() if v[0]}
+        if q or xq: allq[f"{lg}|{m[0]}|{m[1]}|{m[2]}"] = {**q, **xq}
     try:
         # richieste rimaste oggi (la chiamata status non conta); ne lascio 5 di margine
         req = urllib.request.Request("https://v3.football.api-sports.io/status", headers={"x-apisports-key": AF_KEY})
         with urllib.request.urlopen(req, timeout=60) as r: stt = json.loads(r.read().decode()).get("response", {}).get("requests", {})
         budget = int(stt.get("limit_day", 100)) - int(stt.get("current", 0)) - 5
+        paid = int(stt.get("limit_day", 100)) > 100
         # Il piano gratuito non accetta la stagione in corso come parametro: quote chieste per data (tutte le partite, 10 per pagina)
         # oppure per singola partita, scegliendo la via con meno richieste.
-        for k in range(2):   # piano gratuito: quote solo da ieri a domani → oggi e domani
+        for k in range(7 if paid else 2):   # piano gratuito: quote solo da ieri a domani → oggi e domani; a pagamento: 7 giorni
             if budget < 2: break
             dd = rome_now.date() + datetime.timedelta(days=k)
             F = af("fixtures", date=str(dd), timezone="Europe/Rome").get("response", []); budget -= 1
@@ -693,8 +708,21 @@ if AF_KEY and (OD.get("giorno") != rome_now.strftime("%Y-%m-%d") or (OD.get("err
         err = str(e); print("quote API-Football:", e)
     if res or not err:   # con un errore e nessuna quota: si riprova al giro dopo (il file precedente resta)
         OD = {"giorno": rome_now.strftime("%Y-%m-%d"), "aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "API-Football (quota mediana tra i bookmaker)",
-              "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "partite": res}
+              "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "pro": bool(locals().get("paid")), "partite": res}
         json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
+    # Archivio per verificare in futuro i mercati (corner, cartellini, tiri in porta…): per ogni partita la prima quota vista e l'ultima
+    # prima del calcio d'inizio, con l'ora. Non si cancella mai: serve proprio a misurare a posteriori.
+    if allq:
+        hp = os.path.join(OUT, "odds_hist.json")
+        try: OH = json.load(open(hp))
+        except Exception: OH = {}
+        ts = rome_now.strftime("%Y-%m-%d %H:%M")
+        for kk, q in allq.items():
+            x = OH.setdefault(kk, {})
+            if "prima" not in x: x["prima"] = {"ora": ts, "q": q}
+            x["ultima"] = {"ora": ts, "q": q}
+        json.dump(OH, open(hp, "w"), separators=(",", ":"), ensure_ascii=False)
+        print("archivio quote:", len(OH), "partite")
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
 elif not AF_KEY:
     print("APIFOOTBALL_KEY non impostata: quote saltate")
