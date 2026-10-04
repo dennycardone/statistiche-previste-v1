@@ -533,6 +533,7 @@ select{border-radius:10px}
     </div>
     <section class="mhead" id="mhead" aria-label="Partita"></section>
     <section class="card mconf" id="mconf" aria-label="Confidence Score" hidden></section>
+    <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
     <div class="mtabs" role="tablist" aria-label="Sezioni della partita">
       <button class="mtab" data-mt="prev" aria-pressed="true">Previsioni</button>
       <button class="mtab" data-mt="sig" aria-pressed="false">Segnalazioni</button>
@@ -1338,7 +1339,7 @@ const pOver = (pmf, th) => { let s = 0; for (let k = 0; k <= Math.floor(th); k++
    Quanto pesa ogni livello lo decidono i dati: si confronta quanto le squadre differiscono davvero
    con quanto una partita oscilla per caso. Nessuna partita virtuale, nessun peso scelto a mano. */
 const CACHE = new Map();
-function clearCache() { CACHE.clear(); }
+function clearCache() { CACHE.clear(); if (typeof EXC !== "undefined") EXC.clear(); }
 function teamGamesMap(list, cfg) {
   const G = {};
   for (const m of [...list].sort((a, b) => a.date - b.date)) { (G[m.home] = G[m.home] || []).push(m); (G[m.away] = G[m.away] || []).push(m); }
@@ -2000,7 +2001,28 @@ function dispersion(k, cfg) {
   const res = { r: den > 0 && num > 0 ? num / den : Infinity, used };
   CACHE.set(key, res); return res;
 }
+/* Arbitro e cartellini (data/extra.json, da API-Football): per partita [arbitro, partite dell'arbitro, fattore falli,
+   fattore cartellini, cartellini attesi, cartellini reali]. Calcolati con le sole partite precedenti (backtest 2024-2026:
+   falli +1,6% di precisione con il fattore arbitro, cartellini +2,9% sulla media del campionato). */
+let EXTRA = null;
+const EXC = new Map();
+function extraFor(home, away) {
+  if (!EXTRA || !EXTRA.partite) return null;
+  const ck = `${S.league}|${S.cutoff ? +S.cutoff : "n"}|${home}|${away}`;
+  if (EXC.has(ck)) return EXC.get(ck);
+  let x = null;
+  try { x = EXTRA.partite[`${S.league}|${isoD(new Date(goalDate(home, away)))}|${home}|${away}`] || null; } catch (e) {}
+  EXC.set(ck, x); return x;
+}
 function model(home, away, cfg, k = "c") {
+  const M = modelBase(home, away, cfg, k);
+  if (k !== "f" || !M) return M;
+  const x = extraFor(home, away), f = x && x[2];
+  if (!f || f === 1 || !isFinite(f)) return M;
+  const lh = M.lh * f, la = M.la * f;   // arbitro: falli in più o in meno rispetto al previsto nelle sue partite precedenti
+  return { ...M, lh, la, tot: lh + la, refF: f, pmf: pmfTotal(lh + la, M.r, 90) };
+}
+function modelBase(home, away, cfg, k = "c") {
   const list = metricMatches(k); let L = league(list, k);
   const gdyn = cfg.dyn && (k === "gm" || k === "c" || k === "f" || k === "s" || k === "st");   // gol, corner, falli e tiri in Media dinamica: modelli verificati, funzionano anche a inizio stagione
   if (!L && !gdyn) return null;
@@ -2881,6 +2903,7 @@ async function tryHosted() {
     resetState(); tmp.forEach(addParsed);
     try { const cr = await fetch("data/crests.json", { cache: "no-store" }); if (cr.ok) CRESTS = (await cr.json()).colors || {}; } catch (e) {}
     try { const ro = await fetch("data/odds.json", { cache: "no-store" }); if (ro.ok) ODDS = await ro.json(); } catch (e) {}
+    try { const rx = await fetch("data/extra.json", { cache: "no-store" }); if (rx.ok) { EXTRA = await rx.json(); clearCache(); } } catch (e) {}
     S.meta = { source: "football-data.co.uk · I1.csv (aggiornamento automatico)", fetched: man.updated || "N/D", mode: "scaricati il" };
     // previsioni della home già calcolate da GitHub con questi stessi dati (non salvate sul telefono: si riscaricano ogni volta)
     try { const rp = await fetch("data/precalc.json", { cache: "no-store" }); if (rp.ok) { const P = await rp.json(); if (P.updated === S.meta.fetched) PRECALC = P; } } catch (e) {}
@@ -3244,6 +3267,7 @@ function renderMatchExtras(home, away) {
     <span class="team">${crest(S.league, away, "crl") || `<i style="background:var(--s2)"></i>`}${esc(away || "—")}</span>
     <span class="kp"><span>Gol attesi <b>${G ? f2(G.tot) : "N/D"}</b></span><span>Over 2,5 <b>${G ? pc(G.over[1]) : "N/D"}</b></span><span>Gol/No gol <b>${G ? pc(G.btts) : "N/D"}</b></span></span>`;
   renderMatchConf(home, away, e, cfg);
+  renderMatchRef(home, away, e);
   // confronto previsione / partita giocata
   const cmp = $("#mcmp");
   if (m && G) {
@@ -3559,6 +3583,22 @@ function confRowHTML(r, i, withInfo) {
     <div class="cm">${confBar(r.score, r.cls)}</div>
     <div class="cd small">${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}<span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
   </div>`;
+}
+const CARD_LINES = [2.5, 3.5, 4.5, 5.5];
+function cardProbs(mu) { const pmf = pmfTotal(mu, Infinity, 25); return CARD_LINES.map(t => pOver(pmf, t)); }
+function renderMatchRef(home, away, e) {
+  const box = $("#mref"); if (!box) return;
+  const x = e && home && away ? extraFor(home, away) : null;
+  if (!x) { box.hidden = true; return; }
+  const [ref, n, ff, fc, mu, real] = x, pct = v => Math.round(Math.abs(v - 1) * 100) === 0 ? "nella media" : `${v >= 1 ? "+" : "−"}${Math.round(Math.abs(v - 1) * 100)}%`;
+  const refTxt = ref ? `<b>${esc(ref)}</b>` + (n >= 5 ? ` · ${n} partite nei nostri dati: falli <b>${pct(ff)}</b> e cartellini <b>${pct(fc)}</b> rispetto al previsto` : ` · ${n} partite nei nostri dati: storico breve, correzione minima`)
+    : `<span class="muted">Non ancora indicato (di solito 1-2 giorni prima della partita)</span>`;
+  const P = mu ? cardProbs(mu) : null, played = real != null;
+  box.hidden = false;
+  box.innerHTML = `<h2>🟨 Arbitro e cartellini</h2>
+    <p style="margin:0">Arbitro: ${refTxt}</p>
+    ${mu ? `<div class="kp" style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:4px"><span>Cartellini attesi <b class="num">${f1(mu)}</b></span>${CARD_LINES.map((t, i) => `<span>Over ${th1(t)} <b class="num${played ? (real > t) === (P[i] >= 0.5) ? " good" : " bad" : ""}">${pc(P[i])}</b></span>`).join("")}${played ? `<span>Cartellini nella partita <b class="num">${real}</b></span>` : ""}</div>` : `<p class="small muted" style="margin:0">Cartellini attesi: non disponibile (servono almeno 3 partite per squadra con i cartellini).</p>`}
+    <p class="small muted" style="margin:0">Cartellini: gialli + rossi. Modello: cartellini presi e provocati dalle due squadre nelle partite precedenti, corretto per l'arbitro. Verifica 2024-2026 su 21.652 partite: +2,9% di precisione rispetto alla media del campionato, probabilità tarate (es. Over 3,5 dato al 65% → uscito il 64%).${ff && Math.abs(ff - 1) >= 0.005 ? ` I falli attesi della partita sono già corretti per l'arbitro (${pct(ff)}).` : ""}</p>`;
 }
 function renderMatchConf(home, away, e, cfg) {
   const box = $("#mconf"); if (!box) return;

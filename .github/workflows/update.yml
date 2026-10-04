@@ -24,6 +24,11 @@ jobs:
             git fetch -q --depth 1 origin pages
             rm -rf data && git checkout FETCH_HEAD -- data && git reset -q -- data
           fi
+      - name: Storico API-Football (solo la prima volta, se manca data/apif.json)
+        run: |
+          if [ ! -f data/apif.json ] && git ls-remote --exit-code origin storico >/dev/null 2>&1; then
+            mkdir -p storico && git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
+          fi
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - uses: actions/setup-node@v4

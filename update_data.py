@@ -45,7 +45,7 @@ for lg in LEAGUES:
         if os.path.exists(path):
             files.append(name)
 
-import csv, io
+import csv, io, collections
 for lg in NEW_LEAGUES:
     name = f"{lg}.csv"
     try:
@@ -584,6 +584,106 @@ try:
         print("calendario", fn, "tolte", drop)
 except Exception as e:
     print("pulizia calendari:", e)
+
+# Arbitro e cartellini (API-Football, piano a pagamento): archivio partite in data/apif.json (all'inizio dallo storico 2022-2025
+# del ramo storico), aggiornato ogni 3 ore con le stagioni in corso (anche le partite future: lì c'è l'arbitro, di solito 1-2 giorni prima).
+# Per ogni partita (con le sole partite precedenti): fattore arbitro su falli e cartellini e cartellini attesi → data/extra.json.
+# Backtest 2024-2026: falli +1,5% di precisione con l'arbitro, cartellini +2,9% sulla media del campionato (probabilità di Poisson tarate).
+AF_LEAGUES_X = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "EC": 43, "SP1": 140, "SP2": 141, "F1": 61, "F2": 62, "D1": 78, "D2": 79,
+                "N1": 88, "P1": 94, "SC0": 179, "SC1": 180, "SC2": 183, "SC3": 184, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71,
+                "CHN": 169, "DNK": 119, "FIN": 244, "IRL": 357, "JPN": 98, "MEX": 262, "NOR": 103, "POL": 106, "ROU": 283, "RUS": 235, "SWE": 113,
+                "SWZ": 207, "USA": 253}
+try:
+    import apif_extra, glob as _glob, urllib.parse as _up
+    _key = os.environ.get("APIFOOTBALL_KEY", "").strip()
+    ap_path = os.path.join(OUT, "apif.json")
+    try: AP = json.load(open(ap_path))
+    except Exception: AP = {}
+    AP.setdefault("partite", {}); AP.setdefault("agg", "")
+    if not AP["partite"]:   # primo giro: storico dal ramo storico (scaricato dal workflow in storico/)
+        for fn in _glob.glob(os.path.join(os.path.dirname(OUT), "storico", "*.json")):
+            D = json.load(open(fn))
+            for fid, v in D["partite"].items(): AP["partite"][fid] = [v[0], D["lega"], v[1], v[2], v[3], v[4], v[5], v[6], v[7], "FT"]
+        print("arbitri: storico iniziale", len(AP["partite"]), "partite")
+    KS_ = ["Total Shots", "Shots on Goal", "Corner Kicks", "Fouls", "Yellow Cards", "Red Cards", "expected_goals"]
+    def _af(path, **q):
+        req = urllib.request.Request("https://v3.football.api-sports.io/" + path + ("?" + _up.urlencode(q) if q else ""), headers={"x-apisports-key": _key})
+        with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
+        time.sleep(0.25); return d
+    _now = datetime.datetime.now(ROME)
+    try: _due = not AP["agg"] or (_now - datetime.datetime.strptime(AP["agg"], "%Y-%m-%d %H:%M").replace(tzinfo=ROME)).total_seconds() >= 3 * 3600
+    except Exception: _due = True
+    if _key and (_due or os.environ.get("APIF_FORCE")):
+        st_ = _af("status").get("response", {}).get("requests", {})
+        if int(st_.get("limit_day", 100)) > 100:   # serve il piano a pagamento
+            cur_season = {}
+            for x in _af("leagues", current="true").get("response", []):
+                for ss in x.get("seasons", []):
+                    if ss.get("current"): cur_season[x["league"]["id"]] = ss["year"]
+            need, n_new = [], 0
+            for lg, lid in AF_LEAGUES_X.items():
+                sy = cur_season.get(lid)
+                if not sy: continue
+                for f in _af("fixtures", league=lid, season=sy).get("response", []):
+                    fid = str(f["fixture"]["id"]); stt = f["fixture"]["status"]["short"]; old = AP["partite"].get(fid)
+                    base = [f["fixture"]["date"][:16], lg, f["teams"]["home"]["name"], f["teams"]["away"]["name"], f["goals"]["home"], f["goals"]["away"],
+                            f["fixture"].get("referee"), old[7] if old else [None] * 7, old[8] if old else [None] * 7, stt]
+                    AP["partite"][fid] = base
+                    if stt in ("FT", "AET", "PEN") and (base[7][4] is None or (_now.date() - datetime.date.fromisoformat(base[0][:10])).days <= 2): need.append(fid)
+            def _stat(t, k):
+                for s_ in t.get("statistics", []):
+                    if s_["type"] == k:
+                        v = s_["value"]
+                        if v is None: return 0 if k in ("Yellow Cards", "Red Cards") else None
+                        try: return float(str(v).replace("%", ""))
+                        except Exception: return None
+                return None
+            for i in range(0, min(len(need), 2000), 20):
+                for f in _af("fixtures", ids="-".join(need[i:i + 20])).get("response", []):
+                    stt_ = {t["team"]["id"]: t for t in f.get("statistics", [])}
+                    H, A = stt_.get(f["teams"]["home"]["id"], {}), stt_.get(f["teams"]["away"]["id"], {})
+                    x = AP["partite"].get(str(f["fixture"]["id"]))
+                    if x: x[7] = [_stat(H, k) for k in KS_]; x[8] = [_stat(A, k) for k in KS_]; n_new += 1
+            AP["agg"] = _now.strftime("%Y-%m-%d %H:%M")
+            print("arbitri: aggiornate", n_new, "statistiche,", len(AP["partite"]), "partite in archivio")
+        json.dump(AP, open(ap_path, "w"), separators=(",", ":"), ensure_ascii=False)
+    # nostre partite (giocate e in calendario) per abbinare i nomi e le date
+    ours, pairs = collections.defaultdict(list), collections.defaultdict(list)
+    for fn in files:
+        try:
+            rd = list(csv.DictReader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8-sig").read())))
+        except Exception: continue
+        for r in rd:
+            lg = (r.get("Div") or r.get("Country") or "").strip()
+            h, a = (r.get("HomeTeam") or r.get("Home") or "").strip(), (r.get("AwayTeam") or r.get("Away") or "").strip()
+            try:
+                dd = r["Date"].strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; d = datetime.date(int(y), int(dd[1]), int(dd[0]))
+            except Exception: continue
+            g1, g2 = (r.get("FTHG") or r.get("HG") or "").strip(), (r.get("FTAG") or r.get("AG") or "").strip()
+            pairs[(lg, h, a)].append(d)
+            if g1.isdigit() and g2.isdigit(): ours[lg].append((d, h, a, int(g1), int(g2)))
+    by_lg = collections.defaultdict(list)
+    for v in AP["partite"].values(): by_lg[v[1]].append(v)
+    EX, lim = {}, _now.date() - datetime.timedelta(days=400)
+    for lg, L in by_lg.items():
+        L.sort(key=lambda v: v[0])
+        mp = apif_extra.learn_map([(datetime.date.fromisoformat(v[0][:10]), v[2], v[3], v[4], v[5]) for v in L if v[9] in ("FT", "AET", "PEN")], ours.get(lg, []))
+        rows = []
+        for v in L:
+            H, A = v[7], v[8]; played = v[9] in ("FT", "AET", "PEN")
+            rows.append(dict(h=v[2], a=v[3], ref=(v[6] or "").split(",")[0].strip() or None,
+                             hc=(H[4] + (H[5] or 0)) if played and H[4] is not None else None, ac=(A[4] + (A[5] or 0)) if played and A[4] is not None else None,
+                             hf=H[3] if played else None, af=A[3] if played else None))
+        for v, r, x in zip(L, rows, apif_extra.compute(rows)):
+            h, a = mp.get(v[2]), mp.get(v[3]); d = datetime.date.fromisoformat(v[0][:10])
+            if not h or not a or d < lim: continue
+            ds = [z for z in pairs.get((lg, h, a), []) if abs((z - d).days) <= 1]
+            if not ds: continue
+            EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], (r["hc"] + r["ac"]) if r["hc"] is not None and r["ac"] is not None else None]
+    json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "partite": EX}, open(os.path.join(OUT, "extra.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+    print("arbitri e cartellini:", len(EX), "partite abbinate")
+except Exception as e:
+    import traceback; traceback.print_exc(); print("arbitri e cartellini:", e)
 
 # Quote dei bookmaker da API-Football (segreto APIFOOTBALL_KEY; piano gratuito: 100 richieste al giorno, 10 al minuto).
 # Una volta al giorno (dalle 7 italiane): partite di oggi e domani dei nostri campionati, quota mediana tra i bookmaker

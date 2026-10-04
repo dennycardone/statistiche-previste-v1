@@ -16,6 +16,8 @@ const A = ctx.API;
 const markets = [...html.matchAll(/class="chip sstat" data-k="([a-z0-9]+)" aria-pressed="true"/g)].map(m => m[1]);
 const minP = +((html.match(/id="sigMin"[^>]*value="(\d+)"/) || [])[1] || 55) / 100;
 const man = JSON.parse(fs.readFileSync(path.join(DATA, "manifest.json"), "utf8"));
+// arbitro (fattore sui falli) e cartellini da API-Football, come nell'app
+try { const ex = fs.readFileSync(path.join(DATA, "extra.json"), "utf8"); vm.runInContext("EXTRA = " + ex + "; clearCache();", ctx); } catch (e) { console.log("extra.json non disponibile"); }
 A.resetState();
 for (const f of man.files || []) { const p = path.join(DATA, f); if (fs.existsSync(p)) A.addParsed(A.parseCSV(fs.readFileSync(p, "utf8"))); }
 A.S.meta = { fetched: man.updated };
