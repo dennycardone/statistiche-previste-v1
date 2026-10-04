@@ -2878,6 +2878,7 @@ async function tryHosted() {
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
     try { const cr = await fetch("data/crests.json", { cache: "no-store" }); if (cr.ok) CRESTS = (await cr.json()).colors || {}; } catch (e) {}
+    try { const ro = await fetch("data/odds.json", { cache: "no-store" }); if (ro.ok) ODDS = await ro.json(); } catch (e) {}
     S.meta = { source: "football-data.co.uk · I1.csv (aggiornamento automatico)", fetched: man.updated || "N/D", mode: "scaricati il" };
     // previsioni della home già calcolate da GitHub con questi stessi dati (non salvate sul telefono: si riscaricano ogni volta)
     try { const rp = await fetch("data/precalc.json", { cache: "no-store" }); if (rp.ok) { const P = await rp.json(); if (P.updated === S.meta.fetched) PRECALC = P; } } catch (e) {}
@@ -3513,6 +3514,14 @@ function entryOdds(e) {
   const f = S.fixtures.find(x => x.div === e.lg.code && x.home === e.home && x.away === e.away && isoD(x.date) === e.d);
   return f && f.odds || null;
 }
+/* Quote dei bookmaker (API-Football, quota mediana; solo da mostrare: non entrano in modelli e Confidence) */
+let ODDS = null;
+function oddsFor(e, r) {
+  const P = ODDS && ODDS.partite && ODDS.partite[e.id]; if (!P) return null;
+  const k = r.mk in GOAL_LINE ? `ou${GOAL_LINE[r.mk]}:${r.side === "U" ? "U" : "O"}` : r.mk === "gg" ? `gg:${r.side === "N" ? "N" : "S"}` : r.mk === "c" && (r.side === "1" || r.side === "2") ? `c1x2:${r.side}` : null;
+  const v = k && P.q[k]; return v && v[0] > 1 ? { o: v[0], n: v[1] } : null;
+}
+const oddsTxt = q => q ? `Quota media <b class="num">${q.o.toFixed(2).replace(".", ",")}</b> <span class="muted">(${q.n} bookmaker)</span>` : "";
 function confEntry(e, cfg, peek) {   // lista delle previsioni con punteggio; peek = non calcolare
   const key = e.id + "|" + cfg.key;
   if (CONF_C.has(key)) return CONF_C.get(key);
@@ -3546,7 +3555,7 @@ function confRowHTML(r, i, withInfo) {
   return `<div class="crow">
     <div class="cl"><span class="cmk">${esc(confLab(r))}</span><span class="cp num">${pc(r.q)}<small> modello ${pc(r.p)}</small></span></div>
     <div class="cm">${confBar(r.score, r.cls)}</div>
-    <div class="cd small"><span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
+    <div class="cd small">${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}<span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
   </div>`;
 }
 function renderMatchConf(home, away, e, cfg) {
@@ -3554,12 +3563,12 @@ function renderMatchConf(home, away, e, cfg) {
   if (!e || !home || !away || !Object.keys(CONF_COEF).length) { box.hidden = true; return; }
   let L; try { L = withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = e.m ? e.date : null; try { if (e.m) S.season = e.m.season; return confMatch(home, away, e.date, entryOdds(e), cfg.key); } finally { S.cutoff = c0; } }); } catch (x) { L = []; }
   if (!L.length) { box.hidden = true; return; }
-  L = L.map(r => ({ ...r, h: home, a: away }));
+  L = L.map(r => ({ ...r, h: home, a: away, qt: e.m ? null : oddsFor(e, r) }));
   const top = L[0];
   box.hidden = false;
   box.innerHTML = `<div class="selhead"><h2>Confidence Score</h2><button class="info" data-ci="0" aria-label="Cos'è il Confidence Score">ⓘ</button></div>
     <div class="ctop"><span class="small muted">Previsione più solida</span><b>${esc(confLab(top))} · ${pc(top.q)} <small class="muted">(modello ${pc(top.p)})</small></b>${confBar(top.score, top.cls)}
-      <span class="cd small"><span>Stabilità <b>${top.stab}</b></span><span>Campione <b>${top.samp}</b></span><span class="st-${top.status}">${CONF_STATUS[top.status]}</span>${top.why.length ? `<span class="muted">A+ non confermato: ${esc(top.why.join(", "))}</span>` : top.contra >= 2 ? `<span class="muted">${top.contra} frequenze reali su 4 dicono il contrario</span>` : ""}</span></div>
+      <span class="cd small">${top.qt ? `<span>${oddsTxt(top.qt)}</span>` : ""}<span>Stabilità <b>${top.stab}</b></span><span>Campione <b>${top.samp}</b></span><span class="st-${top.status}">${CONF_STATUS[top.status]}</span>${top.why.length ? `<span class="muted">A+ non confermato: ${esc(top.why.join(", "))}</span>` : top.contra >= 2 ? `<span class="muted">${top.contra} frequenze reali su 4 dicono il contrario</span>` : ""}</span></div>
     <details class="call"><summary>Tutti i mercati (${L.length})</summary>${L.map((r, i) => confRowHTML(r, i, true)).join("")}</details>
     <div class="confinfo" id="mconfInfo" hidden></div>
     ${e.m ? `<p class="small muted" style="margin:0">Partita giocata: punteggi calcolati solo con le partite precedenti.</p>` : ""}`;
@@ -3584,7 +3593,7 @@ function renderSel() {
   for (const e of ents) { const L = confEntry(e, cfg, true); if (L === undefined) todo.push(e); else got.push([e, L]); }
   const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "hp" ? r.q >= 0.7 : SEL.f === "c3" ? r.agreeN === C3_MODES.length : true;
   // A+ raggruppati per partita: le previsioni della stessa partita sono legate tra loro (es. tiri e tiri in porta), non sono occasioni indipendenti
-  const apm = got.map(([e, L]) => [e, L.filter(r => r.status === "aplus").map(r => ({ ...r, h: e.home, a: e.away })).sort((a, b) => b.q - a.q)]).filter(([, L]) => L.length)
+  const apm = got.map(([e, L]) => [e, L.filter(r => r.status === "aplus").map(r => ({ ...r, h: e.home, a: e.away, qt: oddsFor(e, r) })).sort((a, b) => b.q - a.q)]).filter(([, L]) => L.length)
     .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
   aBox.innerHTML = `<div class="selhead"><h2>🔥 A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
@@ -3593,6 +3602,7 @@ function renderSel() {
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
       ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(confLab(r))}</span>
         <span class="small">Probabilità <b>${pc(r.q)}</b> <span class="muted">(modello ${pc(r.p)})</span></span>
+        ${r.qt ? `<span class="small">${oddsTxt(r.qt)}</span>` : ""}
         <span class="aplab small">Confidence</span>${confBar(r.score, r.cls)}</span>`).join("")}
       </button>`).join("")}</div>` : `<p class="apnone">NESSUNA OPPORTUNITÀ A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
@@ -3601,7 +3611,7 @@ function renderSel() {
       ${L.slice(0, 3).map(r => `<span class="selp"><span>${esc(confLab(r))}</span><span class="num">${pc(r.q)}</span><span class="num">${r.score}</span><span class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
-  $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}). Per ogni partita le 3 previsioni più solide; colonne: esito · probabilità corretta · Confidence · classe. Probabilità corretta = quanto previsioni come questa sono uscite davvero nelle stagioni passate; Alta probabilità = almeno 70% corretta.`;
+  $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}). Per ogni partita le 3 previsioni più solide; colonne: esito · probabilità corretta · Confidence · classe. Probabilità corretta = quanto previsioni come questa sono uscite davvero nelle stagioni passate; Alta probabilità = almeno 70% corretta.${ODDS && ODDS.aggiornate ? ` Quota media = mediana tra i bookmaker (API-Football, aggiornate il ${ODDS.aggiornate}), solo informativa: il confronto con le nostre probabilità non è ancora stato verificato.` : ""}`;
   clearTimeout(SEL_T);
   if (todo.length) SEL_T = setTimeout(() => { const t = performance.now(); for (const e of todo) { try { confEntry(e, cfg); } catch (x) { CONF_C.set(e.id + "|" + cfg.key, []); } if (performance.now() - t > 250) break; } if (!$("#viewSel").hidden) renderSel(); }, 20);
 }

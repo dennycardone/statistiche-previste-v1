@@ -31,6 +31,7 @@ jobs:
       - run: python update_data.py
         env:
           FD_TOKEN: ${{ secrets.FD_TOKEN }}
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
       - name: Previsioni della home
         run: node precalc.js
       - name: Pubblica sul ramo pages (un solo commit, la cronologia non cresce)

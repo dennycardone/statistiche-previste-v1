@@ -556,6 +556,105 @@ elif not token:
     print("FD_TOKEN non impostato: stemmi saltati")
 
 
+# Quote dei bookmaker da API-Football (segreto APIFOOTBALL_KEY; piano gratuito: 100 richieste al giorno, 10 al minuto).
+# Una volta al giorno (dalle 7 italiane): partite dei prossimi 3 giorni dei nostri campionati, quota mediana tra i bookmaker
+# per Over/Under gol, Gol/No gol, 1X2 e 1X2 corner. Servono solo da mostrare accanto alle nostre probabilità: non entrano
+# nei modelli né nel Confidence Score (che usa le quote di football-data, con cui sono stati stimati i pesi).
+# Una partita riceve le quote solo se le due squadre corrispondono a una sfida del nostro calendario nello stesso campionato (±1 giorno).
+AF_LEAGUES = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "EC": 43, "SP1": 140, "SP2": 141, "F1": 61, "F2": 62, "D1": 78, "D2": 79,
+              "N1": 88, "P1": 94, "SC0": 179, "SC1": 180, "SC2": 183, "SC3": 184, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71,
+              "CHN": 169, "DNK": 119, "FIN": 244, "IRL": 357, "JPN": 98, "MEX": 262, "NOR": 103, "POL": 106, "ROU": 283, "RUS": 235, "SWE": 113,
+              "SWZ": 207, "USA": 253}
+AF_KEY = os.environ.get("APIFOOTBALL_KEY", "").strip()
+odds_path = os.path.join(OUT, "odds.json")
+try: OD = json.load(open(odds_path))
+except Exception: OD = {}
+rome_now = datetime.datetime.now(ROME)
+if AF_KEY and OD.get("giorno") != rome_now.strftime("%Y-%m-%d") and (rome_now.hour >= 7 or os.environ.get("ODDS_FORCE")):
+    af_used = [0]
+    def af(path, **q):
+        af_used[0] += 1
+        req = urllib.request.Request("https://v3.football.api-sports.io/" + path + "?" + urllib.parse.urlencode(q), headers={"x-apisports-key": AF_KEY})
+        with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
+        time.sleep(6.5)
+        if d.get("errors"): raise RuntimeError(str(d["errors"]))
+        return d
+    import urllib.parse, statistics
+    BY_ID = {v: k for k, v in AF_LEAGUES.items()}
+    # il nostro calendario (prossimi giorni), per abbinare le squadre
+    ours = {}
+    for fn in ("next_fixtures.csv", "espn_fixtures.csv", "fixtures.csv"):
+        try:
+            for r in csv.DictReader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8").read())):
+                try: dd = datetime.datetime.strptime(r["Date"].strip(), "%d/%m/%Y").date()
+                except Exception: continue
+                ours.setdefault(r["Div"].strip(), set()).add((dd, r["HomeTeam"].strip(), r["AwayTeam"].strip()))
+        except Exception as e:
+            print("quote: calendario", fn, e)
+    def pick(lg, dd, h, a):   # sfida del nostro calendario che corrisponde (stesso campionato, ±1 giorno), altrimenti None
+        cand = [(d, x, y) for d, x, y in ours.get(lg, ()) if abs((d - dd).days) <= 1]
+        if not cand: return None
+        def sc(api, mine):
+            al = ESPN_ALIAS.get(lg, {}).get(api) or ALIAS.get(lg, {}).get(api) or FIX_ALIAS.get(api)
+            if al == mine or api == mine: return 1.0
+            a1, m1 = _norm(api), _norm(mine)
+            if a1 == m1: return 1.0
+            if a1 and m1 and (a1 in m1 or m1 in a1): return 0.9
+            return difflib.SequenceMatcher(None, a1, m1).ratio()
+        best = sorted(((sc(h, x) + sc(a, y), sc(h, x), sc(a, y), (d, x, y)) for d, x, y in cand), reverse=True)
+        top = best[0]
+        if top[1] < 0.6 or top[2] < 0.6: return None
+        if len(best) > 1 and best[1][0] >= top[0] - 0.15: return None   # ambiguo: due sfide quasi uguali
+        return top[3]
+    def med(xs):
+        xs = [x for x in xs if x and x > 1]
+        return round(statistics.median(xs), 2) if xs else None
+    res, nomatch, err = {}, [], None
+    try:
+        for k in range(3):
+            dd = rome_now.date() + datetime.timedelta(days=k)
+            F = af("fixtures", date=str(dd), timezone="Europe/Rome").get("response", [])
+            fx = {f["fixture"]["id"]: f for f in F if f["league"]["id"] in BY_ID and f["fixture"]["status"]["short"] in ("NS", "TBD")}
+            per_lg = {}
+            for f in fx.values(): per_lg.setdefault((f["league"]["id"], f["league"]["season"]), []).append(f)
+            for (lid, season), lst in per_lg.items():
+                page, pages = 1, 1
+                while page <= pages:
+                    O = af("odds", league=lid, season=season, date=str(dd), timezone="Europe/Rome", page=page)
+                    pages = (O.get("paging") or {}).get("total", 1) or 1; page += 1
+                    for e in O.get("response", []):
+                        f = fx.get(e["fixture"]["id"])
+                        if not f: continue
+                        lg = BY_ID[lid]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
+                        m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
+                        if not m: nomatch.append(f"{lg} {f['teams']['home']['name']} - {f['teams']['away']['name']}"); continue
+                        acc = {}
+                        for b in e.get("bookmakers", []):
+                            for bet in b.get("bets", []):
+                                for v in bet.get("values", []):
+                                    try: o = float(v["odd"])
+                                    except Exception: continue
+                                    nm, val = bet["name"], str(v["value"])
+                                    if nm == "Match Winner": key = "1x2:" + {"Home": "1", "Draw": "X", "Away": "2"}.get(val, "")
+                                    elif nm == "Goals Over/Under" and val.split(" ")[-1] in ("1.5", "2.5", "3.5"): key = "ou" + val.split(" ")[-1] + ":" + val.split(" ")[0][0]
+                                    elif nm == "Both Teams Score": key = "gg:" + {"Yes": "S", "No": "N"}.get(val, "")
+                                    elif nm == "Corners 1x2": key = "c1x2:" + {"Home": "1", "Draw": "X", "Away": "2", "1": "1", "X": "X", "2": "2"}.get(val, "")
+                                    else: continue
+                                    if key.endswith(":"): continue
+                                    acc.setdefault(key, {})[b["name"]] = o
+                        q = {kk: [med(list(v.values())), len(v)] for kk, v in acc.items()}
+                        q = {kk: v for kk, v in q.items() if v[0]}
+                        if q: res[f"{lg}|{m[0]}|{m[1]}|{m[2]}"] = {"q": q, "nb": len(e.get("bookmakers", [])), "agg": e.get("update", "")[:16]}
+    except Exception as e:
+        err = str(e); print("quote API-Football:", e)
+    if res or not OD:
+        OD = {"giorno": rome_now.strftime("%Y-%m-%d"), "aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "API-Football (quota mediana tra i bookmaker)",
+              "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "partite": res}
+        json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
+    print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
+elif not AF_KEY:
+    print("APIFOOTBALL_KEY non impostata: quote saltate")
+
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))
 json.dump({"updated": now.strftime("%d/%m/%Y %H:%M"), "files": files},
           open(os.path.join(OUT, "manifest.json"), "w"), indent=1)
