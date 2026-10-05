@@ -81,6 +81,7 @@ if os.environ.get("APIFOOTBALL_KEY", "").strip():
     except Exception as e:
         print("API-Football non raggiungibile:", e)
 print("API-Football a pagamento:", AF_PRO)
+QUAL = {}   # controllo qualità dei dati di questo giro → data/qualita.json (mostrato nell'app)
 
 # prossime giornate: calendario completo da fixturedownload.com (gratuito, senza chiave).
 # I nomi delle squadre vengono convertiti in quelli usati da football-data.co.uk.
@@ -748,6 +749,21 @@ try:
             try: pairs[(r[0], r[3], r[4])].append(datetime.datetime.strptime(r[1], "%d/%m/%Y").date())
             except Exception: pass
         print("calendario da API-Football:", len(cal) - 1, "partite,", len(api_lg), "campionati; squadre non riconosciute:", sorted(unk)[:30])
+        # controllo qualità: squadre non riconosciute, partite scadute (non giocate con data passata), statistiche scartate, calendario da ESPN
+        QUAL["squadre_non_riconosciute"] = sorted(unk)
+        stale, bad = [], []
+        for lg, L in by_lg.items():
+            for v in L:
+                d = datetime.date.fromisoformat(v[0][:10])
+                if v[9] in ("NS", "TBD") and _now.date() - datetime.timedelta(days=14) <= d < _now.date():
+                    stale.append(f"{lg} {d:%d/%m} {v[2]} - {v[3]}")
+                if v[9] in ("FT", "AET", "PEN") and d >= _now.date() - datetime.timedelta(days=14) and v[7][0] is not None:
+                    ok = apif_extra.api_stats_ok(v)
+                    no = [n for n, k in (("tiri", "s"), ("tiri in porta", "st"), ("falli", "f"), ("corner", "c")) if not ok[k]]
+                    if no: bad.append(f"{lg} {d:%d/%m} {v[2]} - {v[3]}: {', '.join(no)}")
+        QUAL["partite_scadute"] = stale; QUAL["statistiche_scartate"] = bad
+        try: QUAL["calendario_da_espn"] = [" ".join([r[0], r[1], r[3], "-", r[4]]) for r in list(csv.reader(open(os.path.join(OUT, "espn_fixtures.csv"), encoding="utf-8")))[1:] if len(r) > 4]
+        except Exception: QUAL["calendario_da_espn"] = []
     EX, lim = {}, _now.date() - datetime.timedelta(days=400)
     for lg, L in by_lg.items():
         mp = MAPS[lg]
@@ -909,6 +925,29 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
 elif not AF_KEY:
     print("APIFOOTBALL_KEY non impostata: quote saltate")
+
+# controllo qualità: riepilogo del giro (aggiornato a ogni giro, anche se API-Football non ha risposto)
+try:
+    _od = json.load(open(os.path.join(OUT, "odds.json")))
+    na, ab = len(_od.get("non_abbinate", [])), len(_od.get("partite", {}))
+    QUAL["quote"] = {"aggiornate": _od.get("aggiornate"), "abbinate": ab, "non_abbinate": na, "esempi_non_abbinate": _od.get("non_abbinate", [])[:10]}
+except Exception: QUAL["quote"] = None
+try: QUAL["api_aggiornata"] = json.load(open(os.path.join(OUT, "apif.json"))).get("agg")
+except Exception: QUAL["api_aggiornata"] = None
+_av = []
+if QUAL.get("quote") and QUAL["quote"]["abbinate"] + QUAL["quote"]["non_abbinate"] >= 10 and QUAL["quote"]["non_abbinate"] > QUAL["quote"]["abbinate"] * 0.25:
+    _av.append(f"Quote: {QUAL['quote']['non_abbinate']} partite non abbinate su {QUAL['quote']['abbinate'] + QUAL['quote']['non_abbinate']}")
+if QUAL.get("squadre_non_riconosciute"): _av.append(f"{len(QUAL['squadre_non_riconosciute'])} squadre di API-Football non riconosciute")
+if QUAL.get("partite_scadute"): _av.append(f"{len(QUAL['partite_scadute'])} partite non giocate con data passata (rinviate o calendario non aggiornato)")
+if QUAL.get("statistiche_scartate"): _av.append(f"{len(QUAL['statistiche_scartate'])} partite con statistiche API impossibili (usato football-data o vuoto)")
+try:
+    if not AF_PRO: _av.append("API-Football non disponibile: dati dalle fonti gratuite")
+    elif QUAL.get("api_aggiornata") and (datetime.datetime.now(ROME) - datetime.datetime.strptime(QUAL["api_aggiornata"], "%Y-%m-%d %H:%M").replace(tzinfo=ROME)).total_seconds() > 3 * 3600:
+        _av.append("Archivio API-Football non aggiornato da più di 3 ore")
+except Exception: pass
+QUAL["avvisi"] = _av; QUAL["stato"] = "ok" if not _av else "da controllare"; QUAL["giro"] = datetime.datetime.now(ROME).strftime("%d/%m/%Y %H:%M")
+json.dump(QUAL, open(os.path.join(OUT, "qualita.json"), "w"), ensure_ascii=False, indent=1)
+print("controllo qualità:", QUAL["stato"], _av)
 
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))
 json.dump({"updated": now.strftime("%d/%m/%Y %H:%M"), "files": files},
