@@ -813,17 +813,16 @@ try:
         for v, r, x in zip(L, rows, apif_extra.compute(rows)):
             h, a = mp.get(v[2]), mp.get(v[3]); d = datetime.date.fromisoformat(v[0][:10])
             if not h or not a or d < lim: continue
-            ds = [z for z in pairs.get((lg, h, a), []) if abs((z - d).days) <= 1]
-            if not ds: continue
+            ds = sorted({z for z in pairs.get((lg, h, a), []) if abs((z - d).days) <= 1}, key=lambda z: abs((z - d).days))
+            if not ds: continue   # la stessa partita può comparire con date diverse di un giorno nei file (fuso orario, rinvii): la scrivo per ognuna
             real = (r["hc"] + r["ac"]) if r["hc"] is not None and r["ac"] is not None else None
             p = CMP.get((lg, v[0], v[2], v[3]))
             if p:   # [arbitro, sue partite, fattore falli, effetto arbitro sui cartellini, cartellini attesi, reali, casa, ospite, fattori]
-                EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], p["rN"], x["ff"], round(p["ref"], 4), round(p["mu"], 3), real, round(p["mh"], 3), round(p["ma"], 3),
-                                               [round(p["team"], 3), round(p["ref"], 3), round(p["fouls"], 3), round(p["h2h"], 3), round(p["early"], 3)]]
-            elif not CMP:
-                EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], real, x["mh"], x["ma"]]
-            else:
-                EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], x["n"], x["ff"], None, None, real, None, None]
+                ent = [x["ref"], p["rN"], x["ff"], round(p["ref"], 4), round(p["mu"], 3), real, round(p["mh"], 3), round(p["ma"], 3),
+                       [round(p["team"], 3), round(p["ref"], 3), round(p["fouls"], 3), round(p["h2h"], 3), round(p["early"], 3)]]
+            elif not CMP: ent = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], real, x["mh"], x["ma"]]
+            else: ent = [x["ref"], x["n"], x["ff"], None, None, real, None, None]
+            for z in ds: EX[f"{lg}|{z}|{h}|{a}"] = ent
     json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "partite": EX, "alpha": _alpha if CMP else None, "modello": cards_model.VERSION if CMP else "cartellini-v1"},
               open(os.path.join(OUT, "extra.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("arbitri e cartellini:", len(EX), "partite abbinate")
