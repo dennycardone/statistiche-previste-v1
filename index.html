@@ -470,15 +470,27 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .sheet .sh-h b{font-family:var(--display);font-size:19px;letter-spacing:.06em;text-transform:uppercase}
 .sheet .sh-x{width:34px;height:34px;border-radius:50%;padding:0;font-size:18px}
 .sheet .sh-b{display:flex;flex-direction:column;gap:10px;font-size:14.5px;color:var(--ink-2);line-height:1.5}
-.sheet .sh-b>*{display:block!important;margin:0}
+.sheet .sh-b>p{margin:0}.sheet .sh-b h3{font-family:var(--display);font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:6px}.kgrid>span{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;background:var(--surface-2);min-width:0}.kgrid small{font-size:11px;color:var(--ink-2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kgrid b{font-family:var(--display);font-size:22px}
 .kfac{display:flex;flex-direction:column;gap:4px}.kfac small{font-family:var(--display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}.kfac ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13.5px}.kfac .up{color:var(--ink)}.kfac .up::first-letter{color:var(--warn)}.kfac .dn::first-letter{color:var(--accent)}.kfac .wa{color:var(--ink-2)}.kfac .wa::first-letter{color:var(--gold)}
 .mhead .sx-rg{display:block;font-family:var(--body);font-style:normal;font-size:11.5px;font-weight:500;color:var(--ink-3);letter-spacing:.02em;margin-top:1px}
+.mhead .refbtn{background:transparent;border:none;padding:0;color:var(--ink);font:600 12.5px/1.15 var(--body);display:flex;flex-direction:column;align-items:flex-end;text-align:right;cursor:pointer}
+.mhead .refbtn small{display:flex;align-items:center;gap:4px}.ibtn.sm{width:15px;height:15px;font-size:9.5px;font-style:normal;margin:0}
+.mhead .sx-leg{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 14px;padding:7px 8px;font-size:11px;color:var(--ink-3);border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--surface-2) 40%,transparent)}
+.mhead .sx-leg b{color:var(--ink);font-family:var(--display);font-size:14px}.mhead .sx-leg small{color:var(--ink-3)}
+.mhead .sx-v.pl{gap:0}.mhead .sx-v .rv{font-family:var(--display);font-size:25px;font-weight:700;color:var(--ink-2);line-height:1.05}.mhead .sx-v.top .rv{color:var(--ink)}
+.mhead .pv{font-family:var(--body);font-size:11px;font-weight:500;color:var(--ink-3);letter-spacing:.01em}
+.mhead .sx-m .pv{color:var(--ink-3)}
+.mk{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;font-style:normal;font-size:10.5px;font-weight:700;margin-top:3px}
+.mk.ok{background:color-mix(in srgb,var(--good) 22%,transparent);color:var(--good)}.mk.ko{background:color-mix(in srgb,var(--dot-r) 22%,transparent);color:var(--dot-r)}.mk.eq{background:var(--surface-2);color:var(--ink-3)}
+.sx-leg .mk{margin:0 1px 0 0;vertical-align:-3px}
 .boot{display:none}body.booting .boot{display:flex;flex-direction:column;align-items:center;gap:8px;padding:90px 16px;text-align:center;color:var(--ink-2)}body.booting .boot b{font-family:var(--display);font-size:20px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}body.booting .view{display:none!important}
 .spin{width:38px;height:38px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--hot);animation:spin .9s linear infinite;margin-bottom:6px}@keyframes spin{to{transform:rotate(360deg)}}
 .tlogo{display:inline-block;flex:none;width:18px;height:18px;object-fit:contain;margin-right:7px;vertical-align:-4px}.tlogo.big{display:block;width:30px;height:30px;margin:0 auto 6px}
 .mhead .bdg.lg{background:radial-gradient(circle,#ffffff 0 62%,#e6ebf3 100%);padding:9px}.mhead .bdg.lg img{width:100%;height:100%;object-fit:contain}
 .winstrip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-inline:0;padding-inline:0}.winstrip .day{min-width:0}
+.morebtn{display:block;width:100%;margin:0;padding:10px 12px;border:0;border-top:1px solid var(--line,rgba(255,255,255,.08));background:transparent;color:var(--accent,#7cf);font:inherit;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
+.morebtn:hover{background:rgba(255,255,255,.04)}
 </style>
 </head>
 <body>
@@ -626,7 +638,6 @@ h2.dzh{display:flex;align-items:center;gap:8px}
       <button class="mtab" data-mt="sig" aria-pressed="false">Segnalazioni</button>
       <button class="mtab" data-mt="h2h" aria-pressed="false">Testa a testa</button>
       <button class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
-      <button class="mtab" data-mt="info" aria-pressed="false">Dati e metodo</button>
     </div>
     <div class="mpane" data-mp="prev">
       <section class="mhead" id="mhead" aria-label="Scheda match"></section>
@@ -2511,7 +2522,7 @@ function render() {
     ${M && M.nH != null ? `<div class="warnbox">Basato su ${M.nHt} partite di ${esc(home)} (${M.nH} in casa) e ${M.nAt} di ${esc(away)} (${M.nA} in trasferta). ${hl.dyn ? "Media dinamica: normale del campionato × attacco × difesa, con prudenza che cala partita dopo partita; gol, corner, falli e tiri con i modelli verificati. Calcolo completo in Dati e metodo." : `Pesi della Media ponderata: classica 50% · campionato 25% · avversari 20% · totale squadra 5% (falli: classica ${MF && MF.Bp && MF.Bp.W && MF.Bp.W.cl === 0.5 ? "50% · totale squadra 50%" : "20% · totale squadra 80%, dall'11ª partita 50% · 50%"}; gol: 60% xG · 30% gol veri · 10% avversari).${M.nHt > RECENT_FROM || M.nAt > RECENT_FROM ? " Oltre le 10 partite le ultime 5 di ogni squadra contano il doppio." : ""}`}</div>` : ""}
   </section>
 
-  ${probCard(home, away, { G, M, MF, MT })}
+
 
 
 
@@ -3338,12 +3349,16 @@ function renderH2H(home, away, before) {
   const lh = teamAll(home, before).filter(m => inSeason(m) && (!venue || m.home === home));
   const la = teamAll(away, before).filter(m => inSeason(m) && (!venue || m.away === away));
   const hh = teamAll(home, before).filter(m => inLg(m) && (m.home === away || m.away === away) && (!venue || m.home === home));
-  const block = (title, list, team) => `<section class="card hh"><h3>${title}</h3>${list.length ? hmSummary(list, team) + list.map(m => hmRow(m, team)).join("") : `<p class="muted small" style="margin:0;padding:10px 12px">Nessuna partita nei dati.</p>`}</section>`;
+  const block = (title, list, team) => `<section class="card hh"><h3>${title}</h3>${list.length ? hmSummary(list, team) + list.slice(0, 5).map(m => hmRow(m, team)).join("")
+      + (list.length > 5 ? `<div class="hmore" hidden>${list.slice(5).map(m => hmRow(m, team)).join("")}</div><button class="morebtn" type="button" data-l="Mostra altre (${list.length - 5})">Mostra altre (${list.length - 5}) <span aria-hidden="true">▾</span></button>` : "")
+      : `<p class="muted small" style="margin:0;padding:10px 12px">Nessuna partita nei dati.</p>`}</section>`;
   box.innerHTML = block(`Ultime partite: ${esc(home)}${venue ? " · in casa" : ""}`, lh, home)
     + block(`Ultime partite: ${esc(away)}${venue ? " · in trasferta" : ""}`, la, away)
     + block(`Scontri diretti${venue ? ` · ${esc(home)} in casa` : ""}`, hh, home)
     + `<p class="small muted" style="margin:0">Ultime partite: tutta la stagione in corso di questo campionato. Scontri diretti: tutte le stagioni disponibili${S.meta.mode === "inclusi" ? " (nell'anteprima solo questa; sul sito GitHub anche le 5 precedenti)" : ""}. V/N/P per la squadra in grassetto. C corner · F falli · T tiri · TP tiri in porta (casa-ospite).${before ? " Solo partite giocate prima di questa." : ""}</p>`;
+  box.querySelectorAll(".morebtn").forEach(b => b.addEventListener("click", () => { const d = b.previousElementSibling; d.hidden = !d.hidden; b.innerHTML = d.hidden ? `${b.dataset.l} <span aria-hidden="true">▾</span>` : `Mostra meno <span aria-hidden="true">▴</span>`; }));
 }
+
 function standings(list, mode) {
   const T = new Map(); const get = t => { if (!T.has(t)) T.set(t, { t, g: 0, v: 0, n: 0, p: 0, gf: 0, gs: 0, pt: 0, form: [], sum: {}, cnt: {} }); return T.get(t); };
   for (const m of list) {
@@ -3435,22 +3450,31 @@ function matchHeroHTML(home, away, e, cfg, G) {
   const v = (a, d = 1) => ok(a) ? (d === 2 ? f2(a) : f1(a)) : `<span class="nd">—</span>`;
   // range della media all'80% per squadra (team_ranges.py): media × exp(±1,2816 × errore standard tarato sul backtest)
   const se = x && x[9] ? x[9] : null, rg = (m, s) => ok(m) && s ? `<em class="sx-rg">${f1(m * Math.exp(-1.2816 * s))}–${f1(m * Math.exp(1.2816 * s))}</em>` : "";
-  const row = (lab, h, a, t, d = 1, sh = null, sa = null) => {
+  // partita giocata: numero grande = dato reale, sotto la previsione fatta prima del calcio d'inizio; ✓/✗ = indovinato chi ne fa di più
+  const row = (lab, h, a, t, d = 1, sh = null, sa = null, rh = null, ra = null) => {
+    const T = ok(t) ? (d === 2 ? f2(t) : f1(t)) : "N/D";
+    if (m && rh != null && ra != null) {
+      const hi = rh > ra ? "h" : rh < ra ? "a" : "", ps = ok(h) && ok(a) ? (h > a ? 1 : h < a ? 2 : 0) : 0, rs = rh > ra ? 1 : rh < ra ? 2 : 0;
+      const mk = !ps ? "" : !rs ? `<i class="mk eq" title="Pari">=</i>` : ps === rs ? `<i class="mk ok" title="Indovinato chi ne fa di più">✓</i>` : `<i class="mk ko" title="Sbagliato chi ne fa di più">✗</i>`;
+      const cell = (rv, pv, sv, top) => `<span class="sx-v pl${top ? " top" : ""}"><b class="rv">${rv}</b><small class="pv">prev. ${v(pv, d)}</small>${rg(pv, sv)}</span>`;
+      return `<div class="sx-r">${cell(rh, h, sh, hi === "h")}<span class="sx-m"><small>${lab}</small><b>${rh + ra}</b><small class="pv">prev. ${T}</small>${mk}</span>${cell(ra, a, sa, hi === "a")}</div>`;
+    }
     const hi = ok(h) && ok(a) && Math.abs(h - a) > 1e-9 ? (h > a ? "h" : "a") : "";
-    return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}${rg(h, sh)}</span><span class="sx-m"><small>${lab}</small><b>${ok(t) ? (d === 2 ? f2(t) : f1(t)) : "N/D"}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}${rg(a, sa)}</span></div>`; };
-  return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx">${x && x[0] ? `<span class="ref"><small>Arbitro</small>${esc(x[0])}</span>` : ""}<button class="ibtn" type="button" data-mbase aria-label="Come sono calcolati i valori">i</button></span></div>
+    return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}${rg(h, sh)}</span><span class="sx-m"><small>${lab}</small><b>${T}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}${rg(a, sa)}</span></div>`; };
+  return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button><button class="ibtn" type="button" data-mbase aria-label="Come sono calcolati i valori">i</button></span></div>
     <div class="sx">
       <div class="sx-r sx-h">
         <span class="sx-t">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></span>
         <span class="sx-m sx-c"><small>Scheda match</small>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
         <span class="sx-t">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></span>
       </div>
-      ${row("Gol attesi", G && G.lh, G && G.la, G && G.tot, 2, se && se[0], se && se[1])}
-      ${row("Tiri totali", MT && MT.MS && MT.MS.lh, MT && MT.MS && MT.MS.la, MT && MT.MS && MT.MS.tot)}
-      ${row("Tiri in porta", MT && MT.lh, MT && MT.la, MT && MT.tot)}
-      ${row("Calci d'angolo", M && M.lh, M && M.la, M && M.tot)}
-      ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot)}
-      ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3])}
+      ${m ? `<div class="sx-leg"><span><b>2</b> partita giocata</span><span><small>prev.</small> previsione prima del match</span><span><i class="mk ok">✓</i><i class="mk ko">✗</i> chi ne fa di più</span></div>` : ""}
+      ${row(m ? "Gol" : "Gol attesi", G && G.lh, G && G.la, G && G.tot, 2, se && se[0], se && se[1], m && m.hg, m && m.ag)}
+      ${row("Tiri totali", MT && MT.MS && MT.MS.lh, MT && MT.MS && MT.MS.la, MT && MT.MS && MT.MS.tot, 1, null, null, m && m.hs, m && m.as)}
+      ${row("Tiri in porta", MT && MT.lh, MT && MT.la, MT && MT.tot, 1, null, null, m && m.hst, m && m.ast)}
+      ${row("Calci d'angolo", M && M.lh, M && M.la, M && M.tot, 1, null, null, m && m.hc, m && m.ac)}
+      ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot, 1, null, null, m && m.hf, m && m.af)}
+      ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
     </div>`;
 }
 function renderMatchExtras(home, away) {
@@ -3460,24 +3484,13 @@ function renderMatchExtras(home, away) {
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}` : "Confronto libero";
   $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G);
   renderMatchConf(home, away, e, cfg);
-  renderMatchRef(home, away, e);
+  $("#mref").hidden = true; REFCTX = { home, away, e };   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
   // confronto previsione / partita giocata
   const cmp = $("#mcmp");
   if (m && G) {
-    const M = model(home, away, cfg, "c"), MF = model(home, away, cfg, "f"), MT = modelShots(home, away, cfg);
-    const row = (lab, P, rh, ra, fmt = f1) => {
-      const pv = P ? `${fmt(P.lh)}–${fmt(P.la)}` : "N/D";
-      if (rh == null || ra == null) return [lab, pv, "N/D"];
-      return [lab, pv, `<b>${rh}–${ra}</b>`];
-    };
-    const ok = b => b ? `<span class="good">✓ sì</span>` : `<span class="bad">✗ no</span>`;
-    const tg = m.hg + m.ag;
     cmp.hidden = false;
-    cmp.innerHTML = `<h2>Previsione e partita giocata</h2>
-      <p class="small muted" style="margin:0">Previsione calcolata solo con le partite giocate prima di questa, come sarebbe apparsa prima del calcio d'inizio.</p>
-      <div class="cmp">${rowsTable(["", "Previsti", "Reali"], [row("Gol", G, m.hg, m.ag, f2), row("Corner", M, m.hc, m.ac), row("Falli", MF, m.hf, m.af), row("Tiri", MT && MT.MS, m.hs, m.as), row("Tiri in porta", MT, m.hst, m.ast)])}</div>
-      ${(() => { const P = matchPicks(home, away, cfg, m), h = P.filter(x => x.ok).length;
-        return `<h3>Pronostici: ${h} giusti su ${P.length} (${pc(h / P.length)})</h3>` + rowsTable(["Mercato", "Pron.", "Reale"], P.map(x => [x.lab, `<b>${x.pick}</b><br><span class="muted small">${pc(x.p)}</span>`, `${x.ok ? `<span class="good">✓</span>` : `<span class="bad">✗</span>`} <span class="small">${x.txt}</span>`])); })()}`;
+    cmp.innerHTML = `${(() => { const P = matchPicks(home, away, cfg, m), h = P.filter(x => x.ok).length;
+        return `<h2>Pronostici: ${h} giusti su ${P.length} (${pc(h / P.length)})</h2>` + rowsTable(["Mercato", "Pron.", "Reale"], P.map(x => [x.lab, `<b>${x.pick}</b><br><span class="muted small">${pc(x.p)}</span>`, `${x.ok ? `<span class="good">✓</span>` : `<span class="bad">✗</span>`} <span class="small">${x.txt}</span>`])); })()}`;
   } else { cmp.hidden = true; cmp.innerHTML = ""; }
   renderH2H(home, away, m ? e.date : null);
   renderTable(home, away);
@@ -3787,10 +3800,28 @@ function confRowHTML(r, i, withInfo) {
     <div class="cd small">${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}<span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
   </div>`;
 }
-function renderMatchRef(home, away, e) {
-  const box = $("#mref"); if (!box) return;
+let REFCTX = null;
+/* statistiche reali dell'arbitro nelle sue partite precedenti presenti nei dati (ultimi 12 mesi circa): cartellini, Over, falli */
+function refStats(ref, before) {
+  if (!ref || !EXTRA || !EXTRA.partite) return null;
+  const idx = refStats.idx || (refStats.idx = new Map([...S.matches.values()].map(m => [`${m.div}|${isoD(m.date)}|${m.home}|${m.away}`, m])));
+  const L = [];
+  for (const [k, v] of Object.entries(EXTRA.partite)) {
+    if (v[0] !== ref || v[5] == null) continue;
+    const d = k.split("|")[1]; if (before && d >= isoD(before)) continue;
+    const m = idx.get(k); L.push({ c: v[5], f: m && m.hf != null && m.af != null ? m.hf + m.af : null, d });
+  }
+  const seen = new Set(), U = L.filter(x => { const kk = x.d + "|" + x.c + "|" + x.f; if (seen.has(kk)) return false; seen.add(kk); return true; });   // stessa partita scritta con due date
+  if (!U.length) return null;
+  const fl = U.filter(x => x.f != null);
+  return { n: U.length, c: U.reduce((a, x) => a + x.c, 0) / U.length, o35: U.filter(x => x.c > 3.5).length / U.length, o45: U.filter(x => x.c > 4.5).length / U.length,
+    f: fl.length ? fl.reduce((a, x) => a + x.f, 0) / fl.length : null, nf: fl.length };
+}
+function refSheetHTML() {
+  if (!REFCTX) return "<p>Nessuna partita aperta.</p>";
+  const { home, away, e } = REFCTX;
   const x = e && home && away ? extraFor(home, away) : null;
-  if (!x) { box.hidden = true; return; }
+  if (!x) return "<p>Dati su arbitro e cartellini non disponibili per questa partita.</p>";
   const [ref, n, ff, fc, mu, real, mh, ma, fx] = x, v2 = Array.isArray(fx);
   const pct = v => Math.round(Math.abs(v - 1) * 100) === 0 ? "nella media" : `${v >= 1 ? "+" : "−"}${Math.round(Math.abs(v - 1) * 100)}%`;
   const refTxt = ref ? `<b>${esc(ref)}</b> · ${n} partite nei nostri dati` : `<span class="muted">Non ancora indicato (di solito 1-2 giorni prima della partita)</span>`;
@@ -3807,9 +3838,13 @@ function renderMatchRef(home, away, e) {
     if (!ref) fac.push(`<li class="wa">● Arbitro non ancora indicato: previsione senza il suo effetto</li>`);
     if (mE > 1.001) fac.push(`<li class="wa">● Inizio stagione: una delle due squadre ha meno di 5 partite</li>`);
   }
-  box.hidden = false;
-  box.innerHTML = `<h2>🟨 Cartellini</h2>
-    <p style="margin:0">Arbitro: ${refTxt}${v2 && ref && fc ? ` · effetto sui cartellini <b>${pct(fc)}</b>` : ""}${ff && Math.abs(ff - 1) >= 0.005 ? ` · sui falli <b>${pct(ff)}</b>` : ""}</p>
+  const RS = ref ? refStats(ref, e && e.date) : null;
+  const rsTxt = RS ? `<div class="kgrid"><span><small>Partite</small><b class="num">${RS.n}</b></span><span><small>Cartellini</small><b class="num">${f1(RS.c)}</b></span><span><small>Over 3,5</small><b class="num">${pc(RS.o35)}</b></span><span><small>Over 4,5</small><b class="num">${pc(RS.o45)}</b></span>${RS.f != null ? `<span><small>Falli</small><b class="num">${f1(RS.f)}</b></span>` : ""}</div>
+    <p class="small muted" style="margin:0">Medie reali nelle sue partite dei nostri campionati negli ultimi 12 mesi circa, prima di questa${RS.f != null && RS.nf < RS.n ? ` (falli su ${RS.nf} partite)` : ""}.</p>` : (ref ? `<p class="muted" style="margin:0">Nessuna sua partita precedente nei nostri dati.</p>` : "");
+  return `<h3 style="margin:0">Arbitro</h3>
+    <p style="margin:0">${refTxt}${v2 && ref && fc ? ` · effetto stimato sui cartellini <b>${pct(fc)}</b>` : ""}${ff && Math.abs(ff - 1) >= 0.005 ? ` · sui falli <b>${pct(ff)}</b>` : ""}</p>
+    ${rsTxt}
+    <h3 style="margin:6px 0 0">🟨 Cartellini della partita</h3>
     ${mu ? `<div class="kgrid"><span><small>Previsione</small><b class="num">${f1(mu)}</b></span><span><small>${esc(home)}</small><b class="num">${mh != null ? f1(mh) : "—"}</b></span><span><small>${esc(away)}</small><b class="num">${ma != null ? f1(ma) : "—"}</b></span>${played ? `<span><small>In partita</small><b class="num">${real}</b></span>` : ""}</div>
       <div class="kp" style="display:flex;flex-wrap:wrap;gap:6px 14px">${CARD_LINES.map((t, i) => `<span>Over ${th1(t)} <b class="num${played ? (real > t) === (P[i] >= 0.5) ? " good" : " bad" : ""}">${pc(P[i])}</b></span>`).join("")}</div>` : `<p class="muted" style="margin:0">Previsione cartellini non disponibile per questo campionato (servono i cartellini delle partite precedenti).</p>`}
     ${fac.length ? `<div class="kfac"><small>Fattori principali</small><ul>${fac.join("")}</ul></div>` : ""}
@@ -3938,7 +3973,8 @@ function dzScan() {
     }
   });
 }
-document.addEventListener("click", ev => { if (ev.target.closest("[data-mbase]")) { const b = $("#mbase"); openSheet("Scheda match", b ? [...b.children] : []); } });   // base del calcolo della scheda
+document.addEventListener("click", ev => { if (ev.target.closest("[data-mbase]")) { const b = $("#mbase"); openSheet("Scheda match", b ? [...b.children] : []); } });
+document.addEventListener("click", ev => { if (ev.target.closest("[data-refsheet]")) { SHEET.querySelector(".sh-h b").textContent = "Arbitro e cartellini"; SHEET.querySelector(".sh-b").innerHTML = refSheetHTML(); SHEET.hidden = false; } });   // base del calcolo della scheda
 { let q = 0; new MutationObserver(() => { if (!q) q = requestAnimationFrame(() => { q = 0; dzScan(); }); }).observe(document.body, { childList: true, subtree: true }); }
 /* tooltip */
 const tip = $("#tip");
