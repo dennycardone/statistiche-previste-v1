@@ -426,6 +426,8 @@ body{padding-block:0 calc(88px + env(safe-area-inset-bottom,0px))}
 .mhead .kp b{color:var(--ink)}
 .mrow{grid-template-columns:44px minmax(0,1fr) 28px 28px 28px 28px 46px}
 .mrow .tm.fin{font-size:10.5px;letter-spacing:.02em}
+.boot{display:none}body.booting .boot{display:flex;flex-direction:column;align-items:center;gap:8px;padding:90px 16px;text-align:center;color:var(--ink-2)}body.booting .boot b{font-family:var(--display);font-size:20px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}body.booting .view{display:none!important}
+.spin{width:38px;height:38px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--hot);animation:spin .9s linear infinite;margin-bottom:6px}@keyframes spin{to{transform:rotate(360deg)}}
 .tlogo{display:inline-block;flex:none;width:18px;height:18px;object-fit:contain;margin-right:7px;vertical-align:-4px}.tlogo.big{display:block;width:30px;height:30px;margin:0 auto 6px}
 .mhead .bdg.lg{background:radial-gradient(circle,#ffffff 0 62%,#e6ebf3 100%);padding:9px}.mhead .bdg.lg img{width:100%;height:100%;object-fit:contain}
 .winstrip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-inline:0;padding-inline:0}.winstrip .day{min-width:0}
@@ -451,6 +453,7 @@ body{padding-block:0 calc(88px + env(safe-area-inset-bottom,0px))}
 </nav>
 </header>
 <div class="wrap">
+  <div class="boot" id="boot" role="status"><span class="spin" aria-hidden="true"></span><b>Carico i dati aggiornati…</b><small>partite, risultati e previsioni di oggi</small></div>
 
   <div class="view" id="viewHist" hidden>
     <section class="card" aria-label="Filtri bilancio">
@@ -3844,10 +3847,16 @@ document.addEventListener("focusout", () => { tip.hidden = true; });
 addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
 
 (async () => {
-  loadEmbedded(); refreshAll();
+  // sul sito: niente dati inclusi nella pagina (vecchi) a schermo; si aspetta il download di quelli aggiornati
+  const online = /^https?:$/.test(location.protocol);
+  if (online) document.body.classList.add("booting");
+  loadEmbedded(); if (!online) refreshAll();
   $("#sigMode").value = $("#decay").value;
-  if (await tryHosted()) refreshAll();
+  const ok = await Promise.race([tryHosted(), new Promise(r => setTimeout(() => r(null), 20000))]);
+  document.body.classList.remove("booting");
+  if (ok) refreshAll();
   else if (loadStored()) refreshAll();
+  else if (online) refreshAll();
   if (!$("#viewSig").hidden) renderSignals();
 })();
 </script>
