@@ -658,19 +658,19 @@ h2.dzh{display:flex;align-items:center;gap:8px}
     </div>
     <div class="mtabs" role="tablist" aria-label="Sezioni della partita">
       <button class="mtab" data-mt="prev" aria-pressed="true">Scheda match</button>
-      <button class="mtab" data-mt="sig" aria-pressed="false">Segnalazioni</button>
+      <button class="mtab" data-mt="sig" aria-pressed="false">Confidence</button>
       <button class="mtab" data-mt="h2h" aria-pressed="false">Testa a testa</button>
       <button class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
     </div>
     <div class="mpane" data-mp="prev">
       <section class="mhead" id="mhead" aria-label="Scheda match"></section>
-      <section class="card mconf" id="mconf" aria-label="Confidence Score" hidden></section>
       <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
       <section class="card" id="mcmp" aria-label="Confronto con la partita giocata" hidden></section>
       <main id="out" class="wrap" style="padding:0;margin:0;width:100%"></main>
     </div>
     <div class="mpane" data-mp="sig" hidden>
-      <section class="card" id="msig" aria-label="Segnalazioni della partita"></section>
+      <section class="card mconf" id="mconf" aria-label="Confidence Score"></section>
+      <section class="card" id="msig" aria-label="Segnalazioni della partita" hidden></section>
     </div>
     <div class="mpane" data-mp="h2h" hidden>
       <div class="seg" role="group" aria-label="Filtro partite">
@@ -3567,9 +3567,9 @@ function renderMatchExtras(home, away) {
   } else { cmp.hidden = true; cmp.innerHTML = ""; }
   renderH2H(home, away, m ? e.date : null);
   renderTable(home, away);
-  // segnalazioni della partita
+  // segnalazioni della partita: sostituite dal Confidence Score nella scheda "Confidence" (6/10/2026)
   const box = $("#msig");
-  if (!home || !away || home === away) { box.innerHTML = ""; return; }
+  if (true || !home || !away || home === away) { box.innerHTML = ""; return; }
   const st = sigSettings(), mk = st.markets;
   const f = { div: S.league, date: e ? e.date : new Date(), time: e ? e.time : "", home, away };
   const rows = computeSignals({ lgSel: S.league, markets: mk, cfg, minP: st.minP, needGames: false, noStale: false, pick: c => c === S.league ? [f] : [] }).rows;
@@ -3925,16 +3925,17 @@ function refSheetHTML() {
 }
 function renderMatchConf(home, away, e, cfg) {
   const box = $("#mconf"); if (!box) return;
-  if (!e || !home || !away || !Object.keys(CONF_COEF).length) { box.hidden = true; return; }
+  box.hidden = false;
+  if (!e || !home || !away || !Object.keys(CONF_COEF).length) { box.innerHTML = `<h2>Confidence Score</h2><p class="muted" style="margin:0">Non disponibile per questa partita.</p>`; return; }
   let L; try { L = withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = e.m ? e.date : null; try { if (e.m) S.season = e.m.season; return confMatch(home, away, e.date, entryOdds(e), cfg.key); } finally { S.cutoff = c0; } }); } catch (x) { L = []; }
-  if (!L.length) { box.hidden = true; return; }
+  if (!L.length) { box.innerHTML = `<h2>Confidence Score</h2><p class="muted" style="margin:0">Non disponibile per questa partita (servono più partite giocate).</p>`; return; }
   L = L.map(r => ({ ...r, h: home, a: away, qt: e.m ? null : oddsFor(e, r) }));
   const top = L[0];
   box.hidden = false;
   box.innerHTML = `<div class="selhead"><h2>Confidence Score</h2><button class="info" data-ci="0" aria-label="Cos'è il Confidence Score">ⓘ</button></div>
     <div class="ctop"><span class="small muted">Previsione più solida</span><b>${esc(confLab(top))} · ${pc(top.q)} <small class="muted">(modello ${pc(top.p)})</small></b>${confBar(top.score, top.cls, clsRate(top))}
       <span class="cd small">${top.qt ? `<span>${oddsTxt(top.qt)}</span>` : ""}<span>Stabilità <b>${top.stab}</b></span><span>Campione <b>${top.samp}</b></span><span class="st-${top.status}">${CONF_STATUS[top.status]}</span>${top.why.length ? `<span class="muted">A+ non confermato: ${esc(top.why.join(", "))}</span>` : top.contra >= 2 ? `<span class="muted">${top.contra} frequenze reali su 4 dicono il contrario</span>` : ""}</span></div>
-    <details class="call"><summary>Tutti i mercati (${L.length})</summary>${L.map((r, i) => confRowHTML(r, i, true)).join("")}</details>
+    <details class="call" open><summary>Tutti i mercati (${L.length})</summary>${L.map((r, i) => confRowHTML(r, i, true)).join("")}</details>
     <div class="confinfo" id="mconfInfo" hidden></div>
     ${e.m ? `<p class="small muted" style="margin:0">Partita giocata: punteggi calcolati solo con le partite precedenti.</p>` : ""}`;
   box.querySelectorAll("[data-ci]").forEach(b => b.addEventListener("click", () => { const P = $("#mconfInfo"); const same = !P.hidden && P.dataset.i === b.dataset.ci; P.hidden = same; P.dataset.i = b.dataset.ci; if (!same) P.innerHTML = confInfoHTML(L[+b.dataset.ci]); }));
