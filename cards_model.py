@@ -32,7 +32,7 @@ def features(matches):
     Restituisce, nello stesso ordine, None (dati insufficienti) o dict(x, lm, eh, ea, rN, played, T)."""
     order = sorted(range(len(matches)), key=lambda i: (matches[i]['d'][:16], matches[i]['lg']))
     res = [None] * len(matches)
-    lgs = collections.defaultdict(lambda: {'c': 0.0, 'f': 0.0, 'w': 0.0, 'wf': 0.0, 'n': 0})
+    lgs = collections.defaultdict(lambda: {'c': 0.0, 'f': 0.0, 'w': 0.0, 'wf': 0.0, 'n': 0, 'hc': 0.0, 'ac': 0.0})
     teams = collections.defaultdict(list); ewma = collections.defaultdict(lambda: [0.0, 0.0, 0.0, 0.0, 0.0])
     refs = collections.defaultdict(list); h2h = collections.defaultdict(list)
     shr = lambda s, n, prior, k=K_TEAM: (s + k * prior) / (n + k)
@@ -68,7 +68,7 @@ def features(matches):
                  "FF": math.log(FF) if FF else 0.0,
                  "H": ratio(sum(z[0] for z in HH), sum(z[1] for z in HH), K_H) if HH else 0.0,
                  "nlo": 1.0 if min(len(thS), len(taS)) < 5 else 0.0}
-            feat = dict(x=[x[k] for k in FEATS], lm=lm, eh=eh, ea=ea, rN=len(R), nmin=min(len(thS), len(taS)), played=played, T=(r['hc'] + r['ac']) if played else None, d=r['d'][:10])
+            feat = dict(x=[x[k] for k in FEATS], lm=lm, eh=eh, ea=ea, rH=(L['hc'] / L['ac']) if L['ac'] > 0 else 1.0, rN=len(R), nmin=min(len(thS), len(taS)), played=played, T=(r['hc'] + r['ac']) if played else None, d=r['d'][:10])
         res[i] = feat
         if not played: continue
         T = r['hc'] + r['ac']; F = hf + af if fok else None
@@ -81,6 +81,7 @@ def features(matches):
             if fo is None: fo, fs = (z[2] / z[4], z[3] / z[4]) if z[4] else (0.0, 0.0)
             z[0] = z[0] * W + own; z[1] = z[1] * W + prov; z[2] = z[2] * W + fo; z[3] = z[3] * W + fs; z[4] = z[4] * W + 1
         L['c'] = L['c'] * WL + T; L['w'] = L['w'] * WL + 1; L['n'] += 1
+        L['hc'] = L['hc'] * WL + r['hc']; L['ac'] = L['ac'] * WL + r['ac']
         if F is not None: L['f'] = L['f'] * WL + F; L['wf'] = L['wf'] * WL + 1
     return res
 
@@ -112,8 +113,11 @@ def predict(f, b):
     mu = math.exp(eta)
     mult = {k: math.exp(w * v) for k, w, v in zip(FEATS, b[1:], f['x'])}
     ref = mult["R"] * mult["R10"]
-    if f['eh'] and f['ea']: mh = mu * f['eh'] / (f['eh'] + f['ea'])
-    else: mh = mu / 2
+    # ripartizione casa/ospite: cartellini attesi delle due squadre × rapporto casa/ospite del campionato (in casa se ne prendono meno)
+    # (verifica 2024-2026: prima casa 2,19 previsti contro 2,03 reali e ospite 2,19 contro 2,33; ora 2,05 / 2,33)
+    r = f.get('rH') or 1.0
+    if f['eh'] and f['ea']: mh = mu * f['eh'] * r / (f['eh'] * r + f['ea'])
+    else: mh = mu * r / (1 + r)
     return dict(mu=mu, mh=mh, ma=mu - mh, ref=ref, team=mult["E"], fouls=mult["FF"], h2h=mult["H"], early=mult["nlo"])
 
 def run(matches, cache, today, since):

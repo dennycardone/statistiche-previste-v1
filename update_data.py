@@ -802,6 +802,18 @@ try:
         print("cartellini v2:", len(CMP), "previsioni · alpha %.4f" % _alpha, "· mesi stimati", len(_cm.get("mesi", {})))
     except Exception as e_:
         import traceback; traceback.print_exc(); print("cartellini v2 non disponibile, resta il modello precedente:", e_); _alpha = None
+    # range della media per squadra (gol e cartellini): team_ranges.py, settimane passate conservate in data/team_ranges.json
+    TR = {}
+    try:
+        import team_ranges
+        _tr_path = os.path.join(OUT, "team_ranges.json")
+        try: _trc = json.load(open(_tr_path))
+        except Exception: _trc = {}
+        TR = team_ranges.run(by_lg, apif_extra.refkey, _now.date(), lim, _trc)
+        json.dump(_trc, open(_tr_path, "w"), separators=(",", ":"))
+        print("range per squadra:", len(TR), "partite")
+    except Exception as e_:
+        import traceback; traceback.print_exc(); print("range per squadra non disponibili:", e_)
     for lg, L in by_lg.items():
         mp = MAPS[lg]
         rows = []
@@ -820,8 +832,9 @@ try:
             if p:   # [arbitro, sue partite, fattore falli, effetto arbitro sui cartellini, cartellini attesi, reali, casa, ospite, fattori]
                 ent = [x["ref"], p["rN"], x["ff"], round(p["ref"], 4), round(p["mu"], 3), real, round(p["mh"], 3), round(p["ma"], 3),
                        [round(p["team"], 3), round(p["ref"], 3), round(p["fouls"], 3), round(p["h2h"], 3), round(p["early"], 3)]]
-            elif not CMP: ent = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], real, x["mh"], x["ma"]]
-            else: ent = [x["ref"], x["n"], x["ff"], None, None, real, None, None]
+            elif not CMP: ent = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], real, x["mh"], x["ma"], None]
+            else: ent = [x["ref"], x["n"], x["ff"], None, None, real, None, None, None]
+            ent.append(TR.get((lg, v[0], v[2], v[3])))   # [9] errori standard per il range: gol casa, gol ospite, cartellini casa, cartellini ospite
             for z in ds: EX[f"{lg}|{z}|{h}|{a}"] = ent
     json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "partite": EX, "alpha": _alpha if CMP else None, "modello": cards_model.VERSION if CMP else "cartellini-v1"},
               open(os.path.join(OUT, "extra.json"), "w"), separators=(",", ":"), ensure_ascii=False)

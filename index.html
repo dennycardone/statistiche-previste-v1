@@ -473,6 +473,7 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .sheet .sh-b>*{display:block!important;margin:0}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:6px}.kgrid>span{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;background:var(--surface-2);min-width:0}.kgrid small{font-size:11px;color:var(--ink-2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kgrid b{font-family:var(--display);font-size:22px}
 .kfac{display:flex;flex-direction:column;gap:4px}.kfac small{font-family:var(--display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}.kfac ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13.5px}.kfac .up{color:var(--ink)}.kfac .up::first-letter{color:var(--warn)}.kfac .dn::first-letter{color:var(--accent)}.kfac .wa{color:var(--ink-2)}.kfac .wa::first-letter{color:var(--gold)}
+.mhead .sx-rg{display:block;font-family:var(--body);font-style:normal;font-size:11.5px;font-weight:500;color:var(--ink-3);letter-spacing:.02em;margin-top:1px}
 .boot{display:none}body.booting .boot{display:flex;flex-direction:column;align-items:center;gap:8px;padding:90px 16px;text-align:center;color:var(--ink-2)}body.booting .boot b{font-family:var(--display);font-size:20px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}body.booting .view{display:none!important}
 .spin{width:38px;height:38px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--hot);animation:spin .9s linear infinite;margin-bottom:6px}@keyframes spin{to{transform:rotate(360deg)}}
 .tlogo{display:inline-block;flex:none;width:18px;height:18px;object-fit:contain;margin-right:7px;vertical-align:-4px}.tlogo.big{display:block;width:30px;height:30px;margin:0 auto 6px}
@@ -2504,6 +2505,7 @@ function render() {
 
   out.innerHTML = `
   <section id="mbase" hidden>
+    <p class="small muted" style="margin:0">Sotto i gol attesi e i cartellini di ogni squadra: range della media all'80%. È l'intervallo in cui cade la media vera di quella squadra in quella partita, data l'incertezza dei dati prima della partita (più largo a inizio stagione e per le squadre con poco storico). Non è il numero di gol o cartellini che verranno fatti: per quello conta la media. Calcolo: modello attacco×difesa (gol) e cartellini presi×provocati con arbitro (cartellini) sulle partite degli ultimi 365 giorni, incertezza tarata sul backtest confrontando due stime indipendenti della stessa partita (verifica: 79,8% gol, 80,1% cartellini dentro l'80%). Il totale è la somma delle due medie.</p>
     <p class="small muted" style="margin:0">${esc(LG[S.league].name)} · statistica richiesta: <b>${hl.label}</b></p>
     ${staleNote()}
     ${M && M.nH != null ? `<div class="warnbox">Basato su ${M.nHt} partite di ${esc(home)} (${M.nH} in casa) e ${M.nAt} di ${esc(away)} (${M.nA} in trasferta). ${hl.dyn ? "Media dinamica: normale del campionato × attacco × difesa, con prudenza che cala partita dopo partita; gol, corner, falli e tiri con i modelli verificati. Calcolo completo in Dati e metodo." : `Pesi della Media ponderata: classica 50% · campionato 25% · avversari 20% · totale squadra 5% (falli: classica ${MF && MF.Bp && MF.Bp.W && MF.Bp.W.cl === 0.5 ? "50% · totale squadra 50%" : "20% · totale squadra 80%, dall'11ª partita 50% · 50%"}; gol: 60% xG · 30% gol veri · 10% avversari).${M.nHt > RECENT_FROM || M.nAt > RECENT_FROM ? " Oltre le 10 partite le ultime 5 di ogni squadra contano il doppio." : ""}`}</div>` : ""}
@@ -3431,9 +3433,11 @@ function matchHeroHTML(home, away, e, cfg, G) {
   let M = null, MF = null, MT = null; try { M = model(home, away, cfg); MF = model(home, away, cfg, "f"); MT = modelShots(home, away, cfg); } catch (err) {}
   const ok = a => a != null && isFinite(a);
   const v = (a, d = 1) => ok(a) ? (d === 2 ? f2(a) : f1(a)) : `<span class="nd">—</span>`;
-  const row = (lab, h, a, t, d = 1) => {
+  // range della media all'80% per squadra (team_ranges.py): media × exp(±1,2816 × errore standard tarato sul backtest)
+  const se = x && x[9] ? x[9] : null, rg = (m, s) => ok(m) && s ? `<em class="sx-rg">${f1(m * Math.exp(-1.2816 * s))}–${f1(m * Math.exp(1.2816 * s))}</em>` : "";
+  const row = (lab, h, a, t, d = 1, sh = null, sa = null) => {
     const hi = ok(h) && ok(a) && Math.abs(h - a) > 1e-9 ? (h > a ? "h" : "a") : "";
-    return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}</span><span class="sx-m"><small>${lab}</small><b>${ok(t) ? (d === 2 ? f2(t) : f1(t)) : "N/D"}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}</span></div>`; };
+    return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}${rg(h, sh)}</span><span class="sx-m"><small>${lab}</small><b>${ok(t) ? (d === 2 ? f2(t) : f1(t)) : "N/D"}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}${rg(a, sa)}</span></div>`; };
   return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx">${x && x[0] ? `<span class="ref"><small>Arbitro</small>${esc(x[0])}</span>` : ""}<button class="ibtn" type="button" data-mbase aria-label="Come sono calcolati i valori">i</button></span></div>
     <div class="sx">
       <div class="sx-r sx-h">
@@ -3441,13 +3445,12 @@ function matchHeroHTML(home, away, e, cfg, G) {
         <span class="sx-m sx-c"><small>Scheda match</small>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
         <span class="sx-t">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></span>
       </div>
-      ${row("Gol attesi", G && G.lh, G && G.la, G && G.tot, 2)}
+      ${row("Gol attesi", G && G.lh, G && G.la, G && G.tot, 2, se && se[0], se && se[1])}
       ${row("Tiri totali", MT && MT.MS && MT.MS.lh, MT && MT.MS && MT.MS.la, MT && MT.MS && MT.MS.tot)}
       ${row("Tiri in porta", MT && MT.lh, MT && MT.la, MT && MT.tot)}
       ${row("Calci d'angolo", M && M.lh, M && M.la, M && M.tot)}
       ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot)}
-      ${row("Cartellini", x && x[6], x && x[7], x && x[4])}
-      <div class="sx-r sx-f"><span class="sx-v">${G ? pc(G.p1) : "—"}<small>1</small></span><span class="sx-m"><small>Over 2,5 · Gol</small><b>${G ? pc(G.over[1]) : "N/D"} · ${G ? pc(G.btts) : "N/D"}</b></span><span class="sx-v">${G ? pc(G.p2) : "—"}<small>2</small></span></div>
+      ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3])}
     </div>`;
 }
 function renderMatchExtras(home, away) {
