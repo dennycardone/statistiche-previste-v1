@@ -646,6 +646,8 @@ try:
                     base = [f["fixture"]["date"][:16], lg, f["teams"]["home"]["name"], f["teams"]["away"]["name"], f["goals"]["home"], f["goals"]["away"],
                             f["fixture"].get("referee"), old[7] if old else [None] * 7, old[8] if old else [None] * 7, stt]
                     AP["partite"][fid] = base
+                    for side_ in ("home", "away"):   # loghi delle squadre (immagini gratuite di API-Football, non consumano richieste)
+                        if f["teams"][side_].get("logo"): AP.setdefault("loghi", {}).setdefault(lg, {})[f["teams"][side_]["name"]] = f["teams"][side_]["logo"]
                     if stt in ("FT", "AET", "PEN") and (base[7][4] is None or (_now.date() - datetime.date.fromisoformat(base[0][:10])).days <= 2): need.append(fid)
             def _stat(t, k):
                 for s_ in t.get("statistics", []):
@@ -685,6 +687,20 @@ try:
     for lg, L in by_lg.items():
         L.sort(key=lambda v: v[0])
         MAPS[lg] = apif_extra.learn_map([(datetime.date.fromisoformat(v[0][:10]), v[2], v[3], v[4], v[5]) for v in L if v[9] in ("FT", "AET", "PEN")], ours.get(lg, []), lg)
+    # loghi con i nostri nomi di squadra (data/loghi.json): prima API-Football, poi gli stemmi di football-data.org
+    try:
+        _cr = json.load(open(os.path.join(OUT, "crests.json"))).get("teams", {}) if os.path.exists(os.path.join(OUT, "crests.json")) else {}
+        LOGHI = {}
+        for lg_, dd_ in AP.get("loghi", {}).items():
+            mp_ = MAPS.get(lg_, {}); our_ = {t for v in ours.get(lg_, []) for t in (v[1], v[2])}
+            for nm_, url_ in dd_.items():
+                t_ = mp_.get(nm_) or (nm_ if nm_ in our_ else None)
+                if t_: LOGHI.setdefault(lg_, {})[t_] = url_
+        for lg_, dd_ in _cr.items():
+            for t_, url_ in dd_.items(): LOGHI.setdefault(lg_, {}).setdefault(t_, url_)
+        json.dump(LOGHI, open(os.path.join(OUT, "loghi.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+        print("loghi:", sum(len(v) for v in LOGHI.values()), "squadre in", len(LOGHI), "campionati")
+    except Exception as e_: print("loghi saltati:", e_)
     # Statistiche da API-Football su tutte le partite che ha (dal 2022), se plausibili (apif_extra.api_stats_ok); altrimenti
     # quelle di football-data. Anche i campionati senza statistiche su football-data (Polonia, Romania, Svizzera, Finlandia, Irlanda).
     n_fill = 0
