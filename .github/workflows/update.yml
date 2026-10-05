@@ -6,7 +6,7 @@ on:
   workflow_dispatch: {}
   push:   # parte da solo anche quando cambiano l'app o gli script che preparano i dati
     branches: [main]
-    paths: [index.html, precalc.js, update_data.py]
+    paths: [index.html, precalc.js, update_data.py, cards_model.py, apif_extra.py]
 concurrency:   # mai due aggiornamenti insieme
   group: aggiorna-dati
   cancel-in-progress: false
@@ -33,6 +33,7 @@ jobs:
         with: { python-version: "3.12" }
       - uses: actions/setup-node@v4
         with: { node-version: "20" }
+      - run: pip install -q numpy   # modello cartellini v2 (stima dei pesi)
       - run: python update_data.py
         env:
           FD_TOKEN: ${{ secrets.FD_TOKEN }}

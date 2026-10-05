@@ -781,6 +781,27 @@ try:
         try: QUAL["calendario_da_espn"] = [" ".join([r[0], r[1], r[3], "-", r[4]]) for r in list(csv.reader(open(os.path.join(OUT, "espn_fixtures.csv"), encoding="utf-8")))[1:] if len(r) > 4]
         except Exception: QUAL["calendario_da_espn"] = []
     EX, lim = {}, _now.date() - datetime.timedelta(days=400)
+    # cartellini: modello v2 (cards_model.py) su tutti i campionati insieme (gli arbitri dirigono in più campionati dello stesso paese);
+    # pesi stimati mese per mese con le sole partite precedenti, conservati in data/cards_model.json
+    CMP = {}
+    try:
+        import cards_model
+        _cm_path = os.path.join(OUT, "cards_model.json")
+        try: _cm = json.load(open(_cm_path))
+        except Exception: _cm = {}
+        _ms, _keys = [], []
+        for lg, L in by_lg.items():
+            for v in L:
+                H, A = v[7], v[8]; played = v[9] in ("FT", "AET", "PEN") and H[4] is not None and A[4] is not None
+                _ms.append(dict(lg=lg, d=v[0], h=v[2], a=v[3], ref=v[6], hc=(H[4] + (H[5] or 0)) if played else None, ac=(A[4] + (A[5] or 0)) if played else None,
+                                hf=H[3] if played else None, af=A[3] if played else None)); _keys.append((lg, v[0], v[2], v[3]))
+        _pr, _alpha, _coef = cards_model.run(_ms, _cm, _now.date(), lim)
+        CMP = {k: p for k, p in zip(_keys, _pr) if p}
+        _cm["attuale"] = {"pesi": dict(zip(["b0"] + cards_model.FEATS, _coef)), "alpha": _alpha}
+        json.dump(_cm, open(_cm_path, "w"), separators=(",", ":"))
+        print("cartellini v2:", len(CMP), "previsioni · alpha %.4f" % _alpha, "· mesi stimati", len(_cm.get("mesi", {})))
+    except Exception as e_:
+        import traceback; traceback.print_exc(); print("cartellini v2 non disponibile, resta il modello precedente:", e_); _alpha = None
     for lg, L in by_lg.items():
         mp = MAPS[lg]
         rows = []
@@ -794,8 +815,17 @@ try:
             if not h or not a or d < lim: continue
             ds = [z for z in pairs.get((lg, h, a), []) if abs((z - d).days) <= 1]
             if not ds: continue
-            EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], (r["hc"] + r["ac"]) if r["hc"] is not None and r["ac"] is not None else None, x["mh"], x["ma"]]
-    json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "partite": EX}, open(os.path.join(OUT, "extra.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+            real = (r["hc"] + r["ac"]) if r["hc"] is not None and r["ac"] is not None else None
+            p = CMP.get((lg, v[0], v[2], v[3]))
+            if p:   # [arbitro, sue partite, fattore falli, effetto arbitro sui cartellini, cartellini attesi, reali, casa, ospite, fattori]
+                EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], p["rN"], x["ff"], round(p["ref"], 4), round(p["mu"], 3), real, round(p["mh"], 3), round(p["ma"], 3),
+                                               [round(p["team"], 3), round(p["ref"], 3), round(p["fouls"], 3), round(p["h2h"], 3), round(p["early"], 3)]]
+            elif not CMP:
+                EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], real, x["mh"], x["ma"]]
+            else:
+                EX[f"{lg}|{ds[0]}|{h}|{a}"] = [x["ref"], x["n"], x["ff"], None, None, real, None, None]
+    json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "partite": EX, "alpha": _alpha if CMP else None, "modello": cards_model.VERSION if CMP else "cartellini-v1"},
+              open(os.path.join(OUT, "extra.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("arbitri e cartellini:", len(EX), "partite abbinate")
 except Exception as e:
     import traceback; traceback.print_exc(); print("arbitri e cartellini:", e)
