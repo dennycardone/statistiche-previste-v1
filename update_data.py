@@ -1,7 +1,7 @@
 """Scarica da football-data.co.uk i CSV dei campionati della dashboard nella cartella data/.
 Campionati europei: stagione corrente sempre, le 5 precedenti solo se mancano (servono per gli H2H).
 """
-import datetime, json, os, urllib.request
+import datetime, json, os, urllib.request, math
 
 LEAGUES = ["I1", "I2", "E0", "SP1", "F1", "D1", "N1", "P1",
            "E1", "E2", "E3", "EC", "SC0", "SC1", "SC2", "SC3", "D2", "F2", "SP2", "B1", "T1", "G1"]
@@ -905,7 +905,8 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
     res, nomatch, err, allq = {}, [], None, {}
     XBETS = {"Corners Over Under": "cou", "Home Corners Over/Under": "hcou", "Away Corners Over/Under": "acou", "Corners Asian Handicap": "cah",
              "Cards Over/Under": "kou", "Home Team Total Cards": "hk", "Away Team Total Cards": "ak", "Total ShotOnGoal": "sot",
-             "Home Total ShotOnGoal": "hsot", "Away Total ShotOnGoal": "asot", "Asian Handicap": "ah", "Double Chance": "dc"}
+             "Home Total ShotOnGoal": "hsot", "Away Total ShotOnGoal": "asot", "Asian Handicap": "ah", "Double Chance": "dc",
+             "Goals Over/Under": "gou", "Total - Home": "hgou", "Total - Away": "agou"}
     def take(e, f):   # quote mediane di una partita
         lg = BY_ID[f["league"]["id"]]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
         m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
@@ -983,6 +984,42 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
 elif not AF_KEY:
     print("APIFOOTBALL_KEY non impostata: quote saltate")
+# Linee principali dei bookmaker per la scheda match e il Radar (data/linee.json), dall'archivio: per ogni partita e mercato la linea
+# x,5 con quote Over e Under entrambe presenti e più equilibrate (quella su cui il book è vicino al 50%), con l'ultima quota vista
+# prima del calcio d'inizio. Solo quote reali; dove la linea non c'è, la partita o il mercato mancano (nell'app: N.D.).
+try:
+    try: OH
+    except NameError: OH = json.load(open(os.path.join(OUT, "odds_hist.json")))
+    LMK = {"g": "gou", "hg": "hgou", "ag": "agou", "c": "cou", "hc": "hcou", "ac": "acou", "k": "kou", "hk": "hk", "ak": "ak", "st": "sot", "hst": "hsot", "ast": "asot"}
+    LN = {}
+    for kk, x in OH.items():
+        q = x.get("ultima", {}).get("q", {}); ent = {}
+        for short, mk in LMK.items():
+            lines = {}
+            for k2, v in q.items():
+                if not k2.startswith(mk + ":"): continue
+                try: side, ln = k2.split(":", 1)[1].split(" "); ln = float(ln)
+                except Exception: continue
+                if abs(ln * 2 - round(ln * 2)) > 1e-9 or abs(ln - math.floor(ln) - 0.5) > 1e-9: continue   # solo linee x,5 (niente rimborso)
+                lines.setdefault(ln, {})[side[0]] = v
+            if short == "g":   # gol totali: anche le linee 1,5 · 2,5 · 3,5 delle quote principali
+                for ln in (1.5, 2.5, 3.5):
+                    for sd in ("O", "U"):
+                        v = q.get(f"ou{ln}:{sd}")
+                        if v and sd not in lines.get(ln, {}): lines.setdefault(ln, {})[sd] = v
+            best = None
+            for ln, o in lines.items():
+                if "O" in o and "U" in o and o["O"][0] > 1 and o["U"][0] > 1:
+                    d = abs(1 / o["O"][0] - 1 / o["U"][0])
+                    if best is None or d < best[0] - 1e-9 or (abs(d - best[0]) < 1e-9 and min(o["O"][1], o["U"][1]) > best[4]):
+                        best = (d, ln, o["O"][0], o["U"][0], min(o["O"][1], o["U"][1]))
+            if best: ent[short] = [best[1], best[2], best[3], best[4]]
+        if ent: ent["t"] = x["ultima"].get("ora", ""); LN[kk] = ent
+    json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "API-Football: quota mediana tra i bookmaker, ultima vista prima del calcio d'inizio", "partite": LN},
+              open(os.path.join(OUT, "linee.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+    print("linee bookmaker:", len(LN), "partite")
+except Exception as e:
+    print("linee bookmaker:", e)
 
 # controllo qualità: riepilogo del giro (aggiornato a ogni giro, anche se API-Football non ha risposto)
 try:

@@ -491,6 +491,28 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .winstrip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-inline:0;padding-inline:0}.winstrip .day{min-width:0}
 .morebtn{display:block;width:100%;margin:0;padding:10px 12px;border:0;border-top:1px solid var(--line,rgba(255,255,255,.08));background:transparent;color:var(--accent,#7cf);font:inherit;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
 .morebtn:hover{background:rgba(255,255,255,.04)}
+.mhead .hsw{display:flex;flex-direction:column;align-items:center;gap:5px;background:transparent;border:0;padding:0 0 4px;cursor:pointer;color:var(--accent);font:inherit}
+.mhead .hsw-t{position:relative;width:42px;height:22px;border-radius:11px;background:var(--surface);border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));transition:background .2s}
+.mhead .hsw-t i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--accent);transition:transform .2s}
+.mhead .hsw.on .hsw-t{background:color-mix(in srgb,var(--gold) 22%,var(--surface))}.mhead .hsw.on .hsw-t{border-color:var(--gold)}.mhead .hsw.on .hsw-t i{transform:translateX(20px);background:var(--gold)}
+.mhead .hsw-l{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;line-height:1.1}.mhead .hsw.on .hsw-l{color:var(--gold)}
+.mhead .hsw:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.mhead .bk{gap:2px}.mhead .bk-ln{font-family:var(--display);font-size:20px;font-weight:700;color:var(--ink);line-height:1.1}.mhead .bk-ln i{font-style:normal;font-size:12px;color:var(--ink-3);letter-spacing:.06em}
+.mhead .bk-nd{font-family:var(--display);font-size:16px!important;color:var(--ink-3)!important;font-weight:600}
+.mhead .bk-s{font-family:var(--body);font-size:12.5px;font-weight:600;color:var(--ink-2)}.mhead .bk-s.ov b,.mhead .bk-leg .ov{color:var(--s2)}.mhead .bk-s.un b,.mhead .bk-leg .un{color:var(--accent)}
+.mhead .bk-s b{font-family:var(--body);font-size:12.5px}
+.mhead .bk-q{font-family:var(--body);font-size:11.5px;font-weight:500;color:var(--ink-3);letter-spacing:.01em}.mhead .bk-q em{font-style:normal;font-weight:700;color:var(--ink-2)}.mhead .bk-q em.pos{color:var(--gold)}.mhead .bk-q em.neg{color:var(--ink-3);font-weight:500}
+.mhead .bk-r{font-family:var(--body);font-size:11.5px;color:var(--ink-2);display:flex;align-items:center;gap:4px}.mhead .bk-r b{font-size:13px;color:var(--ink)}.mhead .bk-r .mk{margin:0}
+.mhead .sx-r>span.val{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--gold) 70%,transparent);background:color-mix(in srgb,var(--gold) 9%,var(--surface-2))}
+.mhead .vtag{font-family:var(--display);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:1px 6px}
+.mhead .bk-none,.mhead .bk-note{margin:0;padding:12px 14px;font-size:12px;line-height:1.45;color:var(--ink-3);text-align:center}.mhead .bk-none{font-size:14px;color:var(--ink-2);padding:22px 16px}.mhead .bk-note b{color:var(--gold)}
+#selBk .vtag{font-family:var(--display);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:2px 7px;white-space:nowrap}
+.bklist{display:flex;flex-direction:column;gap:6px}
+.bkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"m m" "p n";align-items:center;gap:6px 10px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;cursor:pointer}
+.bkrow:hover{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
+.bkm{grid-area:m}.bkp{grid-area:p}.bkn{grid-area:n;flex-direction:row!important;align-items:baseline!important;gap:8px}.bkm,.bkp,.bkn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.bkm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkm small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bkmk{font-size:11.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkp b{font-family:var(--display);font-size:16px;letter-spacing:.02em}.bkp b.ov{color:var(--s2)}.bkp b.un{color:var(--accent)}
+.bkn{align-items:flex-end;font-variant-numeric:tabular-nums}.bkn b{font-family:var(--display);font-size:17px}.bkn small{font-size:11.5px;color:var(--ink-3)}.bkn em{font-style:normal;font-weight:700;font-size:12.5px;color:var(--gold)}
 </style>
 </head>
 <body>
@@ -541,6 +563,7 @@ h2.dzh{display:flex;align-items:center;gap:8px}
   <div class="view" id="viewSel" hidden>
     <label class="fl selwin" for="selWin">Periodo<select id="selWin"><option value="24" selected>Prossime 24 ore</option><option value="48">Prossime 48 ore</option><option value="72">Prossime 72 ore</option></select></label>
     <section class="card aplus" id="selAplus" aria-label="A+ sul radar"></section>
+    <section class="card" id="selBk" aria-label="Linea bookmakers" hidden></section>
     <section class="card" aria-label="Partite in arrivo">
       <div class="selhead"><h2>📅 Partite in arrivo</h2><button class="info" data-conf-info aria-label="Cos'è il Confidence Score">ⓘ</button></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
@@ -3051,6 +3074,7 @@ async function tryHosted() {
     try { const cr = await fetch("data/crests.json", { cache: "no-store" }); if (cr.ok) CRESTS = (await cr.json()).colors || {}; } catch (e) {}
     try { const rl = await fetch("data/loghi.json", { cache: "no-store" }); if (rl.ok) LOGOS = await rl.json(); } catch (e) {}
     try { const ro = await fetch("data/odds.json", { cache: "no-store" }); if (ro.ok) ODDS = await ro.json(); } catch (e) {}
+    try { const rb = await fetch("data/linee.json", { cache: "no-store" }); if (rb.ok) LINEE = await rb.json(); } catch (e) {}
     try { const rx = await fetch("data/extra.json", { cache: "no-store" }); if (rx.ok) { EXTRA = await rx.json(); clearCache(); } } catch (e) {}
     try { const rq = await fetch("data/qualita.json", { cache: "no-store" }); if (rq.ok) QUALITA = await rq.json(); } catch (e) {}
     S.meta = { source: "API-Football (risultati, calendario, statistiche, arbitri, cartellini) · football-data.co.uk (quote storiche e riserva) · aggiornamento automatico", fetched: man.updated || "N/D", mode: "scaricati il" };
@@ -3321,7 +3345,7 @@ function openMatch(lg, h, a, d) {
   openEntry({ id: `${lg}|${d}|${h}|${a}`, lg: LG[lg], date: dt, d: isoD(dt), time: "", home: h, away: a, m: null });
 }
 /* ===== Testa a testa e classifica ===== */
-const MV = { h2h: "all", tab: "tot", avg: "tot" };
+const MV = { h2h: "all", tab: "tot", avg: "tot", hero: "sx" };
 function teamAll(team, before) {
   return [...S.matches.values()].filter(m => (m.home === team || m.away === team) && (!before || m.date < before)).sort((a, b) => b.date - a.date);
 }
@@ -3435,6 +3459,45 @@ function c3HTML(home, away, e, cfg) {
 }
 /* intestazione della scheda partita (stile app match): stemmi con i colori del club, posizione in classifica, arbitro,
    poi i valori attesi in tre colonne: casa | statistica e totale | ospite */
+/* ===== Linea bookmakers (data/linee.json: linea x,5 principale per mercato, quota mediana, ultima prima del calcio d'inizio) =====
+   Per ogni linea: nostra probabilità di Over con la distribuzione dell'app (tarata sui totali: verifica 5/10/2026, scarto medio 0,3-0,5 punti),
+   lato con più valore (probabilità × quota − 1). Solo quote reali; dove la linea non c'è: N.D. In verifica sulle partite giocate. */
+let LINEE = null, HEROCTX = null;
+const BK_ROWS = [["Gol", "g", "hg", "ag"], ["Tiri totali", null, null, null], ["Tiri in porta", "st", "hst", "ast"], ["Calci d'angolo", "c", "hc", "ac"], ["Falli", null, null, null], ["Cartellini", "k", "hk", "ak"]];
+const BK_MIN = 0.05;   // valore minimo per segnalare la giocata
+const bkLines = e => (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null;
+function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u, n, po, side, p, odd, ev, real, hit} o null (N.D.)
+  const { G, M, MT, x } = Mods, ok = v => v != null && isFinite(v) && v > 0;
+  const al = EXTRA && EXTRA.alpha, rk = al > 2e-4 ? 1 / al : Infinity;
+  const pO = (mean, r, L) => ok(mean) ? pOver(pmfTotal(mean, r, Math.ceil(L) + 2), L) : null;
+  const D = {
+    g: L => G && ok(G.tot) ? ([1.5, 2.5, 3.5].indexOf(L) >= 0 && G.over ? G.over[[1.5, 2.5, 3.5].indexOf(L)] : pO(G.tot, Infinity, L)) : null,
+    hg: L => G ? pO(G.lh, Infinity, L) : null, ag: L => G ? pO(G.la, Infinity, L) : null,
+    st: L => MT ? pO(MT.tot, MT.MD && MT.MD.r, L) : null, hst: L => MT ? pO(MT.lh, MT.MD && MT.MD.r, L) : null, ast: L => MT ? pO(MT.la, MT.MD && MT.MD.r, L) : null,
+    c: L => M ? pO(M.tot, M.r, L) : null, hc: L => M ? pO(M.lh, M.r, L) : null, ac: L => M ? pO(M.la, M.r, L) : null,
+    k: L => x ? pO(x[4], rk, L) : null, hk: L => x ? pO(x[6], rk, L) : null, ak: L => x ? pO(x[7], rk, L) : null };
+  const REAL = { g: m && [m.hg, m.ag], st: m && [m.hst, m.ast], c: m && [m.hc, m.ac], k: m && [m.hk, m.ak] };
+  const cell = (k, base, i) => {
+    const c = k && LB && LB[k]; if (!c) return null;
+    const [L, o, u, n] = c, po = D[k](L);
+    const R = REAL[base], real = R && R[0] != null && R[1] != null ? (i === 0 ? R[0] : i === 2 ? R[1] : R[0] + R[1]) : null;
+    if (po == null || !isFinite(po)) return { L, o, u, n, po: null, real };
+    const eo = po * o - 1, eu = (1 - po) * u - 1, side = eo >= eu ? "O" : "U";
+    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, ev: Math.max(eo, eu), real, hit: real == null ? null : side === "O" ? real > L : real < L };
+  };
+  return BK_ROWS.map(([lab, t, h, a]) => ({ lab, t: cell(t, t, 1), h: cell(h, t, 0), a: cell(a, t, 2), mk: t }));
+}
+function bkCellHTML(c, center, lab) {
+  const head = center ? `<small>${lab}</small>` : "";
+  if (!c) return `<span class="${center ? "sx-m" : "sx-v"} bk">${head}<b class="bk-nd">N.D.</b></span>`;
+  const ln = `<b class="bk-ln"><i>O/U</i> ${th1(c.L)}</b>`;
+  if (c.po == null) return `<span class="${center ? "sx-m" : "sx-v"} bk">${head}${ln}<small class="bk-q">O ${f2(c.o)} · U ${f2(c.u)}</small></span>`;
+  const val = c.ev >= BK_MIN, evt = `${c.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(c.ev) * 100)}%`;
+  return `<span class="${center ? "sx-m" : "sx-v"} bk${val ? " val" : ""}">${head}${ln}
+    <span class="bk-s ${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} <b>${pc(c.p)}</b></span>
+    <span class="bk-q">@${f2(c.odd)} <em class="${val ? "pos" : c.ev > 0 ? "" : "neg"}">${evt}</em></span>
+    ${c.real != null ? `<span class="bk-r">reale <b>${c.real}</b> ${c.hit ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`}</span>` : ""}</span>`;
+}
 function matchHeroHTML(home, away, e, cfg, G) {
   if (!home || !away || home === away) return `<div class="sx-band"><b>Scheda match</b></div><p style="padding:14px;margin:0">Scegli due squadre diverse.</p>`;
   const L_ = LG[S.league], m = e && e.m;
@@ -3461,20 +3524,30 @@ function matchHeroHTML(home, away, e, cfg, G) {
     }
     const hi = ok(h) && ok(a) && Math.abs(h - a) > 1e-9 ? (h > a ? "h" : "a") : "";
     return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}${rg(h, sh)}</span><span class="sx-m"><small>${lab}</small><b>${T}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}${rg(a, sa)}</span></div>`; };
+  const BK = MV.hero === "bk";
+  let bkBody = "";
+  if (BK) {
+    const LB = bkLines(e), R = bkCalc({ G, M, MT, x }, LB, m);
+    const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a].filter(c => c && c.po != null && c.ev >= BK_MIN).length, 0);
+    bkBody = `<div class="sx-leg bk-leg"><span><b>O/U 9,5</b> linea del book</span><span><b class="ov">Over</b>/<b class="un">Under</b> nostro lato e probabilità</span><span><b>@</b> quota · valore</span><span class="vtag">in verifica</span></div>`
+      + (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
+        : `<p class="bk-none">Linea dei bookmaker non disponibile per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`)
+      + (LB ? `<p class="bk-note">${nVal ? `<b>${nVal} ${nVal === 1 ? "giocata" : "giocate"} con valore</b> (riquadro evidenziato, valore dal +${Math.round(BK_MIN * 100)}%) · ` : "Nessuna linea con valore dal +5% · "}valore = nostra probabilità × quota − 1 · quota mediana tra i bookmaker, ultima vista ${esc((LB.t || "").slice(8, 10) + "/" + (LB.t || "").slice(5, 7) + " " + (LB.t || "").slice(11))} · tiri totali e falli: i bookmaker della nostra fonte non li quotano.</p>` : "");
+  }
   return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button><button class="ibtn" type="button" data-mbase aria-label="Come sono calcolati i valori">i</button></span></div>
     <div class="sx">
       <div class="sx-r sx-h">
         <span class="sx-t">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></span>
-        <span class="sx-m sx-c"><small>Scheda match</small>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
+        <span class="sx-m sx-c"><button class="hsw${BK ? " on" : ""}" type="button" data-hsw role="switch" aria-checked="${BK}" aria-label="Passa da scheda match a linea bookmakers"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Linea bookmakers" : "Scheda match"}</span></button>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
         <span class="sx-t">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></span>
       </div>
-      ${m ? `<div class="sx-leg"><span><b>2</b> partita giocata</span><span><small>prev.</small> previsione prima del match</span><span><i class="mk ok">✓</i><i class="mk ko">✗</i> chi ne fa di più</span></div>` : ""}
+      ${BK ? bkBody : `${m ? `<div class="sx-leg"><span><b>2</b> partita giocata</span><span><small>prev.</small> previsione prima del match</span><span><i class="mk ok">✓</i><i class="mk ko">✗</i> chi ne fa di più</span></div>` : ""}
       ${row(m ? "Gol" : "Gol attesi", G && G.lh, G && G.la, G && G.tot, 2, se && se[0], se && se[1], m && m.hg, m && m.ag)}
       ${row("Tiri totali", MT && MT.MS && MT.MS.lh, MT && MT.MS && MT.MS.la, MT && MT.MS && MT.MS.tot, 1, null, null, m && m.hs, m && m.as)}
       ${row("Tiri in porta", MT && MT.lh, MT && MT.la, MT && MT.tot, 1, null, null, m && m.hst, m && m.ast)}
       ${row("Calci d'angolo", M && M.lh, M && M.la, M && M.tot, 1, null, null, m && m.hc, m && m.ac)}
       ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot, 1, null, null, m && m.hf, m && m.af)}
-      ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
+      ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}`}
     </div>`;
 }
 function renderMatchExtras(home, away) {
@@ -3482,7 +3555,7 @@ function renderMatchExtras(home, away) {
   const cfg = MODES[$("#decay").value] || MODES.dyn, m = e && e.m;
   const G = home && away && home !== away ? modelGoals(home, away, cfg) : null;
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}` : "Confronto libero";
-  $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G);
+  $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G); HEROCTX = { home, away, e, cfg, G };
   renderMatchConf(home, away, e, cfg);
   $("#mref").hidden = true; REFCTX = { home, away, e };   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
   // confronto previsione / partita giocata
@@ -3875,6 +3948,37 @@ function selEntries() {   // partite da giocare nelle prossime SEL.h ore (orario
     return ko >= now - 2 * 36e5 && ko <= end;
   });
 }
+/* Radar: giocate con valore sulla linea dei bookmaker (stesse probabilità della scheda match), solo partite con la linea disponibile */
+const BK_C = new Map();
+function bkEntry(e, cfg) {
+  const key = e.id + "|" + cfg.key; if (BK_C.has(key)) return BK_C.get(key);
+  const LB = bkLines(e); let out = [];
+  if (LB) withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = null;
+    try {
+      let G = null, M = null, MT = null; try { G = modelGoals(e.home, e.away, cfg); M = model(e.home, e.away, cfg); MT = modelShots(e.home, e.away, cfg); } catch (x) {}
+      const x = extraFor(e.home, e.away);
+      for (const r of bkCalc({ G, M, MT, x }, LB, null)) for (const [w, c] of [["t", r.t], ["h", r.h], ["a", r.a]])
+        if (c && c.po != null && c.ev >= BK_MIN) out.push({ ...c, lab: r.lab, who: w === "t" ? "" : w === "h" ? e.home : e.away });
+    } finally { S.cutoff = c0; } });
+  out.sort((a, b) => b.ev - a.ev); BK_C.set(key, out); return out;
+}
+function renderSelBk(ents, cfg, when) {
+  const box = $("#selBk"); if (!box) return;
+  const withL = ents.filter(e => bkLines(e));
+  if (!withL.length) { box.hidden = true; return; }
+  const t0 = performance.now(), todo = [];
+  for (const e of withL) { const k = e.id + "|" + cfg.key; if (!BK_C.has(k)) { if (performance.now() - t0 < 200) { try { bkEntry(e, cfg); } catch (x) { BK_C.set(k, []); } } else todo.push(e); } }
+  const L = withL.flatMap(e => (BK_C.get(e.id + "|" + cfg.key) || []).map(c => ({ e, c }))).sort((a, b) => b.c.ev - a.c.ev);
+  const lab = c => `${c.lab === "Calci d'angolo" ? "Corner" : c.lab}${c.who ? " " + esc(c.who) : " totali"}`;
+  box.hidden = false;
+  box.innerHTML = `<div class="selhead"><h2>💰 Linea bookmakers</h2><span class="vtag">in verifica</span></div>
+    <p class="small muted" style="margin:0">Giocate in cui la nostra probabilità × la quota del book supera 1 di almeno il ${Math.round(BK_MIN * 100)}%. ${withL.length} partite con la linea su ${ents.length}.${todo.length ? " Calcolo…" : ""}</p>
+    ${L.length ? `<div class="bklist">${L.slice(0, 15).map(({ e, c }) => `<button class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
+      <span class="bkp"><span class="bkmk">${lab(c)}</span><b class="${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} ${th1(c.L)}</b></span>
+      <span class="bkn"><b class="num">${pc(c.p)}</b><small class="num">@${f2(c.odd)}</small><em class="num">+${Math.round(c.ev * 100)}%</em></span></button>`).join("")}</div>${L.length > 15 ? `<p class="small muted" style="margin:0">Le prime 15 su ${L.length}, per valore.</p>` : ""}` : `<p class="apnone">${todo.length ? "Calcolo in corso…" : "NESSUNA LINEA CON VALORE"}</p>`}`;
+  box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
+  if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelBk(selEntries(), cfg, when); }, 30);
+}
 let SEL_T = 0;
 function renderSel() {
   const cfg = MODES[$("#decay").value] || MODES.dyn, ents = selEntries();
@@ -3888,6 +3992,7 @@ function renderSel() {
   const apm = got.map(([e, L]) => [e, L.filter(r => r.status === "aplus").map(r => ({ ...r, h: e.home, a: e.away, qt: oddsFor(e, r) })).sort((a, b) => b.q - a.q)]).filter(([, L]) => L.length)
     .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
+  try { renderSelBk(ents, cfg, when); } catch (x) { console.warn(x); }
   aBox.innerHTML = `<div class="selhead"><h2>🔥 A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button class="apcard" data-id="${esc(e.id)}">
       <span class="aptag">🔥 A+ OPPORTUNITY${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
@@ -3973,6 +4078,7 @@ function dzScan() {
     }
   });
 }
+document.addEventListener("click", ev => { if (!ev.target.closest("[data-hsw]") || !HEROCTX) return; MV.hero = MV.hero === "bk" ? "sx" : "bk"; const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); });
 document.addEventListener("click", ev => { if (ev.target.closest("[data-mbase]")) { const b = $("#mbase"); openSheet("Scheda match", b ? [...b.children] : []); } });
 document.addEventListener("click", ev => { if (ev.target.closest("[data-refsheet]")) { SHEET.querySelector(".sh-h b").textContent = "Arbitro e cartellini"; SHEET.querySelector(".sh-b").innerHTML = refSheetHTML(); SHEET.hidden = false; } });   // base del calcolo della scheda
 { let q = 0; new MutationObserver(() => { if (!q) q = requestAnimationFrame(() => { q = 0; dzScan(); }); }).observe(document.body, { childList: true, subtree: true }); }
