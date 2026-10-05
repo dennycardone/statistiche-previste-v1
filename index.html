@@ -426,6 +426,51 @@ body{padding-block:0 calc(88px + env(safe-area-inset-bottom,0px))}
 .mhead .kp b{color:var(--ink)}
 .mrow{grid-template-columns:44px minmax(0,1fr) 28px 28px 28px 28px 46px}
 .mrow .tm.fin{font-size:10.5px;letter-spacing:.02em}
+
+/* scheda match a tabella (5/10/2026, ritocchi): tre colonne separate, colonna centrale evidenziata */
+.mhead .sx-band{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 14px;text-align:left;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 20%,var(--surface-2)),var(--surface-2) 75%);border-bottom:1px solid var(--line)}
+.mhead .sx-band .flag{font-size:22px;text-align:center}
+.mhead .sx-band .nm{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.mhead .sx-band .nm small{font-size:11px;letter-spacing:.06em;color:var(--ink-2)}
+.mhead .sx-band .nm b{font-family:var(--display);font-size:19px;letter-spacing:.04em;text-transform:uppercase}
+.mhead .sx-band .ref{display:flex;flex-direction:column;align-items:flex-end;font-size:12.5px;font-weight:600;max-width:42vw;text-align:right;line-height:1.15}
+.mhead .sx-band .ref small{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.mhead{align-items:stretch}
+.mhead .sx-band .bx{display:flex;align-items:center;gap:10px;min-width:0}
+.mhead .sx{display:flex;flex-direction:column}
+.mhead .sx-r{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);align-items:stretch;border-bottom:1px solid var(--line)}
+.mhead .sx-r:last-child{border-bottom:none}
+.mhead .sx-r>span{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 6px;min-width:0;font-variant-numeric:tabular-nums}
+.mhead .sx-m{background:color-mix(in srgb,var(--accent) 7%,var(--surface-2));border-inline:1px solid var(--line)}
+.mhead .sx-m small{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);line-height:1.1}
+.mhead .sx-m b{font-family:var(--display);font-size:21px;font-weight:700;line-height:1.15;color:var(--ink)}
+.mhead .sx-v{font-family:var(--display);font-size:22px;font-weight:600;color:var(--ink-2)}
+.mhead .sx-v.top{color:var(--ink)}
+.mhead .sx-v small{font-family:var(--body);font-size:10.5px;color:var(--ink-3);letter-spacing:.08em}
+.mhead .sx-v .nd{color:var(--ink-3);font-size:16px}
+.mhead .sx-h>span{padding:14px 6px 12px;gap:6px}
+.mhead .sx-t b{font-family:var(--display);font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;line-height:1.1;text-align:center;overflow-wrap:normal;word-break:normal;hyphens:auto;max-width:100%}
+.mhead .sx-c>small:first-child{font-size:11px;letter-spacing:.12em}
+.mhead .sx-t small{font-size:11.5px;color:var(--ink-2)}
+.mhead .sx-c b{font-size:24px;color:var(--ink-2)}
+.mhead .sx-c b.scr{font-size:34px;color:var(--accent)}
+.mhead .sx-c small+small,.mhead .sx-c b+small{font-family:var(--body);font-size:11px;font-weight:500;color:var(--ink-2);letter-spacing:.06em}
+.mhead .sx-f>span{padding:8px 6px}
+.mhead .sx-f .sx-m b{font-size:17px}
+.mhead .sx-f .sx-v{font-size:18px}
+/* descrizioni nascoste dietro le ⓘ */
+.dz-h{display:none!important}
+h2.dzh{display:flex;align-items:center;gap:8px}
+.ibtn{flex:0 0 auto;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);color:var(--accent);font:600 14px/1 var(--body);display:inline-grid;place-items:center;padding:0;margin-left:auto;letter-spacing:0;text-transform:none}
+.infoline{display:flex;justify-content:flex-end;margin:-6px 0}
+.sheet{position:fixed;inset:0;z-index:60;background:rgba(3,6,14,.72);display:flex;align-items:flex-end;justify-content:center}
+.sheet[hidden]{display:none}
+.sheet .sh{background:var(--surface);border:1px solid var(--line);border-bottom:none;border-radius:18px 18px 0 0;max-width:720px;width:100%;max-height:78vh;overflow:auto;padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.sheet .sh-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sheet .sh-h b{font-family:var(--display);font-size:19px;letter-spacing:.06em;text-transform:uppercase}
+.sheet .sh-x{width:34px;height:34px;border-radius:50%;padding:0;font-size:18px}
+.sheet .sh-b{display:flex;flex-direction:column;gap:10px;font-size:14.5px;color:var(--ink-2);line-height:1.5}
+.sheet .sh-b>*{display:block!important;margin:0}
 .boot{display:none}body.booting .boot{display:flex;flex-direction:column;align-items:center;gap:8px;padding:90px 16px;text-align:center;color:var(--ink-2)}body.booting .boot b{font-family:var(--display);font-size:20px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}body.booting .view{display:none!important}
 .spin{width:38px;height:38px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--hot);animation:spin .9s linear infinite;margin-bottom:6px}@keyframes spin{to{transform:rotate(360deg)}}
 .tlogo{display:inline-block;flex:none;width:18px;height:18px;object-fit:contain;margin-right:7px;vertical-align:-4px}.tlogo.big{display:block;width:30px;height:30px;margin:0 auto 6px}
@@ -573,17 +618,17 @@ body{padding-block:0 calc(88px + env(safe-area-inset-bottom,0px))}
       <button id="back" class="backbtn" aria-label="Torna al palinsesto">‹ Partite</button>
       <span class="tag" id="seasonTag">Stagione —</span>
     </div>
-    <section class="mhead" id="mhead" aria-label="Partita"></section>
-    <section class="card mconf" id="mconf" aria-label="Confidence Score" hidden></section>
-    <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
     <div class="mtabs" role="tablist" aria-label="Sezioni della partita">
-      <button class="mtab" data-mt="prev" aria-pressed="true">Previsioni</button>
+      <button class="mtab" data-mt="prev" aria-pressed="true">Scheda match</button>
       <button class="mtab" data-mt="sig" aria-pressed="false">Segnalazioni</button>
       <button class="mtab" data-mt="h2h" aria-pressed="false">Testa a testa</button>
       <button class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
       <button class="mtab" data-mt="info" aria-pressed="false">Dati e metodo</button>
     </div>
     <div class="mpane" data-mp="prev">
+      <section class="mhead" id="mhead" aria-label="Scheda match"></section>
+      <section class="card mconf" id="mconf" aria-label="Confidence Score" hidden></section>
+      <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
       <section class="card" id="mcmp" aria-label="Confronto con la partita giocata" hidden></section>
       <main id="out" class="wrap" style="padding:0;margin:0;width:100%"></main>
     </div>
@@ -2455,8 +2500,7 @@ function render() {
   const sumRow = (lbl, M) => M ? [lbl, f1(M.lh), f1(M.la), `<b>${f1(M.tot)}</b>`] : [lbl, "N/D", "N/D", "N/D"];
 
   out.innerHTML = `
-  <section class="card" aria-label="Riepilogo">
-    <h2>Base del calcolo</h2>
+  <section id="mbase" hidden>
     <p class="small muted" style="margin:0">${esc(LG[S.league].name)} · statistica richiesta: <b>${hl.label}</b></p>
     ${staleNote()}
     ${M && M.nH != null ? `<div class="warnbox">Basato su ${M.nHt} partite di ${esc(home)} (${M.nH} in casa) e ${M.nAt} di ${esc(away)} (${M.nA} in trasferta). ${hl.dyn ? "Media dinamica: normale del campionato × attacco × difesa, con prudenza che cala partita dopo partita; gol, corner, falli e tiri con i modelli verificati. Calcolo completo in Dati e metodo." : `Pesi della Media ponderata: classica 50% · campionato 25% · avversari 20% · totale squadra 5% (falli: classica ${MF && MF.Bp && MF.Bp.W && MF.Bp.W.cl === 0.5 ? "50% · totale squadra 50%" : "20% · totale squadra 80%, dall'11ª partita 50% · 50%"}; gol: 60% xG · 30% gol veri · 10% avversari).${M.nHt > RECENT_FROM || M.nAt > RECENT_FROM ? " Oltre le 10 partite le ultime 5 di ogni squadra contano il doppio." : ""}`}</div>` : ""}
@@ -3113,7 +3157,7 @@ function crest(div, team, cls = "cr") {
 }
 /* ===== Palinsesto (stile app risultati) ===== */
 const MONTHS = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
-const SCHED = { day: null, lg: (() => lsGet("statPreviste.lg") || "all")(), closed: new Set() };
+const SCHED = { day: null, lg: (() => lsGet("statPreviste.lg") || "all")(), open: new Set() };   // campionati aperti (all'apertura del giorno tutti chiusi)
 const TOP_LG = ["I1", "I2", "E0", "SP1", "D1", "F1"];   // "Top campionati" in cima alla lista
 const FLAGS = { Italia: "🇮🇹", Inghilterra: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", Spagna: "🇪🇸", Francia: "🇫🇷", Germania: "🇩🇪", Olanda: "🇳🇱", Portogallo: "🇵🇹", Scozia: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", Belgio: "🇧🇪", Turchia: "🇹🇷", Grecia: "🇬🇷",
   Argentina: "🇦🇷", Austria: "🇦🇹", Brasile: "🇧🇷", Cina: "🇨🇳", Danimarca: "🇩🇰", Finlandia: "🇫🇮", Irlanda: "🇮🇪", Giappone: "🇯🇵", Messico: "🇲🇽", Norvegia: "🇳🇴", Polonia: "🇵🇱", Romania: "🇷🇴", Russia: "🇷🇺", Svezia: "🇸🇪", Svizzera: "🇨🇭", USA: "🇺🇸" };
@@ -3178,7 +3222,7 @@ function renderSched() {
     const dt = new Date(d + "T00:00:00Z"), n = all.filter(e => e.d === d).length;
     return `<button class="day${d < t0 ? " past" : ""}" role="tab" data-d="${d}" aria-selected="${d === SCHED.day}"><b>${d === t0 ? "Oggi" : DAYS_SHORT[dt.getUTCDay()]}</b><span>${String(dt.getUTCDate()).padStart(2, "0")}.${String(dt.getUTCMonth() + 1).padStart(2, "0")}</span><small>${n ? n + " partite" : "—"}</small></button>`;
   }).join("");
-  $("#days").querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { SCHED.day = b.dataset.d; renderSched(); }));
+  $("#days").querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { SCHED.day = b.dataset.d; SCHED.open.clear(); renderSched(); }));
   const strip = $("#days"), sel = strip.querySelector('[aria-selected="true"]');
   if (SCHED.day === t0 && sel) { const r = sel.getBoundingClientRect(), b = strip.getBoundingClientRect(); strip.scrollLeft += (r.left + r.width / 2) - (b.left + b.width / 2); }   // oggi al centro: prima i giorni passati, dopo i prossimi
   else if (sel) sel.scrollIntoView({ block: "nearest", inline: "nearest" });
@@ -3212,7 +3256,7 @@ function renderSched() {
   const rows = shown.flatMap(L => today.filter(e => e.lg.code === L.code));
   const ccfg = MODES[$("#decay").value] || MODES.dyn;
   const todo = rows.filter(e => !rowCached(e) || (!e.m && confEntry(e, ccfg, true) === undefined));
-  const block = L => { const n = today.filter(e => e.lg.code === L.code).length, cl = SCHED.closed.has(L.code);
+  const block = L => { const n = today.filter(e => e.lg.code === L.code).length, cl = !SCHED.open.has(L.code);
     return `<section class="lgblock${cl ? " closed" : ""}" aria-label="${esc(L.name)}" data-lg="${L.code}">
       <button class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="cnt" data-cnt>${n}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       ${today.filter(e => e.lg.code === L.code).map(e => rowHTML(e, rowCached(e))).join("")}
@@ -3223,8 +3267,8 @@ function renderSched() {
     (altL.length ? `<div class="lgsec">Altri campionati<small>${altL.reduce((a, L) => a + today.filter(e => e.lg.code === L.code).length, 0)} partite</small></div>` + altL.map(block).join("") : "");
   box.querySelectorAll(".mrow").forEach(bind);
   box.querySelectorAll(".lghead").forEach(h => h.addEventListener("click", () => { const sec = h.parentElement, lg = sec.dataset.lg;
-    if (SCHED.closed.has(lg)) SCHED.closed.delete(lg); else SCHED.closed.add(lg);
-    sec.classList.toggle("closed", SCHED.closed.has(lg)); h.setAttribute("aria-expanded", String(!SCHED.closed.has(lg))); }));
+    if (SCHED.open.has(lg)) SCHED.open.delete(lg); else SCHED.open.add(lg);
+    sec.classList.toggle("closed", !SCHED.open.has(lg)); h.setAttribute("aria-expanded", String(SCHED.open.has(lg))); }));
   const updCnt = () => box.querySelectorAll(".lgblock").forEach(sec => {   // quante A+ ci sono nel campionato quel giorno
     const es = today.filter(e => e.lg.code === sec.dataset.lg), ap = es.filter(e => !e.m && (confEntry(e, ccfg, true) || []).some(r => r.cls === "A+")).length;
     const c = sec.querySelector("[data-cnt]"); if (c) c.innerHTML = `${ap ? `<i>${ap} A+</i>` : ""}${es.length}`; });
@@ -3372,7 +3416,7 @@ function c3HTML(home, away, e, cfg) {
 /* intestazione della scheda partita (stile app match): stemmi con i colori del club, posizione in classifica, arbitro,
    poi i valori attesi in tre colonne: casa | statistica e totale | ospite */
 function matchHeroHTML(home, away, e, cfg, G) {
-  if (!home || !away || home === away) return `<div class="mh-top"><span>Scegli due squadre diverse.</span></div>`;
+  if (!home || !away || home === away) return `<div class="sx-band"><b>Scheda match</b></div><p style="padding:14px;margin:0">Scegli due squadre diverse.</p>`;
   const L_ = LG[S.league], m = e && e.m;
   const ini = t => t.replace(/[^A-Za-zÀ-ÿ0-9 ]/g, " ").split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]+$/.test(w)).map(w => w[0]).join("").slice(0, 3).toUpperCase() || t.slice(0, 3).toUpperCase();
   const badge = (t, fb) => { const u = logoOf(S.league, t); if (u) return `<span class="bdg lg"><img src="${esc(u)}" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('lg');this.parentElement.textContent='${esc(ini(t)).replace(/'/g, "")}'"></span>`;
@@ -3382,23 +3426,26 @@ function matchHeroHTML(home, away, e, cfg, G) {
   const x = extraFor(home, away);
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}` : "Confronto libero";
   let M = null, MF = null, MT = null; try { M = model(home, away, cfg); MF = model(home, away, cfg, "f"); MT = modelShots(home, away, cfg); } catch (err) {}
-  const v = (a, d = 1) => a == null || !isFinite(a) ? `<span class="nd">—</span>` : (d === 2 ? f2(a) : f1(a));
-  const row = (lab, h, a, t, d = 1) => `<div class="xr"><span>${v(h, d)}</span><span class="xl">${lab}<b>${t == null || !isFinite(t) ? "N/D" : (d === 2 ? f2(t) : f1(t))}</b></span><span>${v(a, d)}</span></div>`;
-  return `<div class="mh-top"><b>${FLAGS[L_.country] || ""} ${esc(L_.name)}</b><span>${esc(L_.country)} · ${dt}</span>${x && x[0] ? `<span>Arbitro: <b style="font-family:var(--body);font-size:12.5px;text-transform:none;letter-spacing:0">${esc(x[0])}</b></span>` : ""}</div>
-    <div class="mh-teams">
-      <div class="mt">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></div>
-      <div class="mc">${m ? `<span class="scr">${m.hg} – ${m.ag}</span><small>Finale</small>` : `<span>VS</span>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</div>
-      <div class="mt">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></div>
-    </div>
-    <div class="xt">
+  const ok = a => a != null && isFinite(a);
+  const v = (a, d = 1) => ok(a) ? (d === 2 ? f2(a) : f1(a)) : `<span class="nd">—</span>`;
+  const row = (lab, h, a, t, d = 1) => {
+    const hi = ok(h) && ok(a) && Math.abs(h - a) > 1e-9 ? (h > a ? "h" : "a") : "";
+    return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}</span><span class="sx-m"><small>${lab}</small><b>${ok(t) ? (d === 2 ? f2(t) : f1(t)) : "N/D"}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}</span></div>`; };
+  return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx">${x && x[0] ? `<span class="ref"><small>Arbitro</small>${esc(x[0])}</span>` : ""}<button class="ibtn" type="button" data-mbase aria-label="Come sono calcolati i valori">i</button></span></div>
+    <div class="sx">
+      <div class="sx-r sx-h">
+        <span class="sx-t">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></span>
+        <span class="sx-m sx-c"><small>Scheda match</small>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
+        <span class="sx-t">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></span>
+      </div>
       ${row("Gol attesi", G && G.lh, G && G.la, G && G.tot, 2)}
       ${row("Tiri totali", MT && MT.MS && MT.MS.lh, MT && MT.MS && MT.MS.la, MT && MT.MS && MT.MS.tot)}
       ${row("Tiri in porta", MT && MT.lh, MT && MT.la, MT && MT.tot)}
       ${row("Calci d'angolo", M && M.lh, M && M.la, M && M.tot)}
       ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot)}
       ${row("Cartellini", x && x[6], x && x[7], x && x[4])}
-    </div>
-    <div class="kp"><span>Over 2,5 <b>${G ? pc(G.over[1]) : "N/D"}</b></span><span>Gol/No gol <b>${G ? pc(G.btts) : "N/D"}</b></span><span>${esc(cfg.label)}</span></div>`;
+      <div class="sx-r sx-f"><span class="sx-v">${G ? pc(G.p1) : "—"}<small>1</small></span><span class="sx-m"><small>Over 2,5 · Gol</small><b>${G ? pc(G.over[1]) : "N/D"} · ${G ? pc(G.btts) : "N/D"}</b></span><span class="sx-v">${G ? pc(G.p2) : "—"}<small>2</small></span></div>
+    </div>`;
 }
 function renderMatchExtras(home, away) {
   const e = CUR && CUR.home === home && CUR.away === away && CUR.lg.code === S.league ? CUR : null;
@@ -3814,7 +3861,7 @@ $("#selWin").addEventListener("change", () => { SEL.h = +$("#selWin").value; ren
   seg.querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { $("#selWin").value = b.dataset.w; seg.querySelectorAll(".day").forEach(x => x.setAttribute("aria-selected", String(x === b))); $("#selWin").dispatchEvent(new Event("change")); }));
 }
 document.querySelectorAll("#selF .chip").forEach(b => b.addEventListener("click", () => { SEL.f = b.dataset.sf; document.querySelectorAll("#selF .chip").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderSel(); }));
-document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null); P.scrollIntoView({ block: "nearest" }); } }));
+document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null) + ($("#selNote") && !$("#viewSel").hidden ? `<p class="small" style="margin:0">${$("#selNote").innerHTML}</p>` : ""); P.scrollIntoView({ block: "nearest" }); } }));
 
 function showView(v) {
   $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewHist").hidden = true; $("#viewGen").hidden = v !== "gen"; $("#viewSel").hidden = v !== "sel"; $("#viewMatch").hidden = v !== "match";
@@ -3837,6 +3884,42 @@ $("#navSig").addEventListener("click", () => showView("sig"));
 $("#navGen").addEventListener("click", () => showView("gen"));
 $("#navSel").addEventListener("click", () => showView("sel"));
 
+
+/* ===== Descrizioni dietro le ⓘ: ogni testo esplicativo (p.small.muted, legende, avvisi) viene nascosto e si apre dalla ⓘ
+   del suo riquadro; la pagina "Dati e metodo" resta com'è (è la spiegazione completa). ===== */
+const DZ_SEL = "p.small.muted, .schedlegend, .warnbox";
+const SHEET = (() => { const d = document.createElement("div"); d.className = "sheet"; d.hidden = true;
+  d.innerHTML = `<div class="sh" role="dialog" aria-modal="true" aria-label="Informazioni"><div class="sh-h"><b></b><button class="sh-x" aria-label="Chiudi">✕</button></div><div class="sh-b"></div></div>`;
+  document.body.appendChild(d); d.addEventListener("click", ev => { if (ev.target === d || ev.target.closest(".sh-x")) d.hidden = true; });
+  addEventListener("keydown", ev => { if (ev.key === "Escape") d.hidden = true; }); return d; })();
+function openSheet(title, els) {
+  SHEET.querySelector(".sh-h b").textContent = title || "Legenda";
+  SHEET.querySelector(".sh-b").innerHTML = els.filter(e => e.textContent.trim()).map(e => `<p>${e.innerHTML}</p>`).join("") || "<p>Nessuna informazione.</p>";
+  SHEET.hidden = false;
+}
+function dzScan() {
+  document.querySelectorAll(DZ_SEL).forEach(el => {
+    if (el.dataset.dz || el.closest('[data-mp="info"], .sheet, .boot, #confInfo, #dataInfo, #mbase') || el.id === "importMsg" || !el.textContent.trim()) return;
+    el.dataset.dz = "1"; el.classList.add("dz-h");
+    if (el.id === "selNote") return;   // Radar: finisce nell'ⓘ del Confidence Score già presente
+    const card = el.closest(".card, .mhead, .lgblock");
+    const h = card && card.querySelector("h2");
+    if (h) {
+      if (h.querySelector(".ibtn") || (h.parentElement && h.parentElement.querySelector(":scope > .ibtn"))) return;
+      h.classList.add("dzh");
+      const b = document.createElement("button"); b.className = "ibtn"; b.type = "button"; b.setAttribute("aria-label", "Informazioni"); b.textContent = "i";
+      b.addEventListener("click", ev => { ev.stopPropagation(); openSheet(h.textContent.replace(/\bi$/, "").trim(), [...card.querySelectorAll("[data-dz]")]); });
+      h.appendChild(b);
+    } else {
+      const line = document.createElement("div"); line.className = "infoline";
+      const b = document.createElement("button"); b.className = "ibtn"; b.type = "button"; b.setAttribute("aria-label", "Legenda"); b.textContent = "i";
+      b.addEventListener("click", () => openSheet("Legenda", [el])); line.appendChild(b);
+      (el.classList.contains("schedlegend") && $("#sched") ? $("#sched") : el).before(line);
+    }
+  });
+}
+document.addEventListener("click", ev => { if (ev.target.closest("[data-mbase]")) { const b = $("#mbase"); openSheet("Scheda match", b ? [...b.children] : []); } });   // base del calcolo della scheda
+{ let q = 0; new MutationObserver(() => { if (!q) q = requestAnimationFrame(() => { q = 0; dzScan(); }); }).observe(document.body, { childList: true, subtree: true }); }
 /* tooltip */
 const tip = $("#tip");
 function showTip(el, x, y) { tip.textContent = el.dataset.tip; tip.hidden = false; const w = tip.offsetWidth; tip.style.left = Math.min(Math.max(8, x - w / 2), innerWidth - w - 8) + "px"; tip.style.top = Math.max(8, y - 40) + "px"; }
