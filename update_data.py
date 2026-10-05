@@ -802,7 +802,7 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
     BY_ID = {v: k for k, v in AF_LEAGUES.items()}
     # il nostro calendario (prossimi giorni), per abbinare le squadre
     ours = {}
-    for fn in ("next_fixtures.csv", "espn_fixtures.csv", "fixtures.csv"):
+    for fn in ("api_fixtures.csv", "next_fixtures.csv", "espn_fixtures.csv", "fixtures.csv"):   # api_fixtures: calendario principale
         try:
             for r in csv.DictReader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8").read())):
                 try: dd = datetime.datetime.strptime(r["Date"].strip(), "%d/%m/%Y").date()
