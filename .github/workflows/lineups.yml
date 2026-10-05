@@ -1,8 +1,6 @@
 name: Formazioni API-Football
 on:
-  workflow_dispatch: {}
-  schedule:
-    - cron: "25 9 * * *"   # riprende ogni giorno finché lo scarico non è completo
+  workflow_dispatch: {}   # da lanciare a mano (scarico completato il 5/10/2026)
 permissions:
   contents: write
 jobs:
