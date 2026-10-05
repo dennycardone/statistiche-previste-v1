@@ -1,0 +1,35 @@
+name: Formazioni API-Football
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "25 9 * * *"   # riprende ogni giorno finché lo scarico non è completo
+permissions:
+  contents: write
+jobs:
+  lineups:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Partite (ramo storico e stagione in corso) e formazioni già scaricate
+        run: |
+          mkdir -p storico formazioni
+          git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
+          git fetch -q --depth 1 origin pages && git checkout FETCH_HEAD -- data/apif.json && git reset -q -- data
+          if git ls-remote --exit-code origin formazioni >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin formazioni && git archive FETCH_HEAD | tar -x -C formazioni
+          fi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python tools/lineups_apifootball.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Salva sul ramo formazioni
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd formazioni
+          git init -q -b formazioni && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Formazioni $(date -u '+%F %H:%M')"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" formazioni
