@@ -513,6 +513,12 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .bkm{grid-area:m}.bkp{grid-area:p}.bkn{grid-area:n;flex-direction:row!important;align-items:baseline!important;gap:8px}.bkm,.bkp,.bkn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.bkm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkm small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bkmk{font-size:11.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkp b{font-family:var(--display);font-size:16px;letter-spacing:.02em}.bkp b.ov{color:var(--s2)}.bkp b.un{color:var(--accent)}
 .bkn{align-items:flex-end;font-variant-numeric:tabular-nums}.bkn b{font-family:var(--display);font-size:17px}.bkn small{font-size:11.5px;color:var(--ink-3)}.bkn em{font-style:normal;font-weight:700;font-size:12.5px;color:var(--gold)}
+.std tr.mh td{background:color-mix(in srgb,var(--s1) 16%,var(--surface));color:var(--ink);font-weight:700}.std tr.ma td{background:color-mix(in srgb,var(--s2) 16%,var(--surface));color:var(--ink);font-weight:700}
+.std tr.mh td:first-child{box-shadow:inset 4px 0 0 var(--s1)}.std tr.ma td:first-child{box-shadow:inset 4px 0 0 var(--s2)}
+.std tr.mh .tn{color:var(--s1)}.std tr.ma .tn{color:var(--s2)}
+.stdleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-weight:700}.stdleg span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid}
+.stdleg .mh{color:var(--s1);border-color:color-mix(in srgb,var(--s1) 50%,transparent);background:color-mix(in srgb,var(--s1) 10%,transparent)}.stdleg .ma{color:var(--s2);border-color:color-mix(in srgb,var(--s2) 50%,transparent);background:color-mix(in srgb,var(--s2) 10%,transparent)}
+.refinf{display:flex;flex-direction:column;gap:3px;margin:0;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--gold) 9%,var(--surface-2));border:1px solid color-mix(in srgb,var(--gold) 35%,var(--line));font-size:13.5px}.refinf b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -3351,7 +3357,7 @@ function teamAll(team, before) {
 }
 function resFor(m, team) { const f = m.home === team ? m.hg : m.ag, a = m.home === team ? m.ag : m.hg; return f > a ? "V" : f === a ? "N" : "P"; }
 function hmRow(m, team) {
-  const st = [["C", "hc", "ac"], ["F", "hf", "af"], ["T", "hs", "as"], ["TP", "hst", "ast"]].filter(([, h, a]) => m[h] != null && m[a] != null).map(([l, h, a]) => `${l} ${m[h]}-${m[a]}`).join(" · ");
+  const st = [["C", "hc", "ac"], ["F", "hf", "af"], ["T", "hs", "as"], ["TP", "hst", "ast"], ["Cart", "hk", "ak"]].filter(([, h, a]) => m[h] != null && m[a] != null).map(([l, h, a]) => `${l} ${m[h]}-${m[a]}`).join(" · ");
   const y = String(m.date.getUTCFullYear()).slice(2);
   return `<div class="hm"><span class="dt">${dstr(m.date).slice(0, 5)}.${y}</span>
     <span class="tm2"><span class="${m.home === team ? "me" : ""}">${crest(m.div, m.home)}${esc(m.home)}</span><b>${m.hg}</b><span class="${m.away === team ? "me" : ""}">${crest(m.div, m.away)}${esc(m.away)}</span><b>${m.ag}</b></span>
@@ -3379,7 +3385,7 @@ function renderH2H(home, away, before) {
   box.innerHTML = block(`Ultime partite: ${esc(home)}${venue ? " · in casa" : ""}`, lh, home)
     + block(`Ultime partite: ${esc(away)}${venue ? " · in trasferta" : ""}`, la, away)
     + block(`Scontri diretti${venue ? ` · ${esc(home)} in casa` : ""}`, hh, home)
-    + `<p class="small muted" style="margin:0">Ultime partite: tutta la stagione in corso di questo campionato. Scontri diretti: tutte le stagioni disponibili${S.meta.mode === "inclusi" ? " (nell'anteprima solo questa; sul sito GitHub anche le 5 precedenti)" : ""}. V/N/P per la squadra in grassetto. C corner · F falli · T tiri · TP tiri in porta (casa-ospite).${before ? " Solo partite giocate prima di questa." : ""}</p>`;
+    + `<p class="small muted" style="margin:0">Ultime partite: tutta la stagione in corso di questo campionato. Scontri diretti: tutte le stagioni disponibili${S.meta.mode === "inclusi" ? " (nell'anteprima solo questa; sul sito GitHub anche le 5 precedenti)" : ""}. V/N/P per la squadra in grassetto. C corner · F falli · T tiri · TP tiri in porta · Cart cartellini, gialli + rossi (casa-ospite).${before ? " Solo partite giocate prima di questa." : ""}</p>`;
   box.querySelectorAll(".morebtn").forEach(b => b.addEventListener("click", () => { const d = b.previousElementSibling; d.hidden = !d.hidden; b.innerHTML = d.hidden ? `${b.dataset.l} <span aria-hidden="true">▾</span>` : `Mostra meno <span aria-hidden="true">▴</span>`; }));
 }
 
@@ -3407,7 +3413,7 @@ function renderTable(home, away) {
   $("#avgSeg").hidden = mode !== "avg";
   // medie: ordine della classifica generale, valori solo delle partite della sede scelta
   const sub = mode === "avg" ? new Map(standings(list, MV.avg).map(r => [r.t, r])) : null;
-  const L_ = LG[S.league], cls = r => r.t === home || r.t === away ? ` class="me"` : "";
+  const L_ = LG[S.league], cls = r => r.t === home ? ` class="me mh"` : r.t === away ? ` class="me ma"` : "";
   const nm = r => `<td class="tn">${crest(S.league, r.t)}${esc(r.t)}</td>`;
   let head, body;
   if (mode === "form") {
@@ -3424,6 +3430,7 @@ function renderTable(home, away) {
   const last = list.length ? list[list.length - 1].date : null;
   box.innerHTML = `<h2>${esc(L_.name)} ${S.season != null ? seasonLabel(S.season, L_.cal) : ""}</h2>
     <p class="small muted" style="margin:0">${{ tot: "Classifica generale", home: "Solo partite in casa", away: "Solo partite in trasferta", form: "Ultime 5 partite, dalla più vecchia alla più recente", avg: `Medie a partita di quanto fa ogni squadra (fatti, non subiti) · ${{ tot: "tutte le partite", home: "solo in casa", away: "solo in trasferta" }[MV.avg]}` }[mode]} · ${list.length} partite, aggiornata al ${last ? dstr(last) : "N/D"}.</p>
+    ${home && away && home !== away ? `<div class="stdleg"><span class="mh">${crest(S.league, home)}${esc(home)}</span><span class="ma">${crest(S.league, away)}${esc(away)}</span></div>` : ""}
     <div class="tbl-wrap std"><table><thead><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${body.join("")}</tbody></table></div>
     <p class="small muted" style="margin:0">A pari punti: differenza reti, poi gol fatti (senza scontri diretti né penalizzazioni).</p>`;
 }
@@ -3534,7 +3541,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
         : `<p class="bk-none">Linea dei bookmaker non disponibile per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`)
       + (LB ? `<p class="bk-note">${nVal ? `<b>${nVal} ${nVal === 1 ? "giocata" : "giocate"} con valore</b> (riquadro evidenziato, valore dal +${Math.round(BK_MIN * 100)}%) · ` : "Nessuna linea con valore dal +5% · "}valore = nostra probabilità × quota − 1 · quota mediana tra i bookmaker, ultima vista ${esc((LB.t || "").slice(8, 10) + "/" + (LB.t || "").slice(5, 7) + " " + (LB.t || "").slice(11))} · tiri totali e falli: i bookmaker della nostra fonte non li quotano.</p>` : "");
   }
-  return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button><button class="ibtn" type="button" data-mbase aria-label="Come sono calcolati i valori">i</button></span></div>
+  return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button></span></div>
     <div class="sx">
       <div class="sx-r sx-h">
         <span class="sx-t">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></span>
@@ -3897,7 +3904,7 @@ function refSheetHTML() {
   if (!x) return "<p>Dati su arbitro e cartellini non disponibili per questa partita.</p>";
   const [ref, n, ff, fc, mu, real, mh, ma, fx] = x, v2 = Array.isArray(fx);
   const pct = v => Math.round(Math.abs(v - 1) * 100) === 0 ? "nella media" : `${v >= 1 ? "+" : "−"}${Math.round(Math.abs(v - 1) * 100)}%`;
-  const refTxt = ref ? `<b>${esc(ref)}</b> · ${n} partite nei nostri dati` : `<span class="muted">Non ancora indicato (di solito 1-2 giorni prima della partita)</span>`;
+  const refTxt = ref ? `<b>${esc(ref)}</b> · ${n} partite nei nostri dati (tutte le stagioni)` : `<span class="muted">Non ancora indicato (di solito 1-2 giorni prima della partita)</span>`;
   const P = mu ? cardProbs(mu) : null, played = real != null;
   // fattori principali: solo gli effetti che il modello applica davvero a questa partita (almeno ±4%)
   const fac = [];
@@ -3914,9 +3921,15 @@ function refSheetHTML() {
   const RS = ref ? refStats(ref, e && e.date) : null;
   const rsTxt = RS ? `<div class="kgrid"><span><small>Partite</small><b class="num">${RS.n}</b></span><span><small>Cartellini</small><b class="num">${f1(RS.c)}</b></span><span><small>Over 3,5</small><b class="num">${pc(RS.o35)}</b></span><span><small>Over 4,5</small><b class="num">${pc(RS.o45)}</b></span>${RS.f != null ? `<span><small>Falli</small><b class="num">${f1(RS.f)}</b></span>` : ""}</div>
     <p class="small muted" style="margin:0">Medie reali nelle sue partite dei nostri campionati negli ultimi 12 mesi circa, prima di questa${RS.f != null && RS.nf < RS.n ? ` (falli su ${RS.nf} partite)` : ""}.</p>` : (ref ? `<p class="muted" style="margin:0">Nessuna sua partita precedente nei nostri dati.</p>` : "");
+  let fT = null; try { const MF = model(home, away, MODES[$("#decay").value] || MODES.dyn, "f"); fT = MF && MF.tot; } catch (x) {}
+  const infl = !ref ? `<p class="refinf">⚖️ Arbitro non ancora indicato: nei cartellini e nei falli previsti la sua influenza <b>non è applicata</b>.</p>`
+    : `<div class="refinf"><b>⚖️ Influenza dell'arbitro nelle previsioni della scheda match</b>
+      <span>Cartellini: ${v2 && fc ? `<b>${pct(fc)}</b> già applicato${mu ? ` nei <b>${f1(mu)}</b> previsti` : ""}` : "non applicata (modello senza arbitro per questo campionato)"}</span>
+      <span>Falli: ${ff && isFinite(ff) && ff !== 1 ? `<b>${pct(ff)}</b> già applicato${fT ? ` nei <b>${f1(fT)}</b> previsti` : ""}` : "nessun effetto (arbitro nella media o con troppe poche partite)"}</span></div>`;
   return `<h3 style="margin:0">Arbitro</h3>
     <p style="margin:0">${refTxt}${v2 && ref && fc ? ` · effetto stimato sui cartellini <b>${pct(fc)}</b>` : ""}${ff && Math.abs(ff - 1) >= 0.005 ? ` · sui falli <b>${pct(ff)}</b>` : ""}</p>
     ${rsTxt}
+    ${infl}
     <h3 style="margin:6px 0 0">🟨 Cartellini della partita</h3>
     ${mu ? `<div class="kgrid"><span><small>Previsione</small><b class="num">${f1(mu)}</b></span><span><small>${esc(home)}</small><b class="num">${mh != null ? f1(mh) : "—"}</b></span><span><small>${esc(away)}</small><b class="num">${ma != null ? f1(ma) : "—"}</b></span>${played ? `<span><small>In partita</small><b class="num">${real}</b></span>` : ""}</div>
       <div class="kp" style="display:flex;flex-wrap:wrap;gap:6px 14px">${CARD_LINES.map((t, i) => `<span>Over ${th1(t)} <b class="num${played ? (real > t) === (P[i] >= 0.5) ? " good" : " bad" : ""}">${pc(P[i])}</b></span>`).join("")}</div>` : `<p class="muted" style="margin:0">Previsione cartellini non disponibile per questo campionato (servono i cartellini delle partite precedenti).</p>`}
