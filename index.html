@@ -1319,9 +1319,7 @@ const LEAGUES = [
   { code: "SRB", name: "SuperLiga", country: "Serbia", file: "api/SRB.csv", newCountry: "SRB", api: true },
   { code: "CRO", name: "HNL", country: "Croazia", file: "api/CRO.csv", newCountry: "CRO", api: true },
   { code: "CZE", name: "Chance Liga", country: "Repubblica Ceca", file: "api/CZE.csv", newCountry: "CZE", api: true },
-  { code: "SVK", name: "Niké liga", country: "Slovacchia", file: "api/SVK.csv", newCountry: "SVK", api: true },
   { code: "HUN", name: "NB I", country: "Ungheria", file: "api/HUN.csv", newCountry: "HUN", api: true },
-  { code: "UKR", name: "Premier League", country: "Ucraina", file: "api/UKR.csv", newCountry: "UKR", api: true },
   { code: "ISR", name: "Ligat ha'Al", country: "Israele", file: "api/ISR.csv", newCountry: "ISR", api: true },
   { code: "BUL", name: "Parva Liga", country: "Bulgaria", file: "api/BUL.csv", newCountry: "BUL", api: true }
 ];
@@ -3223,7 +3221,7 @@ const SCHED = { day: null, lg: (() => lsGet("statPreviste.lg") || "all")(), open
 const TOP_LG = ["I1", "I2", "E0", "SP1", "D1", "F1"];   // "Top campionati" in cima alla lista
 const FLAGS = { Italia: "🇮🇹", Inghilterra: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", Spagna: "🇪🇸", Francia: "🇫🇷", Germania: "🇩🇪", Olanda: "🇳🇱", Portogallo: "🇵🇹", Scozia: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", Belgio: "🇧🇪", Turchia: "🇹🇷", Grecia: "🇬🇷",
   Argentina: "🇦🇷", Austria: "🇦🇹", Brasile: "🇧🇷", Cina: "🇨🇳", Danimarca: "🇩🇰", Finlandia: "🇫🇮", Irlanda: "🇮🇪", Giappone: "🇯🇵", Messico: "🇲🇽", Norvegia: "🇳🇴", Polonia: "🇵🇱", Romania: "🇷🇴", Russia: "🇷🇺", Svezia: "🇸🇪", Svizzera: "🇨🇭", USA: "🇺🇸",
-  Serbia: "🇷🇸", Croazia: "🇭🇷", "Repubblica Ceca": "🇨🇿", Slovacchia: "🇸🇰", Ungheria: "🇭🇺", Ucraina: "🇺🇦", Israele: "🇮🇱", Bulgaria: "🇧🇬" };
+  Serbia: "🇷🇸", Croazia: "🇭🇷", "Repubblica Ceca": "🇨🇿", Ungheria: "🇭🇺", Israele: "🇮🇱", Bulgaria: "🇧🇬" };
 const ROWC = new Map();
 let CUR = null;   // partita aperta nella scheda
 function rowKey(e) {

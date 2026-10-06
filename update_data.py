@@ -8,12 +8,15 @@ LEAGUES = ["I1", "I2", "E0", "SP1", "F1", "D1", "N1", "P1",
 # campionati "extra" di football-data.co.uk (un file con tutte le stagioni, solo risultati e quote)
 NEW_LEAGUES = ["ARG", "AUT", "BRA", "CHN", "DNK", "FIN", "IRL", "JPN", "MEX", "NOR", "POL", "ROU", "RUS", "SWE", "SWZ", "USA"]
 # campionati solo su API-Football (ottobre 2026, squadre delle coppe europee): codice → (id API-Football, nome, stagione per anno solare).
-# Statistiche partita nello storico 2024-2026: Serbia, Croazia, Cechia oltre il 95% delle partite; Slovacchia 96% / 58%; Ungheria, Ucraina,
+# Statistiche partita nello storico 2024-2026: Serbia, Croazia, Cechia oltre il 95% delle partite; Ungheria,
 # Israele, Bulgaria circa la metà (le partite senza statistiche restano vuote: niente stime).
 API_ONLY = {"SRB": (286, "Super Liga", False), "CRO": (210, "HNL", False), "HUN": (271, "NB I", False), "CZE": (345, "Czech Liga", False),
-            "UKR": (333, "Premier League", False), "ISR": (383, "Ligat Ha'al", False), "BUL": (172, "First League", False),
-            "SVK": (332, "Super Liga", False)}
-# esclusi (verifica 6/10/2026 sullo storico): Cipro (statistiche solo sul 22-35% delle partite 2024-2026), Bielorussia (nessuna statistica)
+            "ISR": (383, "Ligat Ha'al", False), "BUL": (172, "First League", False)}
+# esclusi (verifica 6/10/2026 sullo storico): Cipro (statistiche solo sul 22-35% delle partite 2024-2026), Bielorussia (nessuna statistica);
+# Slovacchia e Ucraina tolte su richiesta (stagione 2026/27 quasi senza statistiche): i loro file vengono cancellati
+for _f in ("SVK.csv", "UKR.csv"):
+    try: os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", _f))
+    except OSError: pass
 BASE = "https://www.football-data.co.uk/mmz4281/{code}/{lg}.csv"
 NEW = "https://www.football-data.co.uk/new/{lg}.csv"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
