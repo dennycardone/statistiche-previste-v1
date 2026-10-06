@@ -577,6 +577,7 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
 .appbar .bslog{order:3;flex:0 0 100%;margin:-3px 0 0;padding-left:39px;font-family:var(--body);font-size:11.5px;font-weight:500;letter-spacing:.03em;color:#A4B0C8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
 .appbar .bslog b{color:#D4FF3F;font-weight:600}
 .appbar .modepick select{background-repeat:no-repeat;background-size:11px 7px}
+.mhead .bk-ln .bk-lt{display:block;width:max-content;margin:0 auto 2px;padding:1px 6px;border-radius:5px;background:rgba(255,201,74,.14);color:var(--gold);font-family:var(--body);font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.4}
 @media (prefers-reduced-motion:reduce){.mhead .hsw-n{animation:none}}
 </style>
 </head>
@@ -678,7 +679,7 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
       <label class="chk" for="genSoon"><input type="checkbox" id="genSoon"> Solo squadre che giocano nei prossimi 3 giorni</label>
     </section>
     <div id="genOut" class="genlist"></div>
-    <p class="small muted" style="margin:0">Almeno 5 partite nel periodo e nella sede scelti. A pari percentuale prima chi ha più partite. "Media campionato" è lo stesso dato su tutte le partite del campionato. La probabilità della prossima partita è quella del metodo scelto in alto.</p>
+    <p hidden style="margin:0">Almeno 5 partite nel periodo e nella sede scelti. A pari percentuale prima chi ha più partite. "Media campionato" è lo stesso dato su tutte le partite del campionato. La probabilità della prossima partita è quella del metodo scelto in alto.</p>
   </div>
 
   <div class="view" id="viewSig" hidden>
@@ -720,7 +721,7 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
     <div class="daystrip" id="days" role="tablist" aria-label="Giorni"></div>
     <div class="lgchips" id="lgChips" role="group" aria-label="Campionati" hidden></div>
     <div id="sched" class="sched"></div>
-    <p class="small muted schedlegend">A destra la previsione più solida della partita (fino a 2, classe B o migliore) con il suo Grado: O2,5 / O3,5 = Over, U2,5 = Under, GG / NG = Gol / No gol, C corner · F falli · T tiri · TP tiri in porta con 1 o 2 = chi ne fa di più. In grigio quando nessuna arriva a B. Partite finite: pronostici giusti sugli 8 mercati, prendendo sempre l'esito più probabile. Le percentuali O1,5 · O2,5 · O3,5 · GG (probabilità di Over e di Gol, Media dinamica) diventano verdi se il lato più probabile è uscito. <span id="dataStamp"></span></p>
+    <span id="dataStamp" hidden></span>
   </div>
 
   <div class="view" id="viewMatch" hidden>
@@ -3478,7 +3479,7 @@ function renderH2H(home, away, before) {
   box.innerHTML = block(`Ultime partite: ${esc(home)}${venue ? " · in casa" : ""}`, lh, home)
     + block(`Ultime partite: ${esc(away)}${venue ? " · in trasferta" : ""}`, la, away)
     + block(`Scontri diretti${venue ? ` · ${esc(home)} in casa` : ""}`, hh, home)
-    + `<p class="small muted" style="margin:0">Ultime partite: tutta la stagione in corso di questo campionato. Scontri diretti: tutte le stagioni disponibili${S.meta.mode === "inclusi" ? " (nell'anteprima solo questa; sul sito GitHub anche le 5 precedenti)" : ""}. V/N/P per la squadra in grassetto. C corner · F falli · T tiri · TP tiri in porta · Cart cartellini, gialli + rossi (casa-ospite).${before ? " Solo partite giocate prima di questa." : ""}</p>`;
+    ;
   box.querySelectorAll(".morebtn").forEach(b => b.addEventListener("click", () => { const d = b.previousElementSibling; d.hidden = !d.hidden; b.innerHTML = d.hidden ? `${b.dataset.l} <span aria-hidden="true">▾</span>` : `Mostra meno <span aria-hidden="true">▴</span>`; }));
 }
 
@@ -3589,7 +3590,7 @@ function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u,
 function bkCellHTML(c, center, lab) {
   const head = center ? `<small>${lab}</small>` : "";
   if (!c) return `<span class="${center ? "sx-m" : "sx-v"} bk">${head}<b class="bk-nd">N.D.</b></span>`;
-  const ln = `<b class="bk-ln"><i>O/U</i> ${th1(c.L)}</b>`;
+  const ln = `<b class="bk-ln"><small class="bk-lt">Linea book</small><i>O/U</i> ${th1(c.L)}</b>`;
   if (c.po == null) return `<span class="${center ? "sx-m" : "sx-v"} bk">${head}${ln}<small class="bk-q">O ${f2(c.o)} · U ${f2(c.u)}</small></span>`;
   const val = c.ev >= BK_MIN, evt = `${c.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(c.ev) * 100)}%`;
   return `<span class="${center ? "sx-m" : "sx-v"} bk${val ? " val" : ""}">${head}${ln}
@@ -3617,7 +3618,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
     const T = ok(t) ? (d === 2 ? f2(t) : f1(t)) : "N/D";
     if (m && rh != null && ra != null) {
       const hi = rh > ra ? "h" : rh < ra ? "a" : "", ps = ok(h) && ok(a) ? (h > a ? 1 : h < a ? 2 : 0) : 0, rs = rh > ra ? 1 : rh < ra ? 2 : 0;
-      const mk = !ps ? "" : !rs ? `<i class="mk eq" title="Pari">=</i>` : ps === rs ? `<i class="mk ok" title="Indovinato chi ne fa di più">✓</i>` : `<i class="mk ko" title="Sbagliato chi ne fa di più">✗</i>`;
+      const mk = "";
       const cell = (rv, pv, sv, top) => `<span class="sx-v pl${top ? " top" : ""}"><b class="rv">${rv}</b><small class="pv">prev. ${v(pv, d)}</small>${rg(pv, sv)}</span>`;
       return `<div class="sx-r">${cell(rh, h, sh, hi === "h")}<span class="sx-m"><small>${lab}</small><b>${rh + ra}</b><small class="pv">prev. ${T}</small>${mk}</span>${cell(ra, a, sa, hi === "a")}</div>`;
     }
@@ -3629,10 +3630,9 @@ function matchHeroHTML(home, away, e, cfg, G) {
   if (BK) {
     const LB = bkLines(e), R = bkCalc({ G, M, MT, x }, LB, m);
     const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a].filter(c => c && c.po != null && c.ev >= BK_MIN).length, 0);
-    bkBody = `<div class="sx-leg bk-leg"><span><b>O/U 9,5</b> linea del book</span><span><b class="ov">Over</b>/<b class="un">Under</b> nostro lato e probabilità</span><span><b>@</b> quota · valore</span><span class="vtag">in verifica</span></div>`
-      + (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
+    bkBody = (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
         : `<p class="bk-none">Linea dei bookmaker non disponibile per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`)
-      + (LB ? `<p class="bk-note">${nVal ? `<b>${nVal} ${nVal === 1 ? "giocata" : "giocate"} con valore</b> (riquadro evidenziato, valore dal +${Math.round(BK_MIN * 100)}%) · ` : "Nessuna linea con valore dal +5% · "}valore = nostra probabilità × quota − 1 · quota mediana tra i bookmaker, ultima vista ${esc((LB.t || "").slice(8, 10) + "/" + (LB.t || "").slice(5, 7) + " " + (LB.t || "").slice(11))} · tiri totali e falli: i bookmaker della nostra fonte non li quotano.</p>` : "");
+      ;
   }
   return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Disciplina: arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button></span></div>
     <div class="sx">
@@ -3641,7 +3641,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
         <span class="sx-m sx-c"><button class="hsw${BK ? " on" : ""}" type="button" data-hsw role="switch" aria-checked="${BK}" aria-label="Passa da Modello a Mercato"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Mercato" : "Modello"}</span>${!BK && nValAny ? `<span class="hsw-n">💰 ${nValAny} ${nValAny === 1 ? "valore" : "valori"}</span>` : ""}</button>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
         <span class="sx-t">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></span>
       </div>
-      ${BK ? bkBody : `${m ? `<div class="sx-leg"><span><b>2</b> partita giocata</span><span><small>prev.</small> previsione prima del match</span><span><i class="mk ok">✓</i><i class="mk ko">✗</i> chi ne fa di più</span></div>` : ""}
+      ${BK ? bkBody : `
       ${row(m ? "Gol" : "Gol attesi", G && G.lh, G && G.la, G && G.tot, 2, se && se[0], se && se[1], m && m.hg, m && m.ag)}
       ${row("Tiri totali", MT && MT.MS && MT.MS.lh, MT && MT.MS && MT.MS.la, MT && MT.MS && MT.MS.tot, 1, null, null, m && m.hs, m && m.as)}
       ${row("Tiri in porta", MT && MT.lh, MT && MT.la, MT && MT.tot, 1, null, null, m && m.hst, m && m.ast)}
@@ -4089,7 +4089,7 @@ function renderMatchConf(home, away, e, cfg) {
     <div class="glist">${L.map((r, i) => { const rr = gradeRate(r); return `<details class="gitem"><summary><span class="gil"><b>${esc(plainLab(r))}</b><small class="muted">${esc(confLab(r))}</small></span><span class="gir"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(rr * 100)}</b> su 100</span></span></summary>${gradeNums(r, i)}</details>`; }).join("")}</div>
     <div class="confinfo" id="mconfInfo" hidden></div>
     <p class="small muted" data-dz="keep" style="margin:0">Tocca una previsione per vedere i numeri.${e.m ? " Partita giocata: calcolato solo con le partite precedenti." : ""}</p>`;
-  box.querySelectorAll("[data-ci]").forEach(b => b.addEventListener("click", ev => { ev.preventDefault(); const P = $("#mconfInfo"); const same = !P.hidden && P.dataset.i === b.dataset.ci; P.hidden = same; P.dataset.i = b.dataset.ci; if (!same) { P.innerHTML = confInfoHTML(L[+b.dataset.ci]); P.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }));
+  box.querySelectorAll("[data-ci]").forEach(b => b.addEventListener("click", ev => { ev.preventDefault(); const P = $("#mconfInfo"); const same = !P.hidden && P.dataset.i === b.dataset.ci; P.hidden = same; P.dataset.i = b.dataset.ci; if (!same) { P.innerHTML = confInfoHTML(L[+b.dataset.ci]); } (b.closest(".gnums") || b.parentElement).after(P); }));
 }
 function selEntries() {   // partite da giocare nelle prossime SEL.h ore (orario del calcio d'inizio se c'è, altrimenti il giorno)
   const now = Date.now(), end = now + SEL.h * 36e5, t0 = localIso(), lim = localIso(new Date(end));
