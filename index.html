@@ -702,7 +702,7 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
         <label for="sigMin">Probabilità minima: <b id="sigMinVal">75%</b><input type="range" id="sigMin" min="75" max="95" step="5" value="75"></label>
         <label class="chk" for="sigGames"><input type="checkbox" id="sigGames" checked> Almeno 3 partite per sede (casa per chi gioca in casa, trasferta per l'ospite)</label>
         <input type="checkbox" id="sigC3" hidden>
-        <label for="sigMode">Statistica richiesta<select id="sigMode">
+        <label for="sigMode" hidden>Statistica richiesta<select id="sigMode">
           <option value="dyn" selected>Media dinamica</option>
           <option value="classic">Media classica</option>
         </select></label>
@@ -3328,8 +3328,8 @@ const PICK_SH = (mk, side) => mk === "k" ? `🟨${side[0]}${th1(side.slice(1))}`
 function pickHTML(L) {   // le previsioni più solide della partita (classe B o meglio, al massimo 2), con cosa giocare
   if (L === undefined) return `<span class="dots pick"><small>…</small></span>`;
   if (!L || !L.length) return `<span class="dots pick" title="Nessuna previsione"><small>–</small></span>`;
-  let top = L.filter(r => r.cls === "A+" || r.cls === "A" || r.cls === "B").slice(0, 2), weak = false;
-  if (!top.length) { top = L.slice(0, 1); weak = true; }
+  const top = L.filter(r => r.cls === "A+").slice(0, 2), weak = false;   // solo i segnali A+
+  if (!top.length) return `<span class="dots pick" aria-hidden="true"></span>`;
   const lab = top.map(r => `${CONF_SIDE_LAB(r.mk, r.side)}: classe ${r.cls}${clsRate(r) != null ? ` (in questo mercato esce il ${pc(clsRate(r))})` : ""}, probabilità corretta ${pc(r.q)}`).join(" · ");
   return `<span class="dots pick${weak ? " weak" : ""}" title="${esc(lab)}" aria-label="${esc(lab)}">${top.map(r => `<span class="pk"><b class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</b>${esc(PICK_SH(r.mk, r.side))}</span>`).join("")}</span>`;
 }
@@ -3412,7 +3412,6 @@ function renderSched() {
     const es = today.filter(e => e.lg.code === sec.dataset.lg), ap = es.filter(e => !e.m && (confEntry(e, ccfg, true) || []).some(r => r.cls === "A+")).length;
     const c = sec.querySelector("[data-cnt]"); if (c) c.innerHTML = `${ap ? `<i>${ap} A+</i>` : ""}${es.length}`; });
   updCnt();
-  markBkRows(box, rows, ccfg);
   const job = renderSched.job = {};
   const step = () => {
     if (renderSched.job !== job) return;                     // la pagina è cambiata: questo calcolo non serve più
@@ -4224,6 +4223,7 @@ function dzScan() {
   document.querySelectorAll(DZ_SEL).forEach(el => {
     if (el.dataset.dz || el.closest('[data-mp="info"], .sheet, .boot, #confInfo, #dataInfo, #mbase') || el.id === "importMsg" || !el.textContent.trim()) return;
     el.dataset.dz = "1"; el.classList.add("dz-h");
+    if (el.closest("#viewSig")) return;   // Segnali: nessuna ⓘ
     if (el.id === "selNote") return;   // Radar: finisce nell'ⓘ del Confidence Score già presente
     const card = el.closest(".card, .mhead, .lgblock");
     const h = card && card.querySelector("h2");
