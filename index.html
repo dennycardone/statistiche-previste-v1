@@ -529,6 +529,9 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .appbar h1.brand .bname{display:inline;opacity:1;font-weight:700}
 @media (max-width:460px){.appbar h1.brand{font-size:25px}.appbar h1.brand .bname{display:inline}}
 .boot .bootmark{width:64px;height:64px;color:var(--ink);margin-bottom:10px}
+.cbarw{flex-wrap:wrap;row-gap:6px}.cidx{display:flex;align-items:center;gap:8px;flex:1 1 140px;min-width:0}.cidx>small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}.cidx .cbar{flex:1}
+.crate b{color:var(--ink);font-size:14px}
+.mhead .sx-fb{margin:0;padding:9px 12px;font-size:11.5px;color:var(--ink-3);text-align:center;border-top:1px solid var(--line)}.mhead .sx-fb b{color:var(--ink-2)}
 </style>
 </head>
 <body>
@@ -546,8 +549,8 @@ h2.dzh{display:flex;align-items:center;gap:8px}
   <nav class="tabbar" aria-label="Sezioni">
   <button id="navStats" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" /></svg>Partite</button>
   <button id="navSel" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" /></svg>Radar</button>
-  <button id="navSig" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-6 4 3 7-9" /><circle cx="20" cy="6" r="1.6" /></svg>Segnalazioni</button>
-  <button id="navGen" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7" /></svg>Generali</button>
+  <button id="navSig" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-6 4 3 7-9" /><circle cx="20" cy="6" r="1.6" /></svg>Segnali</button>
+  <button id="navGen" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7" /></svg>Tendenze</button>
 </nav>
 </header>
 <div class="wrap">
@@ -581,7 +584,7 @@ h2.dzh{display:flex;align-items:center;gap:8px}
     <section class="card aplus" id="selAplus" aria-label="A+ sul radar"></section>
     <section class="card" id="selBk" aria-label="Linea bookmakers" hidden></section>
     <section class="card" aria-label="Partite in arrivo">
-      <div class="selhead"><h2>📅 Partite in arrivo</h2><button class="info" data-conf-info aria-label="Cos'è il Confidence Score">ⓘ</button></div>
+      <div class="selhead"><h2>📅 Partite in arrivo</h2><button class="info" data-conf-info aria-label="Cos'è il Grado">ⓘ</button></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
         <button class="chip" data-sf="all" aria-pressed="true">Tutte</button><button class="chip" data-sf="aplus" aria-pressed="false">A+</button>
         <button class="chip" data-sf="a" aria-pressed="false">A</button><button class="chip" data-sf="b" aria-pressed="false">B</button>
@@ -625,8 +628,8 @@ h2.dzh{display:flex;align-items:center;gap:8px}
   </div>
 
   <div class="view" id="viewSig" hidden>
-    <section class="card" aria-label="Filtri segnalazioni">
-      <h2>Segnalazioni</h2>
+    <section class="card" aria-label="Filtri segnali">
+      <h2>Segnali</h2>
       <p class="small muted" style="margin:0">Partite della prossima giornata con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
       <div class="sigf">
         <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
@@ -651,10 +654,10 @@ h2.dzh{display:flex;align-items:center;gap:8px}
         </select></label>
       </div>
     </section>
-    <section class="card" id="sigOut" aria-label="Elenco segnalazioni"></section>
+    <section class="card" id="sigOut" aria-label="Elenco segnali"></section>
     <section class="card" aria-label="Backup quote" hidden>
       <h2>Le tue quote</h2>
-      <p class="small muted" style="margin:0">Le quote che scrivi nelle Segnalazioni restano solo su questo telefono. Salva un backup ogni tanto: se cambi telefono o cancelli i dati di Chrome, lo reimporti e ritrovi tutto.</p>
+      <p class="small muted" style="margin:0">Le quote che scrivi nei Segnali restano solo su questo telefono. Salva un backup ogni tanto: se cambi telefono o cancelli i dati di Chrome, lo reimporti e ritrovi tutto.</p>
       <div class="hrow"><button id="oddsExport">Esporta backup</button><button id="oddsImport">Importa backup</button><input type="file" id="oddsFile" accept=".json,application/json" hidden></div>
       <p class="small muted" id="oddsMsg" style="margin:0" hidden></p>
     </section>
@@ -664,7 +667,7 @@ h2.dzh{display:flex;align-items:center;gap:8px}
     <div class="daystrip" id="days" role="tablist" aria-label="Giorni"></div>
     <div class="lgchips" id="lgChips" role="group" aria-label="Campionati" hidden></div>
     <div id="sched" class="sched"></div>
-    <p class="small muted schedlegend">A destra la previsione più solida della partita (fino a 2, classe B o migliore) con la sua classe di Confidence: O2,5 / O3,5 = Over, U2,5 = Under, GG / NG = Gol / No gol, C corner · F falli · T tiri · TP tiri in porta con 1 o 2 = chi ne fa di più. In grigio quando nessuna arriva a B. Partite finite: pronostici giusti sugli 8 mercati, prendendo sempre l'esito più probabile. Le percentuali O1,5 · O2,5 · O3,5 · GG (probabilità di Over e di Gol, Media dinamica) diventano verdi se il lato più probabile è uscito. <span id="dataStamp"></span></p>
+    <p class="small muted schedlegend">A destra la previsione più solida della partita (fino a 2, classe B o migliore) con il suo Grado: O2,5 / O3,5 = Over, U2,5 = Under, GG / NG = Gol / No gol, C corner · F falli · T tiri · TP tiri in porta con 1 o 2 = chi ne fa di più. In grigio quando nessuna arriva a B. Partite finite: pronostici giusti sugli 8 mercati, prendendo sempre l'esito più probabile. Le percentuali O1,5 · O2,5 · O3,5 · GG (probabilità di Over e di Gol, Media dinamica) diventano verdi se il lato più probabile è uscito. <span id="dataStamp"></span></p>
   </div>
 
   <div class="view" id="viewMatch" hidden>
@@ -673,19 +676,19 @@ h2.dzh{display:flex;align-items:center;gap:8px}
       <span class="tag" id="seasonTag">Stagione —</span>
     </div>
     <div class="mtabs" role="tablist" aria-label="Sezioni della partita">
-      <button class="mtab" data-mt="prev" aria-pressed="true">Scheda match</button>
-      <button class="mtab" data-mt="sig" aria-pressed="false">Confidence</button>
-      <button class="mtab" data-mt="h2h" aria-pressed="false">Testa a testa</button>
+      <button class="mtab" data-mt="prev" aria-pressed="true">Lettura</button>
+      <button class="mtab" data-mt="sig" aria-pressed="false">Grado</button>
+      <button class="mtab" data-mt="h2h" aria-pressed="false">Precedenti</button>
       <button class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
     </div>
     <div class="mpane" data-mp="prev">
-      <section class="mhead" id="mhead" aria-label="Scheda match"></section>
+      <section class="mhead" id="mhead" aria-label="Lettura della partita"></section>
       <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
       <section class="card" id="mcmp" aria-label="Confronto con la partita giocata" hidden></section>
       <main id="out" class="wrap" style="padding:0;margin:0;width:100%"></main>
     </div>
     <div class="mpane" data-mp="sig" hidden>
-      <section class="card mconf" id="mconf" aria-label="Confidence Score"></section>
+      <section class="card mconf" id="mconf" aria-label="Grado"></section>
       <section class="card" id="msig" aria-label="Segnalazioni della partita" hidden></section>
     </div>
     <div class="mpane" data-mp="h2h" hidden>
@@ -713,7 +716,7 @@ h2.dzh{display:flex;align-items:center;gap:8px}
     <div class="mpane" data-mp="info" hidden>
   <section class="card" aria-label="Scelta partita" hidden style="display:none">   <!-- i menu restano (li usa il codice), ma non si vedono -->
    <details class="fold">
-    <summary><h2>Confronta altre squadre</h2></summary>
+    <summary><h2>Confronto libero</h2></summary>
     <div class="foldbody">
     <label for="league" class="lgpick">Campionato
       <select id="league"></select>
@@ -3192,7 +3195,7 @@ function renderSignals() {
   const box = $("#sigOut"), st = sigSettings();
   $("#sigMinVal").textContent = Math.round(st.minP * 100) + "%";
   // la prima volta (senza previsioni pronte da GitHub) il calcolo può richiedere qualche secondo: prima mostra "Calcolo…"
-  if (!box.firstElementChild) box.innerHTML = `<p class="muted" style="margin:0">Calcolo delle segnalazioni…</p>`;
+  if (!box.firstElementChild) box.innerHTML = `<p class="muted" style="margin:0">Calcolo dei segnali…</p>`;
   clearTimeout(SIG_T); SIG_T = setTimeout(renderSignalsNow, 30);
 }
 function renderSignalsNow() {
@@ -3200,7 +3203,7 @@ function renderSignalsNow() {
   const cfg = MODES[$("#sigMode").value] || MODES.dyn, st = sigSettings();
   let { rows, skipped, noCal } = computeSignals3({ lgSel: $("#sigLeague").value, markets: st.markets, cfg, minP: st.minP, needGames: st.needGames, noStale: $("#sigStale").checked, mdl: sigMdl });
   if ($("#sigC3").checked) rows = rows.filter(x => x.c3);
-  box.innerHTML = `<h2>${rows.length} segnalazion${rows.length === 1 ? "e" : "i"}</h2>
+  box.innerHTML = `<h2>${rows.length} segnal${rows.length === 1 ? "e" : "i"}</h2>
     <p class="small muted" style="margin:0">Gol: Over a linea fissa e Gol/No gol. Corner, falli, tiri e tiri in porta: <b>1</b> se la squadra di casa ne fa di più, <b>2</b> se ne fa di più l'ospite (il pari fa perdere). Cartellini (gialli + rossi): la linea più alta con l'Over sopra la soglia, altrimenti la più bassa con l'Under; modello squadre + arbitro, uguale per i due metodi. Base: ${cfg.label}.</p>
     ${rows.length ? sigCardsHTML(rows, "q") : `<p class="muted" style="margin:0">Nessuna partita supera la soglia con questi filtri. Prova ad abbassare la probabilità minima.</p>`}
     ${skipped.length ? `<p class="small muted" style="margin:0">Esclusi per dati vecchi: ${skipped.map(esc).join(", ")}.</p>` : ""}
@@ -3263,7 +3266,7 @@ const dotCls = p => p >= 0.8 ? "g" : p >= 0.65 ? "y" : "r";
 function dotsHTML(sig) {
   // un pallino verde per ogni segnalazione concorde (corner, falli, tiri, tiri in porta), dalla più alta
   const SH = { c: "C", f: "F", s: "T", st: "TP" };
-  const lab = sig.length ? sig.map(t => `2/2 · ${MK_LABEL[t.mk]}: ${t.fav} ${pc(t.p)}`).join(" · ") : "Nessuna segnalazione concorde";
+  const lab = sig.length ? sig.map(t => `2/2 · ${MK_LABEL[t.mk]}: ${t.fav} ${pc(t.p)}`).join(" · ") : "Nessun segnale concorde";
   if (!sig.length) return `<span class="dots" title="${esc(lab)}" aria-label="${esc(lab)}"><span class="dotx"></span><small>–</small></span>`;
   return `<span class="dots" title="${esc(lab)}" aria-label="${esc(lab)}"><span class="dotrow">${sig.map(() => `<span class="dotx g"></span>`).join("")}</span><em>${sig.map(t => `${SH[t.mk]}${t.fav}`).join(" ")}</em></span>`;
 }
@@ -3486,7 +3489,7 @@ function c3HTML(home, away, e, cfg) {
   const st = sigSettings();
   const f = { div: S.league, date: e ? e.date : new Date(), time: e ? e.time : "", home, away };
   const rows = computeSignals3({ lgSel: S.league, markets: DOT_MK.filter(k => st.markets.includes(k)), cfg, minP: st.minP, needGames: false, noStale: false, pick: c => c === S.league ? [f] : [] }).rows.filter(x => x.c3);
-  return `<span class="c3box"><span><i class="ldot" style="background:${rows.length ? "var(--dot-g)" : "transparent;border:1.5px solid var(--line)"}"></i> <b>Pallino 2/2</b> ${rows.length ? "· stesso esito con Media dinamica e Media classica:" : "· nessuna segnalazione concorde su corner, falli, tiri e tiri in porta"}</span>
+  return `<span class="c3box"><span><i class="ldot" style="background:${rows.length ? "var(--dot-g)" : "transparent;border:1.5px solid var(--line)"}"></i> <b>Pallino 2/2</b> ${rows.length ? "· stesso esito con Media dinamica e Media classica:" : "· nessun segnale concorde su corner, falli, tiri e tiri in porta"}</span>
     ${rows.map(x => `<span>${SIG_LABEL[x.mk]} · <b>${x.fav}</b> (${esc(x.team)} ne fa di più) · <b>${pc(x.p3.reduce((a, b) => a + b, 0) / 3)}</b></span>`).join("")}</span>`;
 }
 /* intestazione della scheda partita (stile app match): stemmi con i colori del club, posizione in classifica, arbitro,
@@ -3531,7 +3534,7 @@ function bkCellHTML(c, center, lab) {
     ${c.real != null ? `<span class="bk-r">reale <b>${c.real}</b> ${c.hit ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`}</span>` : ""}</span>`;
 }
 function matchHeroHTML(home, away, e, cfg, G) {
-  if (!home || !away || home === away) return `<div class="sx-band"><b>Scheda match</b></div><p style="padding:14px;margin:0">Scegli due squadre diverse.</p>`;
+  if (!home || !away || home === away) return `<div class="sx-band"><b>Lettura</b></div><p style="padding:14px;margin:0">Scegli due squadre diverse.</p>`;
   const L_ = LG[S.league], m = e && e.m;
   const ini = t => t.replace(/[^A-Za-zÀ-ÿ0-9 ]/g, " ").split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]+$/.test(w)).map(w => w[0]).join("").slice(0, 3).toUpperCase() || t.slice(0, 3).toUpperCase();
   const badge = (t, fb) => { const u = logoOf(S.league, t); if (u) return `<span class="bdg lg"><img src="${esc(u)}" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('lg');this.parentElement.textContent='${esc(ini(t)).replace(/'/g, "")}'"></span>`;
@@ -3544,7 +3547,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
   const ok = a => a != null && isFinite(a);
   const v = (a, d = 1) => ok(a) ? (d === 2 ? f2(a) : f1(a)) : `<span class="nd">—</span>`;
   // range della media all'80% per squadra (team_ranges.py): media × exp(±1,2816 × errore standard tarato sul backtest)
-  const se = x && x[9] ? x[9] : null, rg = (m, s) => ok(m) && s ? `<em class="sx-rg">${f1(m * Math.exp(-1.2816 * s))}–${f1(m * Math.exp(1.2816 * s))}</em>` : "";
+  const se = x && x[9] ? x[9] : null, rg = (m, s) => ok(m) && s ? `<em class="sx-rg" title="Forbice: dove cade la media 8 volte su 10">${f1(m * Math.exp(-1.2816 * s))}–${f1(m * Math.exp(1.2816 * s))}</em>` : "";
   // partita giocata: numero grande = dato reale, sotto la previsione fatta prima del calcio d'inizio; ✓/✗ = indovinato chi ne fa di più
   const row = (lab, h, a, t, d = 1, sh = null, sa = null, rh = null, ra = null) => {
     const T = ok(t) ? (d === 2 ? f2(t) : f1(t)) : "N/D";
@@ -3566,11 +3569,11 @@ function matchHeroHTML(home, away, e, cfg, G) {
         : `<p class="bk-none">Linea dei bookmaker non disponibile per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`)
       + (LB ? `<p class="bk-note">${nVal ? `<b>${nVal} ${nVal === 1 ? "giocata" : "giocate"} con valore</b> (riquadro evidenziato, valore dal +${Math.round(BK_MIN * 100)}%) · ` : "Nessuna linea con valore dal +5% · "}valore = nostra probabilità × quota − 1 · quota mediana tra i bookmaker, ultima vista ${esc((LB.t || "").slice(8, 10) + "/" + (LB.t || "").slice(5, 7) + " " + (LB.t || "").slice(11))} · tiri totali e falli: i bookmaker della nostra fonte non li quotano.</p>` : "");
   }
-  return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button></span></div>
+  return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Disciplina: arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button></span></div>
     <div class="sx">
       <div class="sx-r sx-h">
         <span class="sx-t">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></span>
-        <span class="sx-m sx-c"><button class="hsw${BK ? " on" : ""}" type="button" data-hsw role="switch" aria-checked="${BK}" aria-label="Passa da scheda match a linea bookmakers"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Linea bookmakers" : "Scheda match"}</span></button>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
+        <span class="sx-m sx-c"><button class="hsw${BK ? " on" : ""}" type="button" data-hsw role="switch" aria-checked="${BK}" aria-label="Passa da Modello a Mercato"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Mercato" : "Modello"}</span></button>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
         <span class="sx-t">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></span>
       </div>
       ${BK ? bkBody : `${m ? `<div class="sx-leg"><span><b>2</b> partita giocata</span><span><small>prev.</small> previsione prima del match</span><span><i class="mk ok">✓</i><i class="mk ko">✗</i> chi ne fa di più</span></div>` : ""}
@@ -3579,7 +3582,8 @@ function matchHeroHTML(home, away, e, cfg, G) {
       ${row("Tiri in porta", MT && MT.lh, MT && MT.la, MT && MT.tot, 1, null, null, m && m.hst, m && m.ast)}
       ${row("Calci d'angolo", M && M.lh, M && M.la, M && M.tot, 1, null, null, m && m.hc, m && m.ac)}
       ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot, 1, null, null, m && m.hf, m && m.af)}
-      ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}`}
+      ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
+      ${se ? `<p class="sx-fb"><b>Forbice</b> · i numeri piccoli sotto gol e cartellini: dove cade la media di quella squadra 8 volte su 10</p>` : ""}`}
     </div>`;
 }
 function renderMatchExtras(home, away) {
@@ -3595,7 +3599,7 @@ function renderMatchExtras(home, away) {
   if (m && G) {
     cmp.hidden = false;
     cmp.innerHTML = `${(() => { const P = matchPicks(home, away, cfg, m), h = P.filter(x => x.ok).length;
-        return `<h2>Pronostici: ${h} giusti su ${P.length} (${pc(h / P.length)})</h2>` + rowsTable(["Mercato", "Pron.", "Reale"], P.map(x => [x.lab, `<b>${x.pick}</b><br><span class="muted small">${pc(x.p)}</span>`, `${x.ok ? `<span class="good">✓</span>` : `<span class="bad">✗</span>`} <span class="small">${x.txt}</span>`])); })()}`;
+        return `<h2>Alla prova: ${h} giusti su ${P.length} (${pc(h / P.length)})</h2>` + rowsTable(["Mercato", "Pron.", "Reale"], P.map(x => [x.lab, `<b>${x.pick}</b><br><span class="muted small">${pc(x.p)}</span>`, `${x.ok ? `<span class="good">✓</span>` : `<span class="bad">✗</span>`} <span class="small">${x.txt}</span>`])); })()}`;
   } else { cmp.hidden = true; cmp.innerHTML = ""; }
   renderH2H(home, away, m ? e.date : null);
   renderTable(home, away);
@@ -3705,7 +3709,7 @@ function drawBilancio(list, cfg) {
     <h3>Con le tue quote</h3>
     ${nb ? rowsTable(["", "Puntate", "Guadagno", "Resa"], [["Tutte", String(nb), u(pr) + " u", pc1(pr / nb)], ["Solo con valore", String(nbv), nbv ? u(prv) + " u" : "N/D", nbv ? pc1(prv / nbv) : "N/D"]])
       + `<p class="small muted" style="margin:0">1 unità (u) su ogni segnalazione con quota inserita. Resa = guadagno diviso unità puntate.</p>`
-      : `<p class="small muted" style="margin:0">Nessuna quota inserita su partite già giocate. Scrivile nelle Segnalazioni prima delle partite.</p>`}`;
+      : `<p class="small muted" style="margin:0">Nessuna quota inserita su partite già giocate. Scrivile nei Segnali prima delle partite.</p>`}`;
 }
 $("#hLeague").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#hLeague", "#hGames"].forEach(id => $(id).addEventListener("change", renderHist));
@@ -3848,7 +3852,7 @@ document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("clic
 
 /* ===== Confidence Score: interfaccia (Radar, scheda partita) ===== */
 const CONF_C = new Map();   // previsioni con punteggio per partita e metodo (sessione)
-const CONF_STATUS = { aplus: "🔥 A+ OPPORTUNITY", watch: "🟢 WATCH", none: "⚪ NO SIGNAL" };
+const CONF_STATUS = { aplus: "🔥 Segnale A+", watch: "🟢 Da seguire", none: "⚪ Nessun segnale" };
 const SEL = { f: "all", h: 24 };
 function entryOdds(e) {
   if (e.m) return e.m.odds || null;
@@ -3881,13 +3885,26 @@ function clsRate(r) {
   const V = (CONF_VAL[confBase(r.base || "dyn", r.mk)] || {})[r.mk === "g25" && r.side && r.side[0] === "U" ? "g25U" : r.mk];
   const x = V && V.cls && V.cls[r.cls]; return x && x[1] >= 20 ? x[0] / x[1] : null;
 }
+/* Grado = lettera (classe) · Indice 0-100 (forza della previsione dopo le correzioni sulle stagioni passate, scala unica) ·
+   Riscontro (quante volte su 100 la sua classe è uscita in quel mercato nelle stagioni di verifica) */
 function confBar(score, cls, rate) {
-  return `<span class="cbarw"><span class="cbar c-${cls === "A+" ? "ap" : cls.toLowerCase()}"><span class="cfill" style="width:${score}%"></span></span><b class="cnum num">${score}<small>/100</small></b><span class="ccls c-${cls === "A+" ? "ap" : cls.toLowerCase()}">${cls}</span>${rate != null ? `<span class="crate">esce il ${pc(rate)}</span>` : ""}</span>`;
+  const c = cls === "A+" ? "ap" : cls.toLowerCase();
+  return `<span class="cbarw"><span class="ccls c-${c}" title="Grado">${cls}</span><span class="cidx"><small>Indice</small><span class="cbar c-${c}"><span class="cfill" style="width:${score}%"></span></span><b class="cnum num">${score}<small>/100</small></b></span>${rate != null ? `<span class="crate" title="Quante volte su 100 il Grado ${cls} è uscito in questo mercato nelle stagioni passate">Riscontro <b class="num">${Math.round(rate * 100)}</b> su 100</span>` : ""}</span>`;
+}
+/* Solidità: i controlli di contorno (non cambiano l'Indice: nelle verifiche non miglioravano la precisione) */
+function confSolid(r) {
+  const out = [`<span>Stabilità tra i metodi <b>${r.stab}</b></span>`, `<span>Campione <b>${r.samp}</b></span>`];
+  if (r.mk !== "k" && typeof r.contra === "number") out.push(`<span>Frequenze reali a favore <b class="num">${4 - r.contra}/4</b></span>`);
+  return out.join("");
 }
 function confInfoHTML(r) {
-  const base = `<p style="margin:0"><b>Il Confidence Score misura quanto sono coerenti e solide le evidenze statistiche alla base della previsione. Non rappresenta la probabilità di vincita e non tiene conto delle quote dei bookmaker.</b></p>
-    <p class="small" style="margin:0">Come si calcola: per ogni previsione l'app misura concordanza tra Media dinamica e Media classica, distanza tra le loro probabilità, campione, frequenza reale dell'esito (stagione, ultime 10, ultime 5, casa/trasferta), forza degli avversari e, solo per Over/Under 2,5, se il mercato è d'accordo. I pesi di questi fattori sono stati stimati sulle stagioni passate, usando ogni volta solo le partite giocate prima (walk-forward). La "probabilità corretta" è la stima di quanto previsioni come questa sono uscite davvero: è quella da guardare, più della probabilità del modello. Il punteggio traduce la probabilità corretta su una scala unica per tutti i mercati: 60 = 70%, 70 = 75%, 80 = 80%, 90 = 85%. Le previsioni sotto il 60% hanno di solito punteggi bassi.</p>
-    <p class="small" style="margin:0">Classi uguali per tutti i mercati, decise dalla probabilità corretta: A+ almeno 85% · A 80-85% · B 75-80% · C 70-75% · D sotto 70% (punteggio 90 · 80 · 70 · 60). A+ solo per le segnalazioni (almeno 60%; tra gli Under solo Under 2,5 e cartellini) e con almeno 5 partite in stagione e 3 nella sede per entrambe le squadre. Così un A+ è un A+ in ogni mercato: accanto a ogni classe c'è quante volte è uscita nelle stagioni passate in quel mercato. I fattori che sulle stagioni passate non miglioravano le previsioni hanno peso 0 e non compaiono tra i contributi.</p>`;
+  const base = `<p style="margin:0"><b>Il Grado dice quanto è solida una previsione, in tre informazioni distinte.</b></p>
+    <ul class="small" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+      <li><b>La lettera (A+, A, B, C, D)</b>: la classe, uguale in tutti i mercati.</li>
+      <li><b>Indice 0-100</b>: la forza della previsione dopo il controllo con le stagioni passate. Parte dalla probabilità del modello e la corregge con le verifiche che, sulle stagioni passate, miglioravano davvero la precisione (per corner e tiri la frequenza in stagione delle due squadre, per l'Over 2,5 il mercato; nella Media classica anche forma, Elo e accordo tra i metodi). È su una scala unica: 60 = previsioni che escono circa 70 volte su 100, 70 = 75, 80 = 80, 90 = 85. Classi: A+ da 90, A da 80, B da 70, C da 60.</li>
+      <li><b>Riscontro</b>: quante volte su 100 quella classe è uscita davvero in quel mercato nelle stagioni di verifica (2023-24 – 2025-26), usando ogni volta solo le partite giocate prima.</li>
+    </ul>
+    <p class="small" style="margin:0"><b>Solidità</b>: stabilità tra Media dinamica e classica, numero di partite (campione) e quante frequenze reali (stagione, ultime 10, ultime 5, casa/trasferta) vanno nella stessa direzione. Si mostrano per contesto ma non cambiano l'Indice: nelle verifiche non miglioravano la precisione. A+ solo per i segnali (almeno 60%; tra gli Under solo Under 2,5 e cartellini) e con almeno 5 partite in stagione e 3 nella sede per entrambe le squadre. Il Grado non è la probabilità di vincita e non usa le quote dei bookmaker (tranne il mercato per l'Over/Under 2,5).</p>`;
   if (!r) return base;
   const V = (CONF_VAL[confBase(r.base, r.mk)] || {})[r.mk === "g25" && r.side === "U" ? "g25U" : r.mk];
   const val = V ? `<p class="small muted" style="margin:0">Verifica (${esc(V.seasons)}, ${esc(CONF_MNAME[r.mk])}): ${["A+", "A", "B", "C", "D"].filter(c => V.cls[c] && V.cls[c][1]).map(c => `${c} presa ${Math.round(V.cls[c][0] / V.cls[c][1] * 100)}% (${V.cls[c][1]})`).join(" · ")}.</p>` : "";
@@ -3896,13 +3913,13 @@ function confInfoHTML(r) {
     const lab = v => v > 0.15 ? ["molto forte", "good"] : v > 0.05 ? ["forte", "good"] : v >= -0.05 ? ["neutro", "muted"] : v >= -0.15 ? ["contro", "bad"] : ["molto contro", "bad"];
     fac = `<ul class="cfac">${CONF_FACT.map(([n, ks]) => { const ks2 = ks.filter(k => k in r.contrib); if (!ks2.length) return ""; const v = ks2.reduce((a, k) => a + r.contrib[k], 0); const [t, c] = lab(v); return `<li><span>${v >= -0.05 ? "✓" : "✗"} ${esc(n)}</span><b class="${c}">${t}</b></li>`; }).join("")}</ul>`;
   }
-  return `<p style="margin:0"><b>${esc(confLab(r))}</b> · Confidence ${r.score}/100 · ${r.cls}</p>${fac}${val}${base}`;
+  return `<p style="margin:0"><b>${esc(confLab(r))}</b> · Grado ${r.cls} · Indice ${r.score}/100${clsRate(r) != null ? ` · Riscontro ${Math.round(clsRate(r) * 100)} su 100` : ""}</p>${fac}${val}${base}`;
 }
 function confRowHTML(r, i, withInfo) {
   return `<div class="crow">
-    <div class="cl"><span class="cmk">${esc(confLab(r))}</span><span class="cp num">${pc(r.q)}<small> modello ${pc(r.p)}</small></span></div>
+    <div class="cl"><span class="cmk">${esc(confLab(r))}</span><span class="cp num">${pc(r.q)}<small> probabilità · modello ${pc(r.p)}</small></span></div>
     <div class="cm">${confBar(r.score, r.cls, clsRate(r))}</div>
-    <div class="cd small">${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}<span>Stabilità <b>${r.stab}</b></span><span>Campione <b>${r.samp}</b></span><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Perché questo punteggio">ⓘ</button>` : ""}</div>
+    <div class="cd small"><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${confSolid(r)}${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Come si legge il Grado">ⓘ</button>` : ""}</div>
   </div>`;
 }
 let REFCTX = null;
@@ -3948,7 +3965,7 @@ function refSheetHTML() {
     <p class="small muted" style="margin:0">Medie reali nelle sue partite dei nostri campionati negli ultimi 12 mesi circa, prima di questa${RS.f != null && RS.nf < RS.n ? ` (falli su ${RS.nf} partite)` : ""}.</p>` : (ref ? `<p class="muted" style="margin:0">Nessuna sua partita precedente nei nostri dati.</p>` : "");
   let fT = null; try { const MF = model(home, away, MODES[$("#decay").value] || MODES.dyn, "f"); fT = MF && MF.tot; } catch (x) {}
   const infl = !ref ? `<p class="refinf">⚖️ Arbitro non ancora indicato: nei cartellini e nei falli previsti la sua influenza <b>non è applicata</b>.</p>`
-    : `<div class="refinf"><b>⚖️ Influenza dell'arbitro nelle previsioni della scheda match</b>
+    : `<div class="refinf"><b>⚖️ Influenza dell'arbitro nelle previsioni della Lettura</b>
       <span>Cartellini: ${v2 && fc ? `<b>${pct(fc)}</b> già applicato${mu ? ` nei <b>${f1(mu)}</b> previsti` : ""}` : "non applicata (modello senza arbitro per questo campionato)"}</span>
       <span>Falli: ${ff && isFinite(ff) && ff !== 1 ? `<b>${pct(ff)}</b> già applicato${fT ? ` nei <b>${f1(fT)}</b> previsti` : ""}` : "nessun effetto (arbitro nella media o con troppe poche partite)"}</span></div>`;
   return `<h3 style="margin:0">Arbitro</h3>
@@ -3964,14 +3981,14 @@ function refSheetHTML() {
 function renderMatchConf(home, away, e, cfg) {
   const box = $("#mconf"); if (!box) return;
   box.hidden = false;
-  if (!e || !home || !away || !Object.keys(CONF_COEF).length) { box.innerHTML = `<h2>Confidence Score</h2><p class="muted" style="margin:0">Non disponibile per questa partita.</p>`; return; }
+  if (!e || !home || !away || !Object.keys(CONF_COEF).length) { box.innerHTML = `<h2>Grado</h2><p class="muted" style="margin:0">Non disponibile per questa partita.</p>`; return; }
   let L; try { L = withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = e.m ? e.date : null; try { if (e.m) S.season = e.m.season; return confMatch(home, away, e.date, entryOdds(e), cfg.key); } finally { S.cutoff = c0; } }); } catch (x) { L = []; }
-  if (!L.length) { box.innerHTML = `<h2>Confidence Score</h2><p class="muted" style="margin:0">Non disponibile per questa partita (servono più partite giocate).</p>`; return; }
+  if (!L.length) { box.innerHTML = `<h2>Grado</h2><p class="muted" style="margin:0">Non disponibile per questa partita (servono più partite giocate).</p>`; return; }
   L = L.map(r => ({ ...r, h: home, a: away, qt: e.m ? null : oddsFor(e, r) }));
   const top = L[0];
   box.hidden = false;
-  box.innerHTML = `<div class="selhead"><h2>Confidence Score</h2><button class="info" data-ci="0" aria-label="Cos'è il Confidence Score">ⓘ</button></div>
-    <div class="ctop"><span class="small muted">Previsione più solida</span><b>${esc(confLab(top))} · ${pc(top.q)} <small class="muted">(modello ${pc(top.p)})</small></b>${confBar(top.score, top.cls, clsRate(top))}
+  box.innerHTML = `<div class="selhead"><h2>Grado</h2><button class="info" data-ci="0" aria-label="Come si legge il Grado">ⓘ</button></div>
+    <div class="ctop"><span class="small muted">Previsione più solida</span><b>${esc(confLab(top))} · ${pc(top.q)} <small class="muted">probabilità (modello ${pc(top.p)})</small></b>${confBar(top.score, top.cls, clsRate(top))}
       <span class="cd small">${top.qt ? `<span>${oddsTxt(top.qt)}</span>` : ""}<span>Stabilità <b>${top.stab}</b></span><span>Campione <b>${top.samp}</b></span><span class="st-${top.status}">${CONF_STATUS[top.status]}</span>${top.why.length ? `<span class="muted">A+ non confermato: ${esc(top.why.join(", "))}</span>` : top.contra >= 2 ? `<span class="muted">${top.contra} frequenze reali su 4 dicono il contrario</span>` : ""}</span></div>
     <details class="call" open><summary>Tutti i mercati (${L.length})</summary>${L.map((r, i) => confRowHTML(r, i, true)).join("")}</details>
     <div class="confinfo" id="mconfInfo" hidden></div>
@@ -4010,7 +4027,7 @@ function renderSelBk(ents, cfg, when) {
   const L = withL.flatMap(e => (BK_C.get(e.id + "|" + cfg.key) || []).map(c => ({ e, c }))).sort((a, b) => b.c.ev - a.c.ev);
   const lab = c => `${c.lab === "Calci d'angolo" ? "Corner" : c.lab}${c.who ? " " + esc(c.who) : " totali"}`;
   box.hidden = false;
-  box.innerHTML = `<div class="selhead"><h2>💰 Linea bookmakers</h2><span class="vtag">in verifica</span></div>
+  box.innerHTML = `<div class="selhead"><h2>💰 Mercato</h2><span class="vtag">in verifica</span></div>
     <p class="small muted" style="margin:0">Giocate in cui la nostra probabilità × la quota del book supera 1 di almeno il ${Math.round(BK_MIN * 100)}%. ${withL.length} partite con la linea su ${ents.length}.${todo.length ? " Calcolo…" : ""}</p>
     ${L.length ? `<div class="bklist">${L.slice(0, 15).map(({ e, c }) => `<button class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
       <span class="bkp"><span class="bkmk">${lab(c)}</span><b class="${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} ${th1(c.L)}</b></span>
@@ -4023,7 +4040,7 @@ function renderSel() {
   const cfg = MODES[$("#decay").value] || MODES.dyn, ents = selEntries();
   const noModel = !Object.keys(CONF_COEF).length;
   const aBox = $("#selAplus"), list = $("#selList");
-  if (noModel) { aBox.innerHTML = `<h2>🔥 A+ sul radar</h2><p class="muted" style="margin:0">Confidence Score non disponibile.</p>`; list.innerHTML = ""; return; }
+  if (noModel) { aBox.innerHTML = `<h2>🔥 A+ sul radar</h2><p class="muted" style="margin:0">Grado non disponibile.</p>`; list.innerHTML = ""; return; }
   const got = [], todo = [];
   for (const e of ents) { const L = confEntry(e, cfg, true); if (L === undefined) todo.push(e); else got.push([e, L]); }
   const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "hp" ? r.q >= 0.7 : SEL.f === "c3" ? r.agreeN === C3_MODES.length : true;
@@ -4034,20 +4051,20 @@ function renderSel() {
   try { renderSelBk(ents, cfg, when); } catch (x) { console.warn(x); }
   aBox.innerHTML = `<div class="selhead"><h2>🔥 A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button class="apcard" data-id="${esc(e.id)}">
-      <span class="aptag">🔥 A+ OPPORTUNITY${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
+      <span class="aptag">🔥 SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
       ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(confLab(r))}</span>
         <span class="small">Probabilità <b>${pc(r.q)}</b> <span class="muted">(modello ${pc(r.p)})</span></span>
         ${r.qt ? `<span class="small">${oddsTxt(r.qt)}</span>` : ""}
-        <span class="aplab small">Confidence</span>${confBar(r.score, r.cls, clsRate(r))}</span>`).join("")}
-      </button>`).join("")}</div>` : `<p class="apnone">NESSUNA OPPORTUNITÀ A+ DISPONIBILE</p>`);
+        <span class="aplab small">Grado</span>${confBar(r.score, r.cls, clsRate(r))}</span>`).join("")}
+      </button>`).join("")}</div>` : `<p class="apnone">NESSUN SEGNALE A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
   list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime ${SEL.h} ore.</p>` :
     (rows.length ? rows.map(([e, L]) => `<button class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
       ${L.slice(0, 3).map(r => `<span class="selp"><span>${esc(confLab(r))}</span><span class="num">${pc(r.q)}</span><span class="num">${r.score}</span><span class="clsr"><span class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</span>${clsRate(r) != null ? `<small class="num">${Math.round(clsRate(r) * 100)}%</small>` : ""}</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
-  $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}). Per ogni partita le 3 previsioni più solide; colonne: esito · probabilità corretta · Confidence · classe (uguale per tutti i mercati: A+ almeno 85%, A 80%, B 75%, C 70%) con quante volte è uscita in quel mercato nelle stagioni passate. Probabilità corretta = quanto previsioni come questa sono uscite davvero nelle stagioni passate; Alta probabilità = almeno 70% corretta.${ODDS && ODDS.aggiornate ? ` Quota media = mediana tra i bookmaker (API-Football, aggiornate il ${ODDS.aggiornate}), solo informativa: il confronto con le nostre probabilità non è ancora stato verificato.` : ""}`;
+  $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}). Per ogni partita le 3 previsioni più solide; colonne: esito · probabilità corretta · Indice · Grado (uguale per tutti i mercati: A+ almeno 85%, A 80%, B 75%, C 70%) con quante volte è uscita in quel mercato nelle stagioni passate. Probabilità corretta = quanto previsioni come questa sono uscite davvero nelle stagioni passate; Alta probabilità = almeno 70% corretta.${ODDS && ODDS.aggiornate ? ` Quota media = mediana tra i bookmaker (API-Football, aggiornate il ${ODDS.aggiornate}), solo informativa: il confronto con le nostre probabilità non è ancora stato verificato.` : ""}`;
   clearTimeout(SEL_T);
   if (todo.length) SEL_T = setTimeout(() => { const t = performance.now(); for (const e of todo) { try { confEntry(e, cfg); } catch (x) { CONF_C.set(e.id + "|" + cfg.key, []); } if (performance.now() - t > 250) break; } if (!$("#viewSel").hidden) renderSel(); }, 20);
 }
@@ -4119,7 +4136,7 @@ function dzScan() {
 }
 document.addEventListener("click", ev => { if (!ev.target.closest("[data-hsw]") || !HEROCTX) return; MV.hero = MV.hero === "bk" ? "sx" : "bk"; const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); });
 document.addEventListener("click", ev => { if (ev.target.closest("[data-mbase]")) { const b = $("#mbase"); openSheet("Scheda match", b ? [...b.children] : []); } });
-document.addEventListener("click", ev => { if (ev.target.closest("[data-refsheet]")) { SHEET.querySelector(".sh-h b").textContent = "Arbitro e cartellini"; SHEET.querySelector(".sh-b").innerHTML = refSheetHTML(); SHEET.hidden = false; } });   // base del calcolo della scheda
+document.addEventListener("click", ev => { if (ev.target.closest("[data-refsheet]")) { SHEET.querySelector(".sh-h b").textContent = "Disciplina"; SHEET.querySelector(".sh-b").innerHTML = refSheetHTML(); SHEET.hidden = false; } });   // base del calcolo della scheda
 { let q = 0; new MutationObserver(() => { if (!q) q = requestAnimationFrame(() => { q = 0; dzScan(); }); }).observe(document.body, { childList: true, subtree: true }); }
 /* tooltip */
 const tip = $("#tip");
