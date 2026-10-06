@@ -578,6 +578,9 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
 .appbar .bslog b{color:#D4FF3F;font-weight:600}
 .appbar .modepick select{background-repeat:no-repeat;background-size:11px 7px}
 .mhead .bk-ln .bk-lt{display:block;width:max-content;margin:0 auto 2px;padding:1px 6px;border-radius:5px;background:rgba(255,201,74,.14);color:var(--gold);font-family:var(--body);font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;line-height:1.4}
+.gnums{flex-direction:column;align-items:stretch;gap:7px;position:relative;padding-right:34px}.gnums .info{position:absolute;right:0;top:8px;margin:0}
+.gck{display:flex;gap:8px;align-items:baseline;color:var(--ink-2);line-height:1.35}.gck i{font-style:normal;font-weight:700;width:14px;flex:0 0 14px;text-align:center}
+.gck.ok i{color:#5ee08a}.gck.mid i{color:var(--gold)}.gck.ko i{color:#ff7a7a}.gck.why{color:var(--ink-3)}
 @media (prefers-reduced-motion:reduce){.mhead .hsw-n{animation:none}}
 </style>
 </head>
@@ -3956,22 +3959,25 @@ function confBar(score, cls, rate) {
   return `<span class="cbarw"><span class="ccls c-${c}" title="Grado">${cls}</span><span class="cidx"><small>Indice</small><span class="cbar c-${c}"><span class="cfill" style="width:${score}%"></span></span><b class="cnum num">${score}<small>/100</small></b></span>${rate != null ? `<span class="crate" title="Quante volte su 100 il Grado ${cls} è uscito in questo mercato nelle stagioni passate">Riscontro <b class="num">${Math.round(rate * 100)}</b> su 100</span>` : ""}</span>`;
 }
 /* Solidità: i controlli di contorno (non cambiano l'Indice: nelle verifiche non miglioravano la precisione) */
-function confSolid(r) {
-  const out = [`<span>Stabilità tra i metodi <b>${r.stab}</b></span>`, `<span>Campione <b>${r.samp}</b></span>`];
-  if (r.mk !== "k" && typeof r.contra === "number") out.push(`<span>Frequenze reali a favore <b class="num">${4 - r.contra}/4</b></span>`);
+function confSolid(r) {   // i controlli di solidità, a parole: ✓ a favore, ≈ così così, ✗ contro
+  const ck = (lv, t) => `<span class="gck ${lv}"><i>${lv === "ok" ? "✓" : lv === "mid" ? "≈" : "✗"}</i>${t}</span>`;
+  const out = [
+    r.stab === "Alta" ? ck("ok", "I metodi di calcolo danno lo stesso risultato") : r.stab === "Media" ? ck("mid", "I metodi di calcolo sono abbastanza d'accordo") : ck("ko", "I metodi di calcolo non sono d'accordo"),
+    r.samp === "Alto" ? ck("ok", "Tante partite su cui basarsi") : r.samp === "Medio" ? ck("mid", "Partite sufficienti su cui basarsi") : ck("ko", "Poche partite su cui basarsi")];
+  if (r.mk !== "k" && typeof r.contra === "number") { const f = 4 - r.contra; out.push(ck(f === 4 ? "ok" : f === 3 ? "mid" : "ko", `I numeri reali delle due squadre ${f >= 3 ? "lo confermano" : "non lo confermano"} (${f} controlli su 4)`)); }
   return out.join("");
 }
 function confInfoHTML(r) {
-  const base = `<p style="margin:0"><b>Il Grado dice quanto è solida una previsione, in tre informazioni distinte.</b></p>`;
+  const base = `<p class="small" style="margin:0">Il numero "su 100" non è una stima: è quante volte sono uscite davvero le previsioni con lo stesso grado.</p>`;
   if (!r) return base;
-  const V = (CONF_VAL[confBase(r.base, r.mk)] || {})[r.mk === "g25" && r.side === "U" ? "g25U" : r.mk];
-  const val = V ? `<p class="small muted" style="margin:0">Verifica (${esc(V.seasons)}, ${esc(CONF_MNAME[r.mk])}): ${["A+", "A", "B", "C", "D"].filter(c => V.cls[c] && V.cls[c][1]).map(c => `${c} presa ${Math.round(V.cls[c][0] / V.cls[c][1] * 100)}% (${V.cls[c][1]})`).join(" · ")}.</p>` : "";
+  const V = (CONF_VAL[confBase(r.base, r.mk)] || {})[r.mk === "g25" && r.side === "U" ? "g25U" : r.mk], C = V && V.cls[r.cls];
+  const val = C && C[1] ? `<p class="small" style="margin:0">Su questo mercato, nelle stagioni passate, le previsioni di grado ${r.cls} sono state <b>${C[1]}</b>: ne sono uscite <b>${C[0]}</b>, cioè <b>${Math.round(C[0] / C[1] * 100)} su 100</b>.</p>` : "";
   let fac = "";
   if (r.contrib) {
-    const lab = v => v > 0.15 ? ["molto forte", "good"] : v > 0.05 ? ["forte", "good"] : v >= -0.05 ? ["neutro", "muted"] : v >= -0.15 ? ["contro", "bad"] : ["molto contro", "bad"];
-    fac = `<ul class="cfac">${CONF_FACT.map(([n, ks]) => { const ks2 = ks.filter(k => k in r.contrib); if (!ks2.length) return ""; const v = ks2.reduce((a, k) => a + r.contrib[k], 0); const [t, c] = lab(v); return `<li><span>${v >= -0.05 ? "✓" : "✗"} ${esc(n)}</span><b class="${c}">${t}</b></li>`; }).join("")}</ul>`;
+    const lab = v => v > 0.15 ? ["molto a favore", "good"] : v > 0.05 ? ["a favore", "good"] : v >= -0.05 ? ["neutro", "muted"] : v >= -0.15 ? ["contro", "bad"] : ["molto contro", "bad"];
+    fac = `<p class="small" style="margin:0"><b>Cosa ha deciso il grado</b></p><ul class="cfac">${CONF_FACT.map(([n, ks]) => { const ks2 = ks.filter(k => k in r.contrib); if (!ks2.length) return ""; const v = ks2.reduce((a, k) => a + r.contrib[k], 0); const [t, c] = lab(v); return `<li><span>${v >= -0.05 ? "✓" : "✗"} ${esc(n)}</span><b class="${c}">${t}</b></li>`; }).join("")}</ul>`;
   }
-  return `<p style="margin:0"><b>${esc(confLab(r))}</b> · Grado ${r.cls} · Indice ${r.score}/100${clsRate(r) != null ? ` · Riscontro ${Math.round(clsRate(r) * 100)} su 100` : ""}</p>${fac}${val}${base}`;
+  return `${base}${val}${fac}`;
 }
 function confRowHTML(r, i, withInfo) {
   return `<div class="crow">
@@ -4055,14 +4061,11 @@ function gradeDots(rate, cls) {
   const n = Math.max(0, Math.min(10, Math.round(rate * 10)));
   return `<span class="gdots c-${gradeC(cls)}" role="img" aria-label="${n} su 10">${Array.from({ length: 10 }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`;
 }
-function gradeNums(r, i) {
+function gradeNums(r, i) {   // dietro "Perché questo grado": solo controlli a parole, nessun altro numero
   return `<div class="gnums small">
-      <span>Probabilità <b class="num">${pc(r.q)}</b> <span class="muted">(modello ${pc(r.p)})</span></span>
-      <span>Indice <b class="num">${r.score}</b>/100</span>
-      ${clsRate(r) != null ? `<span>Riscontro del grado ${r.cls}: <b class="num">${Math.round(clsRate(r) * 100)}</b> su 100</span>` : ""}
-      ${confSolid(r)}${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}
-      ${r.why && r.why.length ? `<span class="muted">Non è A+ perché: ${esc(r.why.join(", "))}</span>` : ""}
-      <button class="info" data-ci="${i}" aria-label="Come si calcola">ⓘ</button></div>`;
+      ${confSolid(r)}${r.qt ? `<span class="gck q">${oddsTxt(r.qt)}</span>` : ""}
+      ${r.why && r.why.length ? `<span class="gck why">Non è A+ perché: ${esc(r.why.join(", "))}</span>` : ""}
+      <button class="info" data-ci="${i}" aria-label="Da dove viene il numero">ⓘ</button></div>`;
 }
 function renderMatchConf(home, away, e, cfg) {
   const box = $("#mconf"); if (!box) return;
@@ -4081,13 +4084,13 @@ function renderMatchConf(home, away, e, cfg) {
       <small class="muted">${esc(confLab(top))}</small>
       <div class="gline"><span class="ccls c-${gradeC(top.cls)} gbig">${top.cls}</span><span class="gword">${GRADE_WORD[top.cls]}</span>${gradeDots(tr, top.cls)}</div>
       <p class="gsay">Previsioni come questa sono uscite <b>${tn} volte su 100</b>${top.status === "aplus" ? " · <b>Segnale A+</b>" : ""}.</p>
-      <details class="gmore"><summary>I numeri</summary>${gradeNums(top, 0)}</details>
+      <details class="gmore"><summary>Perché questo grado</summary>${gradeNums(top, 0)}</details>
     </div>
     <div class="gscale" aria-label="Scala del Grado">${["A+", "A", "B", "C", "D"].map(c => `<span><span class="ccls c-${gradeC(c)}">${c}</span>${GRADE_WORD[c]}</span>`).join("")}</div>
     <h3 class="gh">Tutte le previsioni della partita</h3>
     <div class="glist">${L.map((r, i) => { const rr = gradeRate(r); return `<details class="gitem"><summary><span class="gil"><b>${esc(plainLab(r))}</b><small class="muted">${esc(confLab(r))}</small></span><span class="gir"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(rr * 100)}</b> su 100</span></span></summary>${gradeNums(r, i)}</details>`; }).join("")}</div>
     <div class="confinfo" id="mconfInfo" hidden></div>
-    <p class="small muted" data-dz="keep" style="margin:0">Tocca una previsione per vedere i numeri.${e.m ? " Partita giocata: calcolato solo con le partite precedenti." : ""}</p>`;
+    <p class="small muted" data-dz="keep" style="margin:0">Tocca una previsione per vedere perché ha quel grado.${e.m ? " Partita giocata: calcolato solo con le partite precedenti." : ""}</p>`;
   box.querySelectorAll("[data-ci]").forEach(b => b.addEventListener("click", ev => { ev.preventDefault(); const P = $("#mconfInfo"); const same = !P.hidden && P.dataset.i === b.dataset.ci; P.hidden = same; P.dataset.i = b.dataset.ci; if (!same) { P.innerHTML = confInfoHTML(L[+b.dataset.ci]); } (b.closest(".gnums") || b.parentElement).after(P); }));
 }
 function selEntries() {   // partite da giocare nelle prossime SEL.h ore (orario del calcio d'inizio se c'è, altrimenti il giorno)
