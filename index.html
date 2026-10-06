@@ -554,6 +554,12 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .gitem .gil{display:flex;flex-direction:column;min-width:0}.gitem .gil b{font-size:15px}.gitem .gil small{font-size:12px}
 .gitem .gir{display:flex;align-items:center;gap:10px;flex:0 0 auto}.gitem .gin{font-size:13px;color:var(--ink-2);white-space:nowrap}.gitem .gin b{font-size:16px;color:var(--ink)}
 .gitem[open] summary .gil b{color:var(--accent)}
+.rtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-size:18px;color:var(--hot);min-height:20px}
+.gword.sm{font-size:16px}.gsay.sm{font-size:13.5px}
+.selp2{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:14px}.selp2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp2 .gin{font-size:12.5px;color:var(--ink-2);white-space:nowrap}.selp2 .gin b{font-size:15px;color:var(--ink)}
+.mhead .hsw-n{max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;font-family:var(--body);font-size:11px;font-weight:700;color:var(--gold-ink);background:var(--gold);border-radius:999px;padding:2px 8px;white-space:nowrap;animation:hswp 2.4s ease-in-out 3}
+@keyframes hswp{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){.mhead .hsw-n{animation:none}}
 </style>
 </head>
 <body>
@@ -603,9 +609,14 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 
   <div class="view" id="viewSel" hidden>
     <label class="fl selwin" for="selWin">Periodo<select id="selWin"><option value="24" selected>Prossime 24 ore</option><option value="48">Prossime 48 ore</option><option value="72">Prossime 72 ore</option></select></label>
+    <div class="seg rtabs" role="tablist" aria-label="Sezioni del Radar" id="selTabs">
+      <button class="segb" data-rt="aplus" aria-pressed="true">🔥 Segnali A+ <b id="rtA"></b></button>
+      <button class="segb" data-rt="bk" aria-pressed="false">💰 Mercato <b id="rtB"></b></button>
+      <button class="segb" data-rt="all" aria-pressed="false">📅 Tutte <b id="rtC"></b></button>
+    </div>
     <section class="card aplus" id="selAplus" aria-label="A+ sul radar"></section>
     <section class="card" id="selBk" aria-label="Linea bookmakers" hidden></section>
-    <section class="card" aria-label="Partite in arrivo">
+    <section class="card" id="selAll" aria-label="Partite in arrivo">
       <div class="selhead"><h2>📅 Partite in arrivo</h2><button class="info" data-conf-info aria-label="Cos'è il Grado">ⓘ</button></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
         <button class="chip" data-sf="all" aria-pressed="true">Tutte</button><button class="chip" data-sf="aplus" aria-pressed="false">A+</button>
@@ -3582,7 +3593,8 @@ function matchHeroHTML(home, away, e, cfg, G) {
     const hi = ok(h) && ok(a) && Math.abs(h - a) > 1e-9 ? (h > a ? "h" : "a") : "";
     return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}${rg(h, sh)}</span><span class="sx-m"><small>${lab}</small><b>${T}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}${rg(a, sa)}</span></div>`; };
   const BK = MV.hero === "bk";
-  let bkBody = "";
+  let bkBody = "", nValAny = 0;
+  try { const LB0 = bkLines(e); if (LB0) nValAny = bkCalc({ G, M, MT, x }, LB0, m).reduce((a, r) => a + [r.h, r.t, r.a].filter(c => c && c.po != null && c.ev >= BK_MIN).length, 0); } catch (err) {}
   if (BK) {
     const LB = bkLines(e), R = bkCalc({ G, M, MT, x }, LB, m);
     const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a].filter(c => c && c.po != null && c.ev >= BK_MIN).length, 0);
@@ -3595,7 +3607,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
     <div class="sx">
       <div class="sx-r sx-h">
         <span class="sx-t">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></span>
-        <span class="sx-m sx-c"><button class="hsw${BK ? " on" : ""}" type="button" data-hsw role="switch" aria-checked="${BK}" aria-label="Passa da Modello a Mercato"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Mercato" : "Modello"}</span></button>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
+        <span class="sx-m sx-c"><button class="hsw${BK ? " on" : ""}" type="button" data-hsw role="switch" aria-checked="${BK}" aria-label="Passa da Modello a Mercato"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Mercato" : "Modello"}</span>${!BK && nValAny ? `<span class="hsw-n">💰 ${nValAny} ${nValAny === 1 ? "valore" : "valori"}</span>` : ""}</button>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
         <span class="sx-t">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></span>
       </div>
       ${BK ? bkBody : `${m ? `<div class="sx-leg"><span><b>2</b> partita giocata</span><span><small>prev.</small> previsione prima del match</span><span><i class="mk ok">✓</i><i class="mk ko">✗</i> chi ne fa di più</span></div>` : ""}
@@ -4080,12 +4092,12 @@ function bkEntry(e, cfg) {
 function renderSelBk(ents, cfg, when) {
   const box = $("#selBk"); if (!box) return;
   const withL = ents.filter(e => bkLines(e));
-  if (!withL.length) { box.hidden = true; return; }
+  if (!withL.length) { SEL.bkN = 0; box.hidden = SEL.tab !== "bk"; box.innerHTML = `<div class="selhead"><h2>💰 Mercato</h2></div><p class="apnone">NESSUNA LINEA DEI BOOKMAKER NEL PERIODO</p>`; radarTabs(); return; }
   const t0 = performance.now(), todo = [];
   for (const e of withL) { const k = e.id + "|" + cfg.key; if (!BK_C.has(k)) { if (performance.now() - t0 < 200) { try { bkEntry(e, cfg); } catch (x) { BK_C.set(k, []); } } else todo.push(e); } }
   const L = withL.flatMap(e => (BK_C.get(e.id + "|" + cfg.key) || []).map(c => ({ e, c }))).sort((a, b) => b.c.ev - a.c.ev);
   const lab = c => `${c.lab === "Calci d'angolo" ? "Corner" : c.lab}${c.who ? " " + esc(c.who) : " totali"}`;
-  box.hidden = false;
+  SEL.bkN = L.length; box.hidden = SEL.tab !== "bk"; radarTabs();
   box.innerHTML = `<div class="selhead"><h2>💰 Mercato</h2><span class="vtag">in verifica</span></div>
     <p class="small muted" style="margin:0">Giocate in cui la nostra probabilità × la quota del book supera 1 di almeno il ${Math.round(BK_MIN * 100)}%. ${withL.length} partite con la linea su ${ents.length}.${todo.length ? " Calcolo…" : ""}</p>
     ${L.length ? `<div class="bklist">${L.slice(0, 15).map(({ e, c }) => `<button class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
@@ -4094,6 +4106,16 @@ function renderSelBk(ents, cfg, when) {
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelBk(selEntries(), cfg, when); }, 30);
 }
+/* Radar a tre schede: Segnali A+ · Mercato · Tutte (il Mercato non resta in fondo alla pagina) */
+function radarTabs() {
+  if (!SEL.tab) SEL.tab = "aplus";
+  const set = (id, n) => { const el = $(id); if (el) el.textContent = n == null ? "" : n; };
+  set("#rtA", SEL.aN); set("#rtB", SEL.bkN); set("#rtC", SEL.cN);
+  document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.rt === SEL.tab)));
+  $("#selAplus").hidden = SEL.tab !== "aplus"; $("#selAll").hidden = SEL.tab !== "all";
+  const bk = $("#selBk"); if (bk && bk.innerHTML) bk.hidden = SEL.tab !== "bk";
+}
+document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { SEL.tab = b.dataset.rt; radarTabs(); }));
 let SEL_T = 0;
 function renderSel() {
   const cfg = MODES[$("#decay").value] || MODES.dyn, ents = selEntries();
@@ -4112,17 +4134,18 @@ function renderSel() {
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button class="apcard" data-id="${esc(e.id)}">
       <span class="aptag">🔥 SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
-      ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(confLab(r))}</span>
-        <span class="small">Probabilità <b>${pc(r.q)}</b> <span class="muted">(modello ${pc(r.p)})</span></span>
-        ${r.qt ? `<span class="small">${oddsTxt(r.qt)}</span>` : ""}
-        <span class="aplab small">Grado</span>${confBar(r.score, r.cls, clsRate(r))}</span>`).join("")}
+      ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(plainLab(r))}</span><small class="muted">${esc(confLab(r))}</small>
+        <span class="gline"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gword sm">${GRADE_WORD[r.cls]}</span>${gradeDots(gradeRate(r), r.cls)}</span>
+        <span class="gsay sm">Previsioni come questa sono uscite <b>${Math.round(gradeRate(r) * 100)} volte su 100</b>.</span>
+        ${r.qt ? `<span class="small muted">${oddsTxt(r.qt)}</span>` : ""}</span>`).join("")}
       </button>`).join("")}</div>` : `<p class="apnone">NESSUN SEGNALE A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
   list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime ${SEL.h} ore.</p>` :
     (rows.length ? rows.map(([e, L]) => `<button class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
-      ${L.slice(0, 3).map(r => `<span class="selp"><span>${esc(confLab(r))}</span><span class="num">${pc(r.q)}</span><span class="num">${r.score}</span><span class="clsr"><span class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</span>${clsRate(r) != null ? `<small class="num">${Math.round(clsRate(r) * 100)}%</small>` : ""}</span></span>`).join("")}</button>`).join("")
+      ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}</span><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
+  SEL.aN = todo.length ? null : apm.reduce((a, [, L]) => a + L.length, 0); SEL.cN = ents.length; radarTabs();
   $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}). Per ogni partita le 3 previsioni più solide; colonne: esito · probabilità corretta · Indice · Grado (uguale per tutti i mercati: A+ almeno 85%, A 80%, B 75%, C 70%) con quante volte è uscita in quel mercato nelle stagioni passate. Probabilità corretta = quanto previsioni come questa sono uscite davvero nelle stagioni passate; Alta probabilità = almeno 70% corretta.${ODDS && ODDS.aggiornate ? ` Quota media = mediana tra i bookmaker (API-Football, aggiornate il ${ODDS.aggiornate}), solo informativa: il confronto con le nostre probabilità non è ancora stato verificato.` : ""}`;
   clearTimeout(SEL_T);
   if (todo.length) SEL_T = setTimeout(() => { const t = performance.now(); for (const e of todo) { try { confEntry(e, cfg); } catch (x) { CONF_C.set(e.id + "|" + cfg.key, []); } if (performance.now() - t > 250) break; } if (!$("#viewSel").hidden) renderSel(); }, 20);
