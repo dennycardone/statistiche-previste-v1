@@ -532,6 +532,28 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .cbarw{flex-wrap:wrap;row-gap:6px}.cidx{display:flex;align-items:center;gap:8px;flex:1 1 140px;min-width:0}.cidx>small{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}.cidx .cbar{flex:1}
 .crate b{color:var(--ink);font-size:14px}
 .mhead .sx-fb{margin:0;padding:9px 12px;font-size:11.5px;color:var(--ink-3);text-align:center;border-top:1px solid var(--line)}.mhead .sx-fb b{color:var(--ink-2)}
+.gintro{margin:0;font-size:14px;color:var(--ink-2);line-height:1.45}
+.gtop{display:flex;flex-direction:column;gap:6px;padding:16px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.gtop.c-ap{border-color:color-mix(in srgb,var(--hot) 60%,var(--line));background:color-mix(in srgb,var(--hot) 7%,var(--surface-2))}
+.gtop .gk{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.gtop .gq{font-family:var(--display);font-size:24px;line-height:1.15;color:var(--ink)}
+.gline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
+.ccls.gbig{min-width:44px;height:34px;font-size:18px;border-radius:8px}
+.gword{font-family:var(--display);font-size:20px;font-weight:700;color:var(--ink)}
+.gdots{display:inline-flex;gap:4px}.gdots i{width:11px;height:11px;border-radius:50%;background:var(--line)}
+.gdots.c-ap i.on{background:var(--hot)}.gdots.c-a i.on{background:var(--cls-a)}.gdots.c-b i.on{background:#6aa3e0}.gdots.c-c i.on{background:#8d9ab5}.gdots.c-d i.on{background:var(--ink-3)}
+.gsay{margin:0;font-size:15px;color:var(--ink-2)}.gsay b{color:var(--ink)}
+.gmore summary,.gitem summary{cursor:pointer;list-style:none}.gmore summary::-webkit-details-marker,.gitem summary::-webkit-details-marker{display:none}
+.gmore summary{color:var(--accent);font-weight:600;font-size:13.5px;margin-top:2px}
+.gnums{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:10px 0 2px;color:var(--ink-2)}.gnums b{color:var(--ink)}.gnums .info{margin-left:auto}
+.gscale{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px;color:var(--ink-2)}.gscale>span{display:inline-flex;align-items:center;gap:6px}.gscale .ccls{min-width:26px;height:20px;font-size:11px}
+.gh{margin:4px 0 0;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.glist{display:flex;flex-direction:column}
+.gitem{border-top:1px solid var(--line);padding:10px 0}
+.gitem summary{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.gitem .gil{display:flex;flex-direction:column;min-width:0}.gitem .gil b{font-size:15px}.gitem .gil small{font-size:12px}
+.gitem .gir{display:flex;align-items:center;gap:10px;flex:0 0 auto}.gitem .gin{font-size:13px;color:var(--ink-2);white-space:nowrap}.gitem .gin b{font-size:16px;color:var(--ink)}
+.gitem[open] summary .gil b{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -3978,6 +4000,34 @@ function refSheetHTML() {
     ${fac.length ? `<div class="kfac"><small>Fattori principali</small><ul>${fac.join("")}</ul></div>` : ""}
     <p class="small muted" style="margin:0">Cartellini: gialli + rossi. ${v2 ? `Modello cartellini v2: regressione con media del campionato, cartellini presi e provocati dalle due squadre (media mobile), arbitro (tutte le sue partite e le ultime 10, ristretto verso la media se ne ha poche), falli delle due squadre e scontri diretti; distribuzione Binomiale Negativa. Pesi stimati mese per mese con le sole partite precedenti, anche per le partite già giocate. Verifica 2024-2026 su 23.382 partite: errore medio 1,73 cartellini (media del campionato 1,77, modello precedente 1,74); probabilità tarate (Over 4,5 dato al 55% → uscito il 56%).` : `Modello: cartellini presi e provocati dalle due squadre nelle partite precedenti, corretto per l'arbitro.`}</p>`;
 }
+/* Grado spiegato a parole semplici: frase sull'esito, giudizio in parole, 10 pallini (quante volte su 10 escono previsioni così) */
+const GRADE_WORD = { "A+": "Ottima", A: "Molto buona", B: "Buona", C: "Discreta", D: "Debole" };
+function plainLab(r) {
+  const t = r.side === "1" ? r.h : r.side === "2" ? r.a : null;
+  if (t && r.mk === "c") return `Più corner per ${t}`;
+  if (t && r.mk === "f") return `Più falli commessi da ${t}`;
+  if (t && r.mk === "s") return `Più tiri per ${t}`;
+  if (t && r.mk === "st") return `Più tiri in porta per ${t}`;
+  if (r.mk in GOAL_LINE) { const L = GOAL_LINE[r.mk]; return r.side === "U" ? `Al massimo ${Math.floor(L)} gol nella partita` : `Almeno ${Math.ceil(L)} gol nella partita`; }
+  if (r.mk === "gg") return r.side === "N" ? "Almeno una squadra non segna" : "Segnano entrambe le squadre";
+  if (r.mk === "k" && r.side) { const L = +r.side.slice(1); return r.side[0] === "U" ? `Al massimo ${Math.floor(L)} cartellini` : `Almeno ${Math.ceil(L)} cartellini`; }
+  return confLab(r);
+}
+const gradeRate = r => { const c = clsRate(r); return c != null ? c : r.q; };
+const gradeC = cls => cls === "A+" ? "ap" : cls.toLowerCase();
+function gradeDots(rate, cls) {
+  const n = Math.max(0, Math.min(10, Math.round(rate * 10)));
+  return `<span class="gdots c-${gradeC(cls)}" role="img" aria-label="${n} su 10">${Array.from({ length: 10 }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span>`;
+}
+function gradeNums(r, i) {
+  return `<div class="gnums small">
+      <span>Probabilità <b class="num">${pc(r.q)}</b> <span class="muted">(modello ${pc(r.p)})</span></span>
+      <span>Indice <b class="num">${r.score}</b>/100</span>
+      ${clsRate(r) != null ? `<span>Riscontro del grado ${r.cls}: <b class="num">${Math.round(clsRate(r) * 100)}</b> su 100</span>` : ""}
+      ${confSolid(r)}${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}
+      ${r.why && r.why.length ? `<span class="muted">Non è A+ perché: ${esc(r.why.join(", "))}</span>` : ""}
+      <button class="info" data-ci="${i}" aria-label="Come si calcola">ⓘ</button></div>`;
+}
 function renderMatchConf(home, away, e, cfg) {
   const box = $("#mconf"); if (!box) return;
   box.hidden = false;
@@ -3985,15 +4035,24 @@ function renderMatchConf(home, away, e, cfg) {
   let L; try { L = withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = e.m ? e.date : null; try { if (e.m) S.season = e.m.season; return confMatch(home, away, e.date, entryOdds(e), cfg.key); } finally { S.cutoff = c0; } }); } catch (x) { L = []; }
   if (!L.length) { box.innerHTML = `<h2>Grado</h2><p class="muted" style="margin:0">Non disponibile per questa partita (servono più partite giocate).</p>`; return; }
   L = L.map(r => ({ ...r, h: home, a: away, qt: e.m ? null : oddsFor(e, r) }));
-  const top = L[0];
+  const top = L[0], tr = gradeRate(top), tn = Math.round(tr * 100);
   box.hidden = false;
   box.innerHTML = `<div class="selhead"><h2>Grado</h2><button class="info" data-ci="0" aria-label="Come si legge il Grado">ⓘ</button></div>
-    <div class="ctop"><span class="small muted">Previsione più solida</span><b>${esc(confLab(top))} · ${pc(top.q)} <small class="muted">probabilità (modello ${pc(top.p)})</small></b>${confBar(top.score, top.cls, clsRate(top))}
-      <span class="cd small">${top.qt ? `<span>${oddsTxt(top.qt)}</span>` : ""}<span>Stabilità <b>${top.stab}</b></span><span>Campione <b>${top.samp}</b></span><span class="st-${top.status}">${CONF_STATUS[top.status]}</span>${top.why.length ? `<span class="muted">A+ non confermato: ${esc(top.why.join(", "))}</span>` : top.contra >= 2 ? `<span class="muted">${top.contra} frequenze reali su 4 dicono il contrario</span>` : ""}</span></div>
-    <details class="call" open><summary>Tutti i mercati (${L.length})</summary>${L.map((r, i) => confRowHTML(r, i, true)).join("")}</details>
+    <p class="gintro">Quanto ci si può fidare di ogni previsione, in base a come sono andate previsioni simili nelle stagioni passate.</p>
+    <div class="gtop c-${gradeC(top.cls)}">
+      <small class="gk">La previsione più affidabile</small>
+      <b class="gq">${esc(plainLab(top))}</b>
+      <small class="muted">${esc(confLab(top))}</small>
+      <div class="gline"><span class="ccls c-${gradeC(top.cls)} gbig">${top.cls}</span><span class="gword">${GRADE_WORD[top.cls]}</span>${gradeDots(tr, top.cls)}</div>
+      <p class="gsay">Previsioni come questa sono uscite <b>${tn} volte su 100</b>${top.status === "aplus" ? " · <b>Segnale A+</b>" : ""}.</p>
+      <details class="gmore"><summary>I numeri</summary>${gradeNums(top, 0)}</details>
+    </div>
+    <div class="gscale" aria-label="Scala del Grado">${["A+", "A", "B", "C", "D"].map(c => `<span><span class="ccls c-${gradeC(c)}">${c}</span>${GRADE_WORD[c]}</span>`).join("")}</div>
+    <h3 class="gh">Tutte le previsioni della partita</h3>
+    <div class="glist">${L.map((r, i) => { const rr = gradeRate(r); return `<details class="gitem"><summary><span class="gil"><b>${esc(plainLab(r))}</b><small class="muted">${esc(confLab(r))}</small></span><span class="gir"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(rr * 100)}</b> su 100</span></span></summary>${gradeNums(r, i)}</details>`; }).join("")}</div>
     <div class="confinfo" id="mconfInfo" hidden></div>
-    ${e.m ? `<p class="small muted" style="margin:0">Partita giocata: punteggi calcolati solo con le partite precedenti.</p>` : ""}`;
-  box.querySelectorAll("[data-ci]").forEach(b => b.addEventListener("click", () => { const P = $("#mconfInfo"); const same = !P.hidden && P.dataset.i === b.dataset.ci; P.hidden = same; P.dataset.i = b.dataset.ci; if (!same) P.innerHTML = confInfoHTML(L[+b.dataset.ci]); }));
+    <p class="small muted" style="margin:0">Tocca una previsione per vedere i numeri.${e.m ? " Partita giocata: calcolato solo con le partite precedenti." : ""}</p>`;
+  box.querySelectorAll("[data-ci]").forEach(b => b.addEventListener("click", ev => { ev.preventDefault(); const P = $("#mconfInfo"); const same = !P.hidden && P.dataset.i === b.dataset.ci; P.hidden = same; P.dataset.i = b.dataset.ci; if (!same) { P.innerHTML = confInfoHTML(L[+b.dataset.ci]); P.scrollIntoView({ block: "nearest", behavior: "smooth" }); } }));
 }
 function selEntries() {   // partite da giocare nelle prossime SEL.h ore (orario del calcio d'inizio se c'è, altrimenti il giorno)
   const now = Date.now(), end = now + SEL.h * 36e5, t0 = localIso(), lim = localIso(new Date(end));
