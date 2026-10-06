@@ -581,6 +581,11 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
 .gnums{flex-direction:column;align-items:stretch;gap:7px;position:relative;padding-right:34px}.gnums .info{position:absolute;right:0;top:8px;margin:0}
 .gck{display:flex;gap:8px;align-items:baseline;color:var(--ink-2);line-height:1.35}.gck i{font-style:normal;font-weight:700;width:14px;flex:0 0 14px;text-align:center}
 .gck.ok i{color:#5ee08a}.gck.mid i{color:var(--gold)}.gck.ko i{color:#ff7a7a}.gck.why{color:var(--ink-3)}
+.mrow,.mrow{grid-template-columns:50px minmax(0,1fr) 30px 30px 30px 30px}
+.mrow .tmc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
+.mrow .tmc .dots{align-items:flex-start;gap:3px}
+.mrow .tmc .dots.presi{flex-direction:row;align-items:baseline;gap:3px}.mrow .tmc .dots.presi b{font-size:12px}.mrow .tmc .dots.presi small{font-size:10px}.mrow .tm.fin{font-size:10px}
+.mrow .tmc .pick .pk{font-size:10.5px;gap:2px}.mrow .tmc .pick .ccls{font-size:9.5px;padding:1px 3px}
 @media (prefers-reduced-motion:reduce){.mhead .hsw-n{animation:none}}
 </style>
 </head>
@@ -3384,9 +3389,10 @@ function renderSched() {
   const rowHTML = (e, R) => {
     const m = e.m, G = R ? R.G : null, gg = G ? G.btts : null, ov = i => G && G.over && G.over[i] != null ? G.over[i] : null;
     const hitL = (p, L) => m && p != null ? (p >= 0.5) === (m.hg + m.ag > L) : null, hitG = m && gg != null ? (gg >= 0.5) === (m.hg > 0 && m.ag > 0) : null;
-    const vals = R ? `${pv("O1,5", ov(0), hitL(ov(0), 1.5))}${pv("O2,5", ov(1), hitL(ov(1), 2.5))}${pv("O3,5", ov(2), hitL(ov(2), 3.5))}${pv("GG", gg, hitG)}${m ? presiHTML(R) : pickHTML(confEntry(e, MODES[$("#decay").value] || MODES.dyn, true))}` : `<span class="pv"><small>O1,5</small><b>…</b></span><span class="pv"><small>O2,5</small><b>…</b></span><span class="pv"><small>O3,5</small><b>…</b></span><span class="pv"><small>GG</small><b>…</b></span>`;
+    const vals = R ? `${pv("O1,5", ov(0), hitL(ov(0), 1.5))}${pv("O2,5", ov(1), hitL(ov(1), 2.5))}${pv("O3,5", ov(2), hitL(ov(2), 3.5))}${pv("GG", gg, hitG)}` : `<span class="pv"><small>O1,5</small><b>…</b></span><span class="pv"><small>O2,5</small><b>…</b></span><span class="pv"><small>O3,5</small><b>…</b></span><span class="pv"><small>GG</small><b>…</b></span>`;
+    const end = R ? (m ? presiHTML(R) : pickHTML(confEntry(e, MODES[$("#decay").value] || MODES.dyn, true))) : "";   // sotto l'orario: % presi (finite) o segnale A+
     return `<button class="mrow" data-id="${esc(e.id)}">
-          <span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>
+          <span class="tmc"><span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>${end}</span>
           <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}</span><b>${m ? m.ag : ""}</b></span>
           ${vals}
         </button>`; };
