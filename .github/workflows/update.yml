@@ -46,9 +46,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           rm -rf _site && mkdir _site
-          cp -r index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png data _site/
+          cp -r index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt data _site/
           touch _site/.nojekyll
-          mkdir _site/docs && cp -r index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png data _site/docs/ && touch _site/docs/.nojekyll   # copia identica in docs/: il sito funziona sia con la cartella "/ (root)" sia con "/docs" nelle impostazioni di Pages (stessi file, git non occupa spazio in più)
+          mkdir _site/docs && cp -r index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt data _site/docs/ && touch _site/docs/.nojekyll   # copia identica in docs/: il sito funziona sia con la cartella "/ (root)" sia con "/docs" nelle impostazioni di Pages (stessi file, git non occupa spazio in più)
           cd _site
           git init -q -b pages
           git config user.name "corner-bot"
