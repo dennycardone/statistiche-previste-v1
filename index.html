@@ -125,7 +125,7 @@ details{border-top:1px solid var(--line);padding-top:10px}
 details.fold{border-top:none;padding-top:0}
 details.fold>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
 details.fold>summary::-webkit-details-marker{display:none}
-details.fold>summary::after{content:"▾";font-size:18px;color:var(--ink-2);transition:transform .2s}
+details.fold>summary::after{content:"";width:16px;height:16px;flex:0 0 16px;background:var(--accent);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;transition:transform .2s}
 details.fold[open]>summary::after{transform:rotate(180deg)}
 .foldbody{display:flex;flex-direction:column;gap:12px;margin-top:12px}
 summary{cursor:pointer;font-weight:600}
@@ -586,11 +586,44 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
 .mrow .tmc .dots{align-items:flex-start;gap:3px}
 .mrow .tmc .dots.presi{flex-direction:row;align-items:baseline;gap:3px}.mrow .tmc .dots.presi b{font-size:12px}.mrow .tmc .dots.presi small{font-size:10px}.mrow .tm.fin{font-size:10px}
 .mrow .tmc .pick .pk{font-size:10.5px;gap:2px}.mrow .tmc .pick .ccls{font-size:9.5px;padding:1px 3px}
+/* ===== Icone Prevista: griglia 24, tratto 2 arrotondato, un solo punto lime (come nel logo) ===== */
+.ic{width:1.15em;height:1.15em;flex:0 0 auto;display:inline-block;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+symbol .d{fill:#D4FF3F;stroke:none}
+symbol .k{fill:var(--gold);stroke:none}
+.ic.gold{color:var(--gold)}.ic.good{color:var(--good)}
+h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
+.segb .ic{margin-right:5px;width:16px;height:16px;vertical-align:-3px}
+.aptag .ic{width:14px;height:14px;margin-right:5px;vertical-align:-2px}
+.st-aplus .ic{width:14px;height:14px;margin-right:4px;vertical-align:-2px}
+.hsw-n .ic{width:12px;height:12px;margin-right:3px;vertical-align:-2px;stroke-width:2.4}
+.refinf .ic{width:16px;height:16px;margin-right:6px;vertical-align:-3px}
+.swap .ic{width:20px;height:20px;vertical-align:middle}
+.sdot{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ink-3);margin-right:6px;vertical-align:0}.sdot.on{background:#D4FF3F;border-color:#D4FF3F}
+.kc{display:inline-block;width:7px;height:10px;border-radius:1.5px;background:var(--gold);transform:rotate(8deg);margin-right:2px;vertical-align:-1px}
+.chv{display:inline-block;width:14px;height:14px;vertical-align:-2px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}.chv.up{transform:rotate(180deg)}
+.info{display:inline-grid;place-items:center;font:600 13px/1 var(--body);font-style:normal;background:var(--surface-2);border-color:var(--line)}
+.tabbar svg.ic{stroke-width:1.9}
 @media (prefers-reduced-motion:reduce){.mhead .hsw-n{animation:none}}
 </style>
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-partite" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M12 5v14"/><circle cx="12" cy="12" r="3.4"/><circle class="d" cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7a5 5 0 1 0 5 5" opacity=".55"/><path d="M12 12l5.2-5.2"/><circle class="d" cx="17" cy="7" r="2"/></symbol>
+<symbol id="i-segnali" viewBox="0 0 24 24"><path d="M3 18l5.5-6 4 3.5L18 8"/><path d="M3 21h18" opacity=".45"/><circle class="d" cx="19" cy="7" r="2.2"/></symbol>
+<symbol id="i-tendenze" viewBox="0 0 24 24"><path d="M5 20v-6M12 20V9M19 20v-8"/><circle class="d" cx="12" cy="4.5" r="2"/></symbol>
+<symbol id="i-aplus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.6"/><circle class="d" cx="12" cy="12" r="1.9"/></symbol>
+<symbol id="i-mercato" viewBox="0 0 24 24"><path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1.5 1.5 0 0 1 0 2.1l-7 7a1.5 1.5 0 0 1-2.1 0z"/><circle class="d" cx="8.3" cy="8.3" r="1.9"/></symbol>
+<symbol id="i-tutte" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle class="d" cx="15.5" cy="15" r="1.7"/></symbol>
+<symbol id="i-gol" viewBox="0 0 24 24"><path d="M2.5 19V6.5h19V19"/><path d="M6 6.5v9M10 6.5v9M14 6.5v9M18 6.5v9M2.5 11h19M2.5 15.5h19" opacity=".4"/><circle class="d" cx="16" cy="18" r="2.4"/></symbol>
+<symbol id="i-arbitro" viewBox="0 0 24 24"><path d="M3 9.5h11.5l6.5-2.5v4.5l-4 1.2"/><circle cx="9.5" cy="14" r="5.5"/><circle class="d" cx="9.5" cy="14" r="1.8"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect class="k" x="6.5" y="3.5" width="11" height="17" rx="2.2" transform="rotate(8 12 12)"/></symbol>
+<symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/></symbol>
+<symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.2 9.5"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5"/><circle class="d" cx="12" cy="17.4" r="1.2"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></symbol>
+</defs></svg>
 <header class="appbar">
   <div class="appbar-in">
     <h1 class="brand"><svg class="pmark" viewBox="0 0 100 100" aria-hidden="true"><rect x="27" y="14" width="15" height="72" rx="4" fill="currentColor"/><circle cx="52" cy="40" r="19" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="52" cy="40" r="6.5" fill="#D4FF3F"/></svg><span class="bname">Prevista</span></h1>
@@ -603,10 +636,10 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
     </label>
   </div>
   <nav class="tabbar" aria-label="Sezioni">
-  <button id="navStats" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" /></svg>Partite</button>
-  <button id="navSel" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" /></svg>Radar</button>
-  <button id="navSig" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l5-6 4 3 7-9" /><circle cx="20" cy="6" r="1.6" /></svg>Segnali</button>
-  <button id="navGen" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7" /></svg>Tendenze</button>
+  <button id="navStats" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-partite"/></svg>Partite</button>
+  <button id="navSel" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-radar"/></svg>Radar</button>
+  <button id="navSig" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-segnali"/></svg>Segnali</button>
+  <button id="navGen" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-tendenze"/></svg>Tendenze</button>
 </nav>
 </header>
 <div class="wrap">
@@ -638,18 +671,17 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
   <div class="view" id="viewSel" hidden>
     <label class="fl selwin" for="selWin">Periodo<select id="selWin"><option value="24" selected>Prossime 24 ore</option><option value="48">Prossime 48 ore</option><option value="72">Prossime 72 ore</option></select></label>
     <div class="seg rtabs" role="tablist" aria-label="Sezioni del Radar" id="selTabs">
-      <button class="segb" data-rt="aplus" aria-pressed="true">🔥 Segnali A+ <b id="rtA"></b></button>
-      <button class="segb" data-rt="bk" aria-pressed="false">💰 Mercato <b id="rtB"></b></button>
-      <button class="segb" data-rt="all" aria-pressed="false">📅 Tutte <b id="rtC"></b></button>
+      <button class="segb" data-rt="aplus" aria-pressed="true"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnali A+ <b id="rtA"></b></button>
+      <button class="segb" data-rt="bk" aria-pressed="false"><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato <b id="rtB"></b></button>
+      <button class="segb" data-rt="all" aria-pressed="false"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Tutte <b id="rtC"></b></button>
     </div>
     <section class="card aplus" id="selAplus" aria-label="A+ sul radar"></section>
     <section class="card" id="selBk" aria-label="Linea bookmakers" hidden></section>
     <section class="card" id="selAll" aria-label="Partite in arrivo">
-      <div class="selhead"><h2>📅 Partite in arrivo</h2><button class="info" data-conf-info aria-label="Cos'è il Grado">ⓘ</button></div>
+      <div class="selhead"><h2><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Partite in arrivo</h2></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
         <button class="chip" data-sf="all" aria-pressed="true">Tutte</button><button class="chip" data-sf="aplus" aria-pressed="false">A+</button>
         <button class="chip" data-sf="a" aria-pressed="false">A</button><button class="chip" data-sf="b" aria-pressed="false">B</button>
-        <button class="chip" data-sf="hp" aria-pressed="false">Alta probabilità</button>
       </div>
       <div id="selList"></div>
     </section>
@@ -785,7 +817,7 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
     </label>
     <div class="picker">
       <label for="home">Squadra casa<select id="home"></select></label>
-      <button class="swap" id="swap" aria-label="Inverti casa e trasferta" title="Inverti">⇄</button>
+      <button class="swap" id="swap" aria-label="Inverti casa e trasferta" title="Inverti"><svg class="ic ic-swap" aria-hidden="true"><use href="#i-swap"/></svg></button>
       <label for="away">Squadra trasferta<select id="away"></select></label>
     </div>
     </div>
@@ -2416,13 +2448,13 @@ function marketOdds(home, away) {
   res.raw = o; return res;
 }
 function goalsCard(home, away, G, hl) {
-  if (!G) return `<section class="card" aria-label="Gol attesi"><h2>🥅 Gol attesi</h2><p class="muted" style="margin:0">N/D: dati insufficienti per la statistica scelta.</p></section>`;
+  if (!G) return `<section class="card" aria-label="Gol attesi"><h2><svg class="ic ic-gol" aria-hidden="true"><use href="#i-gol"/></svg>Gol attesi</h2><p class="muted" style="margin:0">N/D: dati insufficienti per la statistica scelta.</p></section>`;
   const mk = marketOdds(home, away);
   const diff = (m, k) => { if (m == null) return "N/D"; const d = (k - m) * 100; return `${d >= 0 ? "+" : "−"}${Math.round(Math.abs(d))} pt${Math.abs(d) >= 8 ? " ••" : Math.abs(d) >= 4 ? " •" : ""}`; };
   const mkRows = mk ? [["1 · " + esc(home), pc(G.p1), pc(mk.p1), diff(mk.p1, G.p1)], ["X · pareggio", pc(G.px), pc(mk.px), diff(mk.px, G.px)], ["2 · " + esc(away), pc(G.p2), pc(mk.p2), diff(mk.p2, G.p2)],
     ["Over 2,5", pc(G.over[1]), pc(mk.over), diff(mk.over, G.over[1])], ["Under 2,5", pc(1 - G.over[1]), mk.over == null ? "N/D" : pc(1 - mk.over), mk.over == null ? "N/D" : diff(1 - mk.over, 1 - G.over[1])]] : null;
   return `<section class="card" aria-label="Gol attesi">
-    <h2>🥅 Gol attesi</h2>
+    <h2><svg class="ic ic-gol" aria-hidden="true"><use href="#i-gol"/></svg>Gol attesi</h2>
     <div class="xp num">
       <div><span class="lbl">${esc(home)}</span><span class="val">${f2(G.lh)}</span></div>
       <div><span class="lbl">${esc(away)}</span><span class="val">${f2(G.la)}</span></div>
@@ -2697,7 +2729,7 @@ function qualitaHTML() {
   const av = Q.avvisi || [];
   const list = (t, xs) => xs && xs.length ? `<div style="margin-top:4px"><b>${esc(t)}</b> (${xs.length})<br>${xs.slice(0, 30).map(esc).join("<br>")}${xs.length > 30 ? "<br>…" : ""}</div>` : "";
   const q = Q.quote;
-  return `${Q.stato === "ok" ? "✅ tutto a posto" : "⚠️ da controllare"} · ${esc(Q.giro || "")}` +
+  return `${Q.stato === "ok" ? `<svg class="ic ic-ok good" aria-hidden="true"><use href="#i-ok"/></svg>tutto a posto` : `<svg class="ic ic-warn gold" aria-hidden="true"><use href="#i-warn"/></svg>da controllare`} · ${esc(Q.giro || "")}` +
     (av.length ? `<details style="text-align:left;margin-top:4px"><summary>${av.length} avvisi</summary>${av.map(x => "• " + esc(x)).join("<br>")}` +
       list("Squadre non riconosciute", Q.squadre_non_riconosciute) + list("Partite con data passata", Q.partite_scadute) +
       list("Statistiche scartate", Q.statistiche_scartate) + list("Quote non abbinate (esempi)", q && q.esempi_non_abbinate) + `</details>` : "") +
@@ -3332,14 +3364,14 @@ function dotsHTML(sig) {
   if (!sig.length) return `<span class="dots" title="${esc(lab)}" aria-label="${esc(lab)}"><span class="dotx"></span><small>–</small></span>`;
   return `<span class="dots" title="${esc(lab)}" aria-label="${esc(lab)}"><span class="dotrow">${sig.map(() => `<span class="dotx g"></span>`).join("")}</span><em>${sig.map(t => `${SH[t.mk]}${t.fav}`).join(" ")}</em></span>`;
 }
-const PICK_SH = (mk, side) => mk === "k" ? `🟨${side[0]}${th1(side.slice(1))}` : mk in GOAL_LINE ? (side === "U" ? "U" : "O") + th1(GOAL_LINE[mk]) : mk === "gg" ? (side === "N" ? "NG" : "GG") : ({ c: "C", f: "F", s: "T", st: "TP" }[mk] + side);
+const PICK_SH = (mk, side) => mk === "k" ? `<i class="kc"></i>${side[0]}${th1(side.slice(1))}` : mk in GOAL_LINE ? (side === "U" ? "U" : "O") + th1(GOAL_LINE[mk]) : mk === "gg" ? (side === "N" ? "NG" : "GG") : ({ c: "C", f: "F", s: "T", st: "TP" }[mk] + side);
 function pickHTML(L) {   // le previsioni più solide della partita (classe B o meglio, al massimo 2), con cosa giocare
   if (L === undefined) return `<span class="dots pick"><small>…</small></span>`;
   if (!L || !L.length) return `<span class="dots pick" title="Nessuna previsione"><small>–</small></span>`;
   const top = L.filter(r => r.cls === "A+").slice(0, 2), weak = false;   // solo i segnali A+
   if (!top.length) return `<span class="dots pick" aria-hidden="true"></span>`;
   const lab = top.map(r => `${CONF_SIDE_LAB(r.mk, r.side)}: classe ${r.cls}${clsRate(r) != null ? ` (in questo mercato esce il ${pc(clsRate(r))})` : ""}, probabilità corretta ${pc(r.q)}`).join(" · ");
-  return `<span class="dots pick${weak ? " weak" : ""}" title="${esc(lab)}" aria-label="${esc(lab)}">${top.map(r => `<span class="pk"><b class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</b>${esc(PICK_SH(r.mk, r.side))}</span>`).join("")}</span>`;
+  return `<span class="dots pick${weak ? " weak" : ""}" title="${esc(lab)}" aria-label="${esc(lab)}">${top.map(r => `<span class="pk"><b class="ccls c-${r.cls === "A+" ? "ap" : r.cls.toLowerCase()}">${r.cls}</b>${PICK_SH(r.mk, r.side)}</span>`).join("")}</span>`;
 }
 function presiHTML(R) {
   const n = R.done ? R.done.length : 0;
@@ -3482,13 +3514,13 @@ function renderH2H(home, away, before) {
   const la = teamAll(away, before).filter(m => inSeason(m) && (!venue || m.away === away));
   const hh = teamAll(home, before).filter(m => inLg(m) && (m.home === away || m.away === away) && (!venue || m.home === home));
   const block = (title, list, team) => `<section class="card hh"><h3>${title}</h3>${list.length ? hmSummary(list, team) + list.slice(0, 5).map(m => hmRow(m, team)).join("")
-      + (list.length > 5 ? `<div class="hmore" hidden>${list.slice(5).map(m => hmRow(m, team)).join("")}</div><button class="morebtn" type="button" data-l="Mostra altre (${list.length - 5})">Mostra altre (${list.length - 5}) <span aria-hidden="true">▾</span></button>` : "")
+      + (list.length > 5 ? `<div class="hmore" hidden>${list.slice(5).map(m => hmRow(m, team)).join("")}</div><button class="morebtn" type="button" data-l="Mostra altre (${list.length - 5})">Mostra altre (${list.length - 5}) <span class="chv" aria-hidden="true"></span></button>` : "")
       : `<p class="muted small" style="margin:0;padding:10px 12px">Nessuna partita nei dati.</p>`}</section>`;
   box.innerHTML = block(`Ultime partite: ${esc(home)}${venue ? " · in casa" : ""}`, lh, home)
     + block(`Ultime partite: ${esc(away)}${venue ? " · in trasferta" : ""}`, la, away)
     + block(`Scontri diretti${venue ? ` · ${esc(home)} in casa` : ""}`, hh, home)
     ;
-  box.querySelectorAll(".morebtn").forEach(b => b.addEventListener("click", () => { const d = b.previousElementSibling; d.hidden = !d.hidden; b.innerHTML = d.hidden ? `${b.dataset.l} <span aria-hidden="true">▾</span>` : `Mostra meno <span aria-hidden="true">▴</span>`; }));
+  box.querySelectorAll(".morebtn").forEach(b => b.addEventListener("click", () => { const d = b.previousElementSibling; d.hidden = !d.hidden; b.innerHTML = d.hidden ? `${b.dataset.l} <span class="chv" aria-hidden="true"></span>` : `Mostra meno <span class="chv up" aria-hidden="true"></span>`; }));
 }
 
 function standings(list, mode) {
@@ -3646,7 +3678,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
     <div class="sx">
       <div class="sx-r sx-h">
         <span class="sx-t">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></span>
-        <span class="sx-m sx-c"><button class="hsw${BK ? " on" : ""}" type="button" data-hsw role="switch" aria-checked="${BK}" aria-label="Passa da Modello a Mercato"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Mercato" : "Modello"}</span>${!BK && nValAny ? `<span class="hsw-n">💰 ${nValAny} ${nValAny === 1 ? "valore" : "valori"}</span>` : ""}</button>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
+        <span class="sx-m sx-c"><button class="hsw${BK ? " on" : ""}" type="button" data-hsw role="switch" aria-checked="${BK}" aria-label="Passa da Modello a Mercato"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Mercato" : "Modello"}</span>${!BK && nValAny ? `<span class="hsw-n"><svg class="ic ic-mercato" aria-hidden="true"><use href="#i-mercato"/></svg>${nValAny} ${nValAny === 1 ? "valore" : "valori"}</span>` : ""}</button>${m ? `<b class="scr">${m.hg} – ${m.ag}</b><small>Finale</small>` : `<b>VS</b>${e && e.time ? `<small>${esc(e.time)}</small>` : ""}`}</span>
         <span class="sx-t">${badge(away, "var(--s2)")}<b>${esc(away)}</b><small>${pos(away)}</small></span>
       </div>
       ${BK ? bkBody : `
@@ -3925,7 +3957,7 @@ document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("clic
 
 /* ===== Confidence Score: interfaccia (Radar, scheda partita) ===== */
 const CONF_C = new Map();   // previsioni con punteggio per partita e metodo (sessione)
-const CONF_STATUS = { aplus: "🔥 Segnale A+", watch: "🟢 Da seguire", none: "⚪ Nessun segnale" };
+const CONF_STATUS = { aplus: `<svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnale A+`, watch: `<i class="sdot on"></i>Da seguire`, none: `<i class="sdot"></i>Nessun segnale` };
 const SEL = { f: "all", h: 24 };
 function entryOdds(e) {
   if (e.m) return e.m.odds || null;
@@ -3989,7 +4021,7 @@ function confRowHTML(r, i, withInfo) {
   return `<div class="crow">
     <div class="cl"><span class="cmk">${esc(confLab(r))}</span><span class="cp num">${pc(r.q)}<small> probabilità · modello ${pc(r.p)}</small></span></div>
     <div class="cm">${confBar(r.score, r.cls, clsRate(r))}</div>
-    <div class="cd small"><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${confSolid(r)}${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Come si legge il Grado">ⓘ</button>` : ""}</div>
+    <div class="cd small"><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${confSolid(r)}${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Come si legge il Grado">i</button>` : ""}</div>
   </div>`;
 }
 let REFCTX = null;
@@ -4034,15 +4066,15 @@ function refSheetHTML() {
   const rsTxt = RS ? `<div class="kgrid"><span><small>Partite</small><b class="num">${RS.n}</b></span><span><small>Cartellini</small><b class="num">${f1(RS.c)}</b></span><span><small>Over 3,5</small><b class="num">${pc(RS.o35)}</b></span><span><small>Over 4,5</small><b class="num">${pc(RS.o45)}</b></span>${RS.f != null ? `<span><small>Falli</small><b class="num">${f1(RS.f)}</b></span>` : ""}</div>
     <p class="small muted" style="margin:0">Medie reali nelle sue partite dei nostri campionati negli ultimi 12 mesi circa, prima di questa${RS.f != null && RS.nf < RS.n ? ` (falli su ${RS.nf} partite)` : ""}.</p>` : (ref ? `<p class="muted" style="margin:0">Nessuna sua partita precedente nei nostri dati.</p>` : "");
   let fT = null; try { const MF = model(home, away, MODES[$("#decay").value] || MODES.dyn, "f"); fT = MF && MF.tot; } catch (x) {}
-  const infl = !ref ? `<p class="refinf">⚖️ Arbitro non ancora indicato: nei cartellini e nei falli previsti la sua influenza <b>non è applicata</b>.</p>`
-    : `<div class="refinf"><b>⚖️ Influenza dell'arbitro nelle previsioni della Lettura</b>
+  const infl = !ref ? `<p class="refinf"><svg class="ic ic-arbitro" aria-hidden="true"><use href="#i-arbitro"/></svg>Arbitro non ancora indicato: nei cartellini e nei falli previsti la sua influenza <b>non è applicata</b>.</p>`
+    : `<div class="refinf"><b><svg class="ic ic-arbitro" aria-hidden="true"><use href="#i-arbitro"/></svg>Influenza dell'arbitro nelle previsioni della Lettura</b>
       <span>Cartellini: ${v2 && fc ? `<b>${pct(fc)}</b> già applicato${mu ? ` nei <b>${f1(mu)}</b> previsti` : ""}` : "non applicata (modello senza arbitro per questo campionato)"}</span>
       <span>Falli: ${ff && isFinite(ff) && ff !== 1 ? `<b>${pct(ff)}</b> già applicato${fT ? ` nei <b>${f1(fT)}</b> previsti` : ""}` : "nessun effetto (arbitro nella media o con troppe poche partite)"}</span></div>`;
   return `<h3 style="margin:0">Arbitro</h3>
     <p style="margin:0">${refTxt}${v2 && ref && fc ? ` · effetto stimato sui cartellini <b>${pct(fc)}</b>` : ""}${ff && Math.abs(ff - 1) >= 0.005 ? ` · sui falli <b>${pct(ff)}</b>` : ""}</p>
     ${rsTxt}
     ${infl}
-    <h3 style="margin:6px 0 0">🟨 Cartellini della partita</h3>
+    <h3 style="margin:6px 0 0"><svg class="ic ic-card" aria-hidden="true"><use href="#i-card"/></svg>Cartellini della partita</h3>
     ${mu ? `<div class="kgrid"><span><small>Previsione</small><b class="num">${f1(mu)}</b></span><span><small>${esc(home)}</small><b class="num">${mh != null ? f1(mh) : "—"}</b></span><span><small>${esc(away)}</small><b class="num">${ma != null ? f1(ma) : "—"}</b></span>${played ? `<span><small>In partita</small><b class="num">${real}</b></span>` : ""}</div>
       <div class="kp" style="display:flex;flex-wrap:wrap;gap:6px 14px">${CARD_LINES.map((t, i) => `<span>Over ${th1(t)} <b class="num${played ? (real > t) === (P[i] >= 0.5) ? " good" : " bad" : ""}">${pc(P[i])}</b></span>`).join("")}</div>` : `<p class="muted" style="margin:0">Previsione cartellini non disponibile per questo campionato (servono i cartellini delle partite precedenti).</p>`}
     ${fac.length ? `<div class="kfac"><small>Fattori principali</small><ul>${fac.join("")}</ul></div>` : ""}
@@ -4071,7 +4103,7 @@ function gradeNums(r, i) {   // dietro "Perché questo grado": solo controlli a 
   return `<div class="gnums small">
       ${confSolid(r)}${r.qt ? `<span class="gck q">${oddsTxt(r.qt)}</span>` : ""}
       ${r.why && r.why.length ? `<span class="gck why">Non è A+ perché: ${esc(r.why.join(", "))}</span>` : ""}
-      <button class="info" data-ci="${i}" aria-label="Da dove viene il numero">ⓘ</button></div>`;
+      <button class="info" data-ci="${i}" aria-label="Da dove viene il numero">i</button></div>`;
 }
 function renderMatchConf(home, away, e, cfg) {
   const box = $("#mconf"); if (!box) return;
@@ -4125,13 +4157,13 @@ function bkEntry(e, cfg) {
 function renderSelBk(ents, cfg, when) {
   const box = $("#selBk"); if (!box) return;
   const withL = ents.filter(e => bkLines(e));
-  if (!withL.length) { SEL.bkN = 0; box.hidden = SEL.tab !== "bk"; box.innerHTML = `<div class="selhead"><h2>💰 Mercato</h2></div><p class="apnone">NESSUNA LINEA DEI BOOKMAKER NEL PERIODO</p>`; radarTabs(); return; }
+  if (!withL.length) { SEL.bkN = 0; box.hidden = SEL.tab !== "bk"; box.innerHTML = `<div class="selhead"><h2><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato</h2></div><p class="apnone">NESSUNA LINEA DEI BOOKMAKER NEL PERIODO</p>`; radarTabs(); return; }
   const t0 = performance.now(), todo = [];
   for (const e of withL) { const k = e.id + "|" + cfg.key; if (!BK_C.has(k)) { if (performance.now() - t0 < 200) { try { bkEntry(e, cfg); } catch (x) { BK_C.set(k, []); } } else todo.push(e); } }
   const L = withL.flatMap(e => (BK_C.get(e.id + "|" + cfg.key) || []).map(c => ({ e, c }))).sort((a, b) => b.c.ev - a.c.ev);
   const lab = c => `${c.lab === "Calci d'angolo" ? "Corner" : c.lab}${c.who ? " " + esc(c.who) : " totali"}`;
   SEL.bkN = L.length; box.hidden = SEL.tab !== "bk"; radarTabs();
-  box.innerHTML = `<div class="selhead"><h2>💰 Mercato</h2><span class="vtag">in verifica</span></div>
+  box.innerHTML = `<div class="selhead"><h2><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato</h2><span class="vtag">in verifica</span></div>
     
     ${L.length ? `<div class="bklist">${L.slice(0, 15).map(({ e, c }) => `<button class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
       <span class="bkp"><span class="bkmk">${lab(c)}</span><b class="${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} ${th1(c.L)}</b></span>
@@ -4154,7 +4186,7 @@ function renderSel() {
   const cfg = MODES[$("#decay").value] || MODES.dyn, ents = selEntries();
   const noModel = !Object.keys(CONF_COEF).length;
   const aBox = $("#selAplus"), list = $("#selList");
-  if (noModel) { aBox.innerHTML = `<h2>🔥 A+ sul radar</h2><p class="muted" style="margin:0">Grado non disponibile.</p>`; list.innerHTML = ""; return; }
+  if (noModel) { aBox.innerHTML = `<h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><p class="muted" style="margin:0">Grado non disponibile.</p>`; list.innerHTML = ""; return; }
   const got = [], todo = [];
   for (const e of ents) { const L = confEntry(e, cfg, true); if (L === undefined) todo.push(e); else got.push([e, L]); }
   const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "hp" ? r.q >= 0.7 : SEL.f === "c3" ? r.agreeN === C3_MODES.length : true;
@@ -4163,9 +4195,9 @@ function renderSel() {
     .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
   try { renderSelBk(ents, cfg, when); } catch (x) { console.warn(x); }
-  aBox.innerHTML = `<div class="selhead"><h2>🔥 A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
+  aBox.innerHTML = `<div class="selhead"><h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button class="apcard" data-id="${esc(e.id)}">
-      <span class="aptag">🔥 SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
+      <span class="aptag"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
       ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(plainLab(r))}</span><small class="muted">${esc(confLab(r))}</small>
         <span class="gline"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gword sm">${GRADE_WORD[r.cls]}</span>${gradeDots(gradeRate(r), r.cls)}</span>
@@ -4232,7 +4264,7 @@ function dzScan() {
   document.querySelectorAll(DZ_SEL).forEach(el => {
     if (el.dataset.dz || el.closest('[data-mp="info"], .sheet, .boot, #confInfo, #dataInfo, #mbase') || el.id === "importMsg" || !el.textContent.trim()) return;
     el.dataset.dz = "1"; el.classList.add("dz-h");
-    if (el.closest("#viewSig")) return;   // Segnali: nessuna ⓘ
+    if (el.closest("#viewSig, #viewSel")) return;   // Segnali e Radar: nessuna ⓘ
     if (el.id === "selNote") return;   // Radar: finisce nell'ⓘ del Confidence Score già presente
     const card = el.closest(".card, .mhead, .lgblock");
     const h = card && card.querySelector("h2");
