@@ -1,0 +1,2598 @@
+{
+ "quando": "2026-10-06 07:43 UTC",
+ "status": {
+  "account": {
+   "firstname": "denisio",
+   "lastname": "cardone",
+   "email": "dennycardone@gmail.com"
+  },
+  "subscription": {
+   "plan": "Pro",
+   "end": "2026-11-04T15:14:09+00:00",
+   "active": true
+  },
+  "requests": {
+   "current": 265,
+   "limit_day": 7500
+  }
+ },
+ "coppe_copertura": {
+  "Champions League": [
+   {
+    "stagione": 2022,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2023,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2024,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2025,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2026,
+    "statistiche": true,
+    "quote": false
+   }
+  ],
+  "Europa League": [
+   {
+    "stagione": 2022,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2023,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2024,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2025,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2026,
+    "statistiche": true,
+    "quote": false
+   }
+  ],
+  "Conference League": [
+   {
+    "stagione": 2022,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2023,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2024,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2025,
+    "statistiche": true,
+    "quote": false
+   },
+   {
+    "stagione": 2026,
+    "statistiche": true,
+    "quote": false
+   }
+  ]
+ },
+ "paesi": [
+  {
+   "paese": "Scotland",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 9,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 2,
+    "Champions League 2026": 2,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4,
+    "Europa League 2024": 3,
+    "Europa League 2025": 4,
+    "Europa League 2026": 3
+   }
+  },
+  {
+   "paese": "England",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 13,
+   "presenze": {
+    "Champions League 2024": 4,
+    "Champions League 2025": 6,
+    "Champions League 2026": 5,
+    "Conference League 2024": 1,
+    "Conference League 2025": 1,
+    "Conference League 2026": 1,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 3
+   }
+  },
+  {
+   "paese": "Switzerland",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 9,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 2,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4,
+    "Europa League 2024": 2,
+    "Europa League 2025": 4,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "France",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 10,
+   "presenze": {
+    "Champions League 2024": 4,
+    "Champions League 2025": 4,
+    "Champions League 2026": 4,
+    "Conference League 2024": 1,
+    "Conference League 2025": 1,
+    "Conference League 2026": 1,
+    "Europa League 2024": 2,
+    "Europa League 2025": 3,
+    "Europa League 2026": 3
+   }
+  },
+  {
+   "paese": "Spain",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 11,
+   "presenze": {
+    "Champions League 2024": 4,
+    "Champions League 2025": 5,
+    "Champions League 2026": 5,
+    "Conference League 2024": 1,
+    "Conference League 2025": 1,
+    "Conference League 2026": 1,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Germany",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 10,
+   "presenze": {
+    "Champions League 2024": 5,
+    "Champions League 2025": 4,
+    "Champions League 2026": 4,
+    "Conference League 2024": 1,
+    "Conference League 2025": 1,
+    "Conference League 2026": 1,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Netherlands",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 8,
+   "presenze": {
+    "Champions League 2024": 3,
+    "Champions League 2025": 3,
+    "Champions League 2026": 3,
+    "Conference League 2024": 1,
+    "Conference League 2025": 1,
+    "Conference League 2026": 2,
+    "Europa League 2024": 3,
+    "Europa League 2025": 3,
+    "Europa League 2026": 3
+   }
+  },
+  {
+   "paese": "Poland",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 8,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 2,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 3,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 3
+   }
+  },
+  {
+   "paese": "Italy",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 10,
+   "presenze": {
+    "Champions League 2024": 5,
+    "Champions League 2025": 4,
+    "Champions League 2026": 4,
+    "Conference League 2024": 1,
+    "Conference League 2025": 1,
+    "Conference League 2026": 1,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Serbia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4,
+    "Europa League 2024": 3,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   },
+   "campionato": "Super Liga",
+   "id": 286,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 296,
+   "verifica": [
+    {
+     "partita": "Radnicki NIS-FK Spartak Zdrepceva KRV 2026-05-24",
+     "arbitro": "M. Delibasic",
+     "valori": [
+      [
+       3,
+       15,
+       14,
+       7,
+       4
+      ],
+      [
+       4,
+       11,
+       10,
+       6,
+       3
+      ]
+     ]
+    },
+    {
+     "partita": "Radnicki 1923-Javor 2026-05-24",
+     "arbitro": "N. Minakovic",
+     "valori": [
+      [
+       9,
+       16,
+       13,
+       7,
+       4
+      ],
+      [
+       1,
+       13,
+       5,
+       4,
+       2
+      ]
+     ]
+    },
+    {
+     "partita": "IMT Novi Beograd-TSC Backa Topola 2026-05-24",
+     "arbitro": "P. Ilic",
+     "valori": [
+      [
+       2,
+       6,
+       7,
+       3,
+       1
+      ],
+      [
+       5,
+       16,
+       15,
+       5,
+       3
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "paese": "Turkey",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 2,
+    "Champions League 2026": 2,
+    "Conference League 2024": 2,
+    "Conference League 2025": 3,
+    "Conference League 2026": 2,
+    "Europa League 2024": 4,
+    "Europa League 2025": 3,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Czech-Republic",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 8,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 2,
+    "Champions League 2026": 2,
+    "Conference League 2024": 2,
+    "Conference League 2025": 3,
+    "Conference League 2026": 2,
+    "Europa League 2024": 2,
+    "Europa League 2025": 3,
+    "Europa League 2026": 3
+   },
+   "campionato": "Czech Liga",
+   "id": 345,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 277,
+   "verifica": [
+    {
+     "partita": "Artis-Slovácko 2026-05-27",
+     "arbitro": "J. Benes",
+     "valori": [
+      [
+       4,
+       10,
+       11,
+       3,
+       0
+      ],
+      [
+       5,
+       11,
+       15,
+       9,
+       3
+      ]
+     ]
+    },
+    {
+     "partita": "Táborsko-Baník Ostrava 2026-05-30",
+     "arbitro": "D. Stary",
+     "valori": [
+      [
+       null,
+       null,
+       null,
+       null,
+       1
+      ],
+      [
+       null,
+       null,
+       null,
+       null,
+       2
+      ]
+     ]
+    },
+    {
+     "partita": "Slovácko-Artis 2026-05-31",
+     "arbitro": "S. Volek",
+     "valori": [
+      [
+       4,
+       15,
+       13,
+       5,
+       1
+      ],
+      [
+       7,
+       11,
+       9,
+       1,
+       1
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "paese": "Austria",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 2,
+    "Champions League 2026": 2,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 2,
+    "Europa League 2024": 2,
+    "Europa League 2025": 3,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Belgium",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 8,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 2,
+    "Champions League 2026": 2,
+    "Conference League 2024": 2,
+    "Conference League 2025": 2,
+    "Conference League 2026": 2,
+    "Europa League 2024": 3,
+    "Europa League 2025": 2,
+    "Europa League 2026": 3
+   }
+  },
+  {
+   "paese": "Norway",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 8,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 2,
+    "Champions League 2026": 2,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 2,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Ukraine",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 4,
+    "Conference League 2026": 3,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 1
+   },
+   "campionato": "Premier League",
+   "id": 333,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 242,
+   "verifica": [
+    {
+     "partita": "Oleksandria-Livyi Bereh 2026-06-05",
+     "arbitro": "O. Derevinskyi",
+     "valori": [
+      [
+       3,
+       12,
+       6,
+       2,
+       3
+      ],
+      [
+       10,
+       14,
+       16,
+       6,
+       2
+      ]
+     ]
+    },
+    {
+     "partita": "Kudrivka-Ahrobiznes Volochysk 2026-06-05",
+     "arbitro": "V. Romanov",
+     "valori": [
+      [
+       6,
+       7,
+       20,
+       6,
+       1
+      ],
+      [
+       3,
+       10,
+       3,
+       1,
+       0
+      ]
+     ]
+    },
+    {
+     "partita": "Livyi Bereh-Oleksandria 2026-06-09",
+     "arbitro": "D. Panchyshyn",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Romania",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Greece",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 2,
+    "Champions League 2026": 2,
+    "Conference League 2024": 2,
+    "Conference League 2025": 2,
+    "Conference League 2026": 2,
+    "Europa League 2024": 3,
+    "Europa League 2025": 2,
+    "Europa League 2026": 3
+   }
+  },
+  {
+   "paese": "Moldova",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 4,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2024": 2,
+    "Europa League 2025": 1,
+    "Europa League 2026": 1
+   },
+   "campionato": "Super Liga",
+   "id": 394,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 151,
+   "verifica": [
+    {
+     "partita": "CSF Bălți-Dacia-Buiucani 2026-05-17",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Sireți-Iskra 2026-05-20",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Spartanii Selemet-Floreşti 2026-05-20",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Slovenia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 3,
+    "Europa League 2024": 2,
+    "Europa League 2025": 1,
+    "Europa League 2026": 2
+   },
+   "campionato": "1. SNL",
+   "id": 373,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 163,
+   "verifica": [
+    {
+     "partita": "Bravo-Olimpija Ljubljana 2026-05-23",
+     "arbitro": "D. Sabanagic",
+     "valori": []
+    },
+    {
+     "partita": "Primorje-Nafta 2026-05-27",
+     "arbitro": "D. Smajc",
+     "valori": []
+    },
+    {
+     "partita": "Nafta-Primorje 2026-05-31",
+     "arbitro": "A. Matkovic",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Iceland",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2025": 1,
+    "Europa League 2026": 2
+   },
+   "campionato": "Úrvalsdeild",
+   "id": 164,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 162,
+   "verifica": [
+    {
+     "partita": "Vestri-KR Reykjavik 2025-10-25",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Vikingur Reykjavik-Valur Reykjavik 2025-10-25",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Stjarnan-Breidablik 2025-10-26",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Sweden",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 9,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 2,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Bulgaria",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   },
+   "campionato": "First League",
+   "id": 172,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 292,
+   "verifica": [
+    {
+     "partita": "Ludogorets-CSKA Sofia 2026-05-25",
+     "arbitro": "S. Arsov",
+     "valori": []
+    },
+    {
+     "partita": "CSKA 1948-Levski Sofia 2026-05-25",
+     "arbitro": "G. Piskov",
+     "valori": []
+    },
+    {
+     "partita": "Septemvri Sofia-Yantra 2019 2026-05-28",
+     "arbitro": "K. Kolev",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Israel",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   },
+   "campionato": "Ligat Ha'al",
+   "id": 383,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 239,
+   "verifica": [
+    {
+     "partita": "Hapoel Petah Tikva-Maccabi Tel Aviv 2026-05-23",
+     "arbitro": "I. Layba",
+     "valori": []
+    },
+    {
+     "partita": "Hapoel Beer Sheva-Maccabi Haifa 2026-05-23",
+     "arbitro": "S. Berman",
+     "valori": [
+      [
+       5,
+       11,
+       20,
+       9,
+       null
+      ],
+      [
+       1,
+       15,
+       11,
+       6,
+       null
+      ]
+     ]
+    },
+    {
+     "partita": "Beitar Jerusalem-Hapoel Tel Aviv 2026-05-23",
+     "arbitro": "Y. Mizrahi",
+     "valori": [
+      [
+       3,
+       17,
+       12,
+       1,
+       8
+      ],
+      [
+       3,
+       16,
+       17,
+       3,
+       3
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "paese": "Finland",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2025": 2,
+    "Europa League 2026": 1
+   }
+  },
+  {
+   "paese": "Ireland",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4,
+    "Europa League 2024": 1,
+    "Europa League 2025": 1,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Cyprus",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3,
+    "Europa League 2024": 2,
+    "Europa League 2025": 1,
+    "Europa League 2026": 2
+   },
+   "campionato": "1. Division",
+   "id": 318,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 240,
+   "verifica": [
+    {
+     "partita": "Omonia Nicosia-Apollon Limassol 2026-05-22",
+     "arbitro": "I. Christodoulou",
+     "valori": []
+    },
+    {
+     "partita": "Pafos-Apoel Nicosia 2026-05-22",
+     "arbitro": "A. Kyriakos",
+     "valori": []
+    },
+    {
+     "partita": "Aris-AEK Larnaca 2026-05-22",
+     "arbitro": "A. Konstantinidis",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Kosovo",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2024": 1,
+    "Europa League 2025": 2
+   },
+   "campionato": "Superliga",
+   "id": 664,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 181,
+   "verifica": [
+    {
+     "partita": "Ferizaj-Llapi 2026-05-31",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Malisheva-Drita 2026-05-31",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Dinamo Ferizaj-Llapi 2026-06-06",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Denmark",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 2,
+    "Conference League 2026": 4,
+    "Europa League 2024": 2,
+    "Europa League 2025": 1,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Croatia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3,
+    "Europa League 2024": 1,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   },
+   "campionato": "HNL",
+   "id": 210,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 180,
+   "verifica": [
+    {
+     "partita": "HNK Rijeka-HNK Gorica 2026-05-23",
+     "arbitro": "D. Strukan",
+     "valori": [
+      [
+       7,
+       11,
+       21,
+       7,
+       0
+      ],
+      [
+       3,
+       9,
+       3,
+       2,
+       3
+      ]
+     ]
+    },
+    {
+     "partita": "NK Varazdin-Istra 1961 2026-05-23",
+     "arbitro": "A. Culina",
+     "valori": [
+      [
+       2,
+       18,
+       12,
+       8,
+       2
+      ],
+      [
+       3,
+       11,
+       11,
+       4,
+       3
+      ]
+     ]
+    },
+    {
+     "partita": "Dinamo Zagreb-NK Lokomotiva Zagreb 2026-05-23",
+     "arbitro": "A. Terzic",
+     "valori": [
+      [
+       4,
+       10,
+       13,
+       1,
+       null
+      ],
+      [
+       2,
+       15,
+       8,
+       5,
+       null
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "paese": "Hungary",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 1
+   },
+   "campionato": "NB I",
+   "id": 271,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 198,
+   "verifica": [
+    {
+     "partita": "Debreceni VSC-Ujpest 2026-05-16",
+     "arbitro": "G. Bogar",
+     "valori": [
+      [
+       7,
+       16,
+       21,
+       4,
+       3
+      ],
+      [
+       6,
+       21,
+       11,
+       3,
+       4
+      ]
+     ]
+    },
+    {
+     "partita": "Diosgyori VTK-Paks 2026-05-16",
+     "arbitro": "B. Berke",
+     "valori": [
+      [
+       6,
+       13,
+       10,
+       3,
+       3
+      ],
+      [
+       7,
+       9,
+       21,
+       8,
+       1
+      ]
+     ]
+    },
+    {
+     "partita": "Kisvarda FC-Gyori ETO FC 2026-05-16",
+     "arbitro": "B. Csonka",
+     "valori": [
+      [
+       6,
+       12,
+       12,
+       5,
+       3
+      ],
+      [
+       8,
+       7,
+       13,
+       5,
+       0
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "paese": "Slovakia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 4,
+    "Conference League 2026": 3,
+    "Europa League 2024": 1,
+    "Europa League 2025": 2,
+    "Europa League 2026": 1
+   },
+   "campionato": "Super Liga",
+   "id": 332,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 192,
+   "verifica": [
+    {
+     "partita": "Žilina-Podbrezová 2026-05-16",
+     "arbitro": "M. Dohal",
+     "valori": []
+    },
+    {
+     "partita": "Komárno-Tatran Prešov 2026-05-16",
+     "arbitro": "I. Kruzliak",
+     "valori": []
+    },
+    {
+     "partita": "Skalica-Ružomberok 2026-05-16",
+     "arbitro": "M. Smolak",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Kazakhstan",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4,
+    "Europa League 2024": 1,
+    "Europa League 2025": 1,
+    "Europa League 2026": 1
+   },
+   "campionato": "Premier League",
+   "id": 389,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 182,
+   "verifica": [
+    {
+     "partita": "Zhenys-Kaisar 2025-10-26",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Ulytau-FK Tobol Kostanay 2025-10-26",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Yelimay Semey-Atyrau 2025-10-26",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Faroe-Islands",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2024": 1,
+    "Europa League 2026": 1
+   },
+   "campionato": "Meistaradeildin",
+   "id": 367,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 135,
+   "verifica": [
+    {
+     "partita": "NSI Runavik-KI Klaksvik 2025-10-25",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "07 Vestur-EB / Streymur 2025-10-25",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "TB-B68 2025-10-25",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Bosnia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2024": 1,
+    "Europa League 2025": 1
+   },
+   "campionato": "Premijer Liga",
+   "id": 315,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 180,
+   "verifica": [
+    {
+     "partita": "Borac Banja Luka-Posušje 2026-05-26",
+     "arbitro": "A. Music",
+     "valori": []
+    },
+    {
+     "partita": "Sloga Doboj-Rudar Prijedor 2026-05-26",
+     "arbitro": "D. Petrovic",
+     "valori": []
+    },
+    {
+     "partita": "Zrinjski-Velež 2026-05-26",
+     "arbitro": "M. Kazlagic",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Lithuania",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2024": 1,
+    "Europa League 2026": 1
+   },
+   "campionato": "A Lyga",
+   "id": 362,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 182,
+   "verifica": [
+    {
+     "partita": "Panevėžys-FK Zalgiris Vilnius 2025-11-08",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Neptūną Klaipėda-FK Trakai 2025-11-15",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "FK Trakai-Neptūną Klaipėda 2025-11-22",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Azerbaijan",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3,
+    "Europa League 2024": 2,
+    "Europa League 2025": 1,
+    "Europa League 2026": 1
+   },
+   "campionato": "Premyer Liqa",
+   "id": 419,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 198,
+   "verifica": [
+    {
+     "partita": "Araz-Zira 2026-05-23",
+     "arbitro": "A. Ahmadov",
+     "valori": []
+    },
+    {
+     "partita": "Imisli FK-Karvan 2026-05-24",
+     "arbitro": "I. Mammadov",
+     "valori": []
+    },
+    {
+     "partita": "Qabala-Mingəçevir 2026-05-28",
+     "arbitro": "T. Qurbanov",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Georgia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2026": 1
+   },
+   "campionato": "Erovnuli Liga",
+   "id": 327,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 183,
+   "verifica": [
+    {
+     "partita": "Meshakhte-Telavi 2025-12-10",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Gareji-Spaeri 2025-12-10",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Spaeri-Gareji 2025-12-14",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Armenia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 3,
+    "Europa League 2025": 1,
+    "Europa League 2026": 1
+   },
+   "campionato": "Premier League",
+   "id": 342,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 135,
+   "verifica": [
+    {
+     "partita": "Pyunik Yerevan-Van 2026-05-27",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "FC Urartu-FC Noah 2026-05-27",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Ararat-Armenia-Gandzasar 2026-05-27",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Albania",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2026": 1
+   },
+   "campionato": "Superliga",
+   "id": 310,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 189,
+   "verifica": [
+    {
+     "partita": "AF Elbasani-Dinamo Tirana 2026-05-24",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Egnatia Rrogozhinë-Dinamo Tirana 2026-05-31",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Vllaznia Shkodër-AF Elbasani 2026-05-31",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Latvia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2024": 1,
+    "Europa League 2025": 1
+   },
+   "campionato": "Virsliga",
+   "id": 365,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 182,
+   "verifica": [
+    {
+     "partita": "Metta / LU-BFC Daugavpils 2025-11-09",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Grobiņa-JDFS Alberts 2025-11-20",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "JDFS Alberts-Grobiņa 2025-11-23",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Malta",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2025": 1
+   },
+   "campionato": "Premier League",
+   "id": 393,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 195,
+   "verifica": [
+    {
+     "partita": "Naxxar Lions-Mosta 2026-05-10",
+     "arbitro": "F. Zammit",
+     "valori": []
+    },
+    {
+     "partita": "Valletta FC-Hamrun Spartans 2026-05-15",
+     "arbitro": "A. Johnson",
+     "valori": []
+    },
+    {
+     "partita": "Floriana-Marsaxlokk 2026-05-16",
+     "arbitro": "M. De Gabriele",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Northern-Ireland",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4,
+    "Europa League 2026": 1
+   },
+   "campionato": "Premiership",
+   "id": 408,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 232,
+   "verifica": [
+    {
+     "partita": "Dungannon Swifts-Carrick Rangers 2026-05-06",
+     "arbitro": "S. Andrews",
+     "valori": []
+    },
+    {
+     "partita": "Cliftonville FC-Dungannon Swifts 2026-05-09",
+     "arbitro": "C. Morrison",
+     "valori": []
+    },
+    {
+     "partita": "Linfield-Dungannon Swifts 2026-05-12",
+     "arbitro": "T. Clarke",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Portugal",
+   "gia_nell_app": true,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 2,
+    "Champions League 2025": 2,
+    "Champions League 2026": 2,
+    "Conference League 2024": 1,
+    "Conference League 2025": 1,
+    "Conference League 2026": 1,
+    "Europa League 2024": 2,
+    "Europa League 2025": 2,
+    "Europa League 2026": 2
+   }
+  },
+  {
+   "paese": "Wales",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4,
+    "Europa League 2024": 1
+   },
+   "campionato": "Premier League",
+   "id": 110,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 193,
+   "verifica": [
+    {
+     "partita": "Barry Town-The New Saints 2026-04-18",
+     "arbitro": "R. Kenny",
+     "valori": []
+    },
+    {
+     "partita": "Haverfordwest County AFC-llanelli AFC 2026-04-18",
+     "arbitro": "A. D. Livesey",
+     "valori": []
+    },
+    {
+     "partita": "Penybont-Haverfordwest County AFC 2026-05-02",
+     "arbitro": "J. A. Jones",
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Belarus",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 3,
+    "Europa League 2024": 1
+   },
+   "campionato": "Premier League",
+   "id": 116,
+   "copertura": {
+    "2022": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": true,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 242,
+   "verifica": [
+    {
+     "partita": "FC Minsk-Bate Borisov 2025-11-30",
+     "arbitro": null,
+     "valori": [
+      [
+       null,
+       null,
+       null,
+       null,
+       3
+      ],
+      [
+       null,
+       null,
+       null,
+       null,
+       3
+      ]
+     ]
+    },
+    {
+     "partita": "Molodechno-DYuSSh 4-Torpedo Zhodino 2025-11-30",
+     "arbitro": null,
+     "valori": [
+      [
+       null,
+       null,
+       null,
+       null,
+       1
+      ],
+      [
+       null,
+       null,
+       null,
+       null,
+       1
+      ]
+     ]
+    },
+    {
+     "partita": "Smorgon-Belshina 2025-12-03",
+     "arbitro": null,
+     "valori": [
+      [
+       null,
+       null,
+       null,
+       null,
+       5
+      ],
+      [
+       null,
+       null,
+       null,
+       null,
+       2
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "paese": "Gibraltar",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 4,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3,
+    "Europa League 2024": 1,
+    "Europa League 2025": 1,
+    "Europa League 2026": 1
+   },
+   "campionato": "Premier Division",
+   "id": 758,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 147,
+   "verifica": [
+    {
+     "partita": "Europa-Mons Calpe 2026-04-25",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Lincoln Red Imps FC-Lynx 2026-04-25",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "St Joseph S Fc-Lions Gibraltar 2026-04-26",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Luxembourg",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 7,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4
+   },
+   "campionato": "National Division",
+   "id": 261,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 240,
+   "verifica": [
+    {
+     "partita": "Victoria Rosport-US Hostert 2026-05-23",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Atert Bissen-FC Differdange 03 2026-05-23",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Mamer-Jeunesse Canach 2026-05-23",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Estonia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 4,
+    "Conference League 2025": 4,
+    "Conference League 2026": 4
+   },
+   "campionato": "Meistriliiga",
+   "id": 329,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": true
+    }
+   },
+   "partite_stagione_2025": 182,
+   "verifica": [
+    {
+     "partita": "Laagri-FC Levadia Tallinn 2025-11-08",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Viimsi-Kuressaare 2025-11-22",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Kuressaare-Viimsi 2025-11-29",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Macedonia",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 6,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 4,
+    "Conference League 2026": 3,
+    "Europa League 2025": 1
+   },
+   "campionato": "First League",
+   "id": 371,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 198,
+   "verifica": [
+    {
+     "partita": "FK Rabotnicki-Tikveš 2026-05-25",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Makedonija GjP-Sileks 2026-05-25",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Akademija Pandev-Skopje 2026-05-31",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Andorra",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 4,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3,
+    "Europa League 2024": 1
+   },
+   "campionato": "1a Divisió",
+   "id": 312,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 112,
+   "verifica": [
+    {
+     "partita": "Atlètic Club d'Escaldes-Penya Encarnada 2026-05-17",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Sporting Escaldes-Esperança d'Andorra 2026-05-23",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Esperança d'Andorra-Sporting Escaldes 2026-05-27",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Montenegro",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 5,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 4
+   },
+   "campionato": "First League",
+   "id": 355,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 184,
+   "verifica": [
+    {
+     "partita": "Bokelj-Grbalj 2026-05-29",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Grbalj-Bokelj 2026-06-03",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Iskra-Jezero 2026-06-03",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "San-Marino",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 4,
+   "presenze": {
+    "Champions League 2024": 1,
+    "Champions League 2025": 1,
+    "Champions League 2026": 1,
+    "Conference League 2024": 3,
+    "Conference League 2025": 3,
+    "Conference League 2026": 3
+   },
+   "campionato": "Campionato",
+   "id": 404,
+   "copertura": {
+    "2022": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2023": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2024": {
+     "statistiche": false,
+     "quote": false
+    },
+    "2025": {
+     "statistiche": true,
+     "quote": false
+    },
+    "2026": {
+     "statistiche": false,
+     "quote": false
+    }
+   },
+   "partite_stagione_2025": 256,
+   "verifica": [
+    {
+     "partita": "Domagnano-Virtus 2026-05-12",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Tre Penne-Domagnano 2026-05-16",
+     "arbitro": null,
+     "valori": []
+    },
+    {
+     "partita": "Virtus-La Fiorita 2026-05-16",
+     "arbitro": null,
+     "valori": []
+    }
+   ]
+  },
+  {
+   "paese": "Liechtenstein",
+   "gia_nell_app": false,
+   "squadre_nelle_coppe_2024_2026": 1,
+   "presenze": {
+    "Conference League 2024": 1,
+    "Conference League 2025": 1,
+    "Conference League 2026": 1
+   }
+  }
+ ],
+ "richieste": 250
+}
