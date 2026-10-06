@@ -716,6 +716,9 @@ try:
         except Exception as e:
             print("statistiche API", fn, e)
     print("statistiche da API-Football:", n_fill, "partite riempite")
+    if apif_extra.FIXED:
+        print("risultati corretti con API-Football:", apif_extra.FIXED)
+        QUAL["risultati_corretti"] = apif_extra.FIXED[:50]
     if AF_PRO:
         # risultati: partite giocate che API-Football ha e i nostri file non ancora (fonte principale per i risultati del giorno)
         n_res = 0

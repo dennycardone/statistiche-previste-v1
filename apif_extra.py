@@ -101,6 +101,7 @@ def api_stats_ok(v):
     ok["c"] = hc is not None and ac is not None
     return ok
 GROUP = {"HS": "s", "AS": "s", "HST": "st", "AST": "st", "HF": "f", "AF": "f", "HC": "c", "AC": "c"}
+FIXED = []   # risultati corretti con API-Football in questo giro (per il controllo qualità)
 def fill_stats(rd, lg, api_rows, mp, override=False):
     """rd: righe CSV (intestazione + righe) di un campionato. Riempie SOLO dove mancano: corner, falli, tiri, tiri in porta
     (colonne di football-data) e cartellini per squadra HK/AK (gialli + rossi, sempre da API-Football), con la partita di
@@ -109,6 +110,7 @@ def fill_stats(rd, lg, api_rows, mp, override=False):
     new = "HomeTeam" not in hdr
     iD, iH, iA = hdr.index("Date"), hdr.index("Home" if new else "HomeTeam"), hdr.index("Away" if new else "AwayTeam")
     iG1, iG2 = hdr.index("HG" if new else "FTHG"), hdr.index("AG" if new else "FTAG")
+    iR = hdr.index("Res" if new else "FTR") if ("Res" if new else "FTR") in hdr else None
     for c in STAT_COLS + ["HK", "AK"]:
         if c not in hdr: hdr.append(c); [r.append("") for r in body]
     idx = {c: hdr.index(c) for c in STAT_COLS + ["HK", "AK"]}
@@ -125,8 +127,16 @@ def fill_stats(rd, lg, api_rows, mp, override=False):
             dd = r[iD].strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; d = datetime.date(int(y), int(dd[1]), int(dd[0]))
             g1, g2 = int(r[iG1]), int(r[iG2])
         except Exception: continue
-        for v in by.get((r[iH].strip(), r[iA].strip()), []):
-            if abs((datetime.date.fromisoformat(v[0][:10]) - d).days) <= 1 and v[4] == g1 and v[5] == g2:
+        cand = [v for v in by.get((r[iH].strip(), r[iA].strip()), []) if abs((datetime.date.fromisoformat(v[0][:10]) - d).days) <= 1]
+        if override and len(cand) == 1 and cand[0][9] == "FT" and (datetime.date.today() - d).days <= 60 and (cand[0][4], cand[0][5]) != (g1, g2) and not any(v[4] == g1 and v[5] == g2 for v in cand):
+            # risultato diverso tra le due fonti (solo partite degli ultimi 60 giorni finite nei 90 minuti: le partite vecchie
+            # con risultato diverso sono quasi tutte spareggi con supplementari, dove API-Football conta anche i gol dei supplementari): vale API-Football (fonte principale; nelle verifiche su fonti indipendenti
+            # era giusto molto più spesso, es. Cordoba-Tenerife 5/10/2026: football-data 3-1, reale 3-2)
+            g1, g2 = cand[0][4], cand[0][5]; r[iG1], r[iG2] = str(g1), str(g2)
+            if iR is not None: r[iR] = "H" if g1 > g2 else "A" if g1 < g2 else "D"
+            FIXED.append(f"{lg} {r[iD].strip()} {r[iH].strip()}-{r[iA].strip()}: {g1}-{g2}")
+        for v in cand:
+            if v[4] == g1 and v[5] == g2:
                 done = False
                 vals = {c: v[t][k] for c, (t, k) in API_IDX.items()}
                 ok = api_stats_ok(v)
