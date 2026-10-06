@@ -1315,15 +1315,15 @@ const LEAGUES = [
   { code: "SWE", name: "Allsvenskan", country: "Svezia", file: "new/SWE.csv", newCountry: "Sweden", cal: true },
   { code: "SWZ", name: "Super League", country: "Svizzera", file: "new/SWZ.csv", newCountry: "Switzerland" },
   { code: "USA", name: "MLS", country: "USA", file: "new/USA.csv", newCountry: "USA", cal: true },
-  // ottobre 2026: campionati solo su API-Football (squadre delle coppe europee); part = statistiche partita solo su una parte delle partite
+  // ottobre 2026: campionati solo su API-Football (squadre delle coppe europee); avviso automatico se le statistiche coprono meno del 90% delle partite
   { code: "SRB", name: "SuperLiga", country: "Serbia", file: "api/SRB.csv", newCountry: "SRB", api: true },
   { code: "CRO", name: "HNL", country: "Croazia", file: "api/CRO.csv", newCountry: "CRO", api: true },
   { code: "CZE", name: "Chance Liga", country: "Repubblica Ceca", file: "api/CZE.csv", newCountry: "CZE", api: true },
-  { code: "SVK", name: "Niké liga", country: "Slovacchia", file: "api/SVK.csv", newCountry: "SVK", api: true, part: "circa 60% nella stagione 2025/26, oltre il 95% prima" },
-  { code: "HUN", name: "NB I", country: "Ungheria", file: "api/HUN.csv", newCountry: "HUN", api: true, part: "circa 60-65%" },
-  { code: "UKR", name: "Premier League", country: "Ucraina", file: "api/UKR.csv", newCountry: "UKR", api: true, part: "circa 50%" },
-  { code: "ISR", name: "Ligat ha'Al", country: "Israele", file: "api/ISR.csv", newCountry: "ISR", api: true, part: "circa 50%" },
-  { code: "BUL", name: "Parva Liga", country: "Bulgaria", file: "api/BUL.csv", newCountry: "BUL", api: true, part: "circa 50-60%" }
+  { code: "SVK", name: "Niké liga", country: "Slovacchia", file: "api/SVK.csv", newCountry: "SVK", api: true },
+  { code: "HUN", name: "NB I", country: "Ungheria", file: "api/HUN.csv", newCountry: "HUN", api: true },
+  { code: "UKR", name: "Premier League", country: "Ucraina", file: "api/UKR.csv", newCountry: "UKR", api: true },
+  { code: "ISR", name: "Ligat ha'Al", country: "Israele", file: "api/ISR.csv", newCountry: "ISR", api: true },
+  { code: "BUL", name: "Parva Liga", country: "Bulgaria", file: "api/BUL.csv", newCountry: "BUL", api: true }
 ];
 const LG = Object.fromEntries(LEAGUES.map(l => [l.code, l]));
 const lgName = l => `${l.country} · ${l.name}`;   // prima la nazione, poi il campionato
@@ -2482,10 +2482,13 @@ function formImpactShots(home, away, cfg) {
 
 function staleNote() {
   const sm = seasonMatches(); if (!sm.length) return "";
-  const pt = LG[S.league].part ? `<div class="warnbox">${esc(LG[S.league].country)}: API-Football ha corner, falli, tiri e cartellini solo su una parte delle partite (${esc(LG[S.league].part)}). Le medie usano solo le partite con i dati reali; le altre restano vuote, senza stime.</div>` : "";
+  // campionati solo API-Football: quota reale di partite della stagione con le statistiche (sotto il 90% → avviso)
+  const ws = sm.filter(m => m.hc != null).length, sh = ws / sm.length;
+  const pt = LG[S.league].api && sh < 0.9 ? `<div class="warnbox">${esc(LG[S.league].country)}: API-Football ha corner, falli, tiri e cartellini solo per ${ws} partite su ${sm.length} di questa stagione (${Math.round(sh * 100)}%). Le medie usano solo le partite con i dati reali; le altre restano vuote, senza stime${ws < sm.length / 3 ? ": per corner, falli e tiri le previsioni possono risultare N/D o poco affidabili" : ""}.</div>` : "";
   return pt + staleNoteDays(sm);
 }
 function staleNoteDays(sm) {
+  if (LG[S.league].api) return "";   // API-Football è aggiornato ogni ora: un vuoto vuol dire solo che non si è giocato (es. pausa del campionato)
   const last = sm[sm.length - 1].date, days = Math.floor((Date.now() - last) / 864e5);
   return days > 10 ? `<div class="warnbox">Dati forse incompleti: l'ultima partita di ${esc(LG[S.league].name)} nei dati è del ${dstr(last)} (${days} giorni fa). ${LG[S.league].api ? "Fonte: API-Football, si aggiorna da sola." : `Carica il CSV aggiornato da football-data.co.uk/${LG[S.league].file}.`}</div>` : "";
 }
