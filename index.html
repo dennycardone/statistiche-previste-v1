@@ -1314,7 +1314,16 @@ const LEAGUES = [
   { code: "RUS", name: "Premier League", country: "Russia", file: "new/RUS.csv", newCountry: "Russia" },
   { code: "SWE", name: "Allsvenskan", country: "Svezia", file: "new/SWE.csv", newCountry: "Sweden", cal: true },
   { code: "SWZ", name: "Super League", country: "Svizzera", file: "new/SWZ.csv", newCountry: "Switzerland" },
-  { code: "USA", name: "MLS", country: "USA", file: "new/USA.csv", newCountry: "USA", cal: true }
+  { code: "USA", name: "MLS", country: "USA", file: "new/USA.csv", newCountry: "USA", cal: true },
+  // ottobre 2026: campionati solo su API-Football (squadre delle coppe europee); part = statistiche partita solo su una parte delle partite
+  { code: "SRB", name: "SuperLiga", country: "Serbia", file: "api/SRB.csv", newCountry: "SRB", api: true },
+  { code: "CRO", name: "HNL", country: "Croazia", file: "api/CRO.csv", newCountry: "CRO", api: true },
+  { code: "CZE", name: "Chance Liga", country: "Repubblica Ceca", file: "api/CZE.csv", newCountry: "CZE", api: true },
+  { code: "SVK", name: "Niké liga", country: "Slovacchia", file: "api/SVK.csv", newCountry: "SVK", api: true, part: "circa 60% nella stagione 2025/26, oltre il 95% prima" },
+  { code: "HUN", name: "NB I", country: "Ungheria", file: "api/HUN.csv", newCountry: "HUN", api: true, part: "circa 60-65%" },
+  { code: "UKR", name: "Premier League", country: "Ucraina", file: "api/UKR.csv", newCountry: "UKR", api: true, part: "circa 50%" },
+  { code: "ISR", name: "Ligat ha'Al", country: "Israele", file: "api/ISR.csv", newCountry: "ISR", api: true, part: "circa 50%" },
+  { code: "BUL", name: "Parva Liga", country: "Bulgaria", file: "api/BUL.csv", newCountry: "BUL", api: true, part: "circa 50-60%" }
 ];
 const LG = Object.fromEntries(LEAGUES.map(l => [l.code, l]));
 const lgName = l => `${l.country} · ${l.name}`;   // prima la nazione, poi il campionato
@@ -2473,8 +2482,12 @@ function formImpactShots(home, away, cfg) {
 
 function staleNote() {
   const sm = seasonMatches(); if (!sm.length) return "";
+  const pt = LG[S.league].part ? `<div class="warnbox">${esc(LG[S.league].country)}: API-Football ha corner, falli, tiri e cartellini solo su una parte delle partite (${esc(LG[S.league].part)}). Le medie usano solo le partite con i dati reali; le altre restano vuote, senza stime.</div>` : "";
+  return pt + staleNoteDays(sm);
+}
+function staleNoteDays(sm) {
   const last = sm[sm.length - 1].date, days = Math.floor((Date.now() - last) / 864e5);
-  return days > 10 ? `<div class="warnbox">Dati forse incompleti: l'ultima partita di ${esc(LG[S.league].name)} nei dati è del ${dstr(last)} (${days} giorni fa). Carica il CSV aggiornato da football-data.co.uk/${LG[S.league].file}.</div>` : "";
+  return days > 10 ? `<div class="warnbox">Dati forse incompleti: l'ultima partita di ${esc(LG[S.league].name)} nei dati è del ${dstr(last)} (${days} giorni fa). ${LG[S.league].api ? "Fonte: API-Football, si aggiorna da sola." : `Carica il CSV aggiornato da football-data.co.uk/${LG[S.league].file}.`}</div>` : "";
 }
 
 function render() {
@@ -2487,7 +2500,7 @@ function render() {
   renderMatchExtras(home, away);
   if (!teams().length) {
     const L_ = LG[S.league];
-    out.innerHTML = `<section class="card"><h2>${esc(L_.name)} · nessun dato</h2><p style="margin:0">Nella versione su questo link non ci sono ancora partite di ${esc(L_.name)}. Scarica <span class="num">football-data.co.uk/${L_.file}</span> e caricalo nella sezione "Dati utilizzati" qui sotto; nella versione GitHub arriva da solo.</p>${L_.noStats ? `<p class="small muted" style="margin:0">Per questo campionato la fonte gratuita contiene solo risultati e quote: corner, falli, tiri e tiri in porta risulteranno N/D.</p>` : ""}</section>`;
+    out.innerHTML = `<section class="card"><h2>${esc(L_.name)} · nessun dato</h2><p style="margin:0">Nella versione su questo link non ci sono ancora partite di ${esc(L_.name)}. ${L_.api ? "I dati arrivano da API-Football solo nella versione GitHub." : `Scarica <span class="num">football-data.co.uk/${L_.file}</span> e caricalo nella sezione "Dati utilizzati" qui sotto; nella versione GitHub arriva da solo.`}</p>${L_.noStats ? `<p class="small muted" style="margin:0">Per questo campionato la fonte gratuita contiene solo risultati e quote: corner, falli, tiri e tiri in porta risulteranno N/D.</p>` : ""}</section>`;
     $("#methodLive").innerHTML = ""; return;
   }
   if (!home || !away || home === away) { out.innerHTML = `<section class="card"><p>Scegli due squadre diverse.</p></section>`; return; }
@@ -2628,7 +2641,7 @@ function renderDataInfo() {
     <span>Dati ${S.meta.mode}</span><span>${esc(S.meta.fetched)}</span>
     <span>Fonte</span><span>${esc(S.meta.source)}</span>
     <span>Stagioni caricate</span><span>${seasons.map(y => seasonLabel(y, L_.cal)).join(", ") || "N/D"}</span>
-    <span>File del campionato</span><span>football-data.co.uk/${L_.file}</span>
+    <span>File del campionato</span><span>${L_.api ? `API-Football (data/${L_.code}.csv)` : `football-data.co.uk/${L_.file}`}</span>
     <span>Calendario</span><span>${S.fixtures.some(f => f.div === S.league) ? "API-Football (riserva: ESPN, fixturedownload.com)" : "N/D"}</span>
     <span>Controllo dati</span><span>${qualitaHTML()}</span>`;
   $("#resetBtn").hidden = S.meta.mode === "inclusi";
@@ -3206,7 +3219,8 @@ const MONTHS = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "
 const SCHED = { day: null, lg: (() => lsGet("statPreviste.lg") || "all")(), open: new Set() };   // campionati aperti (all'apertura del giorno tutti chiusi)
 const TOP_LG = ["I1", "I2", "E0", "SP1", "D1", "F1"];   // "Top campionati" in cima alla lista
 const FLAGS = { Italia: "🇮🇹", Inghilterra: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", Spagna: "🇪🇸", Francia: "🇫🇷", Germania: "🇩🇪", Olanda: "🇳🇱", Portogallo: "🇵🇹", Scozia: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", Belgio: "🇧🇪", Turchia: "🇹🇷", Grecia: "🇬🇷",
-  Argentina: "🇦🇷", Austria: "🇦🇹", Brasile: "🇧🇷", Cina: "🇨🇳", Danimarca: "🇩🇰", Finlandia: "🇫🇮", Irlanda: "🇮🇪", Giappone: "🇯🇵", Messico: "🇲🇽", Norvegia: "🇳🇴", Polonia: "🇵🇱", Romania: "🇷🇴", Russia: "🇷🇺", Svezia: "🇸🇪", Svizzera: "🇨🇭", USA: "🇺🇸" };
+  Argentina: "🇦🇷", Austria: "🇦🇹", Brasile: "🇧🇷", Cina: "🇨🇳", Danimarca: "🇩🇰", Finlandia: "🇫🇮", Irlanda: "🇮🇪", Giappone: "🇯🇵", Messico: "🇲🇽", Norvegia: "🇳🇴", Polonia: "🇵🇱", Romania: "🇷🇴", Russia: "🇷🇺", Svezia: "🇸🇪", Svizzera: "🇨🇭", USA: "🇺🇸",
+  Serbia: "🇷🇸", Croazia: "🇭🇷", "Repubblica Ceca": "🇨🇿", Slovacchia: "🇸🇰", Ungheria: "🇭🇺", Ucraina: "🇺🇦", Israele: "🇮🇱", Bulgaria: "🇧🇬" };
 const ROWC = new Map();
 let CUR = null;   // partita aperta nella scheda
 function rowKey(e) {

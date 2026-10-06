@@ -199,3 +199,25 @@ def add_results(rd, lg, api_rows, mp, today, tz):
             r[ix["HK"]] = str(int(v[7][4] + (v[7][5] or 0))); r[ix["AK"]] = str(int(v[8][4] + (v[8][5] or 0)))
         body.append(r); pairs[(h, a)].append(d); n += 1
     return [hdr] + body, n
+
+def build_csv(lg, league_name, api_rows, cal, tz, min_year):
+    """Campionati solo su API-Football (nessun file di football-data): file nel formato "new" di football-data (Country = codice,
+    Season "2025/2026" o "2025" per anno solare) con tutte le partite finite dell'archivio, statistiche se plausibili
+    (api_stats_ok) e cartellini gialli + rossi. Restituisce le righe CSV (intestazione compresa)."""
+    hdr = ["Country", "League", "Season", "Date", "Time", "Home", "Away", "HG", "AG", "Res"] + STAT_COLS + ["HK", "AK"]
+    out = []
+    for v in sorted(api_rows, key=lambda v: v[0]):
+        if v[1] != lg or v[9] not in ("FT", "AET", "PEN") or v[4] is None or v[5] is None: continue
+        loc = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(tz); d = loc.date()
+        y = d.year if cal else (d.year if d.month >= 7 else d.year - 1)
+        if y < min_year: continue
+        r = [lg, league_name, str(y) if cal else f"{y}/{y + 1}", d.strftime("%d/%m/%Y"), loc.strftime("%H:%M"), v[2], v[3], str(v[4]), str(v[5]),
+             "H" if v[4] > v[5] else "A" if v[4] < v[5] else "D"]
+        ok = api_stats_ok(v)
+        for c in STAT_COLS:
+            t, k = API_IDX[c]; x = v[t][k] if v[t] else None
+            r.append(str(int(x)) if ok[GROUP[c]] and x is not None else "")
+        H, A = v[7], v[8]
+        r += [str(int(H[4] + (H[5] or 0))), str(int(A[4] + (A[5] or 0)))] if H and A and H[4] is not None and A[4] is not None else ["", ""]
+        out.append(r)
+    return [hdr] + out

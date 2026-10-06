@@ -7,6 +7,13 @@ LEAGUES = ["I1", "I2", "E0", "SP1", "F1", "D1", "N1", "P1",
            "E1", "E2", "E3", "EC", "SC0", "SC1", "SC2", "SC3", "D2", "F2", "SP2", "B1", "T1", "G1"]
 # campionati "extra" di football-data.co.uk (un file con tutte le stagioni, solo risultati e quote)
 NEW_LEAGUES = ["ARG", "AUT", "BRA", "CHN", "DNK", "FIN", "IRL", "JPN", "MEX", "NOR", "POL", "ROU", "RUS", "SWE", "SWZ", "USA"]
+# campionati solo su API-Football (ottobre 2026, squadre delle coppe europee): codice → (id API-Football, nome, stagione per anno solare).
+# Statistiche partita nello storico 2024-2026: Serbia, Croazia, Cechia oltre il 95% delle partite; Slovacchia 96% / 58%; Ungheria, Ucraina,
+# Israele, Bulgaria circa la metà (le partite senza statistiche restano vuote: niente stime).
+API_ONLY = {"SRB": (286, "Super Liga", False), "CRO": (210, "HNL", False), "HUN": (271, "NB I", False), "CZE": (345, "Czech Liga", False),
+            "UKR": (333, "Premier League", False), "ISR": (383, "Ligat Ha'al", False), "BUL": (172, "First League", False),
+            "SVK": (332, "Super Liga", False)}
+# esclusi (verifica 6/10/2026 sullo storico): Cipro (statistiche solo sul 22-35% delle partite 2024-2026), Bielorussia (nessuna statistica)
 BASE = "https://www.football-data.co.uk/mmz4281/{code}/{lg}.csv"
 NEW = "https://www.football-data.co.uk/new/{lg}.csv"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -610,6 +617,7 @@ AF_LEAGUES_X = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "E
                 "N1": 88, "P1": 94, "SC0": 179, "SC1": 180, "SC2": 183, "SC3": 184, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71,
                 "CHN": 169, "DNK": 119, "FIN": 244, "IRL": 357, "JPN": 98, "MEX": 262, "NOR": 103, "POL": 106, "ROU": 283, "RUS": 235, "SWE": 113,
                 "SWZ": 207, "USA": 253}
+AF_LEAGUES_X.update({k: v[0] for k, v in API_ONLY.items()})
 try:
     import apif_extra, glob as _glob, urllib.parse as _up
     _key = os.environ.get("APIFOOTBALL_KEY", "").strip()
@@ -617,11 +625,13 @@ try:
     try: AP = json.load(open(ap_path))
     except Exception: AP = {}
     AP.setdefault("partite", {}); AP.setdefault("agg", "")
-    if not AP["partite"]:   # primo giro: storico dal ramo storico (scaricato dal workflow in storico/)
-        for fn in _glob.glob(os.path.join(os.path.dirname(OUT), "storico", "*.json")):
-            D = json.load(open(fn))
-            for fid, v in D["partite"].items(): AP["partite"][fid] = [v[0], D["lega"], v[1], v[2], v[3], v[4], v[5], v[6], v[7], "FT"]
-        print("arbitri: storico iniziale", len(AP["partite"]), "partite")
+    # storico dal ramo storico (scaricato dal workflow in storico/): al primo giro, poi per i campionati nuovi che l'archivio non ha
+    _have = {v[1] for v in AP["partite"].values()}; _n0 = len(AP["partite"])
+    for fn in _glob.glob(os.path.join(os.path.dirname(OUT), "storico", "*.json")):
+        D = json.load(open(fn))
+        if D["lega"] in _have or D["lega"] not in AF_LEAGUES_X: continue   # coppe europee: solo per i backtest
+        for fid, v in D["partite"].items(): AP["partite"].setdefault(fid, [v[0], D["lega"], v[1], v[2], v[3], v[4], v[5], v[6], v[7], "FT"])
+    if len(AP["partite"]) > _n0: print("arbitri: dallo storico", len(AP["partite"]) - _n0, "partite")
     KS_ = ["Total Shots", "Shots on Goal", "Corner Kicks", "Fouls", "Yellow Cards", "Red Cards", "expected_goals"]
     def _af(path, **q):
         req = urllib.request.Request("https://v3.football.api-sports.io/" + path + ("?" + _up.urlencode(q) if q else ""), headers={"x-apisports-key": _key})
@@ -666,6 +676,15 @@ try:
             AP["agg"] = _now.strftime("%Y-%m-%d %H:%M")
             print("arbitri: aggiornate", n_new, "statistiche,", len(AP["partite"]), "partite in archivio")
         json.dump(AP, open(ap_path, "w"), separators=(",", ":"), ensure_ascii=False)
+    # campionati solo su API-Football: file dell'app costruito dall'archivio (stesse colonne dei file "new" di football-data)
+    for lg_, (lid_, nm_, cal_) in API_ONLY.items():
+        try:
+            rows_ = apif_extra.build_csv(lg_, nm_, AP["partite"].values(), cal_, ROME, today.year - 6)
+            if len(rows_) > 1:
+                buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(rows_); save(f"{lg_}.csv", buf.getvalue())
+                if f"{lg_}.csv" not in files: files.append(f"{lg_}.csv")
+                print("campionato API-Football", lg_, len(rows_) - 1, "partite")
+        except Exception as e_: print("campionato API-Football", lg_, e_)
     # nostre partite (giocate e in calendario) per abbinare i nomi e le date
     ours, pairs = collections.defaultdict(list), collections.defaultdict(list)
     for fn in files:
@@ -798,7 +817,7 @@ try:
                 H, A = v[7], v[8]; played = v[9] in ("FT", "AET", "PEN") and H[4] is not None and A[4] is not None
                 _ms.append(dict(lg=lg, d=v[0], h=v[2], a=v[3], ref=v[6], hc=(H[4] + (H[5] or 0)) if played else None, ac=(A[4] + (A[5] or 0)) if played else None,
                                 hf=H[3] if played else None, af=A[3] if played else None)); _keys.append((lg, v[0], v[2], v[3]))
-        _pr, _alpha, _coef = cards_model.run(_ms, _cm, _now.date(), lim)
+        _pr, _alpha, _coef = cards_model.run(_ms, _cm, _now.date(), lim, fit_exclude=set(API_ONLY))
         CMP = {k: p for k, p in zip(_keys, _pr) if p}
         _cm["attuale"] = {"pesi": dict(zip(["b0"] + cards_model.FEATS, _coef)), "alpha": _alpha}
         json.dump(_cm, open(_cm_path, "w"), separators=(",", ":"))
@@ -854,6 +873,7 @@ AF_LEAGUES = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "EC"
               "N1": 88, "P1": 94, "SC0": 179, "SC1": 180, "SC2": 183, "SC3": 184, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71,
               "CHN": 169, "DNK": 119, "FIN": 244, "IRL": 357, "JPN": 98, "MEX": 262, "NOR": 103, "POL": 106, "ROU": 283, "RUS": 235, "SWE": 113,
               "SWZ": 207, "USA": 253}
+AF_LEAGUES.update({k: v[0] for k, v in API_ONLY.items()})
 AF_KEY = os.environ.get("APIFOOTBALL_KEY", "").strip()
 odds_path = os.path.join(OUT, "odds.json")
 try: OD = json.load(open(odds_path))

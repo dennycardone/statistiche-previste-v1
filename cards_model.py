@@ -19,7 +19,7 @@ import apif_extra as X
 VERSION = "cartellini-v2 (2026-10-05)"
 COUNTRY = {'I1': 'ITA', 'I2': 'ITA', 'E0': 'ENG', 'E1': 'ENG', 'E2': 'ENG', 'E3': 'ENG', 'EC': 'ENG', 'SP1': 'ESP', 'SP2': 'ESP', 'F1': 'FRA', 'F2': 'FRA',
            'D1': 'GER', 'D2': 'GER', 'SC0': 'SCO', 'SC1': 'SCO', 'SC2': 'SCO', 'SC3': 'SCO'}
-CALENDAR_YEAR = {'ARG', 'BRA', 'CHN', 'FIN', 'IRL', 'JPN', 'NOR', 'SWE', 'USA'}   # stagione = anno solare
+CALENDAR_YEAR = {'ARG', 'BRA', 'CHN', 'FIN', 'IRL', 'JPN', 'NOR', 'SWE', 'USA', 'BLR'}   # stagione = anno solare
 FEATS = ["E", "R", "FF", "H", "nlo", "R10"]
 K_TEAM, K_R, K_H, W, WL, MIN_LG = 3, 10, 12, 0.95, 0.995, 40
 
@@ -68,7 +68,7 @@ def features(matches):
                  "FF": math.log(FF) if FF else 0.0,
                  "H": ratio(sum(z[0] for z in HH), sum(z[1] for z in HH), K_H) if HH else 0.0,
                  "nlo": 1.0 if min(len(thS), len(taS)) < 5 else 0.0}
-            feat = dict(x=[x[k] for k in FEATS], lm=lm, eh=eh, ea=ea, rH=(L['hc'] / L['ac']) if L['ac'] > 0 else 1.0, rN=len(R), nmin=min(len(thS), len(taS)), played=played, T=(r['hc'] + r['ac']) if played else None, d=r['d'][:10])
+            feat = dict(lg=lg, x=[x[k] for k in FEATS], lm=lm, eh=eh, ea=ea, rH=(L['hc'] / L['ac']) if L['ac'] > 0 else 1.0, rN=len(R), nmin=min(len(thS), len(taS)), played=played, T=(r['hc'] + r['ac']) if played else None, d=r['d'][:10])
         res[i] = feat
         if not played: continue
         T = r['hc'] + r['ac']; F = hf + af if fok else None
@@ -120,12 +120,14 @@ def predict(f, b):
     else: mh = mu * r / (1 + r)
     return dict(mu=mu, mh=mh, ma=mu - mh, ref=ref, team=mult["E"], fouls=mult["FF"], h2h=mult["H"], early=mult["nlo"])
 
-def run(matches, cache, today, since):
+def run(matches, cache, today, since, fit_exclude=()):
     """Previsioni per le partite dal giorno `since` in poi. cache: {"version", "mesi": {YYYY-MM: [pesi, alpha]}} aggiornato qui.
     Restituisce (lista allineata a matches con dict o None, alpha attuale, pesi attuali)."""
     F = features(matches)
     if cache.get("version") != VERSION: cache.clear(); cache.update(version=VERSION, mesi={})
-    played = [f for f in F if f and f['played']]
+    # pesi stimati senza i campionati in fit_exclude (aggiunti dopo, con statistiche parziali): le previsioni dei campionati già
+    # presenti restano quelle di prima; i campionati esclusi ricevono le previsioni con gli stessi pesi
+    played = [f for f in F if f and f['played'] and f['lg'] not in fit_exclude]
     cur_m = today.isoformat()[:7]
     need = sorted({f['d'][:7] for f in F if f and f['d'] >= since.isoformat() and f['d'][:7] <= cur_m})
     for m in need:

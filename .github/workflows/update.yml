@@ -24,9 +24,10 @@ jobs:
             git fetch -q --depth 1 origin pages
             rm -rf data && git checkout FETCH_HEAD -- data && git reset -q -- data
           fi
-      - name: Storico API-Football (solo la prima volta, se manca data/apif.json)
+      - name: Storico API-Football (la prima volta o per i campionati nuovi)
         run: |
-          if [ ! -f data/apif.json ] && git ls-remote --exit-code origin storico >/dev/null 2>&1; then
+          # anche quando l'archivio non ha ancora i campionati solo API-Football aggiunti dopo (es. Serbia, codice SRB)
+          if { [ ! -f data/apif.json ] || ! grep -q '"SRB"' data/apif.json; } && git ls-remote --exit-code origin storico >/dev/null 2>&1; then
             mkdir -p storico && git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
           fi
       - uses: actions/setup-python@v5
