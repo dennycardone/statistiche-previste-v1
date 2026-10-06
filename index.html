@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Statistiche Previste</title>
+<title>Prevista — statistiche e previsioni calcio</title>
+<meta name="description" content="Prevista: statistiche e previsioni di calcio — gol, corner, falli, tiri, cartellini e arbitri — con il grado di fiducia di ogni previsione, verificato sulle partite passate.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Prevista">
+<meta name="application-name" content="Prevista">
 <meta name="theme-color" content="#0a0f1c">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -519,13 +524,18 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .stdleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-weight:700}.stdleg span{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid}
 .stdleg .mh{color:var(--s1);border-color:color-mix(in srgb,var(--s1) 50%,transparent);background:color-mix(in srgb,var(--s1) 10%,transparent)}.stdleg .ma{color:var(--s2);border-color:color-mix(in srgb,var(--s2) 50%,transparent);background:color-mix(in srgb,var(--s2) 10%,transparent)}
 .refinf{display:flex;flex-direction:column;gap:3px;margin:0;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--gold) 9%,var(--surface-2));border:1px solid color-mix(in srgb,var(--gold) 35%,var(--line));font-size:13.5px}.refinf b{color:var(--ink)}
+.appbar h1.brand{display:flex;align-items:center;gap:9px;text-transform:none;letter-spacing:.01em;font-size:27px;font-weight:700;line-height:1;overflow:visible}
+.appbar h1.brand .pmark{width:30px;height:30px;flex:0 0 auto;color:#E8EDF5}
+.appbar h1.brand .bname{display:inline;opacity:1;font-weight:700}
+@media (max-width:460px){.appbar h1.brand{font-size:25px}.appbar h1.brand .bname{display:inline}}
+.boot .bootmark{width:64px;height:64px;color:var(--ink);margin-bottom:10px}
 </style>
 </head>
 <body>
 
 <header class="appbar">
   <div class="appbar-in">
-    <h1>Statistiche <span>Previste</span></h1>
+    <h1 class="brand"><svg class="pmark" viewBox="0 0 100 100" aria-hidden="true"><rect x="27" y="14" width="15" height="72" rx="4" fill="currentColor"/><circle cx="52" cy="40" r="19" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="52" cy="40" r="6.5" fill="#D4FF3F"/></svg><span class="bname">Prevista</span></h1>
     <label for="decay" class="modepick"><span class="sr">Statistica richiesta</span>
       <select id="decay">
         <option value="dyn" selected>Media dinamica</option>
@@ -541,7 +551,7 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 </nav>
 </header>
 <div class="wrap">
-  <div class="boot" id="boot" role="status"><span class="spin" aria-hidden="true"></span><b>Carico i dati aggiornati…</b><small>partite, risultati e previsioni di oggi</small></div>
+  <div class="boot" id="boot" role="status"><svg class="pmark bootmark" viewBox="0 0 100 100" aria-hidden="true"><rect x="27" y="14" width="15" height="72" rx="4" fill="currentColor"/><circle cx="52" cy="40" r="19" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="52" cy="40" r="6.5" fill="#D4FF3F"/></svg><span class="spin" aria-hidden="true"></span><b>Carico i dati aggiornati…</b><small>partite, risultati e previsioni di oggi</small></div>
 
   <div class="view" id="viewHist" hidden>
     <section class="card" aria-label="Filtri bilancio">
@@ -3705,8 +3715,8 @@ $("#oddsExport").addEventListener("click", () => {
   const o = getOdds(), n = Object.keys(o).length, msg = $("#oddsMsg"); msg.hidden = false;
   if (!n) { msg.textContent = "Non hai ancora inserito quote."; return; }
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: "statistiche-previste", quote: o }, null, 1)], { type: "application/json" }));
-  a.download = `quote-statistiche-previste-${new Date().toISOString().slice(0, 10)}.json`;
+  a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: "prevista", quote: o }, null, 1)], { type: "application/json" }));
+  a.download = `quote-prevista-${new Date().toISOString().slice(0, 10)}.json`;
   document.body.appendChild(a); a.click(); a.remove();
   msg.textContent = `Backup con ${n} quote salvato nei Download.`;
 });
