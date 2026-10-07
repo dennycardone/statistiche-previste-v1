@@ -789,17 +789,36 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   </div>
 
   <div class="view" id="viewGen" hidden>
-    <section class="card genf3" aria-label="Filtri tendenze">
+    <section class="card genf" aria-label="Filtri classifiche">
       <div class="genrow">
-        <label for="genMk3" class="fl">Statistica<select id="genMk3">
-          <option value="c" selected>Corner</option><option value="f">Falli</option><option value="s">Tiri</option><option value="st">Tiri in porta</option>
-          <option value="gol">Over e Gol</option><option value="k">Cartellini</option>
-        </select></label>
-        <label for="genLg" class="fl">Campionato<select id="genLg"></select></label>
+      <label for="genMk" class="fl">Mercato<select id="genMk">
+        <optgroup label="Gol">
+          <option value="o15">Over 1,5</option><option value="o25" selected>Over 2,5</option><option value="o35">Over 3,5</option>
+          <option value="u15">Under 1,5</option><option value="u25">Under 2,5</option><option value="u35">Under 3,5</option>
+          <option value="gg">Gol</option><option value="ng">No gol</option>
+        </optgroup>
+        <optgroup label="Corner"><option value="c_avg">Corner · media</option><option value="c_win">Corner · 1X2</option></optgroup>
+        <optgroup label="Falli"><option value="f_avg">Falli · media</option><option value="f_win">Falli · 1X2</option></optgroup>
+        <optgroup label="Tiri"><option value="s_avg">Tiri · media</option><option value="s_win">Tiri · 1X2</option></optgroup>
+        <optgroup label="Tiri in porta"><option value="st_avg">Tiri in porta · media</option><option value="st_win">Tiri in porta · 1X2</option></optgroup>
+        <optgroup label="Cartellini"><option value="k_avg">Cartellini · media</option><option value="k_o35">Over 3,5 cartellini</option><option value="k_o45">Over 4,5 cartellini</option><option value="k_o55">Over 5,5 cartellini</option></optgroup>
+      </select></label>
+      <label for="genLg" class="fl">Campionato<select id="genLg"></select></label>
       </div>
-      <div class="seg" role="group" aria-label="Sede" id="genVen3">
-        <button class="segb" data-gv="home" aria-pressed="true">Casa</button>
-        <button class="segb" data-gv="away" aria-pressed="false">Trasferta</button>
+      <div class="seg" role="group" aria-label="Sede" id="genVenue">
+        <button class="segb" data-gv="tot" aria-pressed="true">Totale</button>
+        <button class="segb" data-gv="home" aria-pressed="false">In casa</button>
+        <button class="segb" data-gv="away" aria-pressed="false">In trasferta</button>
+      </div>
+      <div class="seg" role="group" aria-label="Periodo" id="genPer">
+        <button class="segb" data-gp="season" aria-pressed="true">Stagione</button>
+        <button class="segb" data-gp="10" aria-pressed="false">Ultime 10</button>
+        <button class="segb" data-gp="5" aria-pressed="false">Ultime 5</button>
+      </div>
+      <div class="seg" role="group" aria-label="Quando giocano" id="genWhen">
+        <button class="segb" data-gw="all" aria-pressed="true">Tutte</button>
+        <button class="segb" data-gw="0" aria-pressed="false">Giocano oggi</button>
+        <button class="segb" data-gw="1" aria-pressed="false">Giocano domani</button>
       </div>
     </section>
     <div id="genOut" class="genlist"></div>
@@ -4084,13 +4103,38 @@ function gen3Body(L, mk, ven, soon, hi) {
 }
 function renderGen() {
   const box = $("#genOut"); if (!box) return;
-  const mk = $("#genMk3").value, D = GEN3[mk], ven = GEN.ven3 === "away" ? "away" : "home", L = LEAGUES.find(x => x.code === $("#genLg").value);
-  if (!L) { box.innerHTML = ""; return; }
-  const t0 = localIso(), t1 = addDays(t0, 1), soon = new Set();
-  for (const e of allEntries()) if (!e.m && (e.d === t0 || e.d === t1) && e.lg.code === L.code) { soon.add(e.home); soon.add(e.away); }
-  const { body, note } = gen3Body(L, mk, ven, soon, null);
-  box.innerHTML = `<section class="card gl4"><div class="gl4h"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="gl4m">${esc(D.lab)} · ${ven === "home" ? "in casa" : "in trasferta"}</span></div>${body}<p class="lt-ref">${note} Pallino lime: gioca oggi o domani.</p></section>`;
+  const mkKey = $("#genMk").value, D = GEN_MK[mkKey], lgSel = $("#genLg").value, when = GEN.when || "all", soon = when !== "all";
+  const next = genNextEntries();
+  let rows = genRows(mkKey, lgSel, GEN.venue, GEN.per);
+  if (soon) rows = rows.filter(r => { const nx = next.get(r.lg.code + "|" + r.t); return nx && nx.day === +when; });
+  const shown = rows.slice(0, GEN.shown), max = Math.max(...shown.map(r => r.val), 1e-9);
+  if (!rows.length) { box.innerHTML = soon ? `<div class="empty">Nessuna di queste squadre gioca ${when === "0" ? "oggi" : "domani"}.</div>` : `<div class="empty">Nessuna squadra con almeno 5 partite con questi filtri${D.k !== "g" ? ".<br><span class='small'>Corner, falli e tiri non ci sono per i campionati con solo risultati.</span>" : "."}</div>`; return; }
+  const fmtV = v => D.avg ? f1(v) : pc(v);
+  const todo = [];
+  const item = (r, i) => {
+    const nx = next.get(r.lg.code + "|" + r.t), pr = genNextProb(mkKey, nx);
+    if (nx && pr === undefined) todo.push(nx.e);
+    const w = D.avg ? r.val / max : r.val, refw = D.avg ? r.ref / max : r.ref;
+    const opp = nx ? (nx.side === "h" ? nx.e.away : nx.e.home) : null;
+    const nextTxt = nx ? `<span class="gnext">Prossima: ${nx.side === "h" ? "in casa con" : "fuori con"} ${crest(nx.e.lg.code, opp)}<b>${esc(opp)}</b> · ${dstr(nx.e.date)}${nx.e.time ? " " + esc(nx.e.time) : ""}${pr === undefined ? ` · <span class="muted">…</span>` : pr ? ` · <em>${D.avg ? (pr.tot ? "cartellini attesi in partita " : "attesi ") + f1(pr.v) : (D.win ? `${D.name} 1X2: ${nx.side === "h" ? "1" : "2"} ` : D.lab + " ") + pc(pr.p)}</em>` : ""}</span>` : `<span class="gnext muted">Nessuna partita nei prossimi 14 giorni</span>`;
+    return `<button class="grow${i < 3 ? " top" : ""}" data-lg="${r.lg.code}" data-t="${esc(r.t)}" data-id="${nx ? esc(nx.e.id) : ""}">
+      <span class="grk">${i + 1}</span>
+      <span class="gmain"><span class="gteam">${crest(r.lg.code, r.t)}${esc(r.t)}</span><span class="glg">${esc(lgName(r.lg))}</span></span>
+      <span class="gval"><b>${D.avg ? f1(r.val) : `${r.c}/${r.n}`}</b><small>${D.avg ? `in ${r.n} partite` : pc(r.val)}</small></span>
+      <span class="gbar" aria-hidden="true"><i style="width:${Math.max(2, Math.min(100, w * 100))}%"></i><u style="left:${Math.min(100, refw * 100)}%"></u></span>
+      <span class="gref">Media campionato ${fmtV(r.ref)}</span>
+      ${nextTxt}
+    </button>`;
+  };
+  box.innerHTML = shown.map(item).join("") + (rows.length > GEN.shown ? `<button class="genmore" id="genMore">Mostra altre ${Math.min(10, rows.length - GEN.shown)}</button>` : "");
+  box.querySelectorAll(".grow").forEach(b => b.addEventListener("click", () => { const e = b.dataset.id && allEntries().find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
+  const more = $("#genMore"); if (more) more.addEventListener("click", () => { GEN.shown += 10; renderGen(); });
+  // previsioni mancanti: una partita alla volta, senza bloccare la pagina
+  const job = renderGen.job = {}, uniq = [...new Map(todo.map(e => [e.id, e])).values()];
+  const step = () => { if (renderGen.job !== job) return; const e = uniq.shift(); if (!e) { renderGen.job = null; renderGenSoft(); return; } genCalcNext(e); setTimeout(step, 0); };
+  if (uniq.length) setTimeout(step, 0);
 }
+
 /* scheda partita, sezione Classifica: le stesse tabelle del campionato, con le due squadre evidenziate.
    Si apre sul lato della partita: in casa per la squadra di casa, in trasferta per l'ospite. */
 const MTR = { mk: "c", ven: "home" };
@@ -4234,9 +4278,11 @@ $("#ritLg").innerHTML = LEAGUES.slice().sort((a, b) => ((a.country === "Italia" 
 ["#ritLg", "#ritTeam", "#ritGr", "#ritDot"].forEach(id => $(id).addEventListener("change", renderRit));
 document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 function renderGenSoft() { const y = scrollY; renderGen(); scrollTo({ top: y }); }
-$("#genLg").innerHTML = LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
-["#genMk3", "#genLg"].forEach(id => $(id).addEventListener("change", renderGen));
-document.querySelectorAll("#genVen3 .segb").forEach(b => b.addEventListener("click", () => { GEN.ven3 = b.dataset.gv; document.querySelectorAll("#genVen3 .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
+$("#genLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
+document.querySelectorAll("#genWhen .segb").forEach(b => b.addEventListener("click", () => { GEN.when = b.dataset.gw; GEN.shown = 10; document.querySelectorAll("#genWhen .segb").forEach(x => x.setAttribute("aria-pressed", x === b)); renderGen(); }));
+["#genMk", "#genLg"].forEach(id => $(id).addEventListener("change", () => { GEN.shown = 10; renderGen(); }));
+document.querySelectorAll("#genVenue .segb").forEach(b => b.addEventListener("click", () => { GEN.venue = b.dataset.gv; GEN.shown = 10; document.querySelectorAll("#genVenue .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
+document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("click", () => { GEN.per = b.dataset.gp; GEN.shown = 10; document.querySelectorAll("#genPer .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
 
 /* ===== Confidence Score: interfaccia (Radar, scheda partita) ===== */
 const CONF_C = new Map();   // previsioni con punteggio per partita e metodo (sessione)
