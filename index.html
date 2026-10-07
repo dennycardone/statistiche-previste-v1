@@ -787,6 +787,27 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 .rtf{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .rtf .chip{display:inline-flex;align-items:center;gap:6px}
 .rtf .chip i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#D4FF3F}
+
+/* ===== ritocchi 7/10 sera ===== */
+/* intestazioni dei campionati: nazione grande, campionato piccolo */
+.lghead .nm small{order:0;font-family:var(--display);font-stretch:75%;font-size:16.5px;font-weight:700;letter-spacing:.04em;color:var(--ink)}
+.lghead .nm b{order:1;font-family:var(--body);font-stretch:88%;font-size:10.5px;font-weight:600;letter-spacing:.12em;color:var(--ink-2)}
+/* Partite: cerchio lime più grande in tutti e due gli stati, senza toccare la scritta */
+.tabbar .navmain,.tabbar .navmain[aria-pressed]{padding:0 0 5px;gap:3px;justify-content:flex-end}
+.tabbar .navmain .nmc,.tabbar .navmain[aria-pressed="false"] .nmc{width:50px;height:50px;margin:-20px 0 0;border-radius:50%;display:grid;place-items:center}
+.tabbar .navmain .nmc svg,.tabbar .navmain[aria-pressed="false"] .nmc svg{width:26px;height:26px;stroke-width:2}
+.tabbar .navmain[aria-pressed="true"] .nmc{background:#D4FF3F;box-shadow:0 0 0 4px var(--bar-2),0 8px 18px -6px rgba(212,255,63,.55)}
+.tabbar .navmain[aria-pressed="false"] .nmc{background:var(--surface-2);box-shadow:0 0 0 4px var(--bar-2),0 0 0 5.5px color-mix(in srgb,#D4FF3F 55%,transparent)}
+.tabbar .navmain[aria-pressed="false"] .nmc svg{color:var(--ink)}
+/* Digiuni: parte di sopra compatta, pulsanti centrati */
+#viewRit .genf3{gap:7px;padding:10px}
+#viewRit .genrow{gap:7px}
+#viewRit select{padding:7px 8px;font-size:15.5px}
+#viewRit .genf3>.fl{margin-top:0}
+#ritVen{margin-top:0}
+#viewRit .segb{padding:5px 9px}
+.rtf{justify-content:center}
+.rtf .chip{padding:5px 11px}
 </style>
 </head>
 <body>
@@ -887,11 +908,11 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <div class="view" id="viewRit" hidden>
     <section class="card genf3" aria-label="Filtri digiuni">
       <div class="genrow">
-        <label for="ritLg" class="fl">Campionato<select id="ritLg"></select></label>
-        <label for="ritTeam" class="fl">Squadra<select id="ritTeam"></select></label>
+        <label for="ritLg" class="fl"><span class="sr">Campionato</span><select id="ritLg"></select></label>
+        <label for="ritTeam" class="fl"><span class="sr">Squadra</span><select id="ritTeam"></select></label>
       </div>
-      <label for="ritGr" class="fl">Statistica<select id="ritGr">
-        <option value="all" selected>Tutte</option><option value="g">Gol e risultati</option><option value="r">Risultati esatti</option><option value="c">Corner</option><option value="s">Tiri</option>
+      <label for="ritGr" class="fl"><span class="sr">Statistica</span><select id="ritGr">
+        <option value="all" selected>Tutte le statistiche</option><option value="g">Gol e risultati</option><option value="r">Risultati esatti</option><option value="c">Corner</option><option value="s">Tiri</option>
         <option value="st">Tiri in porta</option><option value="f">Falli</option><option value="k">Cartellini</option>
       </select></label>
       <div class="seg" role="group" aria-label="Sede" id="ritVen">
@@ -925,7 +946,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
           <button class="chip sstat" data-k="k" aria-pressed="true">Cartellini</button>
         </div>
         <label for="sigMin">Probabilità minima: <b id="sigMinVal">75%</b><input type="range" id="sigMin" min="75" max="95" step="5" value="75"></label>
-        <label class="chk" for="sigGames"><input type="checkbox" id="sigGames" checked> Almeno 3 partite per sede (casa per chi gioca in casa, trasferta per l'ospite)</label>
+        <label class="chk" for="sigGames"><input type="checkbox" id="sigGames" checked> Almeno 3 partite in casa/trasferta</label>
         <input type="checkbox" id="sigC3" hidden>
         <label for="sigMode" hidden>Statistica richiesta<select id="sigMode">
           <option value="dyn" selected>Media dinamica</option>
@@ -4303,7 +4324,7 @@ function renderRit() {
   const box = $("#ritOut"); if (!box) return;
   const L = LEAGUES.find(x => x.code === $("#ritLg").value); if (!L) { box.innerHTML = ""; return; }
   const sel = $("#ritTeam"), cur = withLeague(L.code, () => { const c0 = S.cutoff; S.cutoff = null; try { return teams(); } finally { S.cutoff = c0; } });
-  if (sel.dataset.lg !== L.code) { sel.innerHTML = `<option value="all">Tutte</option>` + cur.map(t => `<option>${esc(t)}</option>`).join(""); sel.dataset.lg = L.code; }
+  if (sel.dataset.lg !== L.code) { sel.innerHTML = `<option value="all">Tutte le squadre</option>` + cur.map(t => `<option>${esc(t)}</option>`).join(""); sel.dataset.lg = L.code; }
   const team = sel.value || "all", gr = $("#ritGr").value, ven = RIT.ven;
   const rows = ritRows(L, team, gr, ven), venTxt = ven === "home" ? "in casa" : ven === "away" ? "in trasferta" : "";
   const dd = d => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
