@@ -344,7 +344,7 @@ select{border-radius:10px}
 .genmore{width:100%;padding:12px;border-radius:12px;font-weight:600;background:var(--surface);box-shadow:var(--shadow)}
 @media (prefers-reduced-motion:reduce){.day{transition:none}}
 
-.tabbar{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tabbar{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media (max-width:460px){.tabbar button{font-size:11.5px;letter-spacing:0;padding:9px 0}}
 .pick .pk{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap}
 .pick .ccls{min-width:22px;height:16px;font-size:10px;padding:0 3px;border-radius:4px}
@@ -390,7 +390,7 @@ select{border-radius:10px}
 
 /* ===== Interfaccia "Riflettori" (5/10/2026): barra in basso, giorni grandi, campionati a fasce, scheda match a tre colonne ===== */
 body{padding-block:0 calc(88px + env(safe-area-inset-bottom,0px))}
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;max-width:none;margin:0;border-radius:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));background:var(--bar-2);border-top:1px solid var(--line);box-shadow:0 -10px 24px -14px rgba(0,0,0,.8)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;max-width:none;margin:0;border-radius:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));background:var(--bar-2);border-top:1px solid var(--line);box-shadow:0 -10px 24px -14px rgba(0,0,0,.8)}
 .tabbar button,.tabbar button[aria-pressed]{flex-direction:column;gap:4px;padding:7px 0 5px;font-size:11px;letter-spacing:.06em;color:var(--ink-3);background:transparent;opacity:1;box-shadow:none;border-radius:0;position:relative}
 .tabbar svg{display:block!important;width:25px;height:25px;stroke-width:1.8}
 .tabbar button[aria-pressed="true"]{background:transparent;color:var(--hot);box-shadow:none}
@@ -692,6 +692,20 @@ h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
 .gl4{padding:0;overflow:hidden}
 .gl4h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;background:linear-gradient(180deg,var(--surface-2),var(--surface));border-bottom:1px solid var(--line)}
 .gl4h .nm{display:flex;flex-direction:column;line-height:1.1}.gl4h .nm small{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}.gl4h .nm b{font-family:var(--display);font-stretch:75%;font-size:21px;text-transform:uppercase}
+.rtl{list-style:none;margin:0;padding:0}
+.rtr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
+.rtr:first-child{border-top:none}
+.rtt{display:flex;align-items:center;gap:7px;min-width:0;font-weight:600;font-size:14px}.rtt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rtr.soon .rtt span::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#D4FF3F;margin-left:6px;vertical-align:2px}
+.rte{grid-column:1;font-size:14px;color:var(--ink);line-height:1.3}.rte b{color:var(--hot)}
+.rtl2{grid-column:1/-1;font-size:12px;color:var(--ink-3);line-height:1.35}
+.rtn{grid-row:1/3;grid-column:2;text-align:right;line-height:1}.rtn b{display:block;font-family:var(--display);font-stretch:75%;font-size:30px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}.rtn small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rtn.never b{color:var(--hot)}
+.rtnx{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.rtnx b{color:var(--ink-2)}
+.rtnx.on{color:var(--ink-2)}.rtnx.on b{color:#D4FF3F}
+.rtdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#D4FF3F;box-shadow:0 0 0 3px rgba(212,255,63,.18);flex:0 0 auto}
+.rtr.hasdot{background:linear-gradient(90deg,rgba(212,255,63,.06),transparent 60%)}
+#ritVen{margin-top:10px}#viewRit .genf3>.fl{display:block;margin-top:10px}
 .gl4h .flag{font-size:26px}.gl4m{font-size:12px;color:var(--accent);font-weight:600;text-align:right}
 .ltc .lth,.ltc .ltr{grid-template-columns:20px minmax(0,1fr) repeat(var(--nc),46px)}
 .ltf{text-align:center;font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}.ltf b{color:var(--ink);font-size:14.5px;font-weight:600}
@@ -718,6 +732,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 <symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7a5 5 0 1 0 5 5" opacity=".55"/><path d="M12 12l5.2-5.2"/><circle class="d" cx="17" cy="7" r="2"/></symbol>
 <symbol id="i-segnali" viewBox="0 0 24 24"><path d="M3 18l5.5-6 4 3.5L18 8"/><path d="M3 21h18" opacity=".45"/><circle class="d" cx="19" cy="7" r="2.2"/></symbol>
 <symbol id="i-tendenze" viewBox="0 0 24 24"><path d="M5 20v-6M12 20V9M19 20v-8"/><circle class="d" cx="12" cy="4.5" r="2"/></symbol>
+<symbol id="i-ritardi" viewBox="0 0 24 24"><path d="M6 3h12M6 21h12M7.5 3c0 5 4.5 6 4.5 9s-4.5 4-4.5 9M16.5 3c0 5-4.5 6-4.5 9s4.5 4 4.5 9"/><circle class="d" cx="12" cy="17.6" r="1.9"/></symbol>
 <symbol id="i-aplus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.6"/><circle class="d" cx="12" cy="12" r="1.9"/></symbol>
 <symbol id="i-mercato" viewBox="0 0 24 24"><path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1.5 1.5 0 0 1 0 2.1l-7 7a1.5 1.5 0 0 1-2.1 0z"/><circle class="d" cx="8.3" cy="8.3" r="1.9"/></symbol>
 <symbol id="i-tutte" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle class="d" cx="15.5" cy="15" r="1.7"/></symbol>
@@ -745,6 +760,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <button id="navSel" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-radar"/></svg>Radar</button>
   <button id="navSig" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-segnali"/></svg>Segnali</button>
   <button id="navGen" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-tendenze"/></svg>Tendenze</button>
+  <button id="navRit" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-ritardi"/></svg>Digiuni</button>
 </nav>
 </header>
 <div class="wrap">
@@ -788,6 +804,26 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </section>
     <div id="genOut" class="genlist"></div>
     <p hidden style="margin:0">Almeno 5 partite nel periodo e nella sede scelti. A pari percentuale prima chi ha più partite. "Media campionato" è lo stesso dato su tutte le partite del campionato. La probabilità della prossima partita è quella del metodo scelto in alto.</p>
+  </div>
+
+  <div class="view" id="viewRit" hidden>
+    <section class="card genf3" aria-label="Filtri digiuni">
+      <div class="genrow">
+        <label for="ritLg" class="fl">Campionato<select id="ritLg"></select></label>
+        <label for="ritTeam" class="fl">Squadra<select id="ritTeam"></select></label>
+      </div>
+      <label for="ritGr" class="fl">Statistica<select id="ritGr">
+        <option value="all" selected>Tutte</option><option value="g">Gol e risultati</option><option value="r">Risultati esatti</option><option value="c">Corner</option><option value="s">Tiri</option>
+        <option value="st">Tiri in porta</option><option value="f">Falli</option><option value="k">Cartellini</option>
+      </select></label>
+      <div class="seg" role="group" aria-label="Sede" id="ritVen">
+        <button class="segb" data-v="home" aria-pressed="true">Casa</button>
+        <button class="segb" data-v="away" aria-pressed="false">Trasferta</button>
+        <button class="segb" data-v="all" aria-pressed="false">Tutte</button>
+      </div>
+      <label class="chk" for="ritDot" style="margin-top:10px"><input type="checkbox" id="ritDot"> Solo con il pallino (la Lettura della prossima partita dà l'evento)</label>
+    </section>
+    <div id="ritOut"></div>
   </div>
 
   <div class="view" id="viewSig" hidden>
@@ -3336,7 +3372,7 @@ $("#file").addEventListener("change", async e => {
 $("#resetBtn").addEventListener("click", () => { lsDel(STORE_KEY); loadEmbedded(); $("#importMsg").hidden = true; refreshAll(); });
 $("#swap").addEventListener("click", () => { CUR = null; S.cutoff = null; const h = $("#home").value; $("#home").value = $("#away").value; $("#away").value = h; render(); });
 ["#home", "#away"].forEach(s => $(s).addEventListener("change", () => { CUR = null; S.cutoff = null; render(); }));
-$("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; if (!$("#viewMatch").hidden) render(); renderNext(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewGen").hidden) renderGen(); if (!$("#viewSel").hidden) renderSel(); });
+$("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; if (!$("#viewMatch").hidden) render(); renderNext(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewGen").hidden) renderGen(); if (!$("#viewRit").hidden) renderRit(); if (!$("#viewSel").hidden) renderSel(); });
 $("#league").innerHTML = LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 $("#league").addEventListener("change", e => { CUR = null; S.cutoff = null; S.league = e.target.value; let sv = {}; try { sv = JSON.parse(lsGet(PICK_KEY) || "{}") || {}; } catch (x) {} sv.league = S.league; lsSet(PICK_KEY, JSON.stringify(sv)); refreshAll(); });
 
@@ -4073,6 +4109,130 @@ function renderMatchTrend(home, away) {
   $("#mtrMk").addEventListener("change", ev => { MTR.mk = ev.target.value; renderMatchTrend(home, away); });
   box.querySelectorAll("#mtrVen .segb").forEach(b => b.addEventListener("click", () => { MTR.ven = b.dataset.v; renderMatchTrend(home, away); }));
 }
+/* Digiuni: da quante partite di campionato (nei nostri dati, anche delle stagioni precedenti) una squadra non ottiene un evento.
+   Solo partite con il dato disponibile; sede: in casa, in trasferta o tutte. "Mai" = mai successo in tutte le partite che abbiamo. */
+const RIT_EV = [
+  ["g", "g", "non vince", (f, a) => f > a], ["g", "g", "non pareggia", (f, a) => f === a], ["g", "g", "non perde", (f, a) => f < a],
+  ["g", "g", "non segna", (f, a) => f >= 1], ["g", "g", "non fa 2 gol", (f, a) => f >= 2], ["g", "g", "non fa 3 gol", (f, a) => f >= 3],
+  ["g", "g", "non chiude con la porta inviolata", (f, a) => a === 0], ["g", "g", "non subisce 2 gol", (f, a) => a >= 2],
+  ["g", "g", "non ha una partita con Over 1,5", (f, a) => f + a > 1.5], ["g", "g", "non ha una partita con Over 2,5", (f, a) => f + a > 2.5],
+  ["g", "g", "non ha una partita con Over 3,5", (f, a) => f + a > 3.5], ["g", "g", "non ha una partita con Under 2,5", (f, a) => f + a < 2.5],
+  ["g", "g", "non ha una partita con Gol (segnano entrambe)", (f, a) => f > 0 && a > 0], ["g", "g", "non ha una partita con No gol", (f, a) => !(f > 0 && a > 0)],
+  ["c", "c", "non batte più corner dell'avversario", (f, a) => f > a], ["c", "c", "non batte 6 corner", (f, a) => f >= 6], ["c", "c", "non ha una partita con Over 9,5 corner", (f, a) => f + a > 9.5],
+  ["s", "s", "non tira più dell'avversario", (f, a) => f > a], ["s", "s", "non fa 15 tiri", (f, a) => f >= 15],
+  ["st", "st", "non fa più tiri in porta dell'avversario", (f, a) => f > a], ["st", "st", "non fa 6 tiri in porta", (f, a) => f >= 6],
+  ["f", "f", "non fa più falli dell'avversario", (f, a) => f > a], ["f", "f", "non ha una partita con Over 24,5 falli", (f, a) => f + a > 24.5],
+  ["k", "k", "non prende 3 cartellini", (f, a) => f >= 3], ["k", "k", "non ha una partita con Over 3,5 cartellini", (f, a) => f + a > 3.5], ["k", "k", "non ha una partita con Over 4,5 cartellini", (f, a) => f + a > 4.5],
+  // risultati esatti fino a 4 gol totali, dal punto di vista della squadra (gol fatti-subiti); solo nel filtro "Risultati esatti"
+  ...[[1, 0], [2, 0], [2, 1], [3, 0], [3, 1], [4, 0], [0, 0], [1, 1], [2, 2], [0, 1], [0, 2], [1, 2], [0, 3], [1, 3], [0, 4]].map(([x, y]) =>
+    ["r", "g", `${x > y ? "non vince" : x === y ? "non pareggia" : "non perde"} ${x}-${y}`, (f, a) => f === x && a === y])];
+const RIT = { ven: "home", min: 5 };
+const RIT_UNIT = { g: "", c: " corner", s: " tiri", st: " tiri in porta", f: " falli", k: " cartellini" };
+function ritRows(L, team, gr, ven) {
+  const out = [];
+  withLeague(L.code, () => { const c0 = S.cutoff; S.cutoff = null;
+    try {
+      const all = leagueMatches().slice().sort((a, b) => b.date - a.date), cur = teams();
+      for (const t of (team === "all" ? cur : [team])) {
+        const mine = all.filter(m => ven === "home" ? m.home === t : ven === "away" ? m.away === t : (m.home === t || m.away === t));
+        for (const [g, k, lab, fn] of RIT_EV) {
+          if (gr === "all" ? g === "r" : gr !== g) continue;
+          const { h: kh, a: ka } = MET[k]; let n = 0, last = null;
+          for (const m of mine) {
+            if (m[kh] == null || m[ka] == null) continue;
+            const hm = m.home === t, f = hm ? m[kh] : m[ka], a = hm ? m[ka] : m[kh];
+            if (fn(f, a)) { last = m; break; }
+            n++;
+          }
+          if (n >= RIT.min) out.push({ t, g, k, lab, fn, n, last, never: !last });
+        }
+      }
+    } finally { S.cutoff = c0; } });
+  return out.sort((x, y) => y.n - x.n || x.t.localeCompare(y.t, "it") || RIT_EV.findIndex(e => e[2] === x.lab) - RIT_EV.findIndex(e => e[2] === y.lab));
+}
+/* Lettura della prossima partita (entro 14 giorni, stessa sede del filtro): probabilità del modello che l'evento succeda.
+   Gol e risultati: matrice dei risultati del modello gol (Dixon-Coles). Corner, tiri, tiri in porta, falli: due distribuzioni
+   (una per squadra) con le medie e la dispersione del modello. Cartellini: cartellini attesi per squadra del modello v2. */
+function ritNext(L, t, ven, AE) {
+  const e = (AE || allEntries()).filter(x => !x.m && x.lg.code === L.code && (x.home === t || x.away === t) && x.d >= localIso()).sort((a, b) => a.date - b.date)[0];
+  if (!e) return null;
+  const home = e.home === t;
+  if ((ven === "home" && !home) || (ven === "away" && home)) return { e, home, skip: true };
+  return { e, home };
+}
+const RIT_P = new Map();
+function ritDist(L, e, k) {   // [distribuzione squadra di casa, ospite] oppure { mat } per i gol
+  const cfg = MODES[$("#decay").value] || MODES.dyn, key = `${e.id}|${k}|${cfg.key}`;
+  if (RIT_P.has(key)) return RIT_P.get(key);
+  let R = null;
+  withLeague(L.code, () => { const c0 = S.cutoff; S.cutoff = null;
+    try {
+      if (k === "g") {
+        const G = modelGoals(e.home, e.away, cfg);
+        if (G && isFinite(G.lh) && isFinite(G.la)) {
+          const N = 10, mat = []; let z = 0;
+          for (let x = 0; x <= N; x++) { mat[x] = []; for (let y = 0; y <= N; y++) { const p = Math.max(0, dcTau(x, y, G.lh, G.la, G.rho || 0)) * poisP(x, G.lh) * poisP(y, G.la); mat[x][y] = p; z += p; } }
+          R = { mat: mat.map(r => r.map(p => p / z)) };
+        }
+      } else if (k === "k") {
+        const x = EXTRA && EXTRA.partite && EXTRA.partite[e.id], a = EXTRA && EXTRA.alpha, r = a > 2e-4 ? 1 / a : Infinity;
+        if (x && x[6] && x[7]) R = [pmfTotal(x[6], r, 15), pmfTotal(x[7], r, 15)];
+      } else {
+        const M = k === "s" || k === "st" ? (T => T && (k === "s" ? T.MS : T.MD))(modelShots(e.home, e.away, cfg)) : model(e.home, e.away, cfg, k);
+        if (M && isFinite(M.lh) && isFinite(M.la)) { const rt = M.rTeam != null ? M.rTeam : M.r, mx = k === "c" || k === "st" ? 30 : 60; R = [pmfTotal(M.lh, rt, mx), pmfTotal(M.la, rt, mx)]; }
+      }
+    } catch (err) { R = null; } finally { S.cutoff = c0; } });
+  RIT_P.set(key, R); return R;
+}
+function ritProb(L, nx, k, fn) {
+  const D = ritDist(L, nx.e, k); if (!D) return null;
+  let p = 0;
+  if (D.mat) D.mat.forEach((row, x) => row.forEach((q, y) => { const [f, a] = nx.home ? [x, y] : [y, x]; if (fn(f, a)) p += q; }));
+  else { const [ph, pa] = D; ph.forEach((qh, x) => { if (qh < 1e-7) return; pa.forEach((qa, y) => { const [f, a] = nx.home ? [x, y] : [y, x]; if (fn(f, a)) p += qh * qa; }); }); }
+  return p;
+}
+function renderRit() {
+  const box = $("#ritOut"); if (!box) return;
+  const L = LEAGUES.find(x => x.code === $("#ritLg").value); if (!L) { box.innerHTML = ""; return; }
+  const sel = $("#ritTeam"), cur = withLeague(L.code, () => { const c0 = S.cutoff; S.cutoff = null; try { return teams(); } finally { S.cutoff = c0; } });
+  if (sel.dataset.lg !== L.code) { sel.innerHTML = `<option value="all">Tutte</option>` + cur.map(t => `<option>${esc(t)}</option>`).join(""); sel.dataset.lg = L.code; }
+  const team = sel.value || "all", gr = $("#ritGr").value, ven = RIT.ven;
+  const rows = ritRows(L, team, gr, ven), venTxt = ven === "home" ? "in casa" : ven === "away" ? "in trasferta" : "";
+  const dd = d => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+  const lastTxt = r => {
+    if (r.never) return `Mai successo nelle partite ${venTxt ? venTxt + " " : ""}che abbiamo (dal ${dd(r.first)})`;
+    const m = r.last, { h: kh, a: ka } = MET[r.k];
+    return `Ultima volta: ${dd(m.date)} · ${esc(m.home)}–${esc(m.away)} ${m[kh]}-${m[ka]}${RIT_UNIT[r.k]}`;
+  };
+  if (rows.length) withLeague(L.code, () => { const lm = leagueMatches(); for (const r of rows) if (r.never) r.first = lm.filter(m => m.home === r.t || m.away === r.t).reduce((a, m) => !a || m.date < a ? m.date : a, null); });
+  const MAXR = 120, onlyDot = $("#ritDot").checked, NX = new Map(), AE = allEntries().filter(x => !x.m && x.lg.code === L.code);
+  let shown = onlyDot ? rows : rows.slice(0, MAXR);
+  const dshort = d => d.toLocaleDateString("it-IT", { weekday: "short", day: "2-digit", month: "2-digit" });
+  for (const r of shown) {
+    if (!NX.has(r.t)) NX.set(r.t, ritNext(L, r.t, ven, AE));
+    const nx = NX.get(r.t); r.nx = nx;
+    if (nx && !nx.skip) r.p = ritProb(L, nx, r.k, r.fn);
+  }
+  if (onlyDot) shown = shown.filter(r => r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip);
+  const nextTxt = r => {
+    const nx = r.nx; if (!nx) return "";
+    const opp = nx.home ? nx.e.away : nx.e.home, where = nx.home ? "in casa" : "in trasferta";
+    if (nx.skip) return `<span class="rtl2">Prossima: ${dshort(nx.e.date)} ${where} con ${esc(opp)}</span>`;
+    const p = r.p, on = p != null && p >= 0.5;
+    return `<span class="rtl2 rtnx${on ? " on" : ""}">${on ? '<i class="rtdot" aria-hidden="true"></i>' : ""}Prossima: ${dshort(nx.e.date)} ${where} con ${esc(opp)} · Lettura <b>${p == null ? "N/D" : Math.round(p * 100) + "%"}</b></span>`;
+  };
+  const body = shown.length ? `<ul class="rtl">${shown.map(r => `<li class="rtr${r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip ? " hasdot" : ""}">
+      <span class="rtt">${crest(L.code, r.t)}<span>${esc(r.t)}</span></span>
+      <span class="rte">${r.lab}${venTxt ? " " + venTxt : ""} da <b>${r.n}</b> partite</span>
+      <span class="rtn${r.never ? " never" : ""}"><b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>
+      <span class="rtl2">${lastTxt(r)}</span>${nextTxt(r)}</li>`).join("")}</ul>`
+    : `<p class="lt-none">${onlyDot ? "Nessun digiuno con il pallino: per ora la Lettura delle prossime partite non dà nessuno di questi eventi." : `Nessun digiuno di almeno ${RIT.min} partite con questi filtri.`}</p>`;
+  box.innerHTML = `<section class="card gl4"><div class="gl4h"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="gl4m">${ven === "home" ? "In casa" : ven === "away" ? "In trasferta" : "Tutte le partite"}</span></div>${body}
+    <p class="lt-ref">Partite di campionato consecutive senza l'evento, dalla più recente all'indietro, anche nelle stagioni precedenti (solo questo campionato, solo partite con il dato). Almeno ${RIT.min} partite. Pallino: per la prossima partita (stessa sede) la Lettura dà l'evento al 50% o più, con il metodo scelto in alto.${!onlyDot && rows.length > MAXR ? ` Primi ${MAXR} di ${rows.length}: scegli una squadra o una statistica per vederli tutti.` : ""} </p></section>`;
+}
+$("#ritLg").innerHTML = LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
+["#ritLg", "#ritTeam", "#ritGr", "#ritDot"].forEach(id => $(id).addEventListener("change", renderRit));
+document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 function renderGenSoft() { const y = scrollY; renderGen(); scrollTo({ top: y }); }
 $("#genLg").innerHTML = LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#genMk3", "#genLg"].forEach(id => $(id).addEventListener("change", renderGen));
@@ -4353,12 +4513,13 @@ document.querySelectorAll("#selF .chip").forEach(b => b.addEventListener("click"
 document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null) + ($("#selNote") && !$("#viewSel").hidden ? `<p class="small" style="margin:0">${$("#selNote").innerHTML}</p>` : ""); P.scrollIntoView({ block: "nearest" }); } }));
 
 function showView(v) {
-  $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewGen").hidden = v !== "gen"; $("#viewSel").hidden = v !== "sel"; $("#viewMatch").hidden = v !== "match";
-  $("#navStats").setAttribute("aria-pressed", String(v === "stats" || v === "match")); $("#navSig").setAttribute("aria-pressed", String(v === "sig")); $("#navGen").setAttribute("aria-pressed", String(v === "gen")); $("#navSel").setAttribute("aria-pressed", String(v === "sel"));
+  $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewGen").hidden = v !== "gen"; $("#viewRit").hidden = v !== "rit"; $("#viewSel").hidden = v !== "sel"; $("#viewMatch").hidden = v !== "match";
+  $("#navStats").setAttribute("aria-pressed", String(v === "stats" || v === "match")); $("#navSig").setAttribute("aria-pressed", String(v === "sig")); $("#navGen").setAttribute("aria-pressed", String(v === "gen")); $("#navRit").setAttribute("aria-pressed", String(v === "rit")); $("#navSel").setAttribute("aria-pressed", String(v === "sel"));
   if (v !== "match") { S.cutoff = null; lsSet("statPreviste.view", v); }
   if (v === "stats") renderSched();
   if (v === "sig") renderSignals();
   if (v === "gen") renderGen();
+  if (v === "rit") renderRit();
   if (v === "sel") renderSel();
 }
 $("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
@@ -4371,6 +4532,7 @@ $("#navStats").addEventListener("click", () => { showView("stats"); scrollTo({ t
 $("#back").addEventListener("click", () => { showView("stats"); });
 $("#navSig").addEventListener("click", () => showView("sig"));
 $("#navGen").addEventListener("click", () => showView("gen"));
+$("#navRit").addEventListener("click", () => showView("rit"));
 $("#navSel").addEventListener("click", () => showView("sel"));
 
 
