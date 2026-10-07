@@ -760,10 +760,12 @@ try:
                 print("risultati API", fn, e)
         print("risultati da API-Football:", n_res, "partite aggiunte")
         # calendario: prossime 3 settimane da API-Football (data e ora italiane); squadre non riconosciute → partita scartata
+        LIVE_ST = ("1H", "HT", "2H", "ET", "BT", "P", "LIVE", "INT", "SUSP")   # in corso o sospese
         cal, unk = [["Div", "Date", "Time", "HomeTeam", "AwayTeam", "Round"]], set()
         for lg, L in by_lg.items():
             for v in L:
-                if v[9] not in ("NS", "TBD"): continue
+                # anche le partite in corso (1H, HT, 2H…): prima sparivano dalla lista finché non finivano
+                if v[9] not in ("NS", "TBD") + LIVE_ST: continue
                 loc = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(ROME)
                 if not (_now.date() <= loc.date() <= _now.date() + datetime.timedelta(days=21)): continue
                 h, a = MAPS[lg].get(v[2]), MAPS[lg].get(v[3])
