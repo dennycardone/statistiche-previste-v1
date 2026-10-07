@@ -1,8 +1,8 @@
 name: Aggiorna dati corner
 on:
   schedule:
-    - cron: "17 5-23 * * *"
-    - cron: "47 5-22 * * *"   # secondo orario di riserva: GitHub salta spesso i giri programmati, così ne arrivano di più (due giri insieme non partono mai: il secondo aspetta)   # ogni ora dalle 7:17 all'1:17 ora italiana (in UTC; con l'ora solare dalle 6:17 alle 0:17)
+    - cron: "17 3-23 * * *"   # in UTC: dalle 5:17 all'1:17 ora italiana (con l'ora solare dalle 4:17 alle 0:17); GitHub di solito parte 10-15 minuti dopo
+    - cron: "47 3-22 * * *"   # secondo orario di riserva: GitHub salta spesso i giri programmati, così ne arrivano di più (due giri insieme non partono mai: il secondo aspetta)
   workflow_dispatch: {}
   push:   # parte da solo anche quando cambiano l'app o gli script che preparano i dati
     branches: [main]
