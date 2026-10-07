@@ -697,6 +697,10 @@ h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
 .ltf{text-align:center;font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}.ltf b{color:var(--ink);font-size:14.5px;font-weight:600}
 .lt2 .lth,.lt2 .ltr{grid-template-columns:20px minmax(0,1fr) 54px 54px 64px}
 .ltl{background:color-mix(in srgb,var(--surface-2) 70%,transparent)}.ltl .ltt{color:var(--ink-2);font-weight:500}.ltl .ltf,.ltl .lta{color:var(--ink-2)}
+.mtrend{padding-left:0;padding-right:0;gap:10px}.mtrend>h2,.mtrend>.mtrc,.mtrend>.stdleg{margin-left:14px;margin-right:14px}
+.mtrc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}.mtrc select{font-size:15px}.mtrc .seg{min-width:190px}
+.ltr.mh{background:color-mix(in srgb,var(--s1) 16%,transparent);box-shadow:inset 4px 0 0 var(--s1)}.ltr.mh .ltt{color:var(--s1)}
+.ltr.ma{background:color-mix(in srgb,var(--s2) 16%,transparent);box-shadow:inset 4px 0 0 var(--s2)}.ltr.ma .ltt{color:var(--s2)}
 @media (prefers-reduced-motion:reduce){.mhead .hsw-n{animation:none}}
 /* ===== Carattere Prevista: Mona Sans (OFL), una famiglia variabile: larghezza 75 per titoli/etichette, 88 per il testo ===== */
 @font-face{font-family:'Mona Sans';src:url('mona-sans.woff') format('woff');font-weight:200 900;font-stretch:75% 125%;font-display:swap}
@@ -864,6 +868,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
         <button class="segb" data-av="away" aria-pressed="false">Trasferta</button>
       </div>
       <section class="card" id="tableOut" aria-label="Classifica"></section>
+      <section class="card mtrend" id="mtrend" aria-label="Tendenze del campionato" hidden></section>
     </div>
     <div class="mpane" data-mp="info" hidden>
   <section class="card" aria-label="Scelta partita" hidden style="display:none">   <!-- i menu restano (li usa il codice), ma non si vedono -->
@@ -3659,11 +3664,11 @@ document.querySelectorAll(".segb[data-hv]").forEach(b => b.addEventListener("cli
 }));
 document.querySelectorAll(".segb[data-av]").forEach(b => b.addEventListener("click", () => {
   MV.avg = b.dataset.av; document.querySelectorAll(".segb[data-av]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-  renderTable($("#home").value, $("#away").value);
+  renderTable($("#home").value, $("#away").value); renderMatchTrend($("#home").value, $("#away").value);
 }));
 document.querySelectorAll(".segb[data-tv]").forEach(b => b.addEventListener("click", () => {
   MV.tab = b.dataset.tv; document.querySelectorAll(".segb[data-tv]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-  renderTable($("#home").value, $("#away").value);
+  renderTable($("#home").value, $("#away").value); renderMatchTrend($("#home").value, $("#away").value);
 }));
 (function () {   // altezza reale della barra in alto: le schede della partita restano agganciate subito sotto
   const ab = document.querySelector(".appbar"); if (!ab) return;
@@ -3803,7 +3808,7 @@ function renderMatchExtras(home, away) {
         return `<h2>Alla prova: ${h} giusti su ${P.length} (${pc(h / P.length)})</h2>` + rowsTable(["Mercato", "Pron.", "Reale"], P.map(x => [x.lab, `<b>${x.pick}</b><br><span class="muted small">${pc(x.p)}</span>`, `${x.ok ? `<span class="good">✓</span>` : `<span class="bad">✗</span>`} <span class="small">${x.txt}</span>`])); })()}`;
   } else { cmp.hidden = true; cmp.innerHTML = ""; }
   renderH2H(home, away, m ? e.date : null);
-  renderTable(home, away);
+  renderTable(home, away); renderMatchTrend(home, away);
   // segnalazioni della partita: sostituite dal Confidence Score nella scheda "Confidence" (6/10/2026)
   const box = $("#msig");
   if (true || !home || !away || home === away) { box.innerHTML = ""; return; }
@@ -4012,32 +4017,56 @@ function gen3Rows(L, mk, ven) {
   else out.sort((x, y) => y.f - x.f || x.t.localeCompare(y.t));
   return { rows: out, ref };
 }
-function renderGen() {
-  const box = $("#genOut"); if (!box) return;
-  const mk = $("#genMk3").value, D = GEN3[mk], ven = GEN.ven3 === "away" ? "away" : "home", L = LEAGUES.find(x => x.code === $("#genLg").value);
-  if (!L) { box.innerHTML = ""; return; }
-  const t0 = localIso(), t1 = addDays(t0, 1), soon = new Set();
-  for (const e of allEntries()) if (!e.m && (e.d === t0 || e.d === t1)) { soon.add(e.home); soon.add(e.away); }
-  const venLab = ven === "home" ? "in casa" : "in trasferta";
+/* tabella di un campionato per la statistica e la sede scelte; hi = squadre da evidenziare (scheda partita), soon = giocano a breve */
+function gen3Body(L, mk, ven, soon, hi) {
+  const D = GEN3[mk], venLab = ven === "home" ? "in casa" : "in trasferta";
   const { rows, ref } = gen3Rows(L, mk, ven);
+  const rc = t => { const c = (hi && hi.get(t)) || ""; return (soon && soon.has(t) ? " soon" : "") + (c ? " " + c : ""); };
   let body;
   if (!rows.length) body = `<p class="lt-none">${statMissing(L.code, MET[D.k].h) ? `Nessun dato di ${D.lab.toLowerCase()} in questa stagione.` : "Nessuna partita con questo dato nella stagione."}</p>`;
   else if (D.cols) {
     body = `<div class="lt ltc" role="table" aria-label="${esc(D.lab)} · ${esc(L.name)}" style="--nc:${D.cols.length}">
       <div class="lth" role="row"><span>#</span><span>Squadra</span>${D.cols.map(([l]) => `<span>${l}</span>`).join("")}</div>
-      ${rows.map((r, i) => `<div class="ltr${soon.has(r.t) ? " soon" : ""}" role="row"><span class="ltk">${i + 1}</span><span class="ltt">${crest(L.code, r.t)}${esc(r.t)}</span>${r.hits.map(h => `<span class="ltf"><b>${h}</b>/${r.n}</span>`).join("")}</div>`).join("")}
+      ${rows.map((r, i) => `<div class="ltr${rc(r.t)}" role="row"><span class="ltk">${i + 1}</span><span class="ltt">${crest(L.code, r.t)}${esc(r.t)}</span>${r.hits.map(h => `<span class="ltf"><b>${h}</b>/${r.n}</span>`).join("")}</div>`).join("")}
       <div class="ltr ltl" role="row"><span></span><span class="ltt">Campionato</span>${ref.hits.map(h => `<span class="ltf">${Math.round(h / ref.n * 100)}%</span>`).join("")}</div>
     </div>`;
   } else {
     body = `<div class="lt lt2" role="table" aria-label="${esc(D.lab)} · ${esc(L.name)}">
       <div class="lth" role="row"><span>#</span><span>Squadra</span><span>Fatti<em>media</em></span><span>Subiti<em>media</em></span><span>Sfide vinte<em>vinte/partite</em></span></div>
-      ${rows.map((r, i) => `<div class="ltr${soon.has(r.t) ? " soon" : ""}" role="row"><span class="ltk">${i + 1}</span><span class="ltt">${crest(L.code, r.t)}${esc(r.t)}</span><span class="lta"><b>${f1(r.f)}</b></span><span class="lta">${f1(r.s)}</span><span class="ltf"><b>${r.w}</b>/${r.n}</span></div>`).join("")}
+      ${rows.map((r, i) => `<div class="ltr${rc(r.t)}" role="row"><span class="ltk">${i + 1}</span><span class="ltt">${crest(L.code, r.t)}${esc(r.t)}</span><span class="lta"><b>${f1(r.f)}</b></span><span class="lta">${f1(r.s)}</span><span class="ltf"><b>${r.w}</b>/${r.n}</span></div>`).join("")}
       <div class="ltr ltl" role="row"><span></span><span class="ltt">Campionato</span><span class="lta">${f1(ref.f)}</span><span class="lta">${f1(ref.s)}</span><span class="ltf">${Math.round(ref.w / ref.n * 100)}%</span></div>
     </div>`;
   }
   const note = D.cols ? `Partite ${venLab} della stagione in corso: riuscite/giocate. ${mk === "k" ? "Cartellini (gialli + rossi) totali della partita." : "Over = gol totali della partita; Gol = segnano entrambe."}`
     : `Partite ${venLab} della stagione in corso. Fatti e subiti: media a partita. Sfide vinte: partite in cui la squadra ne ha fatti più dell'avversario.`;
-  box.innerHTML = `<section class="card gl4"><div class="gl4h"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="gl4m">${esc(D.lab)} · ${venLab}</span></div>${body}<p class="lt-ref">${note} Pallino lime: gioca oggi o domani.</p></section>`;
+  return { body, note };
+}
+function renderGen() {
+  const box = $("#genOut"); if (!box) return;
+  const mk = $("#genMk3").value, D = GEN3[mk], ven = GEN.ven3 === "away" ? "away" : "home", L = LEAGUES.find(x => x.code === $("#genLg").value);
+  if (!L) { box.innerHTML = ""; return; }
+  const t0 = localIso(), t1 = addDays(t0, 1), soon = new Set();
+  for (const e of allEntries()) if (!e.m && (e.d === t0 || e.d === t1) && e.lg.code === L.code) { soon.add(e.home); soon.add(e.away); }
+  const { body, note } = gen3Body(L, mk, ven, soon, null);
+  box.innerHTML = `<section class="card gl4"><div class="gl4h"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="gl4m">${esc(D.lab)} · ${ven === "home" ? "in casa" : "in trasferta"}</span></div>${body}<p class="lt-ref">${note} Pallino lime: gioca oggi o domani.</p></section>`;
+}
+/* scheda partita, sezione Classifica: le stesse tabelle del campionato, con le due squadre evidenziate.
+   Si apre sul lato della partita: in casa per la squadra di casa, in trasferta per l'ospite. */
+const MTR = { mk: "c", ven: "home" };
+function renderMatchTrend(home, away) {
+  const box = $("#mtrend"); if (!box) return;
+  const L = LEAGUES.find(x => x.code === S.league); if (!L || !home || !away || home === away) { box.hidden = true; return; }
+  box.hidden = false;
+  const D = GEN3[MTR.mk], hi = new Map([[home, "mh"], [away, "ma"]]);
+  const { body, note } = gen3Body(L, MTR.mk, MTR.ven, null, hi);
+  const opt = Object.entries(GEN3).map(([k, d]) => `<option value="${k}"${k === MTR.mk ? " selected" : ""}>${k === "gol" ? "Over e Gol" : d.lab}</option>`).join("");
+  box.innerHTML = `<h2>Tendenze di ${esc(L.name)}</h2>
+    <div class="mtrc"><label for="mtrMk" class="sr">Statistica</label><select id="mtrMk">${opt}</select>
+      <div class="seg" role="group" aria-label="Sede" id="mtrVen"><button class="segb" data-v="home" aria-pressed="${MTR.ven === "home"}">Casa</button><button class="segb" data-v="away" aria-pressed="${MTR.ven === "away"}">Trasferta</button></div></div>
+    <div class="stdleg"><span class="mh">${crest(S.league, home)}${esc(home)}${MTR.ven === "home" ? " · gioca in casa" : ""}</span><span class="ma">${crest(S.league, away)}${esc(away)}${MTR.ven === "away" ? " · gioca fuori" : ""}</span></div>
+    ${body}<p class="lt-ref">${note}</p>`;
+  $("#mtrMk").addEventListener("change", ev => { MTR.mk = ev.target.value; renderMatchTrend(home, away); });
+  box.querySelectorAll("#mtrVen .segb").forEach(b => b.addEventListener("click", () => { MTR.ven = b.dataset.v; renderMatchTrend(home, away); }));
 }
 function renderGenSoft() { const y = scrollY; renderGen(); scrollTo({ top: y }); }
 $("#genLg").innerHTML = LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
