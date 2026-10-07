@@ -18,7 +18,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { ref: main }   # sempre l'ultima versione (non quella di quando il giro è stato messo in coda)
-      - name: Dati precedenti dal ramo pages (il sito pubblicato; il ramo main non contiene dati)
+      - name: Archivi dei dati dal magazzino privato di GitHub Actions (non pubblico)
+        id: dati
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Riserva - dati dal ramo pages (solo se il magazzino è vuoto, es. il primo giro)
+        if: steps.dati.outputs.cache-matched-key == ''
         run: |
           if git ls-remote --exit-code origin pages >/dev/null 2>&1; then
             git fetch -q --depth 1 origin pages
@@ -46,9 +54,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           rm -rf _site && mkdir _site
-          cp -r index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt data _site/
-          touch _site/.nojekyll
-          mkdir _site/docs && cp -r index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt data _site/docs/ && touch _site/docs/.nojekyll   # copia identica in docs/: il sito funziona sia con la cartella "/ (root)" sia con "/docs" nelle impostazioni di Pages (stessi file, git non occupa spazio in più)
+          # sul sito solo i file che l'app usa: gli archivi grezzi (API-Football, quote storiche, ESPN, CSV) restano nel magazzino privato
+          APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
+          DATA="bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json"
+          for d in _site _site/docs; do
+            mkdir -p $d/data && cp $APP $d/ && touch $d/.nojekyll
+            for f in $DATA; do if [ -f data/$f ]; then cp data/$f $d/data/; fi; done
+          done   # copia identica in docs/: il sito funziona sia con "/ (root)" sia con "/docs" nelle impostazioni di Pages
           cd _site
           git init -q -b pages
           git config user.name "corner-bot"
@@ -56,3 +68,9 @@ jobs:
           git add -A
           git commit -q -m "Sito $(date -u '+%F %H:%M')"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages
+      - name: Salva gli archivi nel magazzino privato (per il prossimo giro)
+        if: always() && hashFiles('data/bundle.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}

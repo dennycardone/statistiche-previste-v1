@@ -10,6 +10,15 @@
 <meta name="apple-mobile-web-app-title" content="Prevista">
 <meta name="application-name" content="Prevista">
 <meta name="theme-color" content="#0a0f1c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Prevista">
+<meta property="og:title" content="Prevista — guarda la partita prima che si giochi">
+<meta property="og:description" content="Statistiche e previsioni di calcio in 44 campionati: gol, corner, tiri, falli e cartellini, con il grado di fiducia di ogni previsione verificato sulle partite passate.">
+<meta property="og:url" content="https://dennycardone.github.io/statistiche-previste-v1/">
+<meta property="og:image" content="https://dennycardone.github.io/statistiche-previste-v1/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:locale" content="it_IT">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preload" href="mona-sans.woff" as="font" type="font/woff" crossorigin>
 <style>html{-webkit-text-size-adjust:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -19,7 +28,7 @@
      azzurro per numeri e probabilità; le classi scendono di intensità da A+ a D. */
   color-scheme:dark;
   --bg:#0a0f1c; --surface:#141c2e; --surface-2:#1a2338; --line:#22304a;
-  --ink:#e8edf5; --ink-2:#a4b0c8; --ink-3:#6f7c97;
+  --ink:#e8edf5; --ink-2:#a4b0c8; --ink-3:#8593ae;
   --accent:#38d6ff; --accent-ink:#04121a; --gold:#ffc94a; --gold-ink:#1a1405;
   --hot:#d4ff3f; --hot-ink:#0a0f1c; --cls-a:#7fe0a0; --cls-b:#3d6a99; --cls-c:#2a3550;
   --bar-1:#111a2c; --bar-2:#0a0f1c;
@@ -602,6 +611,10 @@ h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
 .chv{display:inline-block;width:14px;height:14px;vertical-align:-2px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}.chv.up{transform:rotate(180deg)}
 .info{display:inline-grid;place-items:center;font:600 13px/1 var(--body);font-style:normal;background:var(--surface-2);border-color:var(--line)}
 .tabbar svg.ic{stroke-width:1.9}
+.rgline{margin:10px 12px 4px;font-size:11.5px;line-height:1.4;color:var(--ink-3);text-align:center;letter-spacing:.01em}
+.rgcard .rgfull{margin:0;color:var(--ink-2);line-height:1.5}
+.sigf .chk input[type=checkbox],input[type=checkbox]{accent-color:var(--accent);width:22px;height:22px;flex:0 0 22px;margin:0}
+.sigf .chk{min-height:44px}
 @media (prefers-reduced-motion:reduce){.mhead .hsw-n{animation:none}}
 /* ===== Carattere Prevista: Mona Sans (OFL), una famiglia variabile: larghezza 75 per titoli/etichette, 88 per il testo ===== */
 @font-face{font-family:'Mona Sans';src:url('mona-sans.woff') format('woff');font-weight:200 900;font-stretch:75% 125%;font-display:swap}
@@ -651,28 +664,6 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 <div class="wrap">
   <div class="boot" id="boot" role="status"><svg class="pmark bootmark" viewBox="0 0 100 100" aria-hidden="true"><rect x="27" y="14" width="15" height="72" rx="4" fill="currentColor"/><circle cx="52" cy="40" r="19" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="52" cy="40" r="6.5" fill="#D4FF3F"/></svg><span class="spin" aria-hidden="true"></span><b>Carico i dati aggiornati…</b><small>partite, risultati e previsioni di oggi</small></div>
 
-  <div class="view" id="viewHist" hidden>
-    <section class="card" aria-label="Filtri bilancio">
-      <h2>Bilancio della stagione</h2>
-      <p class="small muted" style="margin:0">Tutte le partite giocate della stagione. Ogni previsione usa solo le partite giocate <b>prima</b> di quella gara, come appariva prima del calcio d'inizio, e poi viene confrontata con il risultato vero.</p>
-      <div class="sigf">
-        <label for="hLeague">Campionato<select id="hLeague"></select></label>
-        <div class="row" role="group" aria-label="Mercati">
-          <button class="chip hstat" data-k="g15" aria-pressed="true">Over 1,5</button>
-          <button class="chip hstat" data-k="g25" aria-pressed="true">Over 2,5</button>
-          <button class="chip hstat" data-k="g35" aria-pressed="true">Over 3,5</button>
-          <button class="chip hstat" data-k="gg" aria-pressed="true">Gol/No gol</button>
-          <button class="chip hstat" data-k="c" aria-pressed="true">Corner</button>
-          <button class="chip hstat" data-k="f" aria-pressed="true">Falli</button>
-          <button class="chip hstat" data-k="s" aria-pressed="true">Tiri</button>
-          <button class="chip hstat" data-k="st" aria-pressed="true">Tiri in porta</button>
-        </div>
-        <label for="hMin">Probabilità minima: <b id="hMinVal">55%</b><input type="range" id="hMin" min="55" max="95" step="5" value="55"></label>
-        <label class="chk" for="hGames"><input type="checkbox" id="hGames" checked> Solo con almeno 3 partite per sede</label>
-      </div>
-    </section>
-    <section class="card" id="histOut" aria-label="Risultati bilancio"><p class="muted" style="margin:0">Calcolo in corso…</p></section>
-  </div>
 
   <div class="view" id="viewSel" hidden>
     <label class="fl selwin" for="selWin">Periodo<select id="selWin"><option value="24" selected>Prossime 24 ore</option><option value="48">Prossime 48 ore</option><option value="72">Prossime 72 ore</option></select></label>
@@ -687,7 +678,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <div class="selhead"><h2><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Partite in arrivo</h2></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
         <button class="chip" data-sf="all" aria-pressed="true">Tutte</button><button class="chip" data-sf="aplus" aria-pressed="false">A+</button>
-        <button class="chip" data-sf="a" aria-pressed="false">A</button><button class="chip" data-sf="b" aria-pressed="false">B</button>
+        <button class="chip" data-sf="a" aria-pressed="false">A</button><button class="chip" data-sf="b" aria-pressed="false">B</button><button class="chip" data-sf="c" aria-pressed="false">C</button>
       </div>
       <div id="selList"></div>
     </section>
@@ -759,12 +750,6 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       </div>
     </section>
     <section class="card" id="sigOut" aria-label="Elenco segnali"></section>
-    <section class="card" aria-label="Backup quote" hidden>
-      <h2>Le tue quote</h2>
-      <p class="small muted" style="margin:0">Le quote che scrivi nei Segnali restano solo su questo telefono. Salva un backup ogni tanto: se cambi telefono o cancelli i dati di Chrome, lo reimporti e ritrovi tutto.</p>
-      <div class="hrow"><button id="oddsExport">Esporta backup</button><button id="oddsImport">Importa backup</button><input type="file" id="oddsFile" accept=".json,application/json" hidden></div>
-      <p class="small muted" id="oddsMsg" style="margin:0" hidden></p>
-    </section>
   </div>
 
   <div class="view" id="viewStats">
@@ -839,14 +824,19 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <div class="foldbody">
     <div id="dataInfo" class="kv"></div>
     <div class="row">
-      <button id="importBtn">Carica CSV aggiornati</button>
+      <button id="importBtn" hidden>Carica CSV aggiornati</button>
       <button id="resetBtn" hidden>Torna ai dati inclusi</button>
       <input type="file" id="file" accept=".csv,text/csv" multiple hidden>
     </div>
-    <p class="small muted" style="margin:0">Per aggiornare: dal telefono scarica il file del campionato da football-data.co.uk (indirizzo qui sopra, es. <span class="num">mmz4281/2627/I1.csv</span>) e caricalo qui; puoi caricarne più di uno insieme. Per gli scontri diretti carica anche le stagioni passate (cartelle <span class="num">2526</span>, <span class="num">2425</span>…). Ogni riga viene assegnata al suo campionato: campionati e stagioni non si mescolano mai.</p>
+    <p class="small muted" id="importHelp" style="margin:0" hidden></p>
     <p class="small muted" id="importMsg" style="margin:0" hidden></p>
     </div>
    </details>
+  </section>
+
+  <section class="card rgcard" aria-label="Gioco responsabile">
+    <h2>Gioco responsabile</h2>
+    <p class="rgfull">Prevista è uno strumento di statistica, non un bookmaker. Le quote sono solo informative e le previsioni non sono garanzie. Il gioco è vietato ai minori di 18 anni. Gioca responsabilmente.</p>
   </section>
 
   <section class="card method" aria-label="Metodo">
@@ -2482,8 +2472,8 @@ function goalsCard(home, away, G, hl) {
     <p class="small muted" style="margin:0">Anche il risultato più probabile esce raramente più di una volta su 8: leggilo come una distribuzione, non come un pronostico secco.</p>
     <h3 style="font-size:16px;text-transform:uppercase;letter-spacing:.06em">Modello e mercato</h3>
     ${mkRows ? `${rowsTable(["", "Modello", "Mercato", "Diff."], mkRows)}
-      <p class="small muted" style="margin:0">Mercato = quote medie dei bookmaker (football-data.co.uk) senza margine${mk.m1x2 != null ? ` (margine 1X2 ${pc1(mk.m1x2)})` : ""}. • differenza moderata, •• grande. Le quote dei bookmaker esistono solo per 1X2 e Over/Under 2,5.</p>`
-      : `<p class="small muted" style="margin:0">Quote non ancora disponibili per questa partita: football-data.co.uk le pubblica pochi giorni prima (con la versione GitHub arrivano da sole; qui puoi caricare il file fixtures.csv).</p>`}
+      <p class="small muted" style="margin:0">Mercato = quote medie dei bookmaker (archivio storico delle quote) senza margine${mk.m1x2 != null ? ` (margine 1X2 ${pc1(mk.m1x2)})` : ""}. • differenza moderata, •• grande. Le quote dei bookmaker esistono solo per 1X2 e Over/Under 2,5.</p>`
+      : `<p class="small muted" style="margin:0">Quote non ancora disponibili per questa partita: di solito arrivano pochi giorni prima.</p>`}
     <h3 style="font-size:16px;text-transform:uppercase;letter-spacing:.06em">Confronto tra le statistiche</h3>
     ${modesTable(home, away, hl, m => modelGoals(home, away, m), 0.2, 0.5, f2)}
   </section>`;
@@ -2597,17 +2587,33 @@ function formImpactShots(home, away, cfg) {
     <h3 style="font-size:15px;margin:0">Tiri in porta</h3>${modesTable(home, away, cfg, m => modelShots(home, away, m), 0.4, 1)}`;
 }
 
+/* statistiche della stagione in corso per campionato: quota di partite con il dato reale (per ogni statistica) */
+const STAT_KEYS = [["hc", "corner"], ["hf", "falli"], ["hs", "tiri"], ["hst", "tiri in porta"], ["hk", "cartellini"]];
+const STATC = new Map();
+function statShare(lg, key) {   // quota di partite della stagione con quella statistica (null = stagione senza partite)
+  const ck = lg + "|" + key + "|" + S.matches.size;
+  if (STATC.has(ck)) return STATC.get(ck);
+  let v = null; withLeague(lg, () => { const c0 = S.cutoff; S.cutoff = null; try { const sm = seasonMatches(); if (sm.length) v = sm.filter(m => m[key] != null).length / sm.length; } finally { S.cutoff = c0; } });
+  STATC.set(ck, v); return v;
+}
+const statMissing = (lg, key) => statShare(lg, key) === 0;   // nessun dato reale in stagione: la previsione non si mostra
+const MK_STAT = { c: "hc", f: "hf", s: "hs", st: "hst", k: "hk" };   // mercato → statistica che serve
 function staleNote() {
   const sm = seasonMatches(); if (!sm.length) return "";
-  // campionati solo API-Football: quota reale di partite della stagione con le statistiche (sotto il 90% → avviso)
-  const ws = sm.filter(m => m.hc != null).length, sh = ws / sm.length;
-  const pt = LG[S.league].api && sh < 0.9 ? `<div class="warnbox">${esc(LG[S.league].country)}: API-Football ha corner, falli, tiri e cartellini solo per ${ws} partite su ${sm.length} di questa stagione (${Math.round(sh * 100)}%). Le medie usano solo le partite con i dati reali; le altre restano vuote, senza stime${ws < sm.length / 3 ? ": per corner, falli e tiri le previsioni possono risultare N/D o poco affidabili" : ""}.</div>` : "";
+  const lg = S.league, none = [], part = [];
+  for (const [k, nm] of STAT_KEYS) { const sh = statShare(lg, k); if (sh == null) continue; if (sh === 0) none.push(nm); else if (sh < 0.9) part.push(`${nm} ${Math.round(sh * 100)}%`); }
+  const pt = none.length || part.length ? `<div class="warnbox">${esc(LG[lg].country)}, stagione in corso: ${none.length ? `nessun dato reale di ${none.join(", ")} (previsione non disponibile)` : ""}${none.length && part.length ? "; " : ""}${part.length ? `dati reali solo per una parte delle partite (${part.join(", ")}): le medie usano solo le partite con il dato, senza stime` : ""}.</div>` : "";
   return pt + staleNoteDays(sm);
 }
 function staleNoteDays(sm) {
-  if (LG[S.league].api) return "";   // API-Football è aggiornato ogni ora: un vuoto vuol dire solo che non si è giocato (es. pausa del campionato)
+  if (S.meta && S.meta.mode === "scaricati il") {   // versione pubblicata: si aggiorna da sola; avvisa solo se l'aggiornamento è fermo
+    const t = /^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/.exec(S.meta.fetched || ""); if (!t) return "";
+    const h = (Date.now() - new Date(+t[3], t[2] - 1, +t[1], +t[4], +t[5])) / 36e5;
+    return h > 12 ? `<div class="warnbox">Dati non aggiornati da ${Math.floor(h)} ore (ultimo aggiornamento ${esc(S.meta.fetched)}).</div>` : "";
+  }
+  if (LG[S.league].api) return "";
   const last = sm[sm.length - 1].date, days = Math.floor((Date.now() - last) / 864e5);
-  return days > 10 ? `<div class="warnbox">Dati forse incompleti: l'ultima partita di ${esc(LG[S.league].name)} nei dati è del ${dstr(last)} (${days} giorni fa). ${LG[S.league].api ? "Fonte: API-Football, si aggiorna da sola." : `Carica il CSV aggiornato da football-data.co.uk/${LG[S.league].file}.`}</div>` : "";
+  return days > 10 ? `<div class="warnbox">Dati forse incompleti: l'ultima partita di ${esc(LG[S.league].name)} nei dati è del ${dstr(last)} (${days} giorni fa). Carica il CSV aggiornato da football-data.co.uk/${LG[S.league].file}.</div>` : "";
 }
 
 function render() {
@@ -3178,6 +3184,7 @@ function confMatch(home, away, date, odds, baseKey) {
   if (!MR[baseKey]) { const cfg = MODES[baseKey], G = modelGoals(home, away, cfg), R = { G, st: {} }, st = matchStats(home, away, cfg); for (const k in st) R.st[k] = { p1: st[k][2], px: st[k][3], p2: st[k][4] }; MR[baseKey] = R; }
   const out = [];
   for (const mk of CONF_MKS) {
+    if (MK_STAT[mk] && statMissing(S.league, MK_STAT[mk])) continue;   // nessun dato reale in stagione per questo mercato
     if (mk === "g15") continue;   // Over/Under 1,5: quasi sempre Over, poca informazione → solo come percentuale nella lista partite
     const F = confFeatures(home, away, date, odds, mk, baseKey, MR); if (!F) continue;
     if (F.side === "U" && mk !== "g25") continue;   // Under: solo 2,5 (l'Under 3,5 è quasi sempre il lato probabile)
@@ -3195,30 +3202,33 @@ const confUnpack = a => ({ mk: a[0], side: a[1], p: a[2], score: a[3], cls: a[4]
 /* ===== FINE MODELLO: tutto ciò che sta sopra è usato anche da storico.js su GitHub ===== */
 
 /* ===== Caricamento dati ===== */
+const IMPORT_HELP = `Per aggiornare: dal telefono scarica il file del campionato da football-data.co.uk (indirizzo qui sopra, es. <span class="num">mmz4281/2627/I1.csv</span>) e caricalo qui; puoi caricarne più di uno insieme. Per gli scontri diretti carica anche le stagioni passate (cartelle <span class="num">2526</span>, <span class="num">2425</span>…). Ogni riga viene assegnata al suo campionato: campionati e stagioni non si mescolano mai.`;
 async function tryHosted() {
-  // Versione GitHub Pages: i file li aggiorna una GitHub Action in data/
+  // Versione GitHub Pages: i file li aggiorna una GitHub Action in data/. Tutti i file partono insieme; "no-cache" = il telefono
+  // chiede al sito se il file è cambiato e, se no, riusa la copia che ha già (risposta 304, quasi nessun dato scaricato).
+  const get = (f, as = "json") => fetch("data/" + f, { cache: "no-cache" }).then(r => r.ok ? (as === "text" ? r.text() : r.json()) : null).catch(() => null);
   try {
-    // un solo file compatto con tutti i dati (preparato da GitHub); se manca, i singoli CSV
+    const P = { bundle: get("bundle.json"), crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
+                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json") };
     let man = null, texts = null;
-    try { const rb = await fetch("data/bundle.json", { cache: "no-store" }); if (rb.ok) { const b = await rb.json(); man = { updated: b.updated }; texts = b.files.map(f => f.text); } } catch (e) {}
-    if (!texts) {
-      const r = await fetch("data/manifest.json", { cache: "no-store" });
-      if (!r.ok) return false;
-      man = await r.json();
-      texts = await Promise.all((man.files || []).map(f => fetch("data/" + f, { cache: "no-store" }).then(x => x.ok ? x.text() : "")));
+    const b = await P.bundle;
+    if (b && b.files) { man = { updated: b.updated }; texts = b.files.map(f => f.text); }
+    if (!texts) {   // riserva: i singoli CSV (versione con i file separati)
+      man = await get("manifest.json"); if (!man) return false;
+      texts = await Promise.all((man.files || []).map(f => get(f, "text").then(x => x || "")));
     }
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
-    try { const cr = await fetch("data/crests.json", { cache: "no-store" }); if (cr.ok) CRESTS = (await cr.json()).colors || {}; } catch (e) {}
-    try { const rl = await fetch("data/loghi.json", { cache: "no-store" }); if (rl.ok) LOGOS = await rl.json(); } catch (e) {}
-    try { const ro = await fetch("data/odds.json", { cache: "no-store" }); if (ro.ok) ODDS = await ro.json(); } catch (e) {}
-    try { const rb = await fetch("data/linee.json", { cache: "no-store" }); if (rb.ok) LINEE = await rb.json(); } catch (e) {}
-    try { const rx = await fetch("data/extra.json", { cache: "no-store" }); if (rx.ok) { EXTRA = await rx.json(); clearCache(); } } catch (e) {}
-    try { const rq = await fetch("data/qualita.json", { cache: "no-store" }); if (rq.ok) QUALITA = await rq.json(); } catch (e) {}
-    S.meta = { source: "API-Football (risultati, calendario, statistiche, arbitri, cartellini) · football-data.co.uk (quote storiche e riserva) · aggiornamento automatico", fetched: man.updated || "N/D", mode: "scaricati il" };
-    // previsioni della home già calcolate da GitHub con questi stessi dati (non salvate sul telefono: si riscaricano ogni volta)
-    try { const rp = await fetch("data/precalc.json", { cache: "no-store" }); if (rp.ok) { const P = await rp.json(); if (P.updated === S.meta.fetched) PRECALC = P; } } catch (e) {}
+    const [cr, lo, od, li, ex, qu, pr] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre]);
+    if (cr) CRESTS = cr.colors || {};
+    if (lo) LOGOS = lo;
+    if (od) ODDS = od;
+    if (li) LINEE = li;
+    if (ex) { EXTRA = ex; clearCache(); }
+    if (qu) QUALITA = qu;
+    S.meta = { source: "API-Football (risultati, calendario, statistiche, arbitri, cartellini, quote) · football-data.co.uk (archivio delle stagioni passate e riserva) · aggiornamento automatico", fetched: man.updated || "N/D", mode: "scaricati il" };
+    if (pr && pr.updated === S.meta.fetched) PRECALC = pr;   // previsioni della home già calcolate da GitHub con questi stessi dati
     return true;
   } catch (e) { return false; }
 }
@@ -3308,6 +3318,7 @@ function renderSignalsNow() {
   const box = $("#sigOut");
   const cfg = MODES[$("#sigMode").value] || MODES.dyn, st = sigSettings();
   let { rows, skipped, noCal } = computeSignals3({ lgSel: $("#sigLeague").value, markets: st.markets, cfg, minP: st.minP, needGames: st.needGames, noStale: true, mdl: sigMdl });
+  rows = rows.filter(x => !(MK_STAT[x.k] && statMissing(x.id.split("|")[0], MK_STAT[x.k])));
   if ($("#sigC3").checked) rows = rows.filter(x => x.c3);
   box.innerHTML = `<h2>${rows.length} segnal${rows.length === 1 ? "e" : "i"}</h2>
     <p class="small muted" style="margin:0">Gol: Over a linea fissa e Gol/No gol. Corner, falli, tiri e tiri in porta: <b>1</b> se la squadra di casa ne fa di più, <b>2</b> se ne fa di più l'ospite (il pari fa perdere). Cartellini (gialli + rossi): la linea più alta con l'Over sopra la soglia, altrimenti la più bassa con l'Under; modello squadre + arbitro, uguale per i due metodi. Base: ${cfg.label}.</p>
@@ -3617,6 +3628,10 @@ function c3HTML(home, away, e, cfg) {
 let LINEE = null, HEROCTX = null;
 const BK_ROWS = [["Gol", "g", "hg", "ag"], ["Tiri totali", null, null, null], ["Tiri in porta", "st", "hst", "ast"], ["Calci d'angolo", "c", "hc", "ac"], ["Falli", null, null, null], ["Cartellini", "k", "hk", "ak"]];
 const BK_MIN = 0.05;   // valore minimo per segnalare la giocata
+/* giocata con valore: solo corner, tiri in porta e cartellini. I gol sono esclusi: sulla stagione 2025-26 (Over/Under 2,5, 7.634 partite)
+   le giocate "con valore" del modello gol perdevano il 7,5% contro le quote reali (audit del 7/10/2026). */
+const RG_LINE = `<p class="rgline">Quote solo informative · Prevista non è un bookmaker · 18+ · Gioca responsabilmente</p>`;
+const isVal = c => !!(c && c.po != null && !c.gol && c.ev >= BK_MIN);
 const bkLines = e => (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null;
 function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u, n, po, side, p, odd, ev, real, hit} o null (N.D.)
   const { G, M, MT, x } = Mods, ok = v => v != null && isFinite(v) && v > 0;
@@ -3633,9 +3648,9 @@ function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u,
     const c = k && LB && LB[k]; if (!c) return null;
     const [L, o, u, n] = c, po = D[k](L);
     const R = REAL[base], real = R && R[0] != null && R[1] != null ? (i === 0 ? R[0] : i === 2 ? R[1] : R[0] + R[1]) : null;
-    if (po == null || !isFinite(po)) return { L, o, u, n, po: null, real };
+    if (po == null || !isFinite(po)) return { L, o, u, n, po: null, real, gol: base === "g" };
     const eo = po * o - 1, eu = (1 - po) * u - 1, side = eo >= eu ? "O" : "U";
-    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, ev: Math.max(eo, eu), real, hit: real == null ? null : side === "O" ? real > L : real < L };
+    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, ev: Math.max(eo, eu), real, gol: base === "g", hit: real == null ? null : side === "O" ? real > L : real < L };
   };
   return BK_ROWS.map(([lab, t, h, a]) => ({ lab, t: cell(t, t, 1), h: cell(h, t, 0), a: cell(a, t, 2), mk: t }));
 }
@@ -3644,10 +3659,10 @@ function bkCellHTML(c, center, lab) {
   if (!c) return `<span class="${center ? "sx-m" : "sx-v"} bk">${head}<b class="bk-nd">N.D.</b></span>`;
   const ln = `<b class="bk-ln"><small class="bk-lt">Linea book</small><i>O/U</i> ${th1(c.L)}</b>`;
   if (c.po == null) return `<span class="${center ? "sx-m" : "sx-v"} bk">${head}${ln}<small class="bk-q">O ${f2(c.o)} · U ${f2(c.u)}</small></span>`;
-  const val = c.ev >= BK_MIN, evt = `${c.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(c.ev) * 100)}%`;
+  const val = isVal(c), evt = `${c.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(c.ev) * 100)}%`;
   return `<span class="${center ? "sx-m" : "sx-v"} bk${val ? " val" : ""}">${head}${ln}
     <span class="bk-s ${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} <b>${pc(c.p)}</b></span>
-    <span class="bk-q">@${f2(c.odd)} <em class="${val ? "pos" : c.ev > 0 ? "" : "neg"}">${evt}</em></span>
+    <span class="bk-q">@${f2(c.odd)}${c.gol ? "" : ` <em class="${val ? "pos" : c.ev > 0 ? "" : "neg"}">${evt}</em>`}</span>
     ${c.real != null ? `<span class="bk-r">reale <b>${c.real}</b> ${c.hit ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`}</span>` : ""}</span>`;
 }
 function matchHeroHTML(home, away, e, cfg, G) {
@@ -3661,6 +3676,12 @@ function matchHeroHTML(home, away, e, cfg, G) {
   const x = extraFor(home, away);
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}` : "Confronto libero";
   let M = null, MF = null, MT = null; try { M = model(home, away, cfg); MF = model(home, away, cfg, "f"); MT = modelShots(home, away, cfg); } catch (err) {}
+  // statistica senza nessun dato reale nella stagione in corso (es. falli in Bulgaria): N/D, niente previsioni dalle stagioni passate
+  const lgS = S.league;
+  if (statMissing(lgS, "hc")) M = null;
+  if (statMissing(lgS, "hf")) MF = null;
+  if (MT && statMissing(lgS, "hs")) MT = { ...MT, MS: null };
+  if (MT && statMissing(lgS, "hst")) MT = { ...MT, lh: null, la: null, tot: null };
   const ok = a => a != null && isFinite(a);
   const v = (a, d = 1) => ok(a) ? (d === 2 ? f2(a) : f1(a)) : `<span class="nd">—</span>`;
   // range della media all'80% per squadra (team_ranges.py): media × exp(±1,2816 × errore standard tarato sul backtest)
@@ -3678,12 +3699,12 @@ function matchHeroHTML(home, away, e, cfg, G) {
     return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}${rg(h, sh)}</span><span class="sx-m"><small>${lab}</small><b>${T}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}${rg(a, sa)}</span></div>`; };
   const BK = MV.hero === "bk";
   let bkBody = "", nValAny = 0;
-  try { const LB0 = bkLines(e); if (LB0) nValAny = bkCalc({ G, M, MT, x }, LB0, m).reduce((a, r) => a + [r.h, r.t, r.a].filter(c => c && c.po != null && c.ev >= BK_MIN).length, 0); } catch (err) {}
+  try { const LB0 = bkLines(e); if (LB0) nValAny = bkCalc({ G, M, MT, x }, LB0, m).reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0); } catch (err) {}
   if (BK) {
     const LB = bkLines(e), R = bkCalc({ G, M, MT, x }, LB, m);
-    const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a].filter(c => c && c.po != null && c.ev >= BK_MIN).length, 0);
+    const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0);
     bkBody = (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
-        : `<p class="bk-none">Linea dei bookmaker non disponibile per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`)
+        : `<p class="bk-none">Linea dei bookmaker non disponibile per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + RG_LINE
       ;
   }
   return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Disciplina: arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button></span></div>
@@ -3828,31 +3849,6 @@ function drawBilancio(list, cfg) {
       + `<p class="small muted" style="margin:0">1 unità (u) su ogni segnalazione con quota inserita. Resa = guadagno diviso unità puntate.</p>`
       : `<p class="small muted" style="margin:0">Nessuna quota inserita su partite già giocate. Scrivile nei Segnali prima delle partite.</p>`}`;
 }
-$("#hLeague").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
-["#hLeague", "#hGames"].forEach(id => $(id).addEventListener("change", renderHist));
-$("#hMin").addEventListener("input", renderHist);
-document.querySelectorAll(".hstat").forEach(b => b.addEventListener("click", () => { b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); renderHist(); }));
-$("#oddsExport").addEventListener("click", () => {
-  const o = getOdds(), n = Object.keys(o).length, msg = $("#oddsMsg"); msg.hidden = false;
-  if (!n) { msg.textContent = "Non hai ancora inserito quote."; return; }
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: "prevista", quote: o }, null, 1)], { type: "application/json" }));
-  a.download = `quote-prevista-${new Date().toISOString().slice(0, 10)}.json`;
-  document.body.appendChild(a); a.click(); a.remove();
-  msg.textContent = `Backup con ${n} quote salvato nei Download.`;
-});
-$("#oddsImport").addEventListener("click", () => $("#oddsFile").click());
-$("#oddsFile").addEventListener("change", async e => {
-  const f = e.target.files[0], msg = $("#oddsMsg"); msg.hidden = false; if (!f) return;
-  try {
-    const j = JSON.parse(await f.text()), inc = j.quote || j;
-    const cur = getOdds(); let n = 0;
-    for (const [id, v] of Object.entries(inc)) if (v && v.q > 1 && v.fav) { cur[id] = v; n++; }
-    lsSet(ODDS_KEY, JSON.stringify(cur));
-    msg.textContent = `Importate ${n} quote.`; renderHist();
-  } catch (x) { msg.textContent = "File non valido: serve il backup esportato da questa app."; }
-  e.target.value = "";
-});
 /* ===== Generali: classifiche delle squadre su tutti i campionati ===== */
 const GEN = { venue: "tot", per: "season", shown: 10 };
 const GEN_MK = {
@@ -3989,12 +3985,12 @@ function confEntry(e, cfg, peek) {   // lista delle previsioni con punteggio; pe
   const key = e.id + "|" + cfg.key;
   if (CONF_C.has(key)) return CONF_C.get(key);
   const P = PRECALC, x = P && P.updated === S.meta.fetched ? P.rows[key] : null;
-  if (x && x[8] && x[8].every(a => a.length > 13)) { const L = x[8].map(a => ({ ...confUnpack(a), base: cfg.key })); CONF_C.set(key, L); return L; }
+  if (x && x[8] && x[8].every(a => a.length > 13)) { const L = x[8].map(a => ({ ...confUnpack(a), base: cfg.key })).filter(r => r.cls !== "D"); CONF_C.set(key, L); return L; }
   if (peek) return undefined;
   let L = [];
   withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = e.m ? e.date : null;
     try { if (e.m) S.season = e.m.season; L = confMatch(e.home, e.away, e.date, entryOdds(e), cfg.key); } finally { S.cutoff = c0; } });
-  CONF_C.set(key, L); return L;
+  L = L.filter(r => r.cls !== "D"); CONF_C.set(key, L); return L;
 }
 const confLab = r => CONF_SIDE_LAB(r.mk, r.side) + (r.h && (r.side === "1" || r.side === "2") ? ` (${r.side === "1" ? r.h : r.a})` : "");
 /* quante volte la classe di questa previsione è uscita nelle stagioni passate, nel suo mercato (CONF_VAL); con la scala unica
@@ -4124,6 +4120,8 @@ function renderMatchConf(home, away, e, cfg) {
   if (!e || !home || !away || !Object.keys(CONF_COEF).length) { box.innerHTML = `<h2>Grado</h2><p class="muted" style="margin:0">Non disponibile per questa partita.</p>`; return; }
   let L; try { L = withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = e.m ? e.date : null; try { if (e.m) S.season = e.m.season; return confMatch(home, away, e.date, entryOdds(e), cfg.key); } finally { S.cutoff = c0; } }); } catch (x) { L = []; }
   if (!L.length) { box.innerHTML = `<h2>Grado</h2><p class="muted" style="margin:0">Non disponibile per questa partita (servono più partite giocate).</p>`; return; }
+  L = L.filter(r => r.cls !== "D");   // la D non si mostra: nella stagione 2026-27 usciva il 56% contro il 64% dichiarato (audit 7/10/2026)
+  if (!L.length) { box.innerHTML = `<h2>Grado</h2><p class="muted" style="margin:0">Nessuna previsione affidabile per questa partita: nessuna arriva al grado C.</p>`; return; }
   L = L.map(r => ({ ...r, h: home, a: away, qt: e.m ? null : oddsFor(e, r) }));
   const top = L[0], tr = gradeRate(top), tn = Math.round(tr * 100);
   box.hidden = false;
@@ -4137,7 +4135,7 @@ function renderMatchConf(home, away, e, cfg) {
       <p class="gsay">Previsioni come questa sono uscite <b>${tn} volte su 100</b>${top.status === "aplus" ? " · <b>Segnale A+</b>" : ""}.</p>
       <details class="gmore"><summary>Perché questo grado</summary>${gradeNums(top, 0)}</details>
     </div>
-    <div class="gscale" aria-label="Scala del Grado">${["A+", "A", "B", "C", "D"].map(c => `<span><span class="ccls c-${gradeC(c)}">${c}</span>${GRADE_WORD[c]}</span>`).join("")}</div>
+    <div class="gscale" aria-label="Scala del Grado">${["A+", "A", "B", "C"].map(c => `<span><span class="ccls c-${gradeC(c)}">${c}</span>${GRADE_WORD[c]}</span>`).join("")}</div>
     <h3 class="gh">Tutte le previsioni della partita</h3>
     <div class="glist">${L.map((r, i) => { const rr = gradeRate(r); return `<details class="gitem"><summary><span class="gil"><b>${esc(plainLab(r))}</b><small class="muted">${esc(confLab(r))}</small></span><span class="gir"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(rr * 100)}</b> su 100</span></span></summary>${gradeNums(r, i)}</details>`; }).join("")}</div>
     <div class="confinfo" id="mconfInfo" hidden></div>
@@ -4163,7 +4161,7 @@ function bkEntry(e, cfg) {
       let G = null, M = null, MT = null; try { G = modelGoals(e.home, e.away, cfg); M = model(e.home, e.away, cfg); MT = modelShots(e.home, e.away, cfg); } catch (x) {}
       const x = extraFor(e.home, e.away);
       for (const r of bkCalc({ G, M, MT, x }, LB, null)) for (const [w, c] of [["t", r.t], ["h", r.h], ["a", r.a]])
-        if (c && c.po != null && c.ev >= BK_MIN) out.push({ ...c, lab: r.lab, who: w === "t" ? "" : w === "h" ? e.home : e.away });
+        if (isVal(c)) out.push({ ...c, lab: r.lab, who: w === "t" ? "" : w === "h" ? e.home : e.away });
     } finally { S.cutoff = c0; } });
   out.sort((a, b) => b.ev - a.ev); BK_C.set(key, out); return out;
 }
@@ -4181,6 +4179,7 @@ function renderSelBk(ents, cfg, when) {
     ${L.length ? `<div class="bklist">${L.slice(0, 15).map(({ e, c }) => `<button class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
       <span class="bkp"><span class="bkmk">${lab(c)}</span><b class="${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} ${th1(c.L)}</b></span>
       <span class="bkn"><b class="num">${pc(c.p)}</b><small class="num">@${f2(c.odd)}</small><em class="num">+${Math.round(c.ev * 100)}%</em></span></button>`).join("")}</div>${L.length > 15 ? `<p class="small muted" style="margin:0">Le prime 15 su ${L.length}, per valore.</p>` : ""}` : `<p class="apnone">${todo.length ? "Calcolo in corso…" : "NESSUNA LINEA CON VALORE"}</p>`}`;
+  box.insertAdjacentHTML("beforeend", RG_LINE);
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelBk(selEntries(), cfg, when); }, 30);
 }
@@ -4202,7 +4201,7 @@ function renderSel() {
   if (noModel) { aBox.innerHTML = `<h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><p class="muted" style="margin:0">Grado non disponibile.</p>`; list.innerHTML = ""; return; }
   const got = [], todo = [];
   for (const e of ents) { const L = confEntry(e, cfg, true); if (L === undefined) todo.push(e); else got.push([e, L]); }
-  const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "hp" ? r.q >= 0.7 : SEL.f === "c3" ? r.agreeN === C3_MODES.length : true;
+  const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "c" ? r.cls === "C" : SEL.f === "hp" ? r.q >= 0.7 : SEL.f === "c3" ? r.agreeN === C3_MODES.length : true;
   // A+ raggruppati per partita: le previsioni della stessa partita sono legate tra loro (es. tiri e tiri in porta), non sono occasioni indipendenti
   const apm = got.map(([e, L]) => [e, L.filter(r => r.status === "aplus").map(r => ({ ...r, h: e.home, a: e.away, qt: oddsFor(e, r) })).sort((a, b) => b.q - a.q)]).filter(([, L]) => L.length)
     .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
@@ -4224,7 +4223,7 @@ function renderSel() {
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
   SEL.aN = todo.length ? null : apm.reduce((a, [, L]) => a + L.length, 0); SEL.cN = ents.length; radarTabs();
-  $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}). Per ogni partita le 3 previsioni più solide; colonne: esito · probabilità corretta · Indice · Grado (uguale per tutti i mercati: A+ almeno 85%, A 80%, B 75%, C 70%) con quante volte è uscita in quel mercato nelle stagioni passate. Probabilità corretta = quanto previsioni come questa sono uscite davvero nelle stagioni passate; Alta probabilità = almeno 70% corretta.${ODDS && ODDS.aggiornate ? ` Quota media = mediana tra i bookmaker (API-Football, aggiornate il ${ODDS.aggiornate}), solo informativa: il confronto con le nostre probabilità non è ancora stato verificato.` : ""}`;
+  $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}): per ogni partita le previsioni più solide, dal grado A+ al C, con quante volte sono uscite le previsioni con lo stesso grado.`;
   clearTimeout(SEL_T);
   if (todo.length) SEL_T = setTimeout(() => { const t = performance.now(); for (const e of todo) { try { confEntry(e, cfg); } catch (x) { CONF_C.set(e.id + "|" + cfg.key, []); } if (performance.now() - t > 250) break; } if (!$("#viewSel").hidden) renderSel(); }, 20);
 }
@@ -4240,7 +4239,7 @@ document.querySelectorAll("#selF .chip").forEach(b => b.addEventListener("click"
 document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null) + ($("#selNote") && !$("#viewSel").hidden ? `<p class="small" style="margin:0">${$("#selNote").innerHTML}</p>` : ""); P.scrollIntoView({ block: "nearest" }); } }));
 
 function showView(v) {
-  $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewHist").hidden = true; $("#viewGen").hidden = v !== "gen"; $("#viewSel").hidden = v !== "sel"; $("#viewMatch").hidden = v !== "match";
+  $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewGen").hidden = v !== "gen"; $("#viewSel").hidden = v !== "sel"; $("#viewMatch").hidden = v !== "match";
   $("#navStats").setAttribute("aria-pressed", String(v === "stats" || v === "match")); $("#navSig").setAttribute("aria-pressed", String(v === "sig")); $("#navGen").setAttribute("aria-pressed", String(v === "gen")); $("#navSel").setAttribute("aria-pressed", String(v === "sel"));
   if (v !== "match") { S.cutoff = null; lsSet("statPreviste.view", v); }
   if (v === "stats") renderSched();
@@ -4315,6 +4314,7 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   loadEmbedded(); if (!online) refreshAll();
   $("#sigMode").value = $("#decay").value;
   const ok = await Promise.race([tryHosted(), new Promise(r => setTimeout(() => r(null), 20000))]);
+  if (!ok) { $("#importBtn").hidden = false; const ih = $("#importHelp"); ih.hidden = false; ih.innerHTML = IMPORT_HELP; }   // caricare CSV a mano serve solo senza il sito aggiornato
   document.body.classList.remove("booting");
   if (ok) refreshAll();
   else if (loadStored()) refreshAll();
@@ -4322,6 +4322,11 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   if (!$("#viewSig").hidden) renderSignals();
 })();
 </script>
+<script>
+/* funziona anche senza rete: il service worker conserva l'ultima versione dell'app e dei dati (prima prova sempre la rete) */
+if ("serviceWorker" in navigator && location.protocol === "https:") addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+
 
 </body>
 </html>

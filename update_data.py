@@ -678,6 +678,7 @@ try:
                     if x: x[7] = [_stat(H, k) for k in KS_]; x[8] = [_stat(A, k) for k in KS_]; n_new += 1
             AP["agg"] = _now.strftime("%Y-%m-%d %H:%M")
             print("arbitri: aggiornate", n_new, "statistiche,", len(AP["partite"]), "partite in archivio")
+        for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR")]: del AP["partite"][_k]   # campionati tolti
         json.dump(AP, open(ap_path, "w"), separators=(",", ":"), ensure_ascii=False)
     # campionati solo su API-Football: file dell'app costruito dall'archivio (stesse colonne dei file "new" di football-data)
     for lg_, (lid_, nm_, cal_) in API_ONLY.items():
@@ -703,8 +704,11 @@ try:
             g1, g2 = (r.get("FTHG") or r.get("HG") or "").strip(), (r.get("FTAG") or r.get("AG") or "").strip()
             pairs[(lg, h, a)].append(d)
             if g1.isdigit() and g2.isdigit(): ours[lg].append((d, h, a, int(g1), int(g2)))
+    # campionati tolti (Slovacchia, Ucraina): fuori dall'archivio, così non tornano nel calendario e nel controllo qualità
+    for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR")]: del AP["partite"][_k]
     by_lg = collections.defaultdict(list)
-    for v in AP["partite"].values(): by_lg[v[1]].append(v)
+    for v in AP["partite"].values():
+        if v[1] in AF_LEAGUES_X: by_lg[v[1]].append(v)   # solo i campionati dell'app
     MAPS = {}
     for lg, L in by_lg.items():
         L.sort(key=lambda v: v[0])
@@ -916,6 +920,7 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
         def sc(api, mine):
             al = ESPN_ALIAS.get(lg, {}).get(api) or ALIAS.get(lg, {}).get(api) or FIX_ALIAS.get(api)
             if al == mine or api == mine: return 1.0
+            if (globals().get("MAPS") or {}).get(lg, {}).get(api) == mine: return 1.0   # nomi API → nostri, imparati dai risultati (es. "Heart Of Midlothian" → "Hearts")
             a1, m1 = _norm(api), _norm(mine)
             if a1 == m1: return 1.0
             if a1 and m1 and (a1 in m1 or m1 in a1): return 0.9
