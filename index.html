@@ -722,7 +722,11 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
         <button class="segb" data-gp="10" aria-pressed="false">Ultime 10</button>
         <button class="segb" data-gp="5" aria-pressed="false">Ultime 5</button>
       </div>
-      <label class="chk" for="genSoon"><input type="checkbox" id="genSoon"> Solo squadre che giocano nei prossimi 3 giorni</label>
+      <div class="seg" role="group" aria-label="Quando giocano" id="genWhen">
+        <button class="segb" data-gw="all" aria-pressed="true">Tutte</button>
+        <button class="segb" data-gw="0" aria-pressed="false">Giocano oggi</button>
+        <button class="segb" data-gw="1" aria-pressed="false">Giocano domani</button>
+      </div>
     </section>
     <div id="genOut" class="genlist"></div>
     <p hidden style="margin:0">Almeno 5 partite nel periodo e nella sede scelti. A pari percentuale prima chi ha più partite. "Media campionato" è lo stesso dato su tutte le partite del campionato. La probabilità della prossima partita è quella del metodo scelto in alto.</p>
@@ -3865,7 +3869,7 @@ const GEN_NEXT = new Map();   // previsioni della prossima partita già calcolat
 function genNextEntries() {   // prossima partita di ogni squadra (entro 14 giorni)
   const t0 = localIso(), next = new Map();
   for (const e of allEntries()) { if (e.m || e.d < t0) continue;
-    for (const [t, side] of [[e.home, "h"], [e.away, "a"]]) { const key = e.lg.code + "|" + t; if (!next.has(key)) next.set(key, { e, side, soon: e.d <= addDays(t0, 3) }); } }
+    for (const [t, side] of [[e.home, "h"], [e.away, "a"]]) { const key = e.lg.code + "|" + t; if (!next.has(key)) next.set(key, { e, side, day: e.d === t0 ? 0 : e.d === addDays(t0, 1) ? 1 : null }); } }
   return next;
 }
 function genRows(mkKey, lgSel, venue, per) {
@@ -3924,12 +3928,12 @@ function genCalcNext(e) {
 }
 function renderGen() {
   const box = $("#genOut"); if (!box) return;
-  const mkKey = $("#genMk").value, D = GEN_MK[mkKey], lgSel = $("#genLg").value, soon = $("#genSoon").checked;
+  const mkKey = $("#genMk").value, D = GEN_MK[mkKey], lgSel = $("#genLg").value, when = GEN.when || "all", soon = when !== "all";
   const next = genNextEntries();
   let rows = genRows(mkKey, lgSel, GEN.venue, GEN.per);
-  if (soon) rows = rows.filter(r => { const nx = next.get(r.lg.code + "|" + r.t); return nx && nx.soon; });
+  if (soon) rows = rows.filter(r => { const nx = next.get(r.lg.code + "|" + r.t); return nx && nx.day === +when; });
   const shown = rows.slice(0, GEN.shown), max = Math.max(...shown.map(r => r.val), 1e-9);
-  if (!rows.length) { box.innerHTML = soon ? `<div class="empty">Nessuna di queste squadre gioca nei prossimi 3 giorni.</div>` : `<div class="empty">Nessuna squadra con almeno 5 partite con questi filtri${D.k !== "g" ? ".<br><span class='small'>Corner, falli e tiri non ci sono per i campionati con solo risultati.</span>" : "."}</div>`; return; }
+  if (!rows.length) { box.innerHTML = soon ? `<div class="empty">Nessuna di queste squadre gioca ${when === "0" ? "oggi" : "domani"}.</div>` : `<div class="empty">Nessuna squadra con almeno 5 partite con questi filtri${D.k !== "g" ? ".<br><span class='small'>Corner, falli e tiri non ci sono per i campionati con solo risultati.</span>" : "."}</div>`; return; }
   const fmtV = v => D.avg ? f1(v) : pc(v);
   const todo = [];
   const item = (r, i) => {
@@ -3957,7 +3961,8 @@ function renderGen() {
 }
 function renderGenSoft() { const y = scrollY; renderGen(); scrollTo({ top: y }); }
 $("#genLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
-["#genMk", "#genLg", "#genSoon"].forEach(id => $(id).addEventListener("change", () => { GEN.shown = 10; renderGen(); }));
+document.querySelectorAll("#genWhen .segb").forEach(b => b.addEventListener("click", () => { GEN.when = b.dataset.gw; GEN.shown = 10; document.querySelectorAll("#genWhen .segb").forEach(x => x.setAttribute("aria-pressed", x === b)); renderGen(); }));
+["#genMk", "#genLg"].forEach(id => $(id).addEventListener("change", () => { GEN.shown = 10; renderGen(); }));
 document.querySelectorAll("#genVenue .segb").forEach(b => b.addEventListener("click", () => { GEN.venue = b.dataset.gv; GEN.shown = 10; document.querySelectorAll("#genVenue .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
 document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("click", () => { GEN.per = b.dataset.gp; GEN.shown = 10; document.querySelectorAll("#genPer .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderGen(); }));
 
