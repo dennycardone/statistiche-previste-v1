@@ -706,7 +706,7 @@ h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
 .rtl{list-style:none;margin:0;padding:0}
 .rtr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
 .rtr:first-child{border-top:none}
-.rtr.go{cursor:pointer}.rtr.go:active{background:var(--surface-2)}.rtr.go .rtt::after{content:"›";margin-left:auto;padding-left:8px;color:var(--ink-3);font-size:18px;line-height:1}
+.rtr.go{cursor:pointer}.rtr.go:active{background:var(--surface-2)}
 .rtt{display:flex;align-items:center;gap:7px;min-width:0;font-weight:600;font-size:14px}.rtt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rtr.soon .rtt span::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#D4FF3F;margin-left:6px;vertical-align:2px}
 .rte{grid-column:1;font-size:14px;color:var(--ink);line-height:1.3}.rte b{color:var(--hot)}
@@ -735,6 +735,58 @@ html body{font-stretch:88%;font-feature-settings:'tnum'}
 .appbar .bslog{font-stretch:80%;letter-spacing:.02em}
 /* P di Prevista come filigrana, fissa in basso a destra */
 html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='27' y='14' width='15' height='72' rx='4' fill='%23E8EDF5' fill-opacity='.06'/%3E%3Ccircle cx='52' cy='40' r='19' fill='none' stroke='%23E8EDF5' stroke-opacity='.06' stroke-width='15'/%3E%3Ccircle cx='52' cy='40' r='6.5' fill='%23D4FF3F' fill-opacity='.14'/%3E%3C/svg%3E") no-repeat right -70px bottom 70px/330px auto fixed,var(--bg)}
+
+/* ===== Versione compatta (7/10/2026): meno spazi vuoti, meno scorrimento ===== */
+.wrap,.view{gap:10px}
+.wrap{padding-top:8px}
+.card{padding:12px;gap:9px}
+.daystrip{padding-block:0}
+.day,.day[aria-selected]{min-width:58px;padding:5px 5px 4px}
+.day b{font-size:17px}.day span{font-size:15px}.day small{font-size:10px;margin-top:0}
+.lgsec{font-size:14px;margin:2px 2px -4px}
+.lgblock{border-radius:10px}
+.lghead,.lghead[aria-expanded]{padding:7px 12px;gap:8px;grid-template-columns:24px minmax(0,1fr) auto 14px}
+.lghead .flag{font-size:18px}
+.lghead .nm small{font-size:9.5px;letter-spacing:.12em}
+.lghead .nm b{font-size:16.5px}
+.lghead .cnt{font-size:17px}
+.sched{gap:7px}
+.lghead .nm{flex-direction:row;align-items:baseline;gap:7px;line-height:1.2}
+.lghead .nm small{flex:0 0 auto}
+.lghead .nm b{min-width:0}
+.mrow,.mrow{padding:6px 12px;gap:8px}
+.mrow .tt{font-size:14.5px;line-height:1.25}
+.daysum{padding:7px 12px}.daysum b{font-size:24px}
+.mtop{min-height:0}
+.mtabs{padding-block:2px}
+.mtab{padding:6px 11px}
+.mhead .sx-band{padding:7px 12px}
+.mhead .sx-band .flag{font-size:18px}.mhead .sx-band .nm b{font-size:17px}
+.mhead .sx-h>span{padding:9px 6px 8px;gap:4px}
+.mhead .sx-r>span{padding:6px 6px}
+.mhead .sx-m small{font-size:12px}.mhead .sx-m b{font-size:19px;line-height:1.1}
+.mhead .sx-v{font-size:20px}.mhead .sx-v .rv{font-size:22px}
+.mhead .sx-f>span{padding:6px 6px}
+.mhead .bdg{width:50px;height:50px}
+.grow{padding:9px 12px;gap:3px 10px;border-radius:12px}
+.gnext{padding-top:4px;margin-top:0}
+.genf,.genf3{gap:8px}
+.segb{padding:6px 9px}
+.gl4h{padding:9px 12px}.gl4h .flag{font-size:22px}.gl4h .nm b{font-size:18px}
+.rtr{padding:8px 12px;gap:2px 10px}.rtn b{font-size:26px}
+.lth,.ltr{padding-block:5px}
+/* loghi delle squadre nella Lettura: sempre dentro il cerchio bianco */
+.mhead .bdg.lg{box-sizing:border-box;padding:8px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.mhead .bdg.lg img{display:block;width:100%;height:100%;min-width:0;min-height:0;max-width:100%;max-height:100%;object-fit:contain}
+/* Partite nella barra: spenta è calibrata come le altre voci, accesa si solleva nel cerchio lime */
+.tabbar .navmain[aria-pressed="false"]{padding:7px 0 5px;color:var(--ink-3)}
+.tabbar .navmain[aria-pressed="false"] .nmc{width:auto;height:auto;margin:0;background:transparent;box-shadow:none;border-radius:0}
+.tabbar .navmain[aria-pressed="false"] .nmc svg{width:25px;height:25px;stroke-width:1.8;color:currentColor}
+.tabbar .navmain[aria-pressed="false"] .nmc svg .d{fill:#D4FF3F}
+/* Digiuni: filtri a pulsanti */
+.rtf{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rtf .chip{display:inline-flex;align-items:center;gap:6px}
+.rtf .chip i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#D4FF3F}
 </style>
 </head>
 <body>
@@ -847,7 +899,10 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
         <button class="segb" data-v="home" aria-pressed="true">Casa</button>
         <button class="segb" data-v="away" aria-pressed="false">Trasferta</button>
       </div>
-      <label class="chk" for="ritDot" style="margin-top:10px"><input type="checkbox" id="ritDot"> Solo con il pallino (la Lettura della prossima partita dà l'evento)</label>
+      <div class="rtf" role="group" aria-label="Quando giocano e Lettura">
+        <button class="chip" data-rw="all" aria-pressed="true">Sempre</button><button class="chip" data-rw="0" aria-pressed="false">Oggi</button><button class="chip" data-rw="1" aria-pressed="false">Domani</button>
+        <button class="chip" id="ritDot" aria-pressed="false"><i aria-hidden="true"></i>Lettura</button>
+      </div>
     </section>
     <div id="ritOut"></div>
   </div>
@@ -4179,7 +4234,7 @@ const RIT_EV = [
   // risultati esatti fino a 4 gol totali, dal punto di vista della squadra (gol fatti-subiti); solo nel filtro "Risultati esatti"
   ...[[1, 0], [2, 0], [2, 1], [3, 0], [3, 1], [4, 0], [0, 0], [1, 1], [2, 2], [0, 1], [0, 2], [1, 2], [0, 3], [1, 3], [0, 4]].map(([x, y]) =>
     ["r", "g", `${x > y ? "non vince" : x === y ? "non pareggia" : "non perde"} ${x}-${y}`, (f, a) => f === x && a === y])];
-const RIT = { ven: "home", min: 5 };
+const RIT = { ven: "home", min: 5, when: "all", dot: false };
 const RIT_UNIT = { g: "", c: " corner", s: " tiri", st: " tiri in porta", f: " falli", k: " cartellini" };
 function ritRows(L, team, gr, ven) {
   const out = [];
@@ -4258,8 +4313,8 @@ function renderRit() {
     return `Ultima volta: ${dd(m.date)} · ${esc(m.home)}–${esc(m.away)} ${m[kh]}-${m[ka]}${RIT_UNIT[r.k]}`;
   };
   if (rows.length) withLeague(L.code, () => { const lm = leagueMatches(); for (const r of rows) if (r.never) r.first = lm.filter(m => m.home === r.t || m.away === r.t).reduce((a, m) => !a || m.date < a ? m.date : a, null); });
-  const MAXR = 120, onlyDot = $("#ritDot").checked, NX = new Map(), AE = allEntries().filter(x => !x.m && x.lg.code === L.code);
-  let shown = onlyDot ? rows : rows.slice(0, MAXR);
+  const MAXR = 120, onlyDot = RIT.dot, NX = new Map(), AE = allEntries().filter(x => !x.m && x.lg.code === L.code);
+  let shown = onlyDot || RIT.when !== "all" ? rows : rows.slice(0, MAXR);
   const dshort = d => d.toLocaleDateString("it-IT", { weekday: "short", day: "2-digit", month: "2-digit" });
   for (const r of shown) {
     if (!NX.has(r.t)) NX.set(r.t, ritNext(L, r.t, ven, AE));
@@ -4267,6 +4322,7 @@ function renderRit() {
     if (nx && !nx.skip) r.p = ritProb(L, nx, r.k, r.fn);
   }
   if (onlyDot) shown = shown.filter(r => r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip);
+  if (RIT.when !== "all") { const day = addDays(localIso(), +RIT.when); shown = shown.filter(r => r.nx && r.nx.e.d === day); }
   const nextTxt = r => {
     const nx = r.nx; if (!nx) return "";
     const opp = nx.home ? nx.e.away : nx.e.home, where = nx.home ? "in casa" : "in trasferta";
@@ -4279,13 +4335,15 @@ function renderRit() {
       <span class="rte">${r.lab}${venTxt ? " " + venTxt : ""} da <b>${r.n}</b> partite</span>
       <span class="rtn${r.never ? " never" : ""}"><b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>
       <span class="rtl2">${lastTxt(r)}</span>${nextTxt(r)}</li>`).join("")}</ul>`
-    : `<p class="lt-none">${onlyDot ? "Nessun digiuno con il pallino: per ora la Lettura delle prossime partite non dà nessuno di questi eventi." : `Nessun digiuno di almeno ${RIT.min} partite con questi filtri.`}</p>`;
+    : `<p class="lt-none">${RIT.when !== "all" && !onlyDot ? `Nessuna squadra con un digiuno gioca ${RIT.when === "0" ? "oggi" : "domani"}.` : onlyDot ? "Per ora la Lettura non dà la fine di nessun digiuno." : `Nessun digiuno di almeno ${RIT.min} partite con questi filtri.`}</p>`;
   box.innerHTML = `<section class="card gl4"><div class="gl4h"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="gl4m">${ven === "home" ? "In casa" : ven === "away" ? "In trasferta" : "Tutte le partite"}</span></div>${body}
-    <p class="lt-ref">Partite di campionato consecutive senza l'evento, dalla più recente all'indietro, anche nelle stagioni precedenti (solo questo campionato, solo partite con il dato). Almeno ${RIT.min} partite. Pallino: per la prossima partita (stessa sede) la Lettura dà l'evento al 50% o più, con il metodo scelto in alto.${!onlyDot && rows.length > MAXR ? ` Primi ${MAXR} di ${rows.length}: scegli una squadra o una statistica per vederli tutti.` : ""} Tocca un digiuno per aprire la Lettura della prossima partita.</p></section>`;
+    <p class="lt-ref">Partite di campionato consecutive senza l'evento, dalla più recente all'indietro, anche nelle stagioni precedenti (solo questo campionato, solo partite con il dato). Almeno ${RIT.min} partite. <i class="rtdot" aria-hidden="true"></i> La Lettura vede la fine del digiuno nella prossima partita (50% o più, stessa sede, metodo scelto in alto).${!onlyDot && rows.length > MAXR ? ` Primi ${MAXR} di ${rows.length}: scegli una squadra o una statistica per vederli tutti.` : ""} Tocca un digiuno per aprire la Lettura della prossima partita.</p></section>`;
   box.querySelectorAll(".rtr.go").forEach(li => { const go = () => { const e = AE.find(x => x.id === li.dataset.id); if (e) openEntry(e); }; li.addEventListener("click", go); li.addEventListener("keydown", ev => { if (ev.key === "Enter") go(); }); });
 }
 $("#ritLg").innerHTML = LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
-["#ritLg", "#ritTeam", "#ritGr", "#ritDot"].forEach(id => $(id).addEventListener("change", renderRit));
+["#ritLg", "#ritTeam", "#ritGr"].forEach(id => $(id).addEventListener("change", renderRit));
+document.querySelectorAll(".rtf [data-rw]").forEach(b => b.addEventListener("click", () => { RIT.when = b.dataset.rw; document.querySelectorAll(".rtf [data-rw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
+$("#ritDot").addEventListener("click", () => { RIT.dot = !RIT.dot; $("#ritDot").setAttribute("aria-pressed", String(RIT.dot)); renderRit(); });
 document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 function renderGenSoft() { const y = scrollY; renderGen(); scrollTo({ top: y }); }
 $("#genLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
