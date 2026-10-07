@@ -615,7 +615,7 @@ except Exception as e:
 # Arbitro e cartellini (API-Football, piano a pagamento): archivio partite in data/apif.json (all'inizio dallo storico 2022-2025
 # del ramo storico), aggiornato ogni 3 ore con le stagioni in corso (anche le partite future: lì c'è l'arbitro, di solito 1-2 giorni prima).
 # Per ogni partita (con le sole partite precedenti): fattore arbitro su falli e cartellini e cartellini attesi → data/extra.json.
-# Backtest 2024-2026: falli +1,5% di precisione con l'arbitro, cartellini +2,9% sulla media del campionato (probabilità di Poisson tarate).
+# Backtest 2024-2026: falli +1,5% di precisione con l'arbitro (tetto +4% nell'app dal 7/10/2026), cartellini +2,9% sulla media del campionato (probabilità di Poisson tarate).
 AF_LEAGUES_X = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "EC": 43, "SP1": 140, "SP2": 141, "F1": 61, "F2": 62, "D1": 78, "D2": 79,
                 "N1": 88, "P1": 94, "SC0": 179, "SC1": 180, "SC2": 183, "SC3": 184, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71,
                 "CHN": 169, "DNK": 119, "FIN": 244, "IRL": 357, "JPN": 98, "MEX": 262, "NOR": 103, "POL": 106, "ROU": 283, "RUS": 235, "SWE": 113,
