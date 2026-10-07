@@ -395,6 +395,17 @@ body{padding-block:0 calc(88px + env(safe-area-inset-bottom,0px))}
 .tabbar svg{display:block!important;width:25px;height:25px;stroke-width:1.8}
 .tabbar button[aria-pressed="true"]{background:transparent;color:var(--hot);box-shadow:none}
 .tabbar button[aria-pressed="true"]::before{content:"";position:absolute;top:-7px;left:28%;right:28%;height:3px;border-radius:0 0 3px 3px;background:var(--hot)}
+/* Partite: voce centrale in evidenza (cerchio lime sollevato) */
+.tabbar{overflow:visible}
+.tabbar .navmain{color:var(--ink);padding-top:0}
+.tabbar .navmain .nmc{display:grid;place-items:center;width:54px;height:54px;margin-top:-22px;border-radius:50%;background:#D4FF3F;color:#0b1220;box-shadow:0 0 0 5px var(--bar-2),0 8px 18px -6px rgba(212,255,63,.55);transition:transform .15s}
+.tabbar .navmain .nmc svg{width:28px;height:28px;stroke-width:2;color:#0b1220}
+.tabbar .navmain .nmc svg .d,.tabbar .navmain .nmc svg circle.d{fill:#0b1220}
+.tabbar .navmain[aria-pressed="true"]{color:#D4FF3F}
+.tabbar .navmain[aria-pressed="true"]::before{display:none}
+.tabbar .navmain[aria-pressed="false"] .nmc{background:var(--surface-2);color:var(--ink);box-shadow:0 0 0 5px var(--bar-2),0 0 0 6px color-mix(in srgb,#D4FF3F 60%,transparent)}
+.tabbar .navmain[aria-pressed="false"] .nmc svg{color:var(--ink)}
+.tabbar .navmain:active .nmc{transform:scale(.94)}
 .mtabs{top:calc(env(safe-area-inset-top,0px) + var(--hdr,64px))}
 .daystrip{gap:2px;padding-block:2px}
 .day,.day[aria-selected]{min-width:66px;padding:8px 6px 7px;background:transparent;border:1px solid transparent;border-radius:10px;box-shadow:none}
@@ -590,7 +601,7 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
 .gnums{flex-direction:column;align-items:stretch;gap:7px;position:relative;padding-right:34px}.gnums .info{position:absolute;right:0;top:8px;margin:0}
 .gck{display:flex;gap:8px;align-items:baseline;color:var(--ink-2);line-height:1.35}.gck i{font-style:normal;font-weight:700;width:14px;flex:0 0 14px;text-align:center}
 .gck.ok i{color:#5ee08a}.gck.mid i{color:var(--gold)}.gck.ko i{color:#ff7a7a}.gck.why{color:var(--ink-3)}
-.mrow,.mrow{grid-template-columns:50px minmax(0,1fr) 30px 30px 30px 30px}
+.mrow,.mrow{grid-template-columns:50px minmax(0,1fr)}
 .mrow .tmc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
 .mrow .tmc .dots{align-items:flex-start;gap:3px}
 .mrow .tmc .dots.presi{flex-direction:row;align-items:baseline;gap:3px}.mrow .tmc .dots.presi b{font-size:12px}.mrow .tmc .dots.presi small{font-size:10px}.mrow .tm.fin{font-size:10px}
@@ -695,6 +706,7 @@ h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
 .rtl{list-style:none;margin:0;padding:0}
 .rtr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
 .rtr:first-child{border-top:none}
+.rtr.go{cursor:pointer}.rtr.go:active{background:var(--surface-2)}.rtr.go .rtt::after{content:"›";margin-left:auto;padding-left:8px;color:var(--ink-3);font-size:18px;line-height:1}
 .rtt{display:flex;align-items:center;gap:7px;min-width:0;font-weight:600;font-size:14px}.rtt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rtr.soon .rtt span::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#D4FF3F;margin-left:6px;vertical-align:2px}
 .rte{grid-column:1;font-size:14px;color:var(--ink);line-height:1.3}.rte b{color:var(--hot)}
@@ -756,9 +768,9 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </label>
   </div>
   <nav class="tabbar" aria-label="Sezioni">
-  <button id="navStats" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-partite"/></svg>Partite</button>
   <button id="navSel" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-radar"/></svg>Radar</button>
   <button id="navSig" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-segnali"/></svg>Segnali</button>
+  <button id="navStats" class="navmain" aria-pressed="true"><span class="nmc"><svg class="ic" aria-hidden="true"><use href="#i-partite"/></svg></span>Partite</button>
   <button id="navGen" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-tendenze"/></svg>Tendenze</button>
   <button id="navRit" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-ritardi"/></svg>Digiuni</button>
 </nav>
@@ -772,7 +784,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <div class="seg rtabs" role="tablist" aria-label="Sezioni del Radar" id="selTabs">
       <button class="segb" data-rt="aplus" aria-pressed="true"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnali A+ <b id="rtA"></b></button>
       <button class="segb" data-rt="bk" aria-pressed="false"><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato <b id="rtB"></b></button>
-      <button class="segb" data-rt="all" aria-pressed="false"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Tutte <b id="rtC"></b></button>
+      <button class="segb" data-rt="all" aria-pressed="false"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>In arrivo <b id="rtC"></b></button>
     </div>
     <section class="card aplus" id="selAplus" aria-label="A+ sul radar"></section>
     <section class="card" id="selBk" aria-label="Linea bookmakers" hidden></section>
@@ -791,19 +803,14 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <div class="view" id="viewGen" hidden>
     <section class="card genf" aria-label="Filtri classifiche">
       <div class="genrow">
+      <label for="genLg" class="fl">Campionato<select id="genLg"></select></label>
       <label for="genMk" class="fl">Mercato<select id="genMk">
-        <optgroup label="Gol">
           <option value="o15">Over 1,5</option><option value="o25" selected>Over 2,5</option><option value="o35">Over 3,5</option>
           <option value="u15">Under 1,5</option><option value="u25">Under 2,5</option><option value="u35">Under 3,5</option>
           <option value="gg">Gol</option><option value="ng">No gol</option>
-        </optgroup>
-        <optgroup label="Corner"><option value="c_avg">Corner · media</option><option value="c_win">Corner · 1X2</option></optgroup>
-        <optgroup label="Falli"><option value="f_avg">Falli · media</option><option value="f_win">Falli · 1X2</option></optgroup>
-        <optgroup label="Tiri"><option value="s_avg">Tiri · media</option><option value="s_win">Tiri · 1X2</option></optgroup>
-        <optgroup label="Tiri in porta"><option value="st_avg">Tiri in porta · media</option><option value="st_win">Tiri in porta · 1X2</option></optgroup>
-        <optgroup label="Cartellini"><option value="k_avg">Cartellini · media</option><option value="k_o35">Over 3,5 cartellini</option><option value="k_o45">Over 4,5 cartellini</option><option value="k_o55">Over 5,5 cartellini</option></optgroup>
+        <option value="c_avg">Corner · media</option><option value="c_win">Corner · 1X2</option><option value="f_avg">Falli · media</option><option value="f_win">Falli · 1X2</option><option value="s_avg">Tiri · media</option><option value="s_win">Tiri · 1X2</option><option value="st_avg">Tiri in porta · media</option><option value="st_win">Tiri in porta · 1X2</option><option value="k_avg">Cartellini · media</option><option value="k_o35">Over 3,5 cartellini</option><option value="k_o45">Over 4,5 cartellini</option><option value="k_o55">Over 5,5 cartellini</option>
       </select></label>
-      <label for="genLg" class="fl">Campionato<select id="genLg"></select></label>
+      
       </div>
       <div class="seg" role="group" aria-label="Sede" id="genVenue">
         <button class="segb" data-gv="tot" aria-pressed="true">Totale</button>
@@ -836,9 +843,9 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
         <option value="st">Tiri in porta</option><option value="f">Falli</option><option value="k">Cartellini</option>
       </select></label>
       <div class="seg" role="group" aria-label="Sede" id="ritVen">
+        <button class="segb" data-v="all" aria-pressed="false">Tutte</button>
         <button class="segb" data-v="home" aria-pressed="true">Casa</button>
         <button class="segb" data-v="away" aria-pressed="false">Trasferta</button>
-        <button class="segb" data-v="all" aria-pressed="false">Tutte</button>
       </div>
       <label class="chk" for="ritDot" style="margin-top:10px"><input type="checkbox" id="ritDot"> Solo con il pallino (la Lettura della prossima partita dà l'evento)</label>
     </section>
@@ -891,6 +898,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <button class="mtab" data-mt="sig" aria-pressed="false">Grado</button>
       <button class="mtab" data-mt="h2h" aria-pressed="false">Precedenti</button>
       <button class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
+      <button class="mtab" data-mt="rend" aria-pressed="false">Rendimento</button>
     </div>
     <div class="mpane" data-mp="prev">
       <section class="mhead" id="mhead" aria-label="Lettura della partita"></section>
@@ -923,7 +931,9 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
         <button class="segb" data-av="away" aria-pressed="false">Trasferta</button>
       </div>
       <section class="card" id="tableOut" aria-label="Classifica"></section>
-      <section class="card mtrend" id="mtrend" aria-label="Tendenze del campionato" hidden></section>
+    </div>
+    <div class="mpane" data-mp="rend" hidden>
+      <section class="card mtrend" id="mtrend" aria-label="Rendimento in casa e in trasferta" hidden></section>
     </div>
     <div class="mpane" data-mp="info" hidden>
   <section class="card" aria-label="Scelta partita" hidden style="display:none">   <!-- i menu restano (li usa il codice), ma non si vedono -->
@@ -3577,8 +3587,7 @@ function renderSched() {
     return `<button class="mrow" data-id="${esc(e.id)}">
           <span class="tmc"><span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>${end}</span>
           <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}</span><b>${m ? m.ag : ""}</b></span>
-          ${vals}
-        </button>`; };
+        </button>`; };   // percentuali Over/Gol tolte dalla lista (7/10/2026): restano nella Lettura
   const bind = b => b.addEventListener("click", () => { const e = all.find(x => x.id === b.dataset.id); if (e) openEntry(e); });
   const daySum = () => {
     let dayTot = 0, dayHit = 0; for (const e of playedToday) { const R = rowCalc(e); dayTot += R.done ? R.done.length : 0; dayHit += R.hit || 0; }
@@ -4135,7 +4144,7 @@ function renderGen() {
   if (uniq.length) setTimeout(step, 0);
 }
 
-/* scheda partita, sezione Classifica: le stesse tabelle del campionato, con le due squadre evidenziate.
+/* scheda partita, sezione Rendimento (a destra di Classifica): le stesse tabelle del campionato, con le due squadre evidenziate.
    Si apre sul lato della partita: in casa per la squadra di casa, in trasferta per l'ospite. */
 const MTR = { mk: "c", ven: "home" };
 function renderMatchTrend(home, away) {
@@ -4145,7 +4154,7 @@ function renderMatchTrend(home, away) {
   const D = GEN3[MTR.mk], hi = new Map([[home, "mh"], [away, "ma"]]);
   const { body, note } = gen3Body(L, MTR.mk, MTR.ven, null, hi);
   const opt = Object.entries(GEN3).map(([k, d]) => `<option value="${k}"${k === MTR.mk ? " selected" : ""}>${k === "gol" ? "Over e Gol" : d.lab}</option>`).join("");
-  box.innerHTML = `<h2>Tendenze di ${esc(L.name)}</h2>
+  box.innerHTML = `<h2>Rendimento · ${esc(L.name)}</h2>
     <div class="mtrc"><label for="mtrMk" class="sr">Statistica</label><select id="mtrMk">${opt}</select>
       <div class="seg" role="group" aria-label="Sede" id="mtrVen"><button class="segb" data-v="home" aria-pressed="${MTR.ven === "home"}">Casa</button><button class="segb" data-v="away" aria-pressed="${MTR.ven === "away"}">Trasferta</button></div></div>
     <div class="stdleg"><span class="mh">${crest(S.league, home)}${esc(home)}${MTR.ven === "home" ? " · gioca in casa" : ""}</span><span class="ma">${crest(S.league, away)}${esc(away)}${MTR.ven === "away" ? " · gioca fuori" : ""}</span></div>
@@ -4265,14 +4274,15 @@ function renderRit() {
     const p = r.p, on = p != null && p >= 0.5;
     return `<span class="rtl2 rtnx${on ? " on" : ""}">${on ? '<i class="rtdot" aria-hidden="true"></i>' : ""}Prossima: ${dshort(nx.e.date)} ${where} con ${esc(opp)} · Lettura <b>${p == null ? "N/D" : Math.round(p * 100) + "%"}</b></span>`;
   };
-  const body = shown.length ? `<ul class="rtl">${shown.map(r => `<li class="rtr${r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip ? " hasdot" : ""}">
+  const body = shown.length ? `<ul class="rtl">${shown.map(r => `<li class="rtr${r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip ? " hasdot" : ""}${r.nx ? " go" : ""}"${r.nx ? ` data-id="${esc(r.nx.e.id)}" role="button" tabindex="0" aria-label="Apri la Lettura di ${esc(r.nx.e.home)}–${esc(r.nx.e.away)}"` : ""}>
       <span class="rtt">${crest(L.code, r.t)}<span>${esc(r.t)}</span></span>
       <span class="rte">${r.lab}${venTxt ? " " + venTxt : ""} da <b>${r.n}</b> partite</span>
       <span class="rtn${r.never ? " never" : ""}"><b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>
       <span class="rtl2">${lastTxt(r)}</span>${nextTxt(r)}</li>`).join("")}</ul>`
     : `<p class="lt-none">${onlyDot ? "Nessun digiuno con il pallino: per ora la Lettura delle prossime partite non dà nessuno di questi eventi." : `Nessun digiuno di almeno ${RIT.min} partite con questi filtri.`}</p>`;
   box.innerHTML = `<section class="card gl4"><div class="gl4h"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="gl4m">${ven === "home" ? "In casa" : ven === "away" ? "In trasferta" : "Tutte le partite"}</span></div>${body}
-    <p class="lt-ref">Partite di campionato consecutive senza l'evento, dalla più recente all'indietro, anche nelle stagioni precedenti (solo questo campionato, solo partite con il dato). Almeno ${RIT.min} partite. Pallino: per la prossima partita (stessa sede) la Lettura dà l'evento al 50% o più, con il metodo scelto in alto.${!onlyDot && rows.length > MAXR ? ` Primi ${MAXR} di ${rows.length}: scegli una squadra o una statistica per vederli tutti.` : ""} </p></section>`;
+    <p class="lt-ref">Partite di campionato consecutive senza l'evento, dalla più recente all'indietro, anche nelle stagioni precedenti (solo questo campionato, solo partite con il dato). Almeno ${RIT.min} partite. Pallino: per la prossima partita (stessa sede) la Lettura dà l'evento al 50% o più, con il metodo scelto in alto.${!onlyDot && rows.length > MAXR ? ` Primi ${MAXR} di ${rows.length}: scegli una squadra o una statistica per vederli tutti.` : ""} Tocca un digiuno per aprire la Lettura della prossima partita.</p></section>`;
+  box.querySelectorAll(".rtr.go").forEach(li => { const go = () => { const e = AE.find(x => x.id === li.dataset.id); if (e) openEntry(e); }; li.addEventListener("click", go); li.addEventListener("keydown", ev => { if (ev.key === "Enter") go(); }); });
 }
 $("#ritLg").innerHTML = LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#ritLg", "#ritTeam", "#ritGr", "#ritDot"].forEach(id => $(id).addEventListener("change", renderRit));
@@ -4503,7 +4513,7 @@ function renderSelBk(ents, cfg, when) {
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelBk(selEntries(), cfg, when); }, 30);
 }
-/* Radar a tre schede: Segnali A+ · Mercato · Tutte (il Mercato non resta in fondo alla pagina) */
+/* Radar a tre schede: Segnali A+ · Mercato · In arrivo (il Mercato non resta in fondo alla pagina) */
 function radarTabs() {
   if (!SEL.tab) SEL.tab = "aplus";
   const set = (id, n) => { const el = $(id); if (el) el.textContent = n == null ? "" : n; };
