@@ -7,7 +7,11 @@ def get(p, **q):
     with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
     time.sleep(0.3); return d
 def note(s): print("::notice title=1xBet::" + s.replace("%", "%25"))
-bk = get("odds/bookmakers").get("response", [])
+try:
+    B0 = get("odds/bookmakers"); bk = B0.get("response", []) or []
+    if B0.get("errors"): note("errori: " + json.dumps(B0.get("errors")))
+except Exception as e:
+    note("errore bookmakers: " + repr(e)); bk = []
 x = [b for b in bk if "1x" in b["name"].lower()]
 note("Bookmaker API-Football: " + str(len(bk)) + " · 1xBet: " + json.dumps(x))
 if x:
@@ -15,7 +19,9 @@ if x:
     for dd in (0, 1, 2):
         day = (datetime.date.today() + datetime.timedelta(days=dd)).isoformat()
         for page in (1, 2, 3):
-            R = get("odds", date=day, bookmaker=bid, page=page)
+            try: R = get("odds", date=day, bookmaker=bid, page=page)
+            except Exception as e: note("errore odds: " + repr(e)); break
+            if R.get("errors"): note("errori odds: " + json.dumps(R.get("errors"))); break
             for e in R.get("response", []):
                 n += 1
                 for b in e.get("bookmakers", []):
