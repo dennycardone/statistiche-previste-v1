@@ -713,7 +713,8 @@ h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
 .rtl2{grid-column:1/-1;font-size:12px;color:var(--ink-3);line-height:1.35}
 .rtn{grid-row:1/3;grid-column:2;text-align:right;line-height:1}.rtn b{display:block;font-family:var(--display);font-stretch:75%;font-size:30px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}.rtn small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
 .rtn.never b{color:var(--hot)}
-.rtn .ccls{display:inline-block;font-size:11px;padding:1px 5px;border-radius:5px;margin-bottom:3px;font-family:var(--body);font-stretch:88%}
+.rtlp{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.rtnx .ccls{display:inline-grid;place-items:center;min-width:22px;height:18px;padding:0 5px;border-radius:5px;font-size:11px;line-height:1;font-family:var(--body);font-stretch:88%;box-sizing:border-box}
+.rtf .chip .ccls{display:inline-grid;place-items:center;min-width:16px;height:16px;padding:0 3px;border-radius:4px;font-size:10px;line-height:1;font-style:normal;box-sizing:border-box}
 .rtlg{font-size:11px;font-weight:500;color:var(--ink-3)}
 .rtnx{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.rtnx b{color:var(--ink-2)}
 .rtnx.on{color:var(--ink-2)}.rtnx.on b{color:#D4FF3F}
@@ -809,7 +810,8 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 #ritVen{margin-top:0}
 #viewRit .segb{padding:5px 9px}
 .rtf{justify-content:center}
-.rtf .chip{padding:5px 11px}
+.rtf{flex-wrap:nowrap;gap:5px}.rtf .chip{padding:5px 9px;font-size:13px;white-space:nowrap;gap:5px}
+@media(max-width:400px){.rtf{gap:4px}.rtf .chip{padding:5px 7px;font-size:12.5px}}
 
 /* Partite: cerchio calibrato (46px, anello dentro il cerchio, 4px sopra la scritta) */
 .tabbar .navmain,.tabbar .navmain[aria-pressed]{gap:6px}
@@ -935,7 +937,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <div class="rtf" role="group" aria-label="Quando giocano e Lettura">
         <button class="chip" data-rw="all" aria-pressed="true">Sempre</button><button class="chip" data-rw="0" aria-pressed="false">Oggi</button><button class="chip" data-rw="1" aria-pressed="false">Domani</button>
         <button class="chip" id="ritDot" aria-pressed="false"><i aria-hidden="true"></i>Lettura</button>
-        <button class="chip" id="ritSort" aria-pressed="false">Ordina per %</button>
+        <button class="chip" id="ritGrd" aria-pressed="false"><em class="ccls c-a" aria-hidden="true">A</em>Grado</button>
       </div>
     </section>
     <div id="ritOut"></div>
@@ -4270,7 +4272,7 @@ const RIT_EV = [
   // risultati esatti fino a 4 gol totali, dal punto di vista della squadra (gol fatti-subiti); solo nel filtro "Risultati esatti"
   ...[[1, 0], [2, 0], [2, 1], [3, 0], [3, 1], [4, 0], [0, 0], [1, 1], [2, 2], [0, 1], [0, 2], [1, 2], [0, 3], [1, 3], [0, 4]].map(([x, y]) =>
     ["r", "g", `${x > y ? "non vince" : x === y ? "non pareggia" : "non perde"} ${x}-${y}`, (f, a) => f === x && a === y])];
-const RIT = { ven: "home", min: 5, when: "all", dot: false, sortP: false };
+const RIT = { ven: "home", min: 5, when: "all", dot: false, grd: false, sortP: true };   // ordine fisso: percentuale della Lettura
 const RIT_UNIT = { g: "", c: " corner", s: " tiri", st: " tiri in porta", f: " falli", k: " cartellini" };
 function ritRows(L, team, gr, ven) {
   const out = [];
@@ -4400,22 +4402,23 @@ function renderRit() {
     setTimeout(step, 0);
   }
   if (onlyDot) shown = shown.filter(r => r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip);
+  if (RIT.grd) { for (const r of shown) r.g = ritGrade(r); shown = shown.filter(r => r.g); }
   if (RIT.sortP) shown = shown.slice().sort((x, y) => (y.p != null ? y.p : -1) - (x.p != null ? x.p : -1) || y.n - x.n);
   const more = shown.length > MAXR; shown = shown.slice(0, MAXR);
-  for (const r of shown) r.g = ritGrade(r);
+  if (!RIT.grd) for (const r of shown) r.g = ritGrade(r);
   const nextTxt = r => {
     const nx = r.nx; if (!nx) return "";
-    const opp = nx.home ? nx.e.away : nx.e.home, where = nx.home ? "in casa" : "in trasferta";
-    if (nx.skip) return `<span class="rtl2">Prossima: ${dshort(nx.e.date)} ${where} con ${esc(opp)}</span>`;
+    const opp = nx.home ? nx.e.away : nx.e.home, where = nx.home ? "In casa" : "In trasferta";
+    if (nx.skip) return `<span class="rtl2">${where} con ${esc(opp)} · ${dshort(nx.e.date)}</span>`;
     const p = r.p, on = p != null && p >= 0.5;
-    return `<span class="rtl2 rtnx${on ? " on" : ""}">${on ? '<i class="rtdot" aria-hidden="true"></i>' : ""}Prossima: ${dshort(nx.e.date)} ${where} con ${esc(opp)} · Lettura <b>${p == null ? "N/D" : Math.round(p * 100) + "%"}</b></span>`;
+    return `<span class="rtl2 rtnx${on ? " on" : ""}">${on ? '<i class="rtdot" aria-hidden="true"></i>' : ""}${where} con ${esc(opp)} · ${dshort(nx.e.date)}<span class="rtlp">· Lettura <b>${p == null ? "N/D" : Math.round(p * 100) + "%"}</b>${gchip(r.g)}</span></span>`;
   };
-  const gchip = c => c ? `<b class="ccls c-${c === "A+" ? "ap" : c.toLowerCase()}" title="Grado della previsione su questo esito">${c}</b>` : "";
+  const gchip = c => c ? `<span class="ccls c-${c === "A+" ? "ap" : c.toLowerCase()}" title="Grado della previsione su questo esito">${c}</span>` : "";
   const body = shown.length ? `<ul class="rtl">${shown.map(r => `<li class="rtr${r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip ? " hasdot" : ""}${r.nx ? " go" : ""}"${r.nx ? ` data-id="${esc(r.nx.e.id)}" role="button" tabindex="0" aria-label="Apri la Lettura di ${esc(r.nx.e.home)}–${esc(r.nx.e.away)}"` : ""}>
       <span class="rtt">${crest(r.L.code, r.t)}<span>${esc(r.t)}${all ? ` <small class="rtlg">${esc(lgName(r.L))}</small>` : ""}</span></span>
       <span class="rte">${r.lab}${venTxt ? " " + venTxt : ""} da <b>${r.n}</b> partite</span>
-      <span class="rtn${r.never ? " never" : ""}">${gchip(r.g)}<b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>${nextTxt(r)}</li>`).join("")}</ul>${more ? `<p class="lt-ref">Primi ${MAXR}: scegli un campionato, una squadra o una statistica per vederne altri.</p>` : ""}`
-    : `<p class="lt-none">${RIT.when !== "all" && !onlyDot ? `Nessuna squadra con un digiuno gioca ${RIT.when === "0" ? "oggi" : "domani"}.` : onlyDot ? "Per ora la Lettura non dà la fine di nessun digiuno." : `Nessun digiuno di almeno ${RIT.min} partite con questi filtri.`}</p>`;
+      <span class="rtn${r.never ? " never" : ""}"><b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>${nextTxt(r)}</li>`).join("")}</ul>${more ? `<p class="lt-ref">Primi ${MAXR}: scegli un campionato, una squadra o una statistica per vederne altri.</p>` : ""}`
+    : `<p class="lt-none">${RIT.when !== "all" && !onlyDot && !RIT.grd ? `Nessuna squadra con un digiuno gioca ${RIT.when === "0" ? "oggi" : "domani"}.` : onlyDot ? "Per ora la Lettura non dà la fine di nessun digiuno." : RIT.grd ? "Per ora nessun digiuno coincide con un esito del Grado." : `Nessun digiuno di almeno ${RIT.min} partite con questi filtri.`}</p>`;
   const L0 = Ls[0], head = all ? `<span class="flag" aria-hidden="true">🌍</span><span class="nm"><small>Tutti</small><b>I campionati</b></span>`
     : `<span class="flag" aria-hidden="true">${FLAGS[L0.country] || "⚽"}</span><span class="nm"><small>${esc(L0.country)}</small><b>${esc(L0.name)}</b></span>`;
   box.innerHTML = `<section class="card gl4"><div class="gl4h">${head}<span class="gl4m">${ven === "home" ? "In casa" : ven === "away" ? "In trasferta" : "Tutte le partite"}</span></div>${pend ? `<p class="lt-ref rtpend">Calcolo le percentuali… ancora ${pend}</p>` : ""}${body}
@@ -4426,7 +4429,7 @@ $("#ritLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAG
 ["#ritLg", "#ritTeam", "#ritGr"].forEach(id => $(id).addEventListener("change", renderRit));
 document.querySelectorAll(".rtf [data-rw]").forEach(b => b.addEventListener("click", () => { RIT.when = b.dataset.rw; document.querySelectorAll(".rtf [data-rw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 $("#ritDot").addEventListener("click", () => { RIT.dot = !RIT.dot; $("#ritDot").setAttribute("aria-pressed", String(RIT.dot)); renderRit(); });
-$("#ritSort").addEventListener("click", () => { RIT.sortP = !RIT.sortP; $("#ritSort").setAttribute("aria-pressed", String(RIT.sortP)); renderRit(); });
+$("#ritGrd").addEventListener("click", () => { RIT.grd = !RIT.grd; $("#ritGrd").setAttribute("aria-pressed", String(RIT.grd)); renderRit(); });
 document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 function renderGenSoft() { const y = scrollY; renderGen(); scrollTo({ top: y }); }
 $("#genLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
