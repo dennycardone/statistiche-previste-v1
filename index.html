@@ -815,6 +815,9 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 .tabbar .navmain .nmc svg,.tabbar .navmain[aria-pressed="false"] .nmc svg{width:24px;height:24px}
 .tabbar .navmain[aria-pressed="true"] .nmc{border:0;box-shadow:0 0 0 3px var(--bar-2),0 6px 14px -6px rgba(212,255,63,.55)}
 .tabbar .navmain[aria-pressed="false"] .nmc{background:var(--surface-2);border:1.5px solid color-mix(in srgb,#D4FF3F 60%,transparent);box-shadow:0 0 0 3px var(--bar-2)}
+
+/* schede della partita: le 5 voci stanno tutte nello schermo anche sui telefoni stretti */
+@media (max-width:420px){.mtabs{gap:3px}.mtab{padding:6px 7px;font-size:12.5px;letter-spacing:0}}
 </style>
 </head>
 <body>
