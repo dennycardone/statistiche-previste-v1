@@ -943,7 +943,8 @@ if ODDS_FULL or ODDS_NEAR:
     XBETS = {"Corners Over Under": "cou", "Home Corners Over/Under": "hcou", "Away Corners Over/Under": "acou", "Corners Asian Handicap": "cah",
              "Cards Over/Under": "kou", "Home Team Total Cards": "hk", "Away Team Total Cards": "ak", "Total ShotOnGoal": "sot",
              "Home Total ShotOnGoal": "hsot", "Away Total ShotOnGoal": "asot", "Asian Handicap": "ah", "Double Chance": "dc",
-             "Goals Over/Under": "gou", "Total - Home": "hgou", "Total - Away": "agou"}
+             "Goals Over/Under": "gou", "Total - Home": "hgou", "Total - Away": "agou",
+             "Total Shots": "sou", "Fouls. Total": "fou", "Fouls. Home Total": "hfou", "Fouls. Away Total": "afou"}
     NICHE = {"Corners 1x2": "c1x2", "Corners. Double Chance": "cdc", "Shots.1x2": "s1x2", "ShotOnTarget 1x2": "st1x2", "Fouls. 1x2": "f1x2",
              "Fouls. Double Chance": "fdc", "Yellow Cards 1x2": "y1x2", "Yellow Double Chance": "ydc", "Corners Over Under": "cou",
              "Home Corners Over/Under": "hcou", "Away Corners Over/Under": "acou", "Total Shots": "sou", "Total ShotOnGoal": "sot", "Fouls. Total": "fou",
@@ -1021,7 +1022,7 @@ if ODDS_FULL or ODDS_NEAR:
         err = str(e); print("quote API-Football:", e)
     if ODDS_NEAR:   # giro leggero: aggiorno solo le partite vicine, senza toccare l'ora dell'aggiornamento completo
         if res: OD.setdefault("partite", {}).update(res); json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
-    elif res or not err:   # con un errore e nessuna quota: si riprova al giro dopo (il file precedente resta)
+    elif res:   # senza quote (errore o richieste del giorno finite): il file precedente resta, si riprova al giro dopo
         OD = {"giorno": rome_now.strftime("%Y-%m-%d"), "aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "API-Football (quota mediana tra i bookmaker)",
               "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "pro": bool(locals().get("paid")), "partite": res}
         json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
@@ -1050,7 +1051,8 @@ elif not AF_KEY:
 try:
     try: OH
     except NameError: OH = json.load(open(os.path.join(OUT, "odds_hist.json")))
-    LMK = {"g": "gou", "hg": "hgou", "ag": "agou", "c": "cou", "hc": "hcou", "ac": "acou", "k": "kou", "hk": "hk", "ak": "ak", "st": "sot", "hst": "hsot", "ast": "asot"}
+    LMK = {"g": "gou", "hg": "hgou", "ag": "agou", "c": "cou", "hc": "hcou", "ac": "acou", "k": "kou", "hk": "hk", "ak": "ak", "st": "sot", "hst": "hsot", "ast": "asot",
+           "s": "sou", "f": "fou", "hf": "hfou", "af": "afou"}
     LN = {}
     for kk, x in OH.items():
         q = x.get("ultima", {}).get("q", {}); ent = {}

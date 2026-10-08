@@ -1,6 +1,6 @@
 """Statistiche per tempo (corner, tiri, tiri in porta; i falli per tempo API-Football non li dà) per il backtest dell'1X2 per tempo.
 fixtures/statistics?fixture=&half=true, una richiesta per partita, dalle più recenti; disponibili circa dalla stagione 2024-25.
-Partite: data/apif.json (giocate dal 1/7/2024). Riprende da tempi/*.json; lascia 400 richieste per gli aggiornamenti dell'app."""
+Partite: data/apif.json (giocate dal 1/7/2024). Riprende da tempi/*.json; lascia 2500 richieste per gli aggiornamenti dell'app (quote comprese)."""
 import json, os, time, urllib.request, urllib.parse
 KEY = os.environ["APIFOOTBALL_KEY"].strip()
 NOSTATS = {"EC", "SC1", "SC2", "SC3"}
@@ -17,7 +17,7 @@ def get(p, **q):
             print("retry", e); time.sleep(5)
     return {"errors": ["rete"]}
 rq = get("status").get("response", {}).get("requests", {})
-budget = int(rq.get("limit_day", 100)) - int(rq.get("current", 0)) - 400
+budget = int(rq.get("limit_day", 100)) - int(rq.get("current", 0)) - 2500
 print("richieste oggi", rq, "disponibili", budget)
 os.makedirs("tempi", exist_ok=True)
 AP = json.load(open("data/apif.json"))["partite"]

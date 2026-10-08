@@ -3849,24 +3849,26 @@ function c3HTML(home, away, e, cfg) {
    Per ogni linea: nostra probabilità di Over con la distribuzione dell'app (tarata sui totali: verifica 5/10/2026, scarto medio 0,3-0,5 punti),
    lato con più valore (probabilità × quota − 1). Solo quote reali; dove la linea non c'è: N.D. In verifica sulle partite giocate. */
 let LINEE = null, HEROCTX = null;
-const BK_ROWS = [["Gol", "g", "hg", "ag"], ["Tiri totali", null, null, null], ["Tiri in porta", "st", "hst", "ast"], ["Calci d'angolo", "c", "hc", "ac"], ["Falli", null, null, null], ["Cartellini", "k", "hk", "ak"]];
+const BK_ROWS = [["Gol", "g", "hg", "ag"], ["Tiri totali", "s", null, null], ["Tiri in porta", "st", "hst", "ast"], ["Calci d'angolo", "c", "hc", "ac"], ["Falli", "f", "hf", "af"], ["Cartellini", "k", "hk", "ak"]];
 const BK_MIN = 0.05;   // valore minimo per segnalare la giocata
-/* giocata con valore: solo corner, tiri in porta e cartellini. I gol sono esclusi: sulla stagione 2025-26 (Over/Under 2,5, 7.634 partite)
+/* giocata con valore: corner, tiri, tiri in porta, falli e cartellini (tiri totali e falli: linee di 1xBet e altri, spesso poche ore prima). I gol sono esclusi: sulla stagione 2025-26 (Over/Under 2,5, 7.634 partite)
    le giocate "con valore" del modello gol perdevano il 7,5% contro le quote reali (audit del 7/10/2026). */
 const RG_LINE = `<p class="rgline">Quote solo informative · Prevista non è un bookmaker · 18+ · Gioca responsabilmente</p>`;
 const isVal = c => !!(c && c.po != null && !c.gol && c.ev >= BK_MIN);
 const bkLines = e => (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null;
 function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u, n, po, side, p, odd, ev, real, hit} o null (N.D.)
-  const { G, M, MT, x } = Mods, ok = v => v != null && isFinite(v) && v > 0;
+  const { G, M, MT, x, MF } = Mods, ok = v => v != null && isFinite(v) && v > 0;
   const al = EXTRA && EXTRA.alpha, rk = al > 2e-4 ? 1 / al : Infinity;
   const pO = (mean, r, L) => ok(mean) ? pOver(pmfTotal(mean, r, Math.ceil(L) + 2), L) : null;
   const D = {
     g: L => G && ok(G.tot) ? ([1.5, 2.5, 3.5].indexOf(L) >= 0 && G.over ? G.over[[1.5, 2.5, 3.5].indexOf(L)] : pO(G.tot, Infinity, L)) : null,
     hg: L => G ? pO(G.lh, Infinity, L) : null, ag: L => G ? pO(G.la, Infinity, L) : null,
     st: L => MT ? pO(MT.tot, MT.MD && MT.MD.r, L) : null, hst: L => MT ? pO(MT.lh, MT.MD && MT.MD.r, L) : null, ast: L => MT ? pO(MT.la, MT.MD && MT.MD.r, L) : null,
+    s: L => MT && MT.MS ? pO(MT.MS.lh + MT.MS.la, MT.MS.r, L) : null,
+    f: L => MF ? pO(MF.tot, MF.r, L) : null, hf: L => MF ? pO(MF.lh, MF.rTeam != null ? MF.rTeam : MF.r, L) : null, af: L => MF ? pO(MF.la, MF.rTeam != null ? MF.rTeam : MF.r, L) : null,
     c: L => M ? pO(M.tot, M.r, L) : null, hc: L => M ? pO(M.lh, M.r, L) : null, ac: L => M ? pO(M.la, M.r, L) : null,
     k: L => x ? pO(x[4], rk, L) : null, hk: L => x ? pO(x[6], rk, L) : null, ak: L => x ? pO(x[7], rk, L) : null };
-  const REAL = { g: m && [m.hg, m.ag], st: m && [m.hst, m.ast], c: m && [m.hc, m.ac], k: m && [m.hk, m.ak] };
+  const REAL = { g: m && [m.hg, m.ag], s: m && [m.hs, m.as], st: m && [m.hst, m.ast], c: m && [m.hc, m.ac], f: m && [m.hf, m.af], k: m && [m.hk, m.ak] };
   const cell = (k, base, i) => {
     const c = k && LB && LB[k]; if (!c) return null;
     const [L, o, u, n] = c, po = D[k](L);
@@ -3922,9 +3924,9 @@ function matchHeroHTML(home, away, e, cfg, G) {
     return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${v(h, d)}${rg(h, sh)}</span><span class="sx-m"><small>${lab}</small><b>${T}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${v(a, d)}${rg(a, sa)}</span></div>`; };
   const BK = MV.hero === "bk";
   let bkBody = "", nValAny = 0;
-  try { const LB0 = bkLines(e); if (LB0) nValAny = bkCalc({ G, M, MT, x }, LB0, m).reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0); } catch (err) {}
+  try { const LB0 = bkLines(e); if (LB0) nValAny = bkCalc({ G, M, MT, x, MF }, LB0, m).reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0); } catch (err) {}
   if (BK) {
-    const LB = bkLines(e), R = bkCalc({ G, M, MT, x }, LB, m);
+    const LB = bkLines(e), R = bkCalc({ G, M, MT, x, MF }, LB, m);
     const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0);
     bkBody = (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
         : `<p class="bk-none">Linea dei bookmaker non disponibile per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + RG_LINE
@@ -4577,9 +4579,9 @@ function bkEntry(e, cfg) {
   const LB = bkLines(e); let out = [];
   if (LB) withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = null;
     try {
-      let G = null, M = null, MT = null; try { G = modelGoals(e.home, e.away, cfg); M = model(e.home, e.away, cfg); MT = modelShots(e.home, e.away, cfg); } catch (x) {}
+      let G = null, M = null, MT = null, MF = null; try { G = modelGoals(e.home, e.away, cfg); M = model(e.home, e.away, cfg); MT = modelShots(e.home, e.away, cfg); MF = model(e.home, e.away, cfg, "f"); } catch (x) {}
       const x = extraFor(e.home, e.away);
-      for (const r of bkCalc({ G, M, MT, x }, LB, null)) for (const [w, c] of [["t", r.t], ["h", r.h], ["a", r.a]])
+      for (const r of bkCalc({ G, M, MT, x, MF }, LB, null)) for (const [w, c] of [["t", r.t], ["h", r.h], ["a", r.a]])
         if (isVal(c)) out.push({ ...c, lab: r.lab, who: w === "t" ? "" : w === "h" ? e.home : e.away });
     } finally { S.cutoff = c0; } });
   out.sort((a, b) => b.ev - a.ev); BK_C.set(key, out); return out;
