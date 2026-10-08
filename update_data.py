@@ -940,6 +940,10 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
              "Cards Over/Under": "kou", "Home Team Total Cards": "hk", "Away Team Total Cards": "ak", "Total ShotOnGoal": "sot",
              "Home Total ShotOnGoal": "hsot", "Away Total ShotOnGoal": "asot", "Asian Handicap": "ah", "Double Chance": "dc",
              "Goals Over/Under": "gou", "Total - Home": "hgou", "Total - Away": "agou"}
+    NICHE = {"Corners 1x2": "c1x2", "Corners. Double Chance": "cdc", "Shots.1x2": "s1x2", "ShotOnTarget 1x2": "st1x2", "Fouls. 1x2": "f1x2",
+             "Fouls. Double Chance": "fdc", "Yellow Cards 1x2": "y1x2", "Yellow Double Chance": "ydc", "Corners Over Under": "cou",
+             "Home Corners Over/Under": "hcou", "Away Corners Over/Under": "acou", "Total Shots": "sou", "Total ShotOnGoal": "sot", "Fouls. Total": "fou"}
+    BOOK_TAG = {"1xBet": "x.", "Pinnacle": "p."}
     def take(e, f):   # quote mediane di una partita
         lg = BY_ID[f["league"]["id"]]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
         m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
@@ -952,6 +956,9 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
                     except Exception: continue
                     nm, val = bet["name"], str(v["value"])
                     if nm in XBETS: xacc.setdefault(XBETS[nm] + ":" + val, {})[b["name"]] = o   # mercati secondari: solo archivio
+                    # 1X2 e doppia chance dei mercati di nicchia: quote di 1xBet (il book usato da Denny) e Pinnacle (riferimento), solo archivio
+                    if nm in NICHE and b["name"] in BOOK_TAG:
+                        xacc.setdefault(BOOK_TAG[b["name"]] + NICHE[nm] + ":" + val, {})[b["name"]] = o
                     if nm == "Match Winner": key = "1x2:" + {"Home": "1", "Draw": "X", "Away": "2"}.get(val, "")
                     elif nm == "Goals Over/Under" and val.split(" ")[-1] in ("1.5", "2.5", "3.5"): key = "ou" + val.split(" ")[-1] + ":" + val.split(" ")[0][0]
                     elif nm == "Both Teams Score": key = "gg:" + {"Yes": "S", "No": "N"}.get(val, "")
