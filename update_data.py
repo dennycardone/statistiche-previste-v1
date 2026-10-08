@@ -653,7 +653,7 @@ try:
     try: _due = not AP["agg"] or (_now - datetime.datetime.strptime(AP["agg"], "%Y-%m-%d %H:%M").replace(tzinfo=ROME)).total_seconds() >= 50 * 60   # ogni giro (circa ogni ora)
     except Exception: _due = True
     if _key and (_due or os.environ.get("APIF_FORCE")):
-        st_ = _af("status").get("response", {}).get("requests", {})
+        _sr = _af("status").get("response"); st_ = (_sr.get("requests") or {}) if isinstance(_sr, dict) else {}   # richieste finite: "response" è una lista vuota
         if int(st_.get("limit_day", 100)) > 100:   # serve il piano a pagamento
             cur_season = {}
             for x in _af("leagues", current="true").get("response", []):
@@ -991,7 +991,7 @@ if ODDS_FULL or ODDS_NEAR:
     try:
         # richieste rimaste oggi (la chiamata status non conta); ne lascio 5 di margine
         req = urllib.request.Request("https://v3.football.api-sports.io/status", headers={"x-apisports-key": AF_KEY})
-        with urllib.request.urlopen(req, timeout=60) as r: stt = json.loads(r.read().decode()).get("response", {}).get("requests", {})
+        with urllib.request.urlopen(req, timeout=60) as r: _sr = json.loads(r.read().decode()).get("response"); stt = (_sr.get("requests") or {}) if isinstance(_sr, dict) else {}
         budget = int(stt.get("limit_day", 100)) - int(stt.get("current", 0)) - 5
         paid = int(stt.get("limit_day", 100)) > 100
         # Il piano gratuito non accetta la stagione in corso come parametro: quote chieste per data (tutte le partite, 10 per pagina)
