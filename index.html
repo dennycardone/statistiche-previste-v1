@@ -4216,7 +4216,7 @@ function renderGen() {
     if (nx && pr === undefined) todo.push(nx.e);
     const w = D.avg ? r.val / max : r.val, refw = D.avg ? r.ref / max : r.ref;
     const opp = nx ? (nx.side === "h" ? nx.e.away : nx.e.home) : null;
-    const nextTxt = nx ? `<span class="gnext">Prossima: ${nx.side === "h" ? "in casa con" : "fuori con"} ${crest(nx.e.lg.code, opp)}<b>${esc(opp)}</b> · ${dstr(nx.e.date)}${nx.e.time ? " " + esc(nx.e.time) : ""}${pr === undefined ? ` · <span class="muted">…</span>` : pr ? ` · <em>${D.avg ? (pr.tot ? "cartellini attesi in partita " : "attesi ") + f1(pr.v) : (D.win ? `${D.name} 1X2: ${nx.side === "h" ? "1" : "2"} ` : D.lab + " ") + pc(pr.p)}</em>` : ""}</span>` : `<span class="gnext muted">Nessuna partita nei prossimi 14 giorni</span>`;
+    const nextTxt = nx ? `<span class="gnext">${nx.side === "h" ? "In casa con" : "In trasferta con"} ${crest(nx.e.lg.code, opp)}<b>${esc(opp)}</b> · ${dstr(nx.e.date)}${nx.e.time ? " " + esc(nx.e.time) : ""}${pr === undefined ? ` · <span class="muted">…</span>` : pr ? ` · <em>${D.avg ? (pr.tot ? "cartellini attesi in partita " : "attesi ") + f1(pr.v) : (D.win ? `${D.name} 1X2: ${nx.side === "h" ? "1" : "2"} ` : D.lab + " ") + pc(pr.p)}</em>` : ""}</span>` : `<span class="gnext muted">Nessuna partita nei prossimi 14 giorni</span>`;
     return `<button class="grow${i < 3 ? " top" : ""}" data-lg="${r.lg.code}" data-t="${esc(r.t)}" data-id="${nx ? esc(nx.e.id) : ""}">
       <span class="grk">${i + 1}</span>
       <span class="gmain"><span class="gteam">${crest(r.lg.code, r.t)}${esc(r.t)}</span><span class="glg">${esc(lgName(r.lg))}</span></span>
@@ -4367,17 +4367,11 @@ function renderRit() {
   let rows = [];
   for (const L of Ls) {
     const R = ritRows(L, team, gr, ven); if (!R.length) continue;
-    withLeague(L.code, () => { const lm = leagueMatches(); for (const r of R) { r.L = L; if (r.never) r.first = lm.filter(m => m.home === r.t || m.away === r.t).reduce((a, m) => !a || m.date < a ? m.date : a, null); } });
+    for (const r of R) r.L = L;
     rows = rows.concat(R);
   }
   rows.sort((x, y) => y.n - x.n || x.t.localeCompare(y.t, "it"));
   const venTxt = ven === "home" ? "in casa" : ven === "away" ? "in trasferta" : "";
-  const dd = d => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-  const lastTxt = r => {
-    if (r.never) return `Mai successo nelle partite ${venTxt ? venTxt + " " : ""}che abbiamo (dal ${dd(r.first)})`;
-    const m = r.last, { h: kh, a: ka } = MET[r.k];
-    return `Ultima volta: ${dd(m.date)} · ${esc(m.home)}–${esc(m.away)} ${m[kh]}-${m[ka]}${RIT_UNIT[r.k]}`;
-  };
   const MAXR = 120, onlyDot = RIT.dot, NX = new Map();
   // con l'ordine per percentuale servono le percentuali di tutte le righe (con la prossima partita); altrimenti solo delle prime 120
   let shown = onlyDot || RIT.when !== "all" || RIT.sortP ? rows : rows.slice(0, MAXR);
@@ -4420,8 +4414,7 @@ function renderRit() {
   const body = shown.length ? `<ul class="rtl">${shown.map(r => `<li class="rtr${r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip ? " hasdot" : ""}${r.nx ? " go" : ""}"${r.nx ? ` data-id="${esc(r.nx.e.id)}" role="button" tabindex="0" aria-label="Apri la Lettura di ${esc(r.nx.e.home)}–${esc(r.nx.e.away)}"` : ""}>
       <span class="rtt">${crest(r.L.code, r.t)}<span>${esc(r.t)}${all ? ` <small class="rtlg">${esc(lgName(r.L))}</small>` : ""}</span></span>
       <span class="rte">${r.lab}${venTxt ? " " + venTxt : ""} da <b>${r.n}</b> partite</span>
-      <span class="rtn${r.never ? " never" : ""}">${gchip(r.g)}<b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>
-      <span class="rtl2">${lastTxt(r)}</span>${nextTxt(r)}</li>`).join("")}</ul>${more ? `<p class="lt-ref">Primi ${MAXR}: scegli un campionato, una squadra o una statistica per vederne altri.</p>` : ""}`
+      <span class="rtn${r.never ? " never" : ""}">${gchip(r.g)}<b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>${nextTxt(r)}</li>`).join("")}</ul>${more ? `<p class="lt-ref">Primi ${MAXR}: scegli un campionato, una squadra o una statistica per vederne altri.</p>` : ""}`
     : `<p class="lt-none">${RIT.when !== "all" && !onlyDot ? `Nessuna squadra con un digiuno gioca ${RIT.when === "0" ? "oggi" : "domani"}.` : onlyDot ? "Per ora la Lettura non dà la fine di nessun digiuno." : `Nessun digiuno di almeno ${RIT.min} partite con questi filtri.`}</p>`;
   const L0 = Ls[0], head = all ? `<span class="flag" aria-hidden="true">🌍</span><span class="nm"><small>Tutti</small><b>I campionati</b></span>`
     : `<span class="flag" aria-hidden="true">${FLAGS[L0.country] || "⚽"}</span><span class="nm"><small>${esc(L0.country)}</small><b>${esc(L0.name)}</b></span>`;
