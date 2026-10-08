@@ -16,7 +16,7 @@ try:
         if B0.get("errors"): note("errori: " + json.dumps(B0.get("errors")))
     except Exception as e:
         note("errore bookmakers: " + repr(e)); bk = []
-    x = [b for b in bk if "1x" in b["name"].lower()]
+    x = [b for b in bk if "1x" in str(b.get("name") or "").lower()]; note("nomi: " + ", ".join(str(b.get("name")) for b in bk)[:3000])
     note("Bookmaker API-Football: " + str(len(bk)) + " · 1xBet: " + json.dumps(x))
     if x:
         bid = x[0]["id"]; mk = collections.Counter(); n = 0; ex = {}
