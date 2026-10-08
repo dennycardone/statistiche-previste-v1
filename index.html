@@ -713,6 +713,8 @@ h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
 .rtl2{grid-column:1/-1;font-size:12px;color:var(--ink-3);line-height:1.35}
 .rtn{grid-row:1/3;grid-column:2;text-align:right;line-height:1}.rtn b{display:block;font-family:var(--display);font-stretch:75%;font-size:30px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}.rtn small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
 .rtn.never b{color:var(--hot)}
+.rtn .ccls{display:inline-block;font-size:11px;padding:1px 5px;border-radius:5px;margin-bottom:3px;font-family:var(--body);font-stretch:88%}
+.rtlg{font-size:11px;font-weight:500;color:var(--ink-3)}
 .rtnx{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.rtnx b{color:var(--ink-2)}
 .rtnx.on{color:var(--ink-2)}.rtnx.on b{color:#D4FF3F}
 .rtdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#D4FF3F;box-shadow:0 0 0 3px rgba(212,255,63,.18);flex:0 0 auto}
@@ -933,6 +935,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <div class="rtf" role="group" aria-label="Quando giocano e Lettura">
         <button class="chip" data-rw="all" aria-pressed="true">Sempre</button><button class="chip" data-rw="0" aria-pressed="false">Oggi</button><button class="chip" data-rw="1" aria-pressed="false">Domani</button>
         <button class="chip" id="ritDot" aria-pressed="false"><i aria-hidden="true"></i>Lettura</button>
+        <button class="chip" id="ritSort" aria-pressed="false">Ordina per %</button>
       </div>
     </section>
     <div id="ritOut"></div>
@@ -3669,7 +3672,7 @@ function renderSched() {
     const m = e.m, G = R ? R.G : null, gg = G ? G.btts : null, ov = i => G && G.over && G.over[i] != null ? G.over[i] : null;
     const hitL = (p, L) => m && p != null ? (p >= 0.5) === (m.hg + m.ag > L) : null, hitG = m && gg != null ? (gg >= 0.5) === (m.hg > 0 && m.ag > 0) : null;
     const vals = R ? `${pv("O1,5", ov(0), hitL(ov(0), 1.5))}${pv("O2,5", ov(1), hitL(ov(1), 2.5))}${pv("O3,5", ov(2), hitL(ov(2), 3.5))}${pv("GG", gg, hitG)}` : `<span class="pv"><small>O1,5</small><b>…</b></span><span class="pv"><small>O2,5</small><b>…</b></span><span class="pv"><small>O3,5</small><b>…</b></span><span class="pv"><small>GG</small><b>…</b></span>`;
-    const end = R ? (m ? presiHTML(R) : pickHTML(confEntry(e, MODES[$("#decay").value] || MODES.dyn, true))) : "";   // sotto l'orario: % presi (finite) o segnale A+
+    const end = R && m ? presiHTML(R) : "";   // sotto l'orario: % presi delle partite finite (i segnali A+ restano nel Radar)
     return `<button class="mrow" data-id="${esc(e.id)}">
           <span class="tmc"><span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>${end}</span>
           <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}</span><b>${m ? m.ag : ""}</b></span>
@@ -3697,7 +3700,7 @@ function renderSched() {
     sec.classList.toggle("closed", !SCHED.open.has(lg)); h.setAttribute("aria-expanded", String(SCHED.open.has(lg))); }));
   const updCnt = () => box.querySelectorAll(".lgblock").forEach(sec => {   // quante A+ ci sono nel campionato quel giorno
     const es = today.filter(e => e.lg.code === sec.dataset.lg), ap = es.filter(e => !e.m && (confEntry(e, ccfg, true) || []).some(r => r.cls === "A+")).length;
-    const c = sec.querySelector("[data-cnt]"); if (c) c.innerHTML = `${ap ? `<i>${ap} A+</i>` : ""}${es.length}`; });
+    const c = sec.querySelector("[data-cnt]"); if (c) c.innerHTML = `${es.length}`; });
   updCnt();
   const job = renderSched.job = {};
   const step = () => {
@@ -4267,7 +4270,7 @@ const RIT_EV = [
   // risultati esatti fino a 4 gol totali, dal punto di vista della squadra (gol fatti-subiti); solo nel filtro "Risultati esatti"
   ...[[1, 0], [2, 0], [2, 1], [3, 0], [3, 1], [4, 0], [0, 0], [1, 1], [2, 2], [0, 1], [0, 2], [1, 2], [0, 3], [1, 3], [0, 4]].map(([x, y]) =>
     ["r", "g", `${x > y ? "non vince" : x === y ? "non pareggia" : "non perde"} ${x}-${y}`, (f, a) => f === x && a === y])];
-const RIT = { ven: "home", min: 5, when: "all", dot: false };
+const RIT = { ven: "home", min: 5, when: "all", dot: false, sortP: false };
 const RIT_UNIT = { g: "", c: " corner", s: " tiri", st: " tiri in porta", f: " falli", k: " cartellini" };
 function ritRows(L, team, gr, ven) {
   const out = [];
@@ -4332,30 +4335,80 @@ function ritProb(L, nx, k, fn) {
   else { const [ph, pa] = D; ph.forEach((qh, x) => { if (qh < 1e-7) return; pa.forEach((qa, y) => { const [f, a] = nx.home ? [x, y] : [y, x]; if (fn(f, a)) p += qh * qa; }); }); }
   return p;
 }
+/* grado della previsione che coincide con la fine del digiuno (stessa partita, stesso esito), se il Grado ce l'ha */
+function ritGrade(r) {
+  if (!r.nx || r.nx.skip) return null;
+  const L = confEntry(r.nx.e, MODES[$("#decay").value] || MODES.dyn, true); if (!L || !L.length) return null;
+  const lab = r.lab, me = r.nx.home ? "1" : "2";
+  let mk = null, side = null, kl = null;
+  if (/più .*dell'avversario/.test(lab) && /^(c|s|st|f)$/.test(r.k)) { mk = r.k; side = me; }
+  else if (/Over 2,5$/.test(lab) && r.k === "g") { mk = "g25"; side = "O"; }
+  else if (/Under 2,5$/.test(lab)) { mk = "g25"; side = "U"; }
+  else if (/Over 3,5$/.test(lab) && r.k === "g") { mk = "g35"; side = "O"; }
+  else if (/con Gol/.test(lab)) { mk = "gg"; side = "S"; }
+  else if (/No gol/.test(lab)) { mk = "gg"; side = "N"; }
+  else if (/Over (\d),5 cartellini/.test(lab)) { mk = "k"; kl = +lab.match(/Over (\d),5 cartellini/)[1] + 0.5; }
+  if (!mk) return null;
+  const g = L.find(x => x.mk === mk && (mk === "k" ? x.side[0] === "O" && +x.side.slice(1) >= kl : x.side === side));
+  return g ? g.cls : null;
+}
 function renderRit() {
   const box = $("#ritOut"); if (!box) return;
-  const L = LEAGUES.find(x => x.code === $("#ritLg").value); if (!L) { box.innerHTML = ""; return; }
-  const sel = $("#ritTeam"), cur = withLeague(L.code, () => { const c0 = S.cutoff; S.cutoff = null; try { return teams(); } finally { S.cutoff = c0; } });
-  if (sel.dataset.lg !== L.code) { sel.innerHTML = `<option value="all">Tutte le squadre</option>` + cur.map(t => `<option>${esc(t)}</option>`).join(""); sel.dataset.lg = L.code; }
-  const team = sel.value || "all", gr = $("#ritGr").value, ven = RIT.ven;
-  const rows = ritRows(L, team, gr, ven), venTxt = ven === "home" ? "in casa" : ven === "away" ? "in trasferta" : "";
+  const all = $("#ritLg").value === "all";
+  const Ls = all ? LEAGUES.slice() : LEAGUES.filter(x => x.code === $("#ritLg").value); if (!Ls.length) { box.innerHTML = ""; return; }
+  const sel = $("#ritTeam");
+  if (sel.dataset.lg !== $("#ritLg").value) {
+    const cur = all ? [] : withLeague(Ls[0].code, () => { const c0 = S.cutoff; S.cutoff = null; try { return teams(); } finally { S.cutoff = c0; } });
+    sel.innerHTML = `<option value="all">Tutte le squadre</option>` + cur.map(t => `<option>${esc(t)}</option>`).join(""); sel.dataset.lg = $("#ritLg").value; sel.disabled = all;
+  }
+  const team = all ? "all" : (sel.value || "all"), gr = $("#ritGr").value, ven = RIT.ven;
+  const AEall = allEntries().filter(x => !x.m), AEby = new Map();
+  for (const x of AEall) { if (!AEby.has(x.lg.code)) AEby.set(x.lg.code, []); AEby.get(x.lg.code).push(x); }
+  let rows = [];
+  for (const L of Ls) {
+    const R = ritRows(L, team, gr, ven); if (!R.length) continue;
+    withLeague(L.code, () => { const lm = leagueMatches(); for (const r of R) { r.L = L; if (r.never) r.first = lm.filter(m => m.home === r.t || m.away === r.t).reduce((a, m) => !a || m.date < a ? m.date : a, null); } });
+    rows = rows.concat(R);
+  }
+  rows.sort((x, y) => y.n - x.n || x.t.localeCompare(y.t, "it"));
+  const venTxt = ven === "home" ? "in casa" : ven === "away" ? "in trasferta" : "";
   const dd = d => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
   const lastTxt = r => {
     if (r.never) return `Mai successo nelle partite ${venTxt ? venTxt + " " : ""}che abbiamo (dal ${dd(r.first)})`;
     const m = r.last, { h: kh, a: ka } = MET[r.k];
     return `Ultima volta: ${dd(m.date)} · ${esc(m.home)}–${esc(m.away)} ${m[kh]}-${m[ka]}${RIT_UNIT[r.k]}`;
   };
-  if (rows.length) withLeague(L.code, () => { const lm = leagueMatches(); for (const r of rows) if (r.never) r.first = lm.filter(m => m.home === r.t || m.away === r.t).reduce((a, m) => !a || m.date < a ? m.date : a, null); });
-  const MAXR = 120, onlyDot = RIT.dot, NX = new Map(), AE = allEntries().filter(x => !x.m && x.lg.code === L.code);
-  let shown = onlyDot || RIT.when !== "all" ? rows : rows.slice(0, MAXR);
+  const MAXR = 120, onlyDot = RIT.dot, NX = new Map();
+  // con l'ordine per percentuale servono le percentuali di tutte le righe (con la prossima partita); altrimenti solo delle prime 120
+  let shown = onlyDot || RIT.when !== "all" || RIT.sortP ? rows : rows.slice(0, MAXR);
+  if (RIT.when !== "all") { const day = addDays(localIso(), +RIT.when); shown = shown.filter(r => { const k = r.L.code + "|" + r.t; if (!NX.has(k)) NX.set(k, ritNext(r.L, r.t, ven, AEby.get(r.L.code) || [])); const nx = NX.get(k); return nx && nx.e.d === day; }); }
   const dshort = d => d.toLocaleDateString("it-IT", { weekday: "short", day: "2-digit", month: "2-digit" });
+  // percentuali a tranche: oltre ~300 ms si mostra quel che c'è e si continua subito dopo (i modelli restano in cache)
+  const t0 = performance.now(), cfgK = (MODES[$("#decay").value] || MODES.dyn).key, Q = [];
   for (const r of shown) {
-    if (!NX.has(r.t)) NX.set(r.t, ritNext(L, r.t, ven, AE));
-    const nx = NX.get(r.t); r.nx = nx;
-    if (nx && !nx.skip) r.p = ritProb(L, nx, r.k, r.fn);
+    const k = r.L.code + "|" + r.t;
+    if (!NX.has(k)) NX.set(k, ritNext(r.L, r.t, ven, AEby.get(r.L.code) || []));
+    const nx = NX.get(k); r.nx = nx; r.p = null;
+    if (nx && !nx.skip) {
+      if ((RIT.sortP || onlyDot) && performance.now() - t0 > 300 && !RIT_P.has(`${nx.e.id}|${r.k}|${cfgK}`)) { Q.push([r.L, nx.e, r.k]); continue; }
+      r.p = ritProb(r.L, nx, r.k, r.fn);
+    }
+  }
+  const pend = Q.length, gen = renderRit._g = (renderRit._g || 0) + 1;
+  if (pend) {   // calcola i modelli mancanti a pezzi, senza ridisegnare; alla fine un solo ridisegno
+    const step = () => {
+      if (gen !== renderRit._g) return;
+      const t1 = performance.now();
+      while (Q.length && performance.now() - t1 < 120) { const [L, e, k] = Q.shift(); ritDist(L, e, k); }
+      const el = $("#ritOut .rtpend"); if (el) el.textContent = `Calcolo le percentuali… ancora ${Q.length}`;
+      if (Q.length) setTimeout(step, 0); else renderRit();
+    };
+    setTimeout(step, 0);
   }
   if (onlyDot) shown = shown.filter(r => r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip);
-  if (RIT.when !== "all") { const day = addDays(localIso(), +RIT.when); shown = shown.filter(r => r.nx && r.nx.e.d === day); }
+  if (RIT.sortP) shown = shown.slice().sort((x, y) => (y.p != null ? y.p : -1) - (x.p != null ? x.p : -1) || y.n - x.n);
+  const more = shown.length > MAXR; shown = shown.slice(0, MAXR);
+  for (const r of shown) r.g = ritGrade(r);
   const nextTxt = r => {
     const nx = r.nx; if (!nx) return "";
     const opp = nx.home ? nx.e.away : nx.e.home, where = nx.home ? "in casa" : "in trasferta";
@@ -4363,20 +4416,24 @@ function renderRit() {
     const p = r.p, on = p != null && p >= 0.5;
     return `<span class="rtl2 rtnx${on ? " on" : ""}">${on ? '<i class="rtdot" aria-hidden="true"></i>' : ""}Prossima: ${dshort(nx.e.date)} ${where} con ${esc(opp)} · Lettura <b>${p == null ? "N/D" : Math.round(p * 100) + "%"}</b></span>`;
   };
+  const gchip = c => c ? `<b class="ccls c-${c === "A+" ? "ap" : c.toLowerCase()}" title="Grado della previsione su questo esito">${c}</b>` : "";
   const body = shown.length ? `<ul class="rtl">${shown.map(r => `<li class="rtr${r.p != null && r.p >= 0.5 && r.nx && !r.nx.skip ? " hasdot" : ""}${r.nx ? " go" : ""}"${r.nx ? ` data-id="${esc(r.nx.e.id)}" role="button" tabindex="0" aria-label="Apri la Lettura di ${esc(r.nx.e.home)}–${esc(r.nx.e.away)}"` : ""}>
-      <span class="rtt">${crest(L.code, r.t)}<span>${esc(r.t)}</span></span>
+      <span class="rtt">${crest(r.L.code, r.t)}<span>${esc(r.t)}${all ? ` <small class="rtlg">${esc(lgName(r.L))}</small>` : ""}</span></span>
       <span class="rte">${r.lab}${venTxt ? " " + venTxt : ""} da <b>${r.n}</b> partite</span>
-      <span class="rtn${r.never ? " never" : ""}"><b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>
-      <span class="rtl2">${lastTxt(r)}</span>${nextTxt(r)}</li>`).join("")}</ul>`
+      <span class="rtn${r.never ? " never" : ""}">${gchip(r.g)}<b>${r.n}</b><small>${r.never ? "mai" : "partite"}</small></span>
+      <span class="rtl2">${lastTxt(r)}</span>${nextTxt(r)}</li>`).join("")}</ul>${more ? `<p class="lt-ref">Primi ${MAXR}: scegli un campionato, una squadra o una statistica per vederne altri.</p>` : ""}`
     : `<p class="lt-none">${RIT.when !== "all" && !onlyDot ? `Nessuna squadra con un digiuno gioca ${RIT.when === "0" ? "oggi" : "domani"}.` : onlyDot ? "Per ora la Lettura non dà la fine di nessun digiuno." : `Nessun digiuno di almeno ${RIT.min} partite con questi filtri.`}</p>`;
-  box.innerHTML = `<section class="card gl4"><div class="gl4h"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="gl4m">${ven === "home" ? "In casa" : ven === "away" ? "In trasferta" : "Tutte le partite"}</span></div>${body}
+  const L0 = Ls[0], head = all ? `<span class="flag" aria-hidden="true">🌍</span><span class="nm"><small>Tutti</small><b>I campionati</b></span>`
+    : `<span class="flag" aria-hidden="true">${FLAGS[L0.country] || "⚽"}</span><span class="nm"><small>${esc(L0.country)}</small><b>${esc(L0.name)}</b></span>`;
+  box.innerHTML = `<section class="card gl4"><div class="gl4h">${head}<span class="gl4m">${ven === "home" ? "In casa" : ven === "away" ? "In trasferta" : "Tutte le partite"}</span></div>${pend ? `<p class="lt-ref rtpend">Calcolo le percentuali… ancora ${pend}</p>` : ""}${body}
     </section>`;
-  box.querySelectorAll(".rtr.go").forEach(li => { const go = () => { const e = AE.find(x => x.id === li.dataset.id); if (e) openEntry(e); }; li.addEventListener("click", go); li.addEventListener("keydown", ev => { if (ev.key === "Enter") go(); }); });
+  box.querySelectorAll(".rtr.go").forEach(li => { const go = () => { const e = AEall.find(x => x.id === li.dataset.id); if (e) openEntry(e); }; li.addEventListener("click", go); li.addEventListener("keydown", ev => { if (ev.key === "Enter") go(); }); });
 }
-$("#ritLg").innerHTML = LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
+$("#ritLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#ritLg", "#ritTeam", "#ritGr"].forEach(id => $(id).addEventListener("change", renderRit));
 document.querySelectorAll(".rtf [data-rw]").forEach(b => b.addEventListener("click", () => { RIT.when = b.dataset.rw; document.querySelectorAll(".rtf [data-rw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 $("#ritDot").addEventListener("click", () => { RIT.dot = !RIT.dot; $("#ritDot").setAttribute("aria-pressed", String(RIT.dot)); renderRit(); });
+$("#ritSort").addEventListener("click", () => { RIT.sortP = !RIT.sortP; $("#ritSort").setAttribute("aria-pressed", String(RIT.sortP)); renderRit(); });
 document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 function renderGenSoft() { const y = scrollY; renderGen(); scrollTo({ top: y }); }
 $("#genLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
@@ -4430,7 +4487,7 @@ function confBar(score, cls, rate) {
 function confSolid(r) {   // i controlli di solidità, a parole: ✓ a favore, ≈ così così, ✗ contro
   const ck = (lv, t) => `<span class="gck ${lv}"><i>${lv === "ok" ? "✓" : lv === "mid" ? "≈" : "✗"}</i>${t}</span>`;
   const out = [
-    r.stab === "Alta" ? ck("ok", "I metodi di calcolo danno lo stesso risultato") : r.stab === "Media" ? ck("mid", "I metodi di calcolo sono abbastanza d'accordo") : ck("ko", "I metodi di calcolo non sono d'accordo"),
+    r.stab === "Alta" ? ck("ok", "Media dinamica e media classica danno lo stesso esito") : r.stab === "Media" ? ck("mid", "Media dinamica e media classica sono vicine") : ck("ko", "Media dinamica e media classica danno esiti diversi"),
     r.samp === "Alto" ? ck("ok", "Tante partite su cui basarsi") : r.samp === "Medio" ? ck("mid", "Partite sufficienti su cui basarsi") : ck("ko", "Poche partite su cui basarsi")];
   if (r.mk !== "k" && typeof r.contra === "number") { const f = 4 - r.contra; out.push(ck(f === 4 ? "ok" : f === 3 ? "mid" : "ko", `I numeri reali delle due squadre ${f >= 3 ? "lo confermano" : "non lo confermano"} (${f} controlli su 4)`)); }
   return out.join("");
