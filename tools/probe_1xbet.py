@@ -40,4 +40,4 @@ try:
         for k_, v in ex.items(): note(f"Esempio {k_}: " + ", ".join(v))
 
 except Exception:
-    note("ERRORE " + traceback.format_exc()[-1500:])
+    for ln in traceback.format_exc().strip().split(chr(10))[-6:]: note("ERRORE " + ln.strip())
