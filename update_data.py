@@ -99,6 +99,7 @@ if os.environ.get("APIFOOTBALL_KEY", "").strip():
             if _od.get("pro"): AF_PRO = True; print("API-Football: richieste non disponibili ora, uso l'archivio (piano a pagamento)")
         except Exception: pass
 print("API-Football a pagamento:", AF_PRO)
+print("::notice title=API-Football::a pagamento " + str(AF_PRO))
 QUAL = {}   # controllo qualità dei dati di questo giro → data/qualita.json (mostrato nell'app)
 
 # prossime giornate: calendario completo da fixturedownload.com (gratuito, senza chiave).
@@ -880,6 +881,7 @@ try:
     print("arbitri e cartellini:", len(EX), "partite abbinate")
 except Exception as e:
     import traceback; traceback.print_exc(); print("arbitri e cartellini:", e)
+    print("::warning title=API-Football archivio::" + " | ".join(traceback.format_exc().strip().split("\n")[-4:]).replace("%", "%25"))
 
 # Quote dei bookmaker da API-Football (segreto APIFOOTBALL_KEY; piano gratuito: 100 richieste al giorno, 10 al minuto).
 # Una volta al giorno (dalle 7 italiane): partite di oggi e domani dei nostri campionati, quota mediana tra i bookmaker
