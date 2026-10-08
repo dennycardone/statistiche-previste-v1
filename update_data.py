@@ -895,7 +895,11 @@ def _odds_due():   # gratis: una volta al giorno dalle 7; a pagamento (OD["pro"]
         try: return (rome_now - datetime.datetime.strptime(OD["aggiornate"], "%d/%m/%Y %H:%M").replace(tzinfo=ROME)).total_seconds() >= 3 * 3600
         except Exception: return True
     return False
-if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
+ODDS_FULL = bool(AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")))
+# Vicino al calcio d'inizio: 1xBet pubblica 1X2 e doppia chance di tiri, tiri in porta e falli poche ore prima. A ogni giro (piano a pagamento)
+# si chiedono le quote, partita per partita, delle sole partite dei nostri campionati che iniziano nelle prossime 3 ore: vanno nell'archivio.
+ODDS_NEAR = bool(AF_KEY and not ODDS_FULL and OD.get("pro"))
+if ODDS_FULL or ODDS_NEAR:
     af_used = [0]
     def af(path, **q):
         af_used[0] += 1
@@ -942,7 +946,8 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
              "Goals Over/Under": "gou", "Total - Home": "hgou", "Total - Away": "agou"}
     NICHE = {"Corners 1x2": "c1x2", "Corners. Double Chance": "cdc", "Shots.1x2": "s1x2", "ShotOnTarget 1x2": "st1x2", "Fouls. 1x2": "f1x2",
              "Fouls. Double Chance": "fdc", "Yellow Cards 1x2": "y1x2", "Yellow Double Chance": "ydc", "Corners Over Under": "cou",
-             "Home Corners Over/Under": "hcou", "Away Corners Over/Under": "acou", "Total Shots": "sou", "Total ShotOnGoal": "sot", "Fouls. Total": "fou"}
+             "Home Corners Over/Under": "hcou", "Away Corners Over/Under": "acou", "Total Shots": "sou", "Total ShotOnGoal": "sot", "Fouls. Total": "fou",
+             "Corners Asian Handicap": "cah", "Cards Asian Handicap": "kah", "Cards Over/Under": "kou"}
     BOOK_TAG = {"1xBet": "x.", "Pinnacle": "p."}
     def take(e, f):   # quote mediane di una partita
         lg = BY_ID[f["league"]["id"]]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
@@ -980,7 +985,17 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
         paid = int(stt.get("limit_day", 100)) > 100
         # Il piano gratuito non accetta la stagione in corso come parametro: quote chieste per data (tutte le partite, 10 per pagina)
         # oppure per singola partita, scegliendo la via con meno richieste.
-        for k in range(7 if paid else 2):   # piano gratuito: quote solo da ieri a domani → oggi e domani; a pagamento: 7 giorni
+        if ODDS_NEAR and budget > 50:
+            F = af("fixtures", date=str(rome_now.date()), timezone="Europe/Rome").get("response", []); budget -= 1
+            now_utc = datetime.datetime.now(datetime.timezone.utc)
+            near = {f["fixture"]["id"]: f for f in F if f["league"]["id"] in BY_ID and f["fixture"]["status"]["short"] in ("NS", "TBD")
+                    and 0 <= (datetime.datetime.fromisoformat(f["fixture"]["date"]) - now_utc).total_seconds() <= 3 * 3600}
+            for i, f in near.items():
+                if budget < 20: break
+                for e in af("odds", fixture=i).get("response", []): take(e, f)
+                budget -= 1
+            print("quote vicino al calcio d'inizio:", len(near), "partite")
+        for k in (range(7 if paid else 2) if ODDS_FULL else []):   # piano gratuito: quote solo da ieri a domani → oggi e domani; a pagamento: 7 giorni
             if budget < 2: break
             dd = rome_now.date() + datetime.timedelta(days=k)
             F = af("fixtures", date=str(dd), timezone="Europe/Rome").get("response", []); budget -= 1
@@ -1004,7 +1019,9 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
                     budget -= 1
     except Exception as e:
         err = str(e); print("quote API-Football:", e)
-    if res or not err:   # con un errore e nessuna quota: si riprova al giro dopo (il file precedente resta)
+    if ODDS_NEAR:   # giro leggero: aggiorno solo le partite vicine, senza toccare l'ora dell'aggiornamento completo
+        if res: OD.setdefault("partite", {}).update(res); json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
+    elif res or not err:   # con un errore e nessuna quota: si riprova al giro dopo (il file precedente resta)
         OD = {"giorno": rome_now.strftime("%Y-%m-%d"), "aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "API-Football (quota mediana tra i bookmaker)",
               "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "pro": bool(locals().get("paid")), "partite": res}
         json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
@@ -1017,8 +1034,11 @@ if AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")):
         ts = rome_now.strftime("%Y-%m-%d %H:%M")
         for kk, q in allq.items():
             x = OH.setdefault(kk, {})
-            if "prima" not in x: x["prima"] = {"ora": ts, "q": q}
-            x["ultima"] = {"ora": ts, "q": q}
+            if "prima" not in x: x["prima"] = {"ora": ts, "q": dict(q)}
+            else:   # mercati comparsi dopo (es. 1X2 tiri di 1xBet poche ore prima): la loro prima quota, con l'ora
+                for qk, qv in q.items():
+                    if qk not in x["prima"]["q"]: x["prima"]["q"][qk] = qv; x["prima"].setdefault("ore", {})[qk] = ts
+            x["ultima"] = {"ora": ts, "q": {**x.get("ultima", {}).get("q", {}), **q}}
         json.dump(OH, open(hp, "w"), separators=(",", ":"), ensure_ascii=False)
         print("archivio quote:", len(OH), "partite")
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
