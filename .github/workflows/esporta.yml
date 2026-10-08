@@ -1,24 +1,22 @@
-name: Esporta archivio quote (solo per analisi)
+name: Analisi quote (solo numeri aggregati)
 on:
   workflow_dispatch: {}
 permissions:
   contents: read
 jobs:
-  esporta:
+  analisi:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Archivi dal magazzino privato
         uses: actions/cache/restore@v4
         with:
           path: data
           key: dati-${{ github.run_id }}
           restore-keys: dati-
-      - run: ls -la data | head -50
-      - name: Archivio quote come allegato privato del giro (non pubblico, scade dopo 3 giorni)
-        uses: actions/upload-artifact@v4
-        with:
-          name: quote
-          path: |
-            data/odds_hist.json
-            data/apif.json
-          retention-days: 3
+      - name: Dati pubblicati (bundle ed extra)
+        run: |
+          mkdir -p pub && git fetch -q --depth 1 origin pages && git show FETCH_HEAD:data/bundle.json > pub/bundle.json && git show FETCH_HEAD:data/extra.json > pub/extra.json
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: node tools/analisi_quote.js .
