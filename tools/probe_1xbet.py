@@ -2,7 +2,7 @@
 Stampa solo nomi di mercati e conteggi come annotazioni del giro (nessuna quota salvata)."""
 import json, os, urllib.request, urllib.parse, datetime, collections, time
 import traceback
-def note(s): print("::notice title=1xBet::" + s.replace("%", "%25").replace("\n", " | "), flush=True)
+def note(s): print("::notice title=" + os.environ.get("BOOK", "1xBet") + "::" + s.replace("%", "%25").replace("\n", " | "), flush=True)
 try:
     KEY = os.environ.get("APIFOOTBALL_KEY", "").strip()
     note("chiave presente: " + str(bool(KEY)))
@@ -10,13 +10,13 @@ try:
         req = urllib.request.Request("https://v3.football.api-sports.io/" + p + ("?" + urllib.parse.urlencode(q) if q else ""), headers={"x-apisports-key": KEY})
         with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
         time.sleep(0.3); return d
-    def note(s): print("::notice title=1xBet::" + s.replace("%", "%25"))
+    def note(s): print("::notice title=" + os.environ.get("BOOK", "1xBet") + "::" + s.replace("%", "%25"))
     try:
         B0 = get("odds/bookmakers"); bk = B0.get("response", []) or []
         if B0.get("errors"): note("errori: " + json.dumps(B0.get("errors")))
     except Exception as e:
         note("errore bookmakers: " + repr(e)); bk = []
-    x = [b for b in bk if "1x" in str(b.get("name") or "").lower()]; note("nomi: " + ", ".join(str(b.get("name")) for b in bk)[:3000])
+    x = [b for b in bk if str(b.get("name") or "").lower() == os.environ.get("BOOK", "1xbet").lower()]; note("nomi: " + ", ".join(str(b.get("name")) for b in bk)[:3000])
     note("Bookmaker API-Football: " + str(len(bk)) + " · 1xBet: " + json.dumps(x))
     if x:
         bid = x[0]["id"]; mk = collections.Counter(); n = 0; ex = {}

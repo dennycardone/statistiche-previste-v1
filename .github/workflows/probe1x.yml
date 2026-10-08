@@ -11,5 +11,9 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: python tools/probe_1xbet.py
+      - run: python tools/probe_1xbet.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+          BOOK: Pinnacle
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
