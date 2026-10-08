@@ -1,0 +1,24 @@
+name: Esporta archivio quote (solo per analisi)
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  esporta:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Archivi dal magazzino privato
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - run: ls -la data | head -50
+      - name: Archivio quote come allegato privato del giro (non pubblico, scade dopo 3 giorni)
+        uses: actions/upload-artifact@v4
+        with:
+          name: quote
+          path: |
+            data/odds_hist.json
+            data/apif.json
+          retention-days: 3
