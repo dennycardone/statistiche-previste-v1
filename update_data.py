@@ -90,6 +90,14 @@ if os.environ.get("APIFOOTBALL_KEY", "").strip():
             AF_PRO = int(json.loads(_r.read().decode()).get("response", {}).get("requests", {}).get("limit_day", 100)) > 100
     except Exception as e:
         print("API-Football non raggiungibile:", e)
+    # richieste del giorno finite (o API momentaneamente giù): il piano resta a pagamento. Senza questo il giro cadeva sulle fonti
+    # gratuite e toglieva dal calendario le partite di API-Football (8/10/2026). Calendario, risultati e statistiche si rifanno
+    # dall'archivio già scaricato (data/apif.json), senza nuove richieste.
+    if not AF_PRO:
+        try:
+            _od = json.load(open(os.path.join(OUT, "odds.json")))
+            if _od.get("pro"): AF_PRO = True; print("API-Football: richieste non disponibili ora, uso l'archivio (piano a pagamento)")
+        except Exception: pass
 print("API-Football a pagamento:", AF_PRO)
 QUAL = {}   # controllo qualità dei dati di questo giro → data/qualita.json (mostrato nell'app)
 
