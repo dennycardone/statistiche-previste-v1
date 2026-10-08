@@ -9,11 +9,19 @@ jobs:
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
+      - name: Archivio partite dal magazzino privato di GitHub Actions (dal 7/10 non è più sul sito pubblico)
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
       - name: Partite (ramo storico e stagione in corso) e formazioni già scaricate
         run: |
           mkdir -p storico formazioni
           git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
-          git fetch -q --depth 1 origin pages && git checkout FETCH_HEAD -- data/apif.json && git reset -q -- data
+          if [ ! -f data/apif.json ]; then   # riserva: vecchio sito (prima del 7/10 l'archivio era sul ramo pages)
+            git fetch -q --depth 1 origin pages && git checkout FETCH_HEAD -- data/apif.json && git reset -q -- data || true
+          fi
           if git ls-remote --exit-code origin formazioni >/dev/null 2>&1; then
             git fetch -q --depth 1 origin formazioni && git archive FETCH_HEAD | tar -x -C formazioni
           fi
