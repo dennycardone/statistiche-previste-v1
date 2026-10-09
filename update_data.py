@@ -769,6 +769,23 @@ try:
             except Exception as e:
                 print("risultati API", fn, e)
         print("risultati da API-Football:", n_res, "partite aggiunte")
+        # partite giocate solo come le dà API-Football: data e ora italiane, niente partite che API-Football non ha
+        for lg in by_lg:
+            fn = f"{lg}_{code(cur)}.csv" if lg in LEAGUES else f"{lg}.csv"
+            if fn not in files: continue
+            try:
+                rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8-sig").read())))
+                rd2, k = apif_extra.align_api(rd, lg, by_lg[lg], MAPS[lg], _now.date(), ROME)
+                if k:
+                    buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(rd2); save(fn, buf.getvalue())
+                    hdr_ = [h.strip() for h in rd2[0]]; new_ = "HomeTeam" not in hdr_
+                    for r in rd2[1:]:   # date nuove anche per gli abbinamenti successivi (cartellini, quote)
+                        try: pairs[(lg, r[hdr_.index("Home" if new_ else "HomeTeam")].strip(), r[hdr_.index("Away" if new_ else "AwayTeam")].strip())].append(datetime.datetime.strptime(r[hdr_.index("Date")].strip(), "%d/%m/%Y").date())
+                        except Exception: pass
+            except Exception as e:
+                print("allineamento API", fn, e)
+        print("::notice title=Allineamento API-Football::date corrette " + str(apif_extra.ALIGNED["date"]) + ", partite tolte (non su API-Football) " + str(len(apif_extra.ALIGNED["tolte"])) + (": " + "; ".join(apif_extra.ALIGNED["tolte"][:20]) if apif_extra.ALIGNED["tolte"] else ""))
+        QUAL["partite_non_api"] = apif_extra.ALIGNED["tolte"][:50]
         # controllo: ogni partita finita negli ultimi 14 giorni (API-Football) deve essere nei nostri risultati; altrimenti avviso
         try:
             _pl = collections.defaultdict(list)
@@ -838,15 +855,8 @@ try:
         for fn in ("next_fixtures.csv", "fixtures.csv", "espn_fixtures.csv"):
             try: rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8").read())))
             except Exception: continue
-            if fn == "espn_fixtures.csv":
-                # ESPN (aggiornato ogni 3 ore) solo per le sfide che API-Football non mette nelle prossime 3 settimane
-                # (es. partita spostata che API-Football ha ancora alla data vecchia)
-                keep = [rd[0]] + [r for r in rd[1:] if len(r) > 4 and not api_dates.get((r[0], r[3].strip(), r[4].strip()))]
-            else:
-                keep = [rd[0]] + [r for r in rd[1:] if len(r) > 4 and (r[0] not in api_lg or (fn == "fixtures.csv" and r[1] in api_dates.get((r[0], r[3].strip(), r[4].strip()), ())))]
-                for r in keep[1:]:   # stessa partita di API-Football: vale l'ora italiana di API-Football
-                    t = api_time.get((r[0], r[1], r[3].strip(), r[4].strip()))
-                    if t is not None and len(r) > 2: r[2] = t
+            # 9/10/2026: calendario SOLO da API-Football per tutti i campionati che API-Football copre (niente ESPN né football-data)
+            keep = [rd[0]] + [r for r in rd[1:] if len(r) > 4 and r[0] not in by_lg and r[0] not in api_lg]
             buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(keep); save(fn, buf.getvalue())
         for r in cal[1:]:
             try: pairs[(r[0], r[3], r[4])].append(datetime.datetime.strptime(r[1], "%d/%m/%Y").date())

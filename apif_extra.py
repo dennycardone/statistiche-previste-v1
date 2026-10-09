@@ -223,3 +223,45 @@ def build_csv(lg, league_name, api_rows, cal, tz, min_year):
         r += [str(int(H[4] + (H[5] or 0))), str(int(A[4] + (A[5] or 0)))] if H and A and H[4] is not None and A[4] is not None else ["", ""]
         out.append(r)
     return [hdr] + out
+
+ALIGNED = {"date": 0, "tolte": []}   # per il controllo qualità
+def align_api(rd, lg, api_rows, mp, today, tz, days=400):
+    """Partite giocate solo come le dà API-Football (9/10/2026: Santos–Flamengo aveva data e ora inglesi di football-data e
+    finiva nel giorno prima). Ultimi `days` giorni: ogni riga con risultato che corrisponde a una partita finita di API-Football
+    prende data e ora italiane di API-Football; una riga che API-Football non ha (stesse squadre ±2 giorni) viene tolta,
+    ma solo se le due squadre sono abbinate (altrimenti resta: meglio una partita in più che una persa)."""
+    hdr = [h.strip() for h in rd[0]]; body = [list(r) for r in rd[1:] if any(x.strip() for x in r)]
+    new = "HomeTeam" not in hdr
+    ix = {h: i for i, h in enumerate(hdr)}
+    if "Date" not in ix: return rd, 0
+    iD, iH, iA = ix["Date"], ix["Home" if new else "HomeTeam"], ix["Away" if new else "AwayTeam"]
+    iG1 = ix.get("HG" if new else "FTHG"); iT = ix.get("Time")
+    known = set(mp.values())
+    by = collections.defaultdict(list)
+    for v in api_rows:
+        if v[9] not in ("FT", "AET", "PEN"): continue
+        h, a = mp.get(v[2]), mp.get(v[3])
+        if h and a:
+            loc = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(tz)
+            by[(h, a)].append(loc)
+    lo = today - datetime.timedelta(days=days)
+    out, n = [], 0
+    for r in body:
+        try:
+            dd = r[iD].strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; d = datetime.date(int(y), int(dd[1]), int(dd[0]))
+        except Exception: out.append(r); continue
+        played = iG1 is not None and r[iG1].strip().isdigit()
+        if not played or d < lo: out.append(r); continue
+        h, a = r[iH].strip(), r[iA].strip()
+        cand = sorted((x for x in by.get((h, a), []) if abs((x.date() - d).days) <= 2), key=lambda x: abs((x.date() - d).days))
+        if cand:
+            loc = cand[0]
+            nd = loc.strftime("%d/%m/%Y")
+            if r[iD].strip() != nd: r[iD] = nd; n += 1; ALIGNED["date"] += 1
+            if iT is not None: r[iT] = loc.strftime("%H:%M")
+            out.append(r)
+        elif h in known and a in known and d >= today - datetime.timedelta(days=60):
+            ALIGNED["tolte"].append(f"{lg} {d:%d/%m} {h}-{a}"); n += 1   # non c'è su API-Football: fuori
+        else:
+            out.append(r)
+    return [hdr] + out, n
