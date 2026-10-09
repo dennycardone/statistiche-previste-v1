@@ -174,7 +174,7 @@ summary{cursor:pointer;font-weight:600}
 .sig .p{font-family:var(--display);font-stretch:75%;font-size:26px;font-weight:700;grid-row:1/3;grid-column:2;text-align:right;line-height:1}
 .sig .p small{display:block;font-family:var(--body);font-stretch:88%;font-size:11px;font-weight:500;color:var(--ink-2)}
 .sig .d{font-size:14px}
-.sig .w{grid-column:1/-1;font-size:12px;color:var(--ink-2)}
+.sig .w{grid-column:1/-1;font-size:12px;color:var(--ink-2)}.sig .w b{color:var(--ink);font-weight:600}.sig .w .tlogo,.sig .w .tcol{width:14px;height:14px;vertical-align:-2px;margin-right:4px}
 .stag.c3{background:var(--dot-g);border-color:var(--dot-g);color:#06140c}
 .stag{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:1px 7px;border-radius:999px;background:var(--surface);border:1px solid var(--line);margin-right:6px}
 @media (max-width:380px){.xp .val{font-size:32px}.matchhead{font-size:20px}}
@@ -946,11 +946,11 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <div class="view" id="viewSig" hidden>
     <section class="card" aria-label="Filtri segnali">
       <h2>Segnali</h2>
-      <p class="small muted" style="margin:0">Partite di oggi e domani (o della prossima giornata), dalla probabilità più alta, con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
+      <p class="small muted" style="margin:0">Dalla probabilità più alta fino al 70%, solo squadre con almeno 3 partite in casa/trasferta. Partite con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
       <div class="sigf">
         <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
         <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano">
-          <button class="chip" data-sw="01" aria-pressed="true">Oggi e domani</button><button class="chip" data-sw="0" aria-pressed="false">Oggi</button><button class="chip" data-sw="1" aria-pressed="false">Domani</button><button class="chip" data-sw="round" aria-pressed="false">Giornata</button>
+          <button class="chip" data-sw="0" aria-pressed="true">Oggi</button><button class="chip" data-sw="1" aria-pressed="true">Domani</button><button class="chip" data-sw="r" aria-pressed="false">Giornata</button>
         </div>
         <div class="row" id="sigStats" role="group" aria-label="Mercati">
           <button class="chip sstat" data-k="g15" aria-pressed="true">Over 1,5</button>
@@ -963,8 +963,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
           <button class="chip sstat" data-k="st" aria-pressed="true">Tiri in porta</button>
           <button class="chip sstat" data-k="k" aria-pressed="true">Cartellini</button>
         </div>
-        <label for="sigMin">Probabilità minima: <b id="sigMinVal">75%</b><input type="range" id="sigMin" min="75" max="95" step="5" value="75"></label>
-        <label class="chk" for="sigGames"><input type="checkbox" id="sigGames" checked> Almeno 3 partite in casa/trasferta</label>
+        <input type="hidden" id="sigMin" value="75"><input type="checkbox" id="sigGames" checked hidden>
         <input type="checkbox" id="sigC3" hidden>
         <label for="sigMode" hidden>Statistica richiesta<select id="sigMode">
           <option value="dyn" selected>Media dinamica</option>
@@ -3020,12 +3019,14 @@ function fillTeams(keep) {
 
 /* Prossima giornata del campionato scelto: partite in calendario non ancora giocate */
 /* Segnali: partite di oggi e/o domani (stesse regole di nextRound: squadre note, sfida non ancora giocata) */
-const SIGW = { when: "01" };
+const SIGW = { days: new Set(["0", "1"]) };   // Oggi, Domani, Giornata ("r"): si possono scegliere insieme
+const SIG_MINP = 0.70;
 function sigPickDays(code) {
-  const t0 = localIso(), want = new Set([...SIGW.when].map(c => addDays(t0, +c)));
+  const t0 = localIso(), want = new Set([...SIGW.days].filter(c => c !== "r").map(c => addDays(t0, +c)));
+  const rnd = SIGW.days.has("r") ? nextRound() : [];
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const t = new Set(teams()), played = seasonMatches().map(m => [m.home + "|" + m.away, +m.date]);
-  return S.fixtures.filter(f => f.div === code && f.date >= today && want.has(isoD(f.date)) && t.has(f.home) && t.has(f.away) && !played.some(([k, d]) => k === f.home + "|" + f.away && Math.abs(d - f.date) <= 4 * DAYMS));
+  return S.fixtures.filter(f => f.div === code && f.date >= today && (want.has(isoD(f.date)) || rnd.includes(f)) && t.has(f.home) && t.has(f.away) && !played.some(([k, d]) => k === f.home + "|" + f.away && Math.abs(d - f.date) <= 4 * DAYMS));
 }
 function nextRound() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -3529,7 +3530,7 @@ function sigCardsHTML(rows, pref, withMatch = true, played = null) {
         ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}
         <span class="p num">${pc(r.p)}</span>
         <span class="d"><span class="stag">${MK_TAG[r.mk]}</span><b>${esc(r.fav)}</b> · ${detail}</span>
-        ${withMatch ? `<span class="w">${esc(r.lg.name)} · ${DAYS_SHORT[r.f.date.getUTCDay()]} ${dstr(r.f.date)}${r.f.time ? " · " + esc(r.f.time) : ""}</span>` : ""}
+        ${withMatch ? `<span class="w">${r.team ? `${r.team === r.f.home ? "In casa con" : "In trasferta con"} ${crest(r.lg.code, r.team === r.f.home ? r.f.away : r.f.home)}<b>${esc(r.team === r.f.home ? r.f.away : r.f.home)}</b> · ` : ""}${DAYS_SHORT[r.f.date.getUTCDay()]} ${dstr(r.f.date)}${r.f.time ? " " + esc(r.f.time) : ""} · ${esc(r.lg.name)}</span>` : ""}
       </button>
       ${played ? (() => { const o = sigOutcome(r, played); return o ? `<span class="esito ${o.ok ? "good" : "bad"}">${o.ok ? "✓ Preso" : "✗ Non preso"} · ${o.txt}</span>` : ""; })() : ""}
     </div>`; }).join("")}</div>`;
@@ -3549,7 +3550,6 @@ function sigSettings() {
 let SIG_T = 0;
 function renderSignals() {
   const box = $("#sigOut"), st = sigSettings();
-  $("#sigMinVal").textContent = Math.round(st.minP * 100) + "%";
   // la prima volta (senza previsioni pronte da GitHub) il calcolo può richiedere qualche secondo: prima mostra "Calcolo…"
   if (!box.firstElementChild) box.innerHTML = `<p class="muted" style="margin:0">Calcolo dei segnali…</p>`;
   clearTimeout(SIG_T); SIG_T = setTimeout(renderSignalsNow, 30);
@@ -3557,14 +3557,14 @@ function renderSignals() {
 function renderSignalsNow() {
   const box = $("#sigOut");
   const cfg = MODES[$("#sigMode").value] || MODES.dyn, st = sigSettings();
-  const byDay = SIGW.when !== "round";
-  let { rows, skipped, noCal } = computeSignals3({ lgSel: $("#sigLeague").value, markets: st.markets, cfg, minP: st.minP, needGames: st.needGames, noStale: true, mdl: sigMdl, pick: byDay ? sigPickDays : undefined });
+  const byDay = !SIGW.days.has("r");
+  let { rows, skipped, noCal } = computeSignals3({ lgSel: $("#sigLeague").value, markets: st.markets, cfg, minP: SIG_MINP, needGames: true, noStale: true, mdl: sigMdl, pick: sigPickDays });
   if (byDay) noCal = [];   // oggi/domani: è normale che molti campionati non giochino
   rows = rows.filter(x => !(MK_STAT[x.k] && statMissing(x.id.split("|")[0], MK_STAT[x.k])));
   if ($("#sigC3").checked) rows = rows.filter(x => x.c3);
   box.innerHTML = `<h2>${rows.length} segnal${rows.length === 1 ? "e" : "i"}</h2>
     <p class="small muted" style="margin:0">Gol: Over a linea fissa e Gol/No gol. Corner, falli, tiri e tiri in porta: <b>1</b> se la squadra di casa ne fa di più, <b>2</b> se ne fa di più l'ospite (il pari fa perdere). Cartellini (gialli + rossi): la linea più alta con l'Over sopra la soglia, altrimenti la più bassa con l'Under; modello squadre + arbitro, uguale per i due metodi. Base: ${cfg.label}.</p>
-    ${rows.length ? sigCardsHTML(rows, "q") : `<p class="muted" style="margin:0">Nessuna partita ${SIGW.when === "01" ? "di oggi e domani " : SIGW.when === "0" ? "di oggi " : SIGW.when === "1" ? "di domani " : ""}supera la soglia con questi filtri. Prova ad abbassare la probabilità minima${byDay ? " o a scegliere Giornata" : ""}.</p>`}
+    ${rows.length ? sigCardsHTML(rows, "q") : `<p class="muted" style="margin:0">${SIGW.days.size ? `Nessuna partita supera il 70% con questi filtri.${byDay ? " Prova ad aggiungere Giornata." : ""}` : "Scegli Oggi, Domani o Giornata."}</p>`}
     ${skipped.length ? `<p class="small muted" style="margin:0">Esclusi per dati vecchi: ${skipped.map(esc).join(", ")}.</p>` : ""}
     ${noCal.length ? `<p class="small muted" style="margin:0">Senza calendario della prossima giornata: ${noCal.map(esc).join(", ")}.</p>` : ""}`;
   bindSigCards(box, rows, "q");
@@ -3590,7 +3590,7 @@ function crest(div, team, cls = "cr") {
 /* ===== Palinsesto (stile app risultati) ===== */
 const MONTHS = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
 const SCHED = { day: null, lg: (() => lsGet("statPreviste.lg") || "all")(), open: new Set() };   // campionati aperti (all'apertura del giorno tutti chiusi)
-const TOP_LG = ["I1", "I2", "E0", "SP1", "D1", "F1"];   // "Top campionati" in cima alla lista
+const TOP_LG = ["I1", "I2", "E0", "SP1", "D1", "F1", "N1", "P1"];   // "Top campionati" in cima alla lista
 const FLAGS = { Italia: "🇮🇹", Inghilterra: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", Spagna: "🇪🇸", Francia: "🇫🇷", Germania: "🇩🇪", Olanda: "🇳🇱", Portogallo: "🇵🇹", Scozia: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", Belgio: "🇧🇪", Turchia: "🇹🇷", Grecia: "🇬🇷",
   Argentina: "🇦🇷", Austria: "🇦🇹", Brasile: "🇧🇷", Cina: "🇨🇳", Danimarca: "🇩🇰", Finlandia: "🇫🇮", Irlanda: "🇮🇪", Giappone: "🇯🇵", Messico: "🇲🇽", Norvegia: "🇳🇴", Polonia: "🇵🇱", Romania: "🇷🇴", Russia: "🇷🇺", Svezia: "🇸🇪", Svizzera: "🇨🇭", USA: "🇺🇸",
   Serbia: "🇷🇸", Croazia: "🇭🇷", "Repubblica Ceca": "🇨🇿", Ungheria: "🇭🇺", Israele: "🇮🇱", Bulgaria: "🇧🇬" };
@@ -4443,7 +4443,7 @@ function renderRit() {
 $("#ritLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#ritLg", "#ritTeam", "#ritGr"].forEach(id => $(id).addEventListener("change", renderRit));
 document.querySelectorAll(".rtf [data-rw]").forEach(b => b.addEventListener("click", () => { RIT.when = b.dataset.rw; document.querySelectorAll(".rtf [data-rw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
-document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.addEventListener("click", () => { SIGW.when = b.dataset.sw; document.querySelectorAll("#sigWhen [data-sw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderSignals(); }));
+document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.addEventListener("click", () => { const k = b.dataset.sw; if (SIGW.days.has(k)) SIGW.days.delete(k); else SIGW.days.add(k); b.setAttribute("aria-pressed", String(SIGW.days.has(k))); renderSignals(); }));
 $("#ritDot").addEventListener("click", () => { RIT.dot = !RIT.dot; $("#ritDot").setAttribute("aria-pressed", String(RIT.dot)); renderRit(); });
 $("#ritGrd").addEventListener("click", () => { RIT.grd = !RIT.grd; $("#ritGrd").setAttribute("aria-pressed", String(RIT.grd)); renderRit(); });
 document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
@@ -4740,7 +4740,6 @@ function showView(v) {
 }
 $("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#sigLeague", "#sigGames", "#sigC3"].forEach(id => $(id).addEventListener("change", renderSignals));
-$("#sigMin").addEventListener("input", renderSignals);
 $("#sigMode").addEventListener("change", () => { $("#decay").value = $("#sigMode").value; renderSignals(); renderNext(); });
 $("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; });
 document.querySelectorAll(".sstat").forEach(b => b.addEventListener("click", () => { b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); renderSignals(); }));
