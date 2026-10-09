@@ -3103,6 +3103,10 @@ const MK_TAG = { g15: "Gol", g25: "Gol", g35: "Gol", gg: "Gol/No gol", c: "Corne
 const GOAL_LINE = { g15: 1.5, g25: 2.5, g35: 3.5 };
 const OVER_TH = { c: TH, f: THF, s: THS, st: THST };
 const sigId = (div, f, mk) => `${div}|${seasonOf(f.date)}|${f.home}|${f.away}|${mk}`;
+function leagueStale(code, last, now) {
+  const played = new Set(seasonMatches().map(m => m.home + "|" + m.away + "|" + isoD(m.date)));
+  return S.fixtures.some(f => f.div === code && f.date > last && (now - f.date) > 2 * 864e5 && !played.has(f.home + "|" + f.away + "|" + isoD(f.date)));
+}
 function computeSignals(o) {
   const rows = [], skipped = [], noCal = [], now = o.now || Date.now(), pick = o.pick || nextRound, mks = o.markets;
   const wantGoals = mks.some(k => k in GOAL_LINE || k === "gg");
@@ -3112,7 +3116,8 @@ function computeSignals(o) {
     withLeague(L.code, () => {
       const sm = seasonMatches(); if (!sm.length) return;
       const days = Math.floor((now - sm[sm.length - 1].date) / 864e5);
-      if (o.noStale && days > 10) { skipped.push(`${L.name} (ultima partita ${dstr(sm[sm.length - 1].date)})`); return; }
+      // dati fermi = partite in calendario già passate da 2+ giorni senza risultato (non basta una pausa lunga, es. nazionali)
+      if (o.noStale && days > 10 && leagueStale(L.code, sm[sm.length - 1].date, now)) { skipped.push(`${L.name} (ultima partita ${dstr(sm[sm.length - 1].date)})`); return; }
       const nx = pick(L.code); if (!nx.length) { noCal.push(L.name); return; }
       for (const f of nx) {
         // o.mdl: risultati del modello già pronti (precalc di GitHub o cache della sessione) → { G, stats: {k: [lh, la, p1, pX, p2]} }
