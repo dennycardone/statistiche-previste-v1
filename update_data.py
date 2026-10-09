@@ -781,6 +781,28 @@ try:
                 h, a = MAPS[lg].get(v[2]), MAPS[lg].get(v[3])
                 if not h or not a: unk.update(x for x, y in ((v[2], h), (v[3], a)) if not y); continue
                 cal.append([lg, loc.strftime("%d/%m/%Y"), "" if v[9] == "TBD" else loc.strftime("%H:%M"), h, a, ""])
+        # rete di sicurezza: una partita del calendario del giro prima (oggi o dopo) che ora manca torna dentro, a meno che
+        # API-Football la dia giocata, rinviata o annullata, o spostata a un'altra data; avviso con l'elenco per capire la causa
+        try:
+            _mem_p = os.path.join(OUT, "cal_prev.json")
+            _prev = json.load(open(_mem_p)) if os.path.exists(_mem_p) else []
+            _now_k = {(r[0], r[3], r[4]) for r in cal[1:]}
+            _gone = set()
+            for lg, L in by_lg.items():
+                for v in L:
+                    h, a = MAPS[lg].get(v[2]), MAPS[lg].get(v[3])
+                    if h and a and v[9] not in ("NS", "TBD") + LIVE_ST: _gone.add((lg, h, a, v[0][:10]))
+            _back = []
+            for r in _prev:
+                try: d_ = datetime.datetime.strptime(r[1], "%d/%m/%Y").date()
+                except Exception: continue
+                if d_ < _now.date() or (r[0], r[3], r[4]) in _now_k: continue
+                if any(g[:3] == (r[0], r[3], r[4]) and abs((datetime.date.fromisoformat(g[3]) - d_).days) <= 2 for g in _gone): continue
+                if any(o[1] == r[3] and o[2] == r[4] and abs((o[0] - d_).days) <= 3 for o in ours.get(r[0], [])): continue   # già giocata
+                cal.append(r); _back.append(f"{r[0]} {r[1]} {r[3]}-{r[4]}")
+            if _back: print("::warning title=Calendario::rimesse " + str(len(_back)) + " partite sparite: " + "; ".join(_back[:15]))
+            json.dump(cal[1:], open(_mem_p, "w"), ensure_ascii=False)
+        except Exception as e_: print("::warning title=Calendario::rete di sicurezza saltata: " + str(e_))
         api_lg = {r[0] for r in cal[1:]}
         buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(cal); save("api_fixtures.csv", buf.getvalue())
         if "api_fixtures.csv" not in files: files.append("api_fixtures.csv")

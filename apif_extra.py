@@ -176,7 +176,9 @@ def add_results(rd, lg, api_rows, mp, today, tz):
         h, a = mp.get(v[2]), mp.get(v[3])
         if not h or not a: continue
         loc = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(tz); d = loc.date()
-        if d <= last or d > today or any(abs((x - d).days) <= 3 for x in pairs.get((h, a), [])): continue
+        # prima: solo dopo l'ultima data del file (d <= last → scartata). Se il file aveva già partite di quel giorno o dopo, una
+        # partita finita non entrava più né nel calendario né nei risultati e spariva dall'app. Ora basta che la sfida non ci sia (±3 giorni).
+        if d < last - datetime.timedelta(days=21) or d > today or any(abs((x - d).days) <= 3 for x in pairs.get((h, a), [])): continue
         r = [""] * len(hdr)
         r[iD] = d.strftime("%d/%m/%Y"); r[iH], r[iA], r[iG1], r[iG2] = h, a, str(v[4]), str(v[5])
         if "Time" in ix: r[ix["Time"]] = loc.strftime("%H:%M")
