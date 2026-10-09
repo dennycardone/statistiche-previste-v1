@@ -946,9 +946,12 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <div class="view" id="viewSig" hidden>
     <section class="card" aria-label="Filtri segnali">
       <h2>Segnali</h2>
-      <p class="small muted" style="margin:0">Partite della prossima giornata con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
+      <p class="small muted" style="margin:0">Partite di oggi e domani (o della prossima giornata), dalla probabilità più alta, con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
       <div class="sigf">
         <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
+        <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano">
+          <button class="chip" data-sw="01" aria-pressed="true">Oggi e domani</button><button class="chip" data-sw="0" aria-pressed="false">Oggi</button><button class="chip" data-sw="1" aria-pressed="false">Domani</button><button class="chip" data-sw="round" aria-pressed="false">Giornata</button>
+        </div>
         <div class="row" id="sigStats" role="group" aria-label="Mercati">
           <button class="chip sstat" data-k="g15" aria-pressed="true">Over 1,5</button>
           <button class="chip sstat" data-k="g25" aria-pressed="true">Over 2,5</button>
@@ -3016,6 +3019,14 @@ function fillTeams(keep) {
 }
 
 /* Prossima giornata del campionato scelto: partite in calendario non ancora giocate */
+/* Segnali: partite di oggi e/o domani (stesse regole di nextRound: squadre note, sfida non ancora giocata) */
+const SIGW = { when: "01" };
+function sigPickDays(code) {
+  const t0 = localIso(), want = new Set([...SIGW.when].map(c => addDays(t0, +c)));
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const t = new Set(teams()), played = seasonMatches().map(m => [m.home + "|" + m.away, +m.date]);
+  return S.fixtures.filter(f => f.div === code && f.date >= today && want.has(isoD(f.date)) && t.has(f.home) && t.has(f.away) && !played.some(([k, d]) => k === f.home + "|" + f.away && Math.abs(d - f.date) <= 4 * DAYMS));
+}
 function nextRound() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const t = new Set(teams());
@@ -3546,12 +3557,14 @@ function renderSignals() {
 function renderSignalsNow() {
   const box = $("#sigOut");
   const cfg = MODES[$("#sigMode").value] || MODES.dyn, st = sigSettings();
-  let { rows, skipped, noCal } = computeSignals3({ lgSel: $("#sigLeague").value, markets: st.markets, cfg, minP: st.minP, needGames: st.needGames, noStale: true, mdl: sigMdl });
+  const byDay = SIGW.when !== "round";
+  let { rows, skipped, noCal } = computeSignals3({ lgSel: $("#sigLeague").value, markets: st.markets, cfg, minP: st.minP, needGames: st.needGames, noStale: true, mdl: sigMdl, pick: byDay ? sigPickDays : undefined });
+  if (byDay) noCal = [];   // oggi/domani: è normale che molti campionati non giochino
   rows = rows.filter(x => !(MK_STAT[x.k] && statMissing(x.id.split("|")[0], MK_STAT[x.k])));
   if ($("#sigC3").checked) rows = rows.filter(x => x.c3);
   box.innerHTML = `<h2>${rows.length} segnal${rows.length === 1 ? "e" : "i"}</h2>
     <p class="small muted" style="margin:0">Gol: Over a linea fissa e Gol/No gol. Corner, falli, tiri e tiri in porta: <b>1</b> se la squadra di casa ne fa di più, <b>2</b> se ne fa di più l'ospite (il pari fa perdere). Cartellini (gialli + rossi): la linea più alta con l'Over sopra la soglia, altrimenti la più bassa con l'Under; modello squadre + arbitro, uguale per i due metodi. Base: ${cfg.label}.</p>
-    ${rows.length ? sigCardsHTML(rows, "q") : `<p class="muted" style="margin:0">Nessuna partita supera la soglia con questi filtri. Prova ad abbassare la probabilità minima.</p>`}
+    ${rows.length ? sigCardsHTML(rows, "q") : `<p class="muted" style="margin:0">Nessuna partita ${SIGW.when === "01" ? "di oggi e domani " : SIGW.when === "0" ? "di oggi " : SIGW.when === "1" ? "di domani " : ""}supera la soglia con questi filtri. Prova ad abbassare la probabilità minima${byDay ? " o a scegliere Giornata" : ""}.</p>`}
     ${skipped.length ? `<p class="small muted" style="margin:0">Esclusi per dati vecchi: ${skipped.map(esc).join(", ")}.</p>` : ""}
     ${noCal.length ? `<p class="small muted" style="margin:0">Senza calendario della prossima giornata: ${noCal.map(esc).join(", ")}.</p>` : ""}`;
   bindSigCards(box, rows, "q");
@@ -4209,8 +4222,10 @@ function renderGen() {
   const next = genNextEntries();
   let rows = genRows(mkKey, lgSel, GEN.venue, GEN.per);
   if (soon) rows = rows.filter(r => { const nx = next.get(r.lg.code + "|" + r.t); return nx && nx.day === +when; });
+  // In casa / In trasferta: solo le squadre la cui prossima partita è in quella sede
+  if (GEN.venue !== "tot") rows = rows.filter(r => { const nx = next.get(r.lg.code + "|" + r.t); return nx && nx.side === (GEN.venue === "home" ? "h" : "a"); });
   const shown = rows.slice(0, GEN.shown), max = Math.max(...shown.map(r => r.val), 1e-9);
-  if (!rows.length) { box.innerHTML = soon ? `<div class="empty">Nessuna di queste squadre gioca ${when === "0" ? "oggi" : "domani"}.</div>` : `<div class="empty">Nessuna squadra con almeno 5 partite con questi filtri${D.k !== "g" ? ".<br><span class='small'>Corner, falli e tiri non ci sono per i campionati con solo risultati.</span>" : "."}</div>`; return; }
+  if (!rows.length) { box.innerHTML = GEN.venue !== "tot" && !soon ? `<div class="empty">Nessuna di queste squadre gioca la prossima partita ${GEN.venue === "home" ? "in casa" : "in trasferta"} nei prossimi 14 giorni.</div>` : soon ? `<div class="empty">Nessuna di queste squadre gioca ${when === "0" ? "oggi" : "domani"}.</div>` : `<div class="empty">Nessuna squadra con almeno 5 partite con questi filtri${D.k !== "g" ? ".<br><span class='small'>Corner, falli e tiri non ci sono per i campionati con solo risultati.</span>" : "."}</div>`; return; }
   const fmtV = v => D.avg ? f1(v) : pc(v);
   const todo = [];
   const item = (r, i) => {
@@ -4428,6 +4443,7 @@ function renderRit() {
 $("#ritLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAGUES.slice().sort((a, b) => ((a.country === "Italia" ? 0 : 1) - (b.country === "Italia" ? 0 : 1)) || a.country.localeCompare(b.country, "it") || LEAGUES.indexOf(a) - LEAGUES.indexOf(b)).map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#ritLg", "#ritTeam", "#ritGr"].forEach(id => $(id).addEventListener("change", renderRit));
 document.querySelectorAll(".rtf [data-rw]").forEach(b => b.addEventListener("click", () => { RIT.when = b.dataset.rw; document.querySelectorAll(".rtf [data-rw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
+document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.addEventListener("click", () => { SIGW.when = b.dataset.sw; document.querySelectorAll("#sigWhen [data-sw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderSignals(); }));
 $("#ritDot").addEventListener("click", () => { RIT.dot = !RIT.dot; $("#ritDot").setAttribute("aria-pressed", String(RIT.dot)); renderRit(); });
 $("#ritGrd").addEventListener("click", () => { RIT.grd = !RIT.grd; $("#ritGrd").setAttribute("aria-pressed", String(RIT.grd)); renderRit(); });
 document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
