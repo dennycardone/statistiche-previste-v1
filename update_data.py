@@ -769,6 +769,30 @@ try:
             except Exception as e:
                 print("risultati API", fn, e)
         print("risultati da API-Football:", n_res, "partite aggiunte")
+        # controllo: ogni partita finita negli ultimi 14 giorni (API-Football) deve essere nei nostri risultati; altrimenti avviso
+        try:
+            _pl = collections.defaultdict(list)
+            for fn in files:
+                if "fixtures" in fn or not fn.endswith(".csv"): continue
+                lgf = fn.split("_")[0].split(".")[0]
+                for r in csv.DictReader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8-sig").read())):
+                    h, a = (r.get("HomeTeam") or r.get("Home") or "").strip(), (r.get("AwayTeam") or r.get("Away") or "").strip()
+                    g1 = (r.get("FTHG") or r.get("HG") or "").strip()
+                    try: dd = r["Date"].strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; d = datetime.date(int(y), int(dd[1]), int(dd[0]))
+                    except Exception: continue
+                    if g1.isdigit(): _pl[(lgf, h, a)].append(d)
+            _miss = []
+            for lg, L in by_lg.items():
+                for v in L:
+                    if v[9] not in ("FT", "AET", "PEN"): continue
+                    d = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(ROME).date()
+                    if not (_now.date() - datetime.timedelta(days=14) <= d <= _now.date()): continue
+                    h, a = MAPS[lg].get(v[2]), MAPS[lg].get(v[3])
+                    if not h or not a: _miss.append(f"{lg} {d:%d/%m} {v[2]}-{v[3]} (nomi non abbinati)"); continue
+                    if not any(abs((x - d).days) <= 3 for x in _pl.get((lg, h, a), [])): _miss.append(f"{lg} {d:%d/%m} {h}-{a}")
+            QUAL["giocate_mancanti"] = _miss
+            print("::" + ("warning" if _miss else "notice") + " title=Partite giocate mancanti::" + (str(len(_miss)) + ": " + "; ".join(_miss[:25]) if _miss else "nessuna"))
+        except Exception as e_: print("::warning title=Partite giocate mancanti::controllo saltato: " + str(e_))
         # calendario: prossime 3 settimane da API-Football (data e ora italiane); squadre non riconosciute → partita scartata
         LIVE_ST = ("1H", "HT", "2H", "ET", "BT", "P", "LIVE", "INT", "SUSP")   # in corso o sospese
         cal, unk = [["Div", "Date", "Time", "HomeTeam", "AwayTeam", "Round"]], set()
