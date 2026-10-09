@@ -3179,8 +3179,8 @@ function quotaValue(p, draw, q, dnb) {
 const isoD = d => d.toISOString().slice(0, 10);
 const localIso = (n = new Date()) => `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
 const addDays = (iso, k) => { const d = new Date(iso + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + k); return isoD(d); };
-function allEntries(t0 = localIso()) {
-  const out = [], lo = addDays(t0, -10), hi = addDays(t0, 14);
+function allEntries(t0 = localIso(), back = 10) {   // back: giorni passati (la lista Partite ne mostra 30)
+  const out = [], lo = addDays(t0, -back), hi = addDays(t0, 14);
   const c0 = S.cutoff; S.cutoff = null;
   try {
     for (const L of LEAGUES) withLeague(L.code, () => {
@@ -3658,7 +3658,8 @@ function markBkRows(box, rows, cfg) {
 }
 function renderSched() {
   const box = $("#sched"); if (!box) return;
-  const all = allEntries(), t0 = localIso();
+  // 30 giorni indietro: con 10 le partite giocate prima di una pausa (es. nazionali) sparivano dalla lista
+  const all = allEntries(localIso(), 30), t0 = localIso();
   const dayset = new Set(all.map(e => e.d)); dayset.add(t0);
   const days = [...dayset].sort();
   if (!SCHED.day || !dayset.has(SCHED.day)) SCHED.day = t0;   // si parte sempre da oggi, anche senza partite
@@ -3743,7 +3744,7 @@ function openEntry(e) {
   scrollTo({ top: 0, behavior: "auto" });
 }
 function openMatch(lg, h, a, d) {
-  const e = allEntries().find(x => x.lg.code === lg && x.home === h && x.away === a && (!d || x.d === d)) || allEntries().find(x => x.lg.code === lg && x.home === h && x.away === a);
+  const AE = allEntries(localIso(), 30), e = AE.find(x => x.lg.code === lg && x.home === h && x.away === a && (!d || x.d === d)) || AE.find(x => x.lg.code === lg && x.home === h && x.away === a);
   if (e) return openEntry(e);
   const dt = d ? new Date(d + "T00:00:00Z") : new Date();
   openEntry({ id: `${lg}|${d}|${h}|${a}`, lg: LG[lg], date: dt, d: isoD(dt), time: "", home: h, away: a, m: null });
