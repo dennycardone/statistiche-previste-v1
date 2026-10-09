@@ -16,9 +16,10 @@ def get(p, **q):
         except Exception as e:
             print("retry", e); time.sleep(5)
     return {"errors": ["rete"]}
-rq = get("status").get("response", {}).get("requests", {})
-budget = int(rq.get("limit_day", 100)) - int(rq.get("current", 0)) - 2500
+_sr = get("status").get("response"); rq = (_sr.get("requests") or {}) if isinstance(_sr, dict) else {}   # richieste finite: "response" è una lista
+budget = int(rq.get("limit_day", 100)) - int(rq.get("current", 0)) - 2500 if rq else 0
 print("richieste oggi", rq, "disponibili", budget)
+print(f"::notice title=Tempi::richieste {rq.get('current')} su {rq.get('limit_day')}, disponibili per i tempi {budget}" if rq else "::notice title=Tempi::stato API non disponibile (richieste del giorno finite): nessun download stasera")
 os.makedirs("tempi", exist_ok=True)
 AP = json.load(open("data/apif.json"))["partite"]
 todo = sorted(((v[0], fid, v[1], v[2], v[3]) for fid, v in AP.items() if v[9] in ("FT", "AET", "PEN") and v[0] >= "2024-07-01" and v[1] not in NOSTATS), reverse=True)

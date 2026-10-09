@@ -654,6 +654,7 @@ try:
     except Exception: _due = True
     if _key and (_due or os.environ.get("APIF_FORCE")):
         _sr = _af("status").get("response"); st_ = (_sr.get("requests") or {}) if isinstance(_sr, dict) else {}   # richieste finite: "response" è una lista vuota
+        print("::notice title=API-Football richieste::" + (f"{st_.get('current')} su {st_.get('limit_day')} oggi" if st_ else "stato non disponibile (richieste finite?)"))
         if int(st_.get("limit_day", 100)) > 100:   # serve il piano a pagamento
             cur_season = {}
             for x in _af("leagues", current="true").get("response", []):
