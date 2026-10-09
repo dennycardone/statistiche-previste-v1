@@ -946,7 +946,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <div class="view" id="viewSig" hidden>
     <section class="card" aria-label="Filtri segnali">
       <h2>Segnali</h2>
-      <p class="small muted" style="margin:0">Dalla probabilità più alta fino al 70%, solo squadre con almeno 3 partite in casa/trasferta. Partite con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
+      <p class="small muted" style="margin:0">Dalla probabilità più alta, con una soglia per mercato (Over 1,5 80%, Over 2,5 60%, Over 3,5 40%, Gol 60%, No gol 65%, corner e falli 70%, tiri e tiri in porta 80%, cartellini secondo la linea), solo squadre con almeno 3 partite in casa/trasferta. Partite con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
       <div class="sigf">
         <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
         <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano">
@@ -3021,6 +3021,10 @@ function fillTeams(keep) {
 /* Segnali: partite di oggi e/o domani (stesse regole di nextRound: squadre note, sfida non ancora giocata) */
 const SIGW = { days: new Set(["0", "1"]) };   // Oggi, Domani, Giornata ("r"): si possono scegliere insieme
 const SIG_MINP = 0.70;
+/* soglie per mercato della pagina Segnali (walk-forward feb–ott 2026, 8.725 partite): la più bassa con almeno ~70% di presi
+   e qualche segnale a settimana. Over 3,5 e Over/Under cartellini estremi: il modello quasi non ci arriva, soglie più basse/alte */
+const SIG_TH = { g15: 0.80, g25: 0.60, g35: 0.40, gol: 0.60, ng: 0.65, c: 0.70, f: 0.70, s: 0.80, st: 0.80,
+  "kO2.5": 0.90, "kO3.5": 0.75, "kO4.5": 0.70, "kO5.5": 2, "kU2.5": 2, "kU3.5": 0.70, "kU4.5": 0.80, "kU5.5": 0.90 };
 function sigPickDays(code) {
   const t0 = localIso(), want = new Set([...SIGW.days].filter(c => c !== "r").map(c => addDays(t0, +c)));
   const rnd = SIGW.days.has("r") ? nextRound() : [];
@@ -3102,6 +3106,7 @@ const sigId = (div, f, mk) => `${div}|${seasonOf(f.date)}|${f.home}|${f.away}|${
 function computeSignals(o) {
   const rows = [], skipped = [], noCal = [], now = o.now || Date.now(), pick = o.pick || nextRound, mks = o.markets;
   const wantGoals = mks.some(k => k in GOAL_LINE || k === "gg");
+  const th = k => o.th && o.th[k] != null ? o.th[k] : o.minP;   // soglia per mercato (Segnali) o unica
   for (const L of LEAGUES) {
     if (o.lgSel && o.lgSel !== "all" && o.lgSel !== L.code) continue;
     withLeague(L.code, () => {
@@ -3130,24 +3135,24 @@ function computeSignals(o) {
         for (const mk of mks) {
           if (mk in GOAL_LINE) {
             if (!G) continue; const p = G.over[THG.indexOf(GOAL_LINE[mk])];
-            if (p >= o.minP) push(mk, "g", G, { line: GOAL_LINE[mk], fav: "Over " + th1(GOAL_LINE[mk]), p });
+            if (p >= th(mk)) push(mk, "g", G, { line: GOAL_LINE[mk], fav: "Over " + th1(GOAL_LINE[mk]), p });
           } else if (mk === "k") {
             // cartellini: la linea più alta con Over sopra la soglia, altrimenti la più bassa con Under sopra la soglia
             const x = EXTRA && EXTRA.partite && EXTRA.partite[`${L.code}|${isoD(f.date)}|${f.home}|${f.away}`], mu = x && x[4];
             if (!mu) continue;
             const P = cardProbs(mu); let pick = null;
-            for (let i = CARD_LINES.length - 1; i >= 0; i--) if (P[i] >= o.minP) { pick = { line: CARD_LINES[i], fav: "Over " + th1(CARD_LINES[i]), p: P[i] }; break; }
-            if (!pick) for (let i = 0; i < CARD_LINES.length; i++) if (1 - P[i] >= o.minP) { pick = { line: CARD_LINES[i], fav: "Under " + th1(CARD_LINES[i]), p: 1 - P[i], under: true }; break; }
+            for (let i = CARD_LINES.length - 1; i >= 0; i--) if (P[i] >= th("kO" + CARD_LINES[i])) { pick = { line: CARD_LINES[i], fav: "Over " + th1(CARD_LINES[i]), p: P[i] }; break; }
+            if (!pick) for (let i = 0; i < CARD_LINES.length; i++) if (1 - P[i] >= th("kU" + CARD_LINES[i])) { pick = { line: CARD_LINES[i], fav: "Under " + th1(CARD_LINES[i]), p: 1 - P[i], under: true }; break; }
             if (pick) rows.push({ id: sigId(L.code, f, mk), lg: L, f, mk, k: "k", g3: true, lh: mu / 2, la: mu / 2, tot: mu, draw: 0, ...pick });
           } else if (mk === "gg") {
             if (!G) continue;
-            if (G.btts >= o.minP) push(mk, "g", G, { sel: "Gol", fav: "Gol", p: G.btts });
-            else if (1 - G.btts >= o.minP) push(mk, "g", G, { sel: "No gol", fav: "No gol", p: 1 - G.btts });
+            if (G.btts >= th("gol")) push(mk, "g", G, { sel: "Gol", fav: "Gol", p: G.btts });
+            else if (1 - G.btts >= th("ng")) push(mk, "g", G, { sel: "No gol", fav: "No gol", p: 1 - G.btts });
           } else {
             // corner, falli, tiri, tiri in porta: 1 = la squadra di casa ne fa di più, 2 = l'ospite (il pari fa perdere)
             const R = res[mk]; if (!R || !isFinite(R.lh) || !isFinite(R.la)) continue;
             const P = R.P || headToHeadProb(R.lh, R.la, R.r, R.rTeam), one = P.home >= P.away, p = one ? P.home : P.away;
-            if (p >= o.minP) push(mk, mk, R, { sel: one ? "1" : "2", fav: one ? "1" : "2", team: one ? f.home : f.away, p, draw: P.draw, p1: P.home, px: P.draw, p2: P.away });
+            if (p >= th(mk)) push(mk, mk, R, { sel: one ? "1" : "2", fav: one ? "1" : "2", team: one ? f.home : f.away, p, draw: P.draw, p1: P.home, px: P.draw, p2: P.away });
           }
         }
       }
@@ -3558,13 +3563,13 @@ function renderSignalsNow() {
   const box = $("#sigOut");
   const cfg = MODES[$("#sigMode").value] || MODES.dyn, st = sigSettings();
   const byDay = !SIGW.days.has("r");
-  let { rows, skipped, noCal } = computeSignals3({ lgSel: $("#sigLeague").value, markets: st.markets, cfg, minP: SIG_MINP, needGames: true, noStale: true, mdl: sigMdl, pick: sigPickDays });
+  let { rows, skipped, noCal } = computeSignals3({ lgSel: $("#sigLeague").value, markets: st.markets, cfg, minP: SIG_MINP, th: SIG_TH, needGames: true, noStale: true, mdl: sigMdl, pick: sigPickDays });
   if (byDay) noCal = [];   // oggi/domani: è normale che molti campionati non giochino
   rows = rows.filter(x => !(MK_STAT[x.k] && statMissing(x.id.split("|")[0], MK_STAT[x.k])));
   if ($("#sigC3").checked) rows = rows.filter(x => x.c3);
   box.innerHTML = `<h2>${rows.length} segnal${rows.length === 1 ? "e" : "i"}</h2>
     <p class="small muted" style="margin:0">Gol: Over a linea fissa e Gol/No gol. Corner, falli, tiri e tiri in porta: <b>1</b> se la squadra di casa ne fa di più, <b>2</b> se ne fa di più l'ospite (il pari fa perdere). Cartellini (gialli + rossi): la linea più alta con l'Over sopra la soglia, altrimenti la più bassa con l'Under; modello squadre + arbitro, uguale per i due metodi. Base: ${cfg.label}.</p>
-    ${rows.length ? sigCardsHTML(rows, "q") : `<p class="muted" style="margin:0">${SIGW.days.size ? `Nessuna partita supera il 70% con questi filtri.${byDay ? " Prova ad aggiungere Giornata." : ""}` : "Scegli Oggi, Domani o Giornata."}</p>`}
+    ${rows.length ? sigCardsHTML(rows, "q") : `<p class="muted" style="margin:0">${SIGW.days.size ? `Nessuna partita supera le soglie con questi filtri.${byDay ? " Prova ad aggiungere Giornata." : ""}` : "Scegli Oggi, Domani o Giornata."}</p>`}
     ${skipped.length ? `<p class="small muted" style="margin:0">Esclusi per dati vecchi: ${skipped.map(esc).join(", ")}.</p>` : ""}
     ${noCal.length ? `<p class="small muted" style="margin:0">Senza calendario della prossima giornata: ${noCal.map(esc).join(", ")}.</p>` : ""}`;
   bindSigCards(box, rows, "q");
