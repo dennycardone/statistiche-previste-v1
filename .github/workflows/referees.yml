@@ -1,8 +1,6 @@
 name: Arbitri API-Football
 on:
   workflow_dispatch: {}
-  schedule:
-    - cron: "40 7 * * *"   # una volta al giorno finché non sono tutti scaricati (poi non fa più richieste)
 permissions:
   contents: write
 jobs:

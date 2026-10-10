@@ -1,8 +1,6 @@
 name: Storico API-Football
 on:
   workflow_dispatch: {}
-  schedule:
-    - cron: "10 8 * * *"   # riprende ogni giorno finché lo storico non è completo
 permissions:
   contents: write
 jobs:

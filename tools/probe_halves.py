@@ -2,6 +2,11 @@
 su partite di stagioni e campionati diversi; confronto con fixtures?ids=. Risultato in probe/apifootball.json."""
 import json, os, urllib.request, urllib.parse, time
 KEY = os.environ["APIFOOTBALL_KEY"].strip()
+# riserva dell'app: la prova parte solo con le richieste che avanzano (tools/af_budget.py), altrimenti si rinvia
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); import af_budget as _ab, urllib.request as _u, json as _j
+_rq = _ab.requests_of(_j.loads(_u.urlopen(_u.Request("https://v3.football.api-sports.io/status", headers={"x-apisports-key": KEY}), timeout=30).read().decode()))
+if _ab.test_budget(_rq) < 50: print("::notice title=Prova rinviata::richieste riservate all'app (" + str(_rq.get("current")) + " su " + str(_rq.get("limit_day")) + ")"); _s.exit(0)
+
 def get(p, **q):
     req = urllib.request.Request("https://v3.football.api-sports.io/" + p + "?" + urllib.parse.urlencode(q), headers={"x-apisports-key": KEY})
     with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())

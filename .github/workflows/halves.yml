@@ -2,7 +2,7 @@ name: Statistiche per tempo API-Football
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "40 22 * * *"   # ogni sera usa le richieste avanzate del giorno, finché lo storico non è completo
+    - cron: "25 23 * * *"   # dopo l'ultimo giro dell'app (23:17 UTC): richieste avanzate dopo la riserva (tools/af_budget.py)
 permissions:
   contents: write
 jobs:

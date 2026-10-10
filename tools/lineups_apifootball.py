@@ -20,8 +20,9 @@ def get(p, **q):
         except Exception as e:
             print("retry", p, e); time.sleep(5)
     return {"errors": ["rete"]}
-rq = get("status").get("response", {}).get("requests", {})
-budget = int(rq.get("limit_day", 100)) - int(rq.get("current", 0)) - 1500
+import sys; sys.path.insert(0, os.path.dirname(__file__)); import af_budget
+rq = af_budget.requests_of(get("status"))
+budget = af_budget.test_budget(rq)   # solo le richieste che avanzano dopo la riserva dell'app
 print("richieste oggi", rq, "disponibili per lo scarico", budget)
 # elenco partite per campionato e stagione
 todo_sets = {}

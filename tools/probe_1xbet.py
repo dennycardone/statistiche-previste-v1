@@ -6,6 +6,9 @@ def note(s): print("::notice title=" + os.environ.get("BOOK", "1xBet") + "::" + 
 try:
     KEY = os.environ.get("APIFOOTBALL_KEY", "").strip()
     note("chiave presente: " + str(bool(KEY)))
+    import sys as _s; _s.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import af_budget as _ab, json as _j
+    _rq = _ab.requests_of(_j.loads(urllib.request.urlopen(urllib.request.Request("https://v3.football.api-sports.io/status", headers={"x-apisports-key": KEY}), timeout=30).read().decode()))
+    if _ab.test_budget(_rq) < 50: note("prova rinviata: richieste riservate all'app"); _s.exit(0)   # riserva dell'app (tools/af_budget.py)
     def get(p, **q):
         req = urllib.request.Request("https://v3.football.api-sports.io/" + p + ("?" + urllib.parse.urlencode(q) if q else ""), headers={"x-apisports-key": KEY})
         with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())

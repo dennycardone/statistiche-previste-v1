@@ -667,7 +667,7 @@ try:
                 for f in _af("fixtures", league=lid, season=sy).get("response", []):
                     fid = str(f["fixture"]["id"]); stt = f["fixture"]["status"]["short"]; old = AP["partite"].get(fid)
                     base = [f["fixture"]["date"][:16], lg, f["teams"]["home"]["name"], f["teams"]["away"]["name"], f["goals"]["home"], f["goals"]["away"],
-                            f["fixture"].get("referee"), old[7] if old else [None] * 7, old[8] if old else [None] * 7, stt]
+                            f["fixture"].get("referee") or (old[6] if old else None), old[7] if old else [None] * 7, old[8] if old else [None] * 7, stt]
                     AP["partite"][fid] = base
                     for side_ in ("home", "away"):   # loghi delle squadre (immagini gratuite di API-Football, non consumano richieste)
                         if f["teams"][side_].get("logo"): AP.setdefault("loghi", {}).setdefault(lg, {})[f["teams"][side_]["name"]] = f["teams"][side_]["logo"]
@@ -911,6 +911,17 @@ try:
         print("range per squadra:", len(TR), "partite")
     except Exception as e_:
         import traceback; traceback.print_exc(); print("range per squadra non disponibili:", e_)
+    # 10/10/2026: date delle partite rilette dai file definitivi (risultati aggiunti e date allineate a API-Football in questo giro):
+    # prima una partita appena finita perdeva arbitro e cartellini perché la sua riga nuova non era tra le date note
+    for fn in files:
+        if not fn.endswith(".csv"): continue
+        try:
+            for r in csv.DictReader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8-sig").read())):
+                lgf = (r.get("Div") or "").strip() or fn.split("_")[0].split(".")[0]
+                h, a = (r.get("HomeTeam") or r.get("Home") or "").strip(), (r.get("AwayTeam") or r.get("Away") or "").strip()
+                try: dd = r["Date"].strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; pairs[(lgf, h, a)].append(datetime.date(int(y), int(dd[1]), int(dd[0])))
+                except Exception: pass
+        except Exception: pass
     for lg, L in by_lg.items():
         mp = MAPS[lg]
         rows = []
@@ -1028,7 +1039,8 @@ if ODDS_FULL or ODDS_NEAR:
                     try: o = float(v["odd"])
                     except Exception: continue
                     nm, val = bet["name"], str(v["value"])
-                    if nm in XBETS: xacc.setdefault(XBETS[nm] + ":" + val, {})[b["name"]] = o   # mercati secondari: solo archivio
+                    if nm in XBETS: xacc.setdefault(XBETS[nm] + ":" + val, {})[b["name"]] = o   # mercati secondari: solo archivio (mediana, per le analisi)
+                    if nm in XBETS and b["name"] == "1xBet": xacc.setdefault("x." + XBETS[nm] + ":" + val, {})[b["name"]] = o   # 1xBet: linee dell'app
                     # 1X2 e doppia chance dei mercati di nicchia: quote di 1xBet (il book usato da Denny) e Pinnacle (riferimento), solo archivio
                     if nm in NICHE and b["name"] in BOOK_TAG:
                         xacc.setdefault(BOOK_TAG[b["name"]] + NICHE[nm] + ":" + val, {})[b["name"]] = o
@@ -1038,6 +1050,7 @@ if ODDS_FULL or ODDS_NEAR:
                     elif nm == "Corners 1x2": key = "c1x2:" + {"Home": "1", "Draw": "X", "Away": "2", "1": "1", "X": "X", "2": "2"}.get(val, "")
                     else: continue
                     if key.endswith(":"): continue
+                    if b["name"] != "1xBet": continue   # 10/10/2026: quote dell'app solo da 1xBet (riferimento unico)
                     acc.setdefault(key, {})[b["name"]] = o
         q = {kk: [med(list(v.values())), len(v)] for kk, v in acc.items()}
         q = {kk: v for kk, v in q.items() if v[0]}
@@ -1090,7 +1103,7 @@ if ODDS_FULL or ODDS_NEAR:
     if ODDS_NEAR:   # giro leggero: aggiorno solo le partite vicine, senza toccare l'ora dell'aggiornamento completo
         if res: OD.setdefault("partite", {}).update(res); json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
     elif res:   # senza quote (errore o richieste del giorno finite): il file precedente resta, si riprova al giro dopo
-        OD = {"giorno": rome_now.strftime("%Y-%m-%d"), "aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "API-Football (quota mediana tra i bookmaker)",
+        OD = {"giorno": rome_now.strftime("%Y-%m-%d"), "aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football)",
               "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "pro": bool(locals().get("paid")), "partite": res}
         json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
     # Archivio per verificare in futuro i mercati (corner, cartellini, tiri in porta…): per ogni partita la prima quota vista e l'ultima
@@ -1120,6 +1133,7 @@ try:
     except NameError: OH = json.load(open(os.path.join(OUT, "odds_hist.json")))
     LMK = {"g": "gou", "hg": "hgou", "ag": "agou", "c": "cou", "hc": "hcou", "ac": "acou", "k": "kou", "hk": "hk", "ak": "ak", "st": "sot", "hst": "hsot", "ast": "asot",
            "s": "sou", "f": "fou", "hf": "hfou", "af": "afou"}
+    LMK = {k: "x." + v for k, v in LMK.items()}   # 10/10/2026: linee solo di 1xBet
     LN = {}
     for kk, x in OH.items():
         q = x.get("ultima", {}).get("q", {}); ent = {}
@@ -1134,7 +1148,7 @@ try:
             if short == "g":   # gol totali: anche le linee 1,5 · 2,5 · 3,5 delle quote principali
                 for ln in (1.5, 2.5, 3.5):
                     for sd in ("O", "U"):
-                        v = q.get(f"ou{ln}:{sd}")
+                        v = q.get(f"x.gou:{'Over' if sd == 'O' else 'Under'} {ln}")
                         if v and sd not in lines.get(ln, {}): lines.setdefault(ln, {})[sd] = v
             best = None
             for ln, o in lines.items():
@@ -1144,7 +1158,7 @@ try:
                         best = (d, ln, o["O"][0], o["U"][0], min(o["O"][1], o["U"][1]))
             if best: ent[short] = [best[1], best[2], best[3], best[4]]
         if ent: ent["t"] = x["ultima"].get("ora", ""); LN[kk] = ent
-    json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "API-Football: quota mediana tra i bookmaker, ultima vista prima del calcio d'inizio", "partite": LN},
+    json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football): ultima quota vista prima del calcio d'inizio", "partite": LN},
               open(os.path.join(OUT, "linee.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("linee bookmaker:", len(LN), "partite")
 except Exception as e:

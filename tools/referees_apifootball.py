@@ -12,8 +12,8 @@ except Exception: R = {}
 def get(p, **q):
     req = urllib.request.Request("https://v3.football.api-sports.io/" + p + ("?" + urllib.parse.urlencode(q) if q else ""), headers={"x-apisports-key": KEY})
     with urllib.request.urlopen(req, timeout=60) as r: return json.loads(r.read().decode())
-st = get("status").get("response", {}).get("requests", {})
-budget = int(st.get("limit_day", 100)) - int(st.get("current", 0)) - 20
+import sys; sys.path.insert(0, os.path.dirname(__file__)); import af_budget
+budget = af_budget.test_budget(af_budget.requests_of(get("status")))   # solo le richieste che avanzano dopo la riserva dell'app
 print("richieste disponibili", budget)
 for s in SEASONS:
     for lg, lid in LEAGUES:

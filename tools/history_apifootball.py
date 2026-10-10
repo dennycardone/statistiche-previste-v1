@@ -24,9 +24,9 @@ def get(p, **q):
         except Exception as e:
             print("retry", p, e); time.sleep(5)
     return {"errors": ["rete"]}
-st = get("status").get("response", {})
-print("piano", st.get("subscription"), "richieste", st.get("requests"))
-rq = st.get("requests", {}); budget = int(rq.get("limit_day", 100)) - int(rq.get("current", 0)) - 500
+import sys; sys.path.insert(0, os.path.dirname(__file__)); import af_budget
+rq = af_budget.requests_of(get("status")); budget = af_budget.test_budget(rq)   # solo le richieste che avanzano dopo la riserva dell'app
+print("richieste", rq, "disponibili", budget)
 def stat(t, k):
     for s in t.get("statistics", []):
         if s["type"] == k:
