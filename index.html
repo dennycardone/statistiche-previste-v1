@@ -8,6 +8,9 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-title" content="Prevista">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="application-name" content="Prevista">
 <meta name="theme-color" content="#0a0f1c">
 <meta property="og:type" content="website">
@@ -855,11 +858,11 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </label>
   </div>
   <nav class="tabbar" aria-label="Sezioni">
-  <button id="navSel" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-radar"/></svg>Radar</button>
-  <button id="navSig" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-segnali"/></svg>Segnali</button>
-  <button id="navStats" class="navmain" aria-pressed="true"><span class="nmc"><svg class="ic" aria-hidden="true"><use href="#i-partite"/></svg></span>Partite</button>
-  <button id="navGen" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-tendenze"/></svg>Tendenze</button>
-  <button id="navRit" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-ritardi"/></svg>Digiuni</button>
+  <button type="button" id="navSel" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-radar"/></svg>Radar</button>
+  <button type="button" id="navSig" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-segnali"/></svg>Segnali</button>
+  <button type="button" id="navStats" class="navmain" aria-pressed="true"><span class="nmc"><svg class="ic" aria-hidden="true"><use href="#i-partite"/></svg></span>Partite</button>
+  <button type="button" id="navGen" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-tendenze"/></svg>Tendenze</button>
+  <button type="button" id="navRit" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-ritardi"/></svg>Digiuni</button>
 </nav>
 </header>
 <div class="wrap">
@@ -869,17 +872,17 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <div class="view" id="viewSel" hidden>
     <label class="fl selwin" for="selWin">Periodo<select id="selWin"><option value="24" selected>Prossime 24 ore</option><option value="48">Prossime 48 ore</option><option value="72">Prossime 72 ore</option></select></label>
     <div class="seg rtabs" role="tablist" aria-label="Sezioni del Radar" id="selTabs">
-      <button class="segb" data-rt="aplus" aria-pressed="true"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnali A+ <b id="rtA"></b></button>
-      <button class="segb" data-rt="bk" aria-pressed="false"><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato <b id="rtB"></b></button>
-      <button class="segb" data-rt="all" aria-pressed="false"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>In arrivo <b id="rtC"></b></button>
+      <button type="button" class="segb" data-rt="aplus" aria-pressed="true"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnali A+ <b id="rtA"></b></button>
+      <button type="button" class="segb" data-rt="bk" aria-pressed="false"><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato <b id="rtB"></b></button>
+      <button type="button" class="segb" data-rt="all" aria-pressed="false"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>In arrivo <b id="rtC"></b></button>
     </div>
     <section class="card aplus" id="selAplus" aria-label="A+ sul radar"></section>
     <section class="card" id="selBk" aria-label="Linea bookmakers" hidden></section>
     <section class="card" id="selAll" aria-label="Partite in arrivo">
       <div class="selhead"><h2><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Partite in arrivo</h2></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
-        <button class="chip" data-sf="all" aria-pressed="true">Tutte</button><button class="chip" data-sf="aplus" aria-pressed="false">A+</button>
-        <button class="chip" data-sf="a" aria-pressed="false">A</button><button class="chip" data-sf="b" aria-pressed="false">B</button><button class="chip" data-sf="c" aria-pressed="false">C</button>
+        <button type="button" class="chip" data-sf="all" aria-pressed="true">Tutte</button><button type="button" class="chip" data-sf="aplus" aria-pressed="false">A+</button>
+        <button type="button" class="chip" data-sf="a" aria-pressed="false">A</button><button type="button" class="chip" data-sf="b" aria-pressed="false">B</button><button type="button" class="chip" data-sf="c" aria-pressed="false">C</button>
       </div>
       <div id="selList"></div>
     </section>
@@ -900,19 +903,19 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       
       </div>
       <div class="seg" role="group" aria-label="Sede" id="genVenue">
-        <button class="segb" data-gv="tot" aria-pressed="true">Totale</button>
-        <button class="segb" data-gv="home" aria-pressed="false">In casa</button>
-        <button class="segb" data-gv="away" aria-pressed="false">In trasferta</button>
+        <button type="button" class="segb" data-gv="tot" aria-pressed="true">Totale</button>
+        <button type="button" class="segb" data-gv="home" aria-pressed="false">In casa</button>
+        <button type="button" class="segb" data-gv="away" aria-pressed="false">In trasferta</button>
       </div>
       <div class="seg" role="group" aria-label="Periodo" id="genPer">
-        <button class="segb" data-gp="season" aria-pressed="true">Stagione</button>
-        <button class="segb" data-gp="10" aria-pressed="false">Ultime 10</button>
-        <button class="segb" data-gp="5" aria-pressed="false">Ultime 5</button>
+        <button type="button" class="segb" data-gp="season" aria-pressed="true">Stagione</button>
+        <button type="button" class="segb" data-gp="10" aria-pressed="false">Ultime 10</button>
+        <button type="button" class="segb" data-gp="5" aria-pressed="false">Ultime 5</button>
       </div>
       <div class="seg" role="group" aria-label="Quando giocano" id="genWhen">
-        <button class="segb" data-gw="all" aria-pressed="true">Tutte</button>
-        <button class="segb" data-gw="0" aria-pressed="false">Giocano oggi</button>
-        <button class="segb" data-gw="1" aria-pressed="false">Giocano domani</button>
+        <button type="button" class="segb" data-gw="all" aria-pressed="true">Tutte</button>
+        <button type="button" class="segb" data-gw="0" aria-pressed="false">Giocano oggi</button>
+        <button type="button" class="segb" data-gw="1" aria-pressed="false">Giocano domani</button>
       </div>
     </section>
     <div id="genOut" class="genlist"></div>
@@ -930,14 +933,14 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
         <option value="st">Tiri in porta</option><option value="f">Falli</option><option value="k">Cartellini</option>
       </select></label>
       <div class="seg" role="group" aria-label="Sede" id="ritVen">
-        <button class="segb" data-v="all" aria-pressed="false">Tutte</button>
-        <button class="segb" data-v="home" aria-pressed="true">Casa</button>
-        <button class="segb" data-v="away" aria-pressed="false">Trasferta</button>
+        <button type="button" class="segb" data-v="all" aria-pressed="false">Tutte</button>
+        <button type="button" class="segb" data-v="home" aria-pressed="true">Casa</button>
+        <button type="button" class="segb" data-v="away" aria-pressed="false">Trasferta</button>
       </div>
       <div class="rtf" role="group" aria-label="Quando giocano e Lettura">
-        <button class="chip" data-rw="all" aria-pressed="true">Sempre</button><button class="chip" data-rw="0" aria-pressed="false">Oggi</button><button class="chip" data-rw="1" aria-pressed="false">Domani</button>
-        <button class="chip" id="ritDot" aria-pressed="false"><i aria-hidden="true"></i>Lettura</button>
-        <button class="chip" id="ritGrd" aria-pressed="false"><em class="ccls c-a" aria-hidden="true">A</em>Grado</button>
+        <button type="button" class="chip" data-rw="all" aria-pressed="true">Sempre</button><button type="button" class="chip" data-rw="0" aria-pressed="false">Oggi</button><button type="button" class="chip" data-rw="1" aria-pressed="false">Domani</button>
+        <button type="button" class="chip" id="ritDot" aria-pressed="false"><i aria-hidden="true"></i>Lettura</button>
+        <button type="button" class="chip" id="ritGrd" aria-pressed="false"><em class="ccls c-a" aria-hidden="true">A</em>Grado</button>
       </div>
     </section>
     <div id="ritOut"></div>
@@ -950,18 +953,18 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <div class="sigf">
         <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
         <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano">
-          <button class="chip" data-sw="0" aria-pressed="true">Oggi</button><button class="chip" data-sw="1" aria-pressed="true">Domani</button><button class="chip" data-sw="r" aria-pressed="false">Giornata</button>
+          <button type="button" class="chip" data-sw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-sw="1" aria-pressed="true">Domani</button><button type="button" class="chip" data-sw="r" aria-pressed="false">Giornata</button>
         </div>
         <div class="row" id="sigStats" role="group" aria-label="Mercati">
-          <button class="chip sstat" data-k="g15" aria-pressed="true">Over 1,5</button>
-          <button class="chip sstat" data-k="g25" aria-pressed="true">Over 2,5</button>
-          <button class="chip sstat" data-k="g35" aria-pressed="true">Over 3,5</button>
-          <button class="chip sstat" data-k="gg" aria-pressed="true">Gol/No gol</button>
-          <button class="chip sstat" data-k="c" aria-pressed="true">Corner</button>
-          <button class="chip sstat" data-k="f" aria-pressed="true">Falli</button>
-          <button class="chip sstat" data-k="s" aria-pressed="true">Tiri</button>
-          <button class="chip sstat" data-k="st" aria-pressed="true">Tiri in porta</button>
-          <button class="chip sstat" data-k="k" aria-pressed="true">Cartellini</button>
+          <button type="button" class="chip sstat" data-k="g15" aria-pressed="true">Over 1,5</button>
+          <button type="button" class="chip sstat" data-k="g25" aria-pressed="true">Over 2,5</button>
+          <button type="button" class="chip sstat" data-k="g35" aria-pressed="true">Over 3,5</button>
+          <button type="button" class="chip sstat" data-k="gg" aria-pressed="true">Gol/No gol</button>
+          <button type="button" class="chip sstat" data-k="c" aria-pressed="true">Corner</button>
+          <button type="button" class="chip sstat" data-k="f" aria-pressed="true">Falli</button>
+          <button type="button" class="chip sstat" data-k="s" aria-pressed="true">Tiri</button>
+          <button type="button" class="chip sstat" data-k="st" aria-pressed="true">Tiri in porta</button>
+          <button type="button" class="chip sstat" data-k="k" aria-pressed="true">Cartellini</button>
         </div>
         <input type="hidden" id="sigMin" value="75"><input type="checkbox" id="sigGames" checked hidden>
         <input type="checkbox" id="sigC3" hidden>
@@ -983,15 +986,15 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 
   <div class="view" id="viewMatch" hidden>
     <div class="mtop">
-      <button id="back" class="backbtn" aria-label="Torna al palinsesto">‹ Partite</button>
+      <button type="button" id="back" class="backbtn" aria-label="Torna al palinsesto">‹ Partite</button>
       <span class="tag" id="seasonTag">Stagione —</span>
     </div>
     <div class="mtabs" role="tablist" aria-label="Sezioni della partita">
-      <button class="mtab" data-mt="prev" aria-pressed="true">Lettura</button>
-      <button class="mtab" data-mt="sig" aria-pressed="false">Grado</button>
-      <button class="mtab" data-mt="h2h" aria-pressed="false">Precedenti</button>
-      <button class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
-      <button class="mtab" data-mt="rend" aria-pressed="false">Rendimento</button>
+      <button type="button" class="mtab" data-mt="prev" aria-pressed="true">Lettura</button>
+      <button type="button" class="mtab" data-mt="sig" aria-pressed="false">Grado</button>
+      <button type="button" class="mtab" data-mt="h2h" aria-pressed="false">Precedenti</button>
+      <button type="button" class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
+      <button type="button" class="mtab" data-mt="rend" aria-pressed="false">Rendimento</button>
     </div>
     <div class="mpane" data-mp="prev">
       <section class="mhead" id="mhead" aria-label="Lettura della partita"></section>
@@ -1005,23 +1008,23 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </div>
     <div class="mpane" data-mp="h2h" hidden>
       <div class="seg" role="group" aria-label="Filtro partite">
-        <button class="segb" data-hv="all" aria-pressed="true">Generale</button>
-        <button class="segb" data-hv="venue" aria-pressed="false">Casa / Trasferta</button>
+        <button type="button" class="segb" data-hv="all" aria-pressed="true">Generale</button>
+        <button type="button" class="segb" data-hv="venue" aria-pressed="false">Casa / Trasferta</button>
       </div>
       <div id="h2hOut" class="h2hlist"></div>
     </div>
     <div class="mpane" data-mp="tab" hidden>
       <div class="seg" role="group" aria-label="Tipo di classifica">
-        <button class="segb" data-tv="tot" aria-pressed="true">Totale</button>
-        <button class="segb" data-tv="home" aria-pressed="false">Casa</button>
-        <button class="segb" data-tv="away" aria-pressed="false">Trasferta</button>
-        <button class="segb" data-tv="form" aria-pressed="false">Forma</button>
-        <button class="segb" data-tv="avg" aria-pressed="false">Medie</button>
+        <button type="button" class="segb" data-tv="tot" aria-pressed="true">Totale</button>
+        <button type="button" class="segb" data-tv="home" aria-pressed="false">Casa</button>
+        <button type="button" class="segb" data-tv="away" aria-pressed="false">Trasferta</button>
+        <button type="button" class="segb" data-tv="form" aria-pressed="false">Forma</button>
+        <button type="button" class="segb" data-tv="avg" aria-pressed="false">Medie</button>
       </div>
       <div class="seg" id="avgSeg" role="group" aria-label="Medie per sede" hidden>
-        <button class="segb" data-av="tot" aria-pressed="true">Totale</button>
-        <button class="segb" data-av="home" aria-pressed="false">Casa</button>
-        <button class="segb" data-av="away" aria-pressed="false">Trasferta</button>
+        <button type="button" class="segb" data-av="tot" aria-pressed="true">Totale</button>
+        <button type="button" class="segb" data-av="home" aria-pressed="false">Casa</button>
+        <button type="button" class="segb" data-av="away" aria-pressed="false">Trasferta</button>
       </div>
       <section class="card" id="tableOut" aria-label="Classifica"></section>
     </div>
@@ -1038,7 +1041,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </label>
     <div class="picker">
       <label for="home">Squadra casa<select id="home"></select></label>
-      <button class="swap" id="swap" aria-label="Inverti casa e trasferta" title="Inverti"><svg class="ic ic-swap" aria-hidden="true"><use href="#i-swap"/></svg></button>
+      <button type="button" class="swap" id="swap" aria-label="Inverti casa e trasferta" title="Inverti"><svg class="ic ic-swap" aria-hidden="true"><use href="#i-swap"/></svg></button>
       <label for="away">Squadra trasferta<select id="away"></select></label>
     </div>
     </div>
@@ -1050,8 +1053,8 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <div class="foldbody">
     <div id="dataInfo" class="kv"></div>
     <div class="row">
-      <button id="importBtn" hidden>Carica CSV aggiornati</button>
-      <button id="resetBtn" hidden>Torna ai dati inclusi</button>
+      <button type="button" id="importBtn" hidden>Carica CSV aggiornati</button>
+      <button type="button" id="resetBtn" hidden>Torna ai dati inclusi</button>
       <input type="file" id="file" accept=".csv,text/csv" multiple hidden>
     </div>
     <p class="small muted" id="importHelp" style="margin:0" hidden></p>
@@ -1664,10 +1667,22 @@ const NEW_BY_COUNTRY = Object.fromEntries(LEAGUES.filter(l => l.newCountry).flat
 const seasonLabel = (y, cal) => cal ? String(y) : `${y}/${String((y + 1) % 100).padStart(2, "0")}`;
 const numOrNull = v => (v === undefined || v === null || String(v).trim() === "") ? null : (isFinite(+v) ? +v : null);
 
+function csvSplit(line) {   // una riga CSV con i campi tra virgolette ("Club, City" e "" per le virgolette)
+  if (line.indexOf('"') < 0) return line.split(",");
+  const out = []; let cur = "", q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) { if (ch === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === ",") { out.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  out.push(cur); return out;
+}
 function parseCSV(text, forceDiv) {
   const lines = text.replace(/^﻿/, "").split(/\r?\n/).filter(l => l.trim());
   if (!lines.length) return { matches: [], fixtures: [], skipped: 0 };
-  const hdr = lines[0].split(",").map(h => h.trim());
+  const hdr = csvSplit(lines[0]).map(h => h.trim());
   const ix = n => hdr.indexOf(n);
   // formato "new" (Brasile, Argentina): Country,League,Season,Date,Time,Home,Away,HG,AG,... senza statistiche partita
   const isNew = ix("Country") >= 0 && ix("Home") >= 0;
@@ -1682,7 +1697,7 @@ function parseCSV(text, forceDiv) {
   const out = { matches: [], fixtures: [], skipped: 0 };
   if (iDate < 0 || iH < 0 || iA < 0) return out;
   for (let i = 1; i < lines.length; i++) {
-    const c = lines[i].split(",");
+    const c = lines[i].indexOf('"') < 0 ? lines[i].split(",") : csvSplit(lines[i]);   // campi tra virgolette (es. un nome con la virgola)
     let div;
     if (isNew) div = NEW_BY_COUNTRY[(c[iCountry] || "").trim()];
     else div = iDiv >= 0 ? (c[iDiv] || "").trim() : forceDiv;
@@ -2735,7 +2750,7 @@ function probCard(home, away, { G, M, MF, MT }) {
   };
   return `<section class="card" aria-label="Probabilità">
     <h2>Probabilità stimate</h2>
-    <div class="row ptabs" role="tablist">${tabs.map(([k, l]) => `<button class="chip ptab" role="tab" data-tab="${k}" aria-pressed="${PTAB === k}">${l}</button>`).join("")}</div>
+    <div class="row ptabs" role="tablist">${tabs.map(([k, l]) => `<button type="button" class="chip ptab" role="tab" data-tab="${k}" aria-pressed="${PTAB === k}">${l}</button>`).join("")}</div>
     ${tabs.map(([k]) => `<div class="ppane" data-pane="${k}"${PTAB === k ? "" : " hidden"}>${panes[k]}</div>`).join("")}
   </section>`;
 }
@@ -3175,14 +3190,13 @@ function computeSignals3(o) {
   base.rows.forEach(x => { const k = x.id + "|" + x.fav; x.c3 = maps.every(M => M.has(k)); if (x.c3) x.p3 = maps.map(M => M.get(k)); });
   return base;
 }
-/* Valore di una quota: pari perso (1X2 corner) oppure pari rimborsato (handicap 0 / draw no bet). Kelly a un quarto, massimo 5%. */
+/* Valore di una quota: pari perso (1X2 corner) oppure pari rimborsato (handicap 0 / draw no bet). Nessuna puntata suggerita. */
 function quotaValue(p, draw, q, dnb) {
   if (!(q > 1)) return null;
   const lose = dnb ? 1 - p - draw : 1 - p;
   const ev = p * (q - 1) - lose;                       // guadagno atteso per 1 unità puntata
   const fair = dnb ? 1 + lose / p : 1 / p;             // quota minima perché convenga
-  const kelly = ev > 0 ? ev / ((q - 1) * (p + lose)) : 0;
-  return { ev, fair, stake: Math.min(0.05, kelly / 4) };
+  return { ev, fair };   // 10/10/2026: tolta la puntata suggerita (Kelly): le quote sono solo informative
 }
 
 /* ===== Righe della home: calcolo puro (lo usa anche precalc.js su GitHub) ===== */
@@ -3454,12 +3468,24 @@ const confUnpack = a => ({ mk: a[0], side: a[1], p: a[2], score: a[3], cls: a[4]
 
 /* ===== Caricamento dati ===== */
 const IMPORT_HELP = `Per aggiornare: dal telefono scarica il file del campionato da football-data.co.uk (indirizzo qui sopra, es. <span class="num">mmz4281/2627/I1.csv</span>) e caricalo qui; puoi caricarne più di uno insieme. Per gli scontri diretti carica anche le stagioni passate (cartelle <span class="num">2526</span>, <span class="num">2425</span>…). Ogni riga viene assegnata al suo campionato: campionati e stagioni non si mescolano mai.`;
+let BOOTN = 0;
+function bootProgress(n) {   // avanzamento del download a schermo (MB già arrivati)
+  BOOTN = n; const s = $("#boot small"); if (!s) return;
+  s.textContent = `${(n / 1048576).toFixed(1).replace(".", ",")} MB scaricati${s.dataset.slow ? " · la rete è lenta, continuo a scaricare" : ""}`;
+}
 async function tryHosted() {
   // Versione GitHub Pages: i file li aggiorna una GitHub Action in data/. Tutti i file partono insieme; "no-cache" = il telefono
   // chiede al sito se il file è cambiato e, se no, riusa la copia che ha già (risposta 304, quasi nessun dato scaricato).
   const get = (f, as = "json") => fetch("data/" + f, { cache: "no-cache" }).then(r => r.ok ? (as === "text" ? r.text() : r.json()) : null).catch(() => null);
   try {
-    const P = { bundle: get("bundle.json"), crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
+    const getBundle = () => fetch("data/bundle.json", { cache: "no-cache" }).then(async r => {
+      if (!r.ok) return null;
+      if (!r.body || !r.body.getReader) return r.json();
+      const rd = r.body.getReader(), parts = []; let n = 0;
+      for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); n += value.length; bootProgress(n); }
+      return JSON.parse(await new Blob(parts).text());
+    }).catch(() => null);
+    const P = { bundle: getBundle(), crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
                 extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json") };
     let man = null, texts = null;
     const b = await P.bundle;
@@ -3527,7 +3553,7 @@ function valueText(p, draw, q, dnb) {
   const V = quotaValue(p, draw, q, dnb);
   if (!V) return `<span class="muted">Scrivi la quota del bookmaker</span>`;
   if (V.ev <= 0) return `<span class="bad">Nessun valore</span> · <span class="muted">serve quota sopra ${f2(V.fair)}</span>`;
-  return `<span class="good">Valore +${(V.ev * 100).toFixed(1).replace(".", ",")}%</span> · puntata <b>${(V.stake * 100).toFixed(1).replace(".", ",")}%</b> della cassa`;
+  return `<span class="good">Valore +${(V.ev * 100).toFixed(1).replace(".", ",")}%</span> · <span class="muted">quota giusta ${f2(V.fair)}</span>`;   // niente puntata suggerita: le quote sono solo informative
 }
 const DAYS_SHORT = ["dom", "lun", "mar", "mer", "gio", "ven", "sab"];
 function sigCardsHTML(rows, pref, withMatch = true, played = null) {
@@ -3536,7 +3562,7 @@ function sigCardsHTML(rows, pref, withMatch = true, played = null) {
     const o = odds[r.id], q = o && o.fav === r.fav ? o.q : null;
     const detail = r.mk === "gg" ? `gol previsti ${f2(r.lh)} – ${f2(r.la)}` : r.team ? `${esc(r.team)} ne fa di più · ${f1(r.lh)} – ${f1(r.la)} · pari ${pc(r.draw)}` : `previsti ${r.k === "g" ? f2(r.tot) : f1(r.tot)}`;
     return `<div class="sig">
-      <button class="sigopen" data-lg="${r.lg.code}" data-h="${esc(r.f.home)}" data-a="${esc(r.f.away)}" data-d="${isoD(r.f.date)}"${withMatch ? "" : " disabled"}>
+      <button type="button" class="sigopen" data-lg="${r.lg.code}" data-h="${esc(r.f.home)}" data-a="${esc(r.f.away)}" data-d="${isoD(r.f.date)}"${withMatch ? "" : " disabled"}>
         ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}
         <span class="p num">${pc(r.p)}</span>
         <span class="d"><span class="stag">${MK_TAG[r.mk]}</span><b>${esc(r.fav)}</b> · ${detail}</span>
@@ -3675,7 +3701,7 @@ function renderSched() {
   if (!SCHED.day || !dayset.has(SCHED.day)) SCHED.day = t0;   // si parte sempre da oggi, anche senza partite
   $("#days").innerHTML = days.map(d => {
     const dt = new Date(d + "T00:00:00Z"), n = all.filter(e => e.d === d).length;
-    return `<button class="day${d < t0 ? " past" : ""}" role="tab" data-d="${d}" aria-selected="${d === SCHED.day}"><b>${d === t0 ? "Oggi" : DAYS_SHORT[dt.getUTCDay()]}</b><span>${String(dt.getUTCDate()).padStart(2, "0")}.${String(dt.getUTCMonth() + 1).padStart(2, "0")}</span><small>${n ? n + " partite" : "—"}</small></button>`;
+    return `<button type="button" class="day${d < t0 ? " past" : ""}" role="tab" data-d="${d}" aria-selected="${d === SCHED.day}"><b>${d === t0 ? "Oggi" : DAYS_SHORT[dt.getUTCDay()]}</b><span>${String(dt.getUTCDate()).padStart(2, "0")}.${String(dt.getUTCMonth() + 1).padStart(2, "0")}</span><small>${n ? n + " partite" : "—"}</small></button>`;
   }).join("");
   $("#days").querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { SCHED.day = b.dataset.d; SCHED.open.clear(); renderSched(); }));
   const strip = $("#days"), sel = strip.querySelector('[aria-selected="true"]');
@@ -3684,12 +3710,12 @@ function renderSched() {
   const today = all.filter(e => e.d === SCHED.day);
   const lgs = LEAGUES.filter(L => today.some(e => e.lg.code === L.code));
   SCHED.lg = "all";   // la home mostra sempre tutti i campionati del giorno
-  $("#lgChips").innerHTML = [`<button class="chip" data-lg="all" aria-pressed="${SCHED.lg === "all"}">Tutti · ${today.length}</button>`]
-    .concat(lgs.map(L => `<button class="chip" data-lg="${L.code}" aria-pressed="${SCHED.lg === L.code}">${esc(lgName(L))} · ${today.filter(e => e.lg.code === L.code).length}</button>`)).join("");
+  $("#lgChips").innerHTML = [`<button type="button" class="chip" data-lg="all" aria-pressed="${SCHED.lg === "all"}">Tutti · ${today.length}</button>`]
+    .concat(lgs.map(L => `<button type="button" class="chip" data-lg="${L.code}" aria-pressed="${SCHED.lg === L.code}">${esc(lgName(L))} · ${today.filter(e => e.lg.code === L.code).length}</button>`)).join("");
   $("#lgChips").querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => { SCHED.lg = b.dataset.lg; lsSet("statPreviste.lg", SCHED.lg); renderSched(); }));
   const shown = lgs.filter(L => SCHED.lg === "all" || SCHED.lg === L.code);
   if (!today.length) { const nx = days.find(d => d > SCHED.day && all.some(e => e.d === d));
-    box.innerHTML = `<div class="empty">${SCHED.day === t0 ? "Oggi nessuna partita" : "Nessuna partita"} di questi campionati.<br><span class="small">${nx ? `Prossime partite: <button class="linkbtn" id="goNextDay">${DAYS_SHORT[new Date(nx + "T00:00:00Z").getUTCDay()]} ${+nx.slice(8)} ${MONTHS[+nx.slice(5, 7) - 1]}</button>` : "Scegli un altro giorno qui sopra."}</span></div>`;
+    box.innerHTML = `<div class="empty">${SCHED.day === t0 ? "Oggi nessuna partita" : "Nessuna partita"} di questi campionati.<br><span class="small">${nx ? `Prossime partite: <button type="button" class="linkbtn" id="goNextDay">${DAYS_SHORT[new Date(nx + "T00:00:00Z").getUTCDay()]} ${+nx.slice(8)} ${MONTHS[+nx.slice(5, 7) - 1]}</button>` : "Scegli un altro giorno qui sopra."}</span></div>`;
     const gb = $("#goNextDay"); if (gb) gb.addEventListener("click", () => { SCHED.day = nx; renderSched(); }); return; }
   const playedToday = today.filter(e => e.m && shown.some(L => L.code === e.lg.code));
   // righe calcolate un po' alla volta: con tanti campionati il calcolo completo bloccherebbe la pagina
@@ -3699,7 +3725,7 @@ function renderSched() {
     const hitL = (p, L) => m && p != null ? (p >= 0.5) === (m.hg + m.ag > L) : null, hitG = m && gg != null ? (gg >= 0.5) === (m.hg > 0 && m.ag > 0) : null;
     const vals = R ? `${pv("O1,5", ov(0), hitL(ov(0), 1.5))}${pv("O2,5", ov(1), hitL(ov(1), 2.5))}${pv("O3,5", ov(2), hitL(ov(2), 3.5))}${pv("GG", gg, hitG)}` : `<span class="pv"><small>O1,5</small><b>…</b></span><span class="pv"><small>O2,5</small><b>…</b></span><span class="pv"><small>O3,5</small><b>…</b></span><span class="pv"><small>GG</small><b>…</b></span>`;
     const end = R && m ? presiHTML(R) : "";   // sotto l'orario: % presi delle partite finite (i segnali A+ restano nel Radar)
-    return `<button class="mrow" data-id="${esc(e.id)}">
+    return `<button type="button" class="mrow" data-id="${esc(e.id)}">
           <span class="tmc"><span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>${end}</span>
           <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}</span><b>${m ? m.ag : ""}</b></span>
         </button>`; };   // percentuali Over/Gol tolte dalla lista (7/10/2026): restano nella Lettura
@@ -3713,7 +3739,7 @@ function renderSched() {
   const todo = rows.filter(e => !rowCached(e) || (!e.m && confEntry(e, ccfg, true) === undefined));
   const block = L => { const n = today.filter(e => e.lg.code === L.code).length, cl = !SCHED.open.has(L.code);
     return `<section class="lgblock${cl ? " closed" : ""}" aria-label="${esc(L.name)}" data-lg="${L.code}">
-      <button class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="cnt" data-cnt>${n}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <button type="button" class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="cnt" data-cnt>${n}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       ${today.filter(e => e.lg.code === L.code).map(e => rowHTML(e, rowCached(e))).join("")}
     </section>`; };
   const topL = shown.filter(L => TOP_LG.includes(L.code)), altL = shown.filter(L => !TOP_LG.includes(L.code));
@@ -3742,7 +3768,8 @@ function renderSched() {
 }
 
 /* ===== Scheda partita ===== */
-function openEntry(e) {
+function openEntry(e, fromNav) {
+  if (!fromNav) navMatch(e);
   CUR = e; S.cutoff = null;
   S.league = e.lg.code; $("#league").value = S.league;
   const ss = [...new Set(leagueMatches().map(m => m.season))]; S.season = ss.length ? Math.max(...ss) : null;
@@ -4245,7 +4272,7 @@ function renderGen() {
     const w = D.avg ? r.val / max : r.val, refw = D.avg ? r.ref / max : r.ref;
     const opp = nx ? (nx.side === "h" ? nx.e.away : nx.e.home) : null;
     const nextTxt = nx ? `<span class="gnext">${nx.side === "h" ? "In casa con" : "In trasferta con"} ${crest(nx.e.lg.code, opp)}<b>${esc(opp)}</b> · ${dstr(nx.e.date)}${nx.e.time ? " " + esc(nx.e.time) : ""}${pr === undefined ? ` · <span class="muted">…</span>` : pr ? ` · <em>${D.avg ? (pr.tot ? "cartellini attesi in partita " : "attesi ") + f1(pr.v) : (D.win ? `${D.name} 1X2: ${nx.side === "h" ? "1" : "2"} ` : D.lab + " ") + pc(pr.p)}</em>` : ""}</span>` : `<span class="gnext muted">Nessuna partita nei prossimi 14 giorni</span>`;
-    return `<button class="grow${i < 3 ? " top" : ""}" data-lg="${r.lg.code}" data-t="${esc(r.t)}" data-id="${nx ? esc(nx.e.id) : ""}">
+    return `<button type="button" class="grow${i < 3 ? " top" : ""}" data-lg="${r.lg.code}" data-t="${esc(r.t)}" data-id="${nx ? esc(nx.e.id) : ""}">
       <span class="grk">${i + 1}</span>
       <span class="gmain"><span class="gteam">${crest(r.lg.code, r.t)}${esc(r.t)}</span><span class="glg">${esc(lgName(r.lg))}</span></span>
       <span class="gval"><b>${D.avg ? f1(r.val) : `${r.c}/${r.n}`}</b><small>${D.avg ? `in ${r.n} partite` : pc(r.val)}</small></span>
@@ -4254,7 +4281,7 @@ function renderGen() {
       ${nextTxt}
     </button>`;
   };
-  box.innerHTML = shown.map(item).join("") + (rows.length > GEN.shown ? `<button class="genmore" id="genMore">Mostra altre ${Math.min(10, rows.length - GEN.shown)}</button>` : "");
+  box.innerHTML = shown.map(item).join("") + (rows.length > GEN.shown ? `<button type="button" class="genmore" id="genMore">Mostra altre ${Math.min(10, rows.length - GEN.shown)}</button>` : "");
   box.querySelectorAll(".grow").forEach(b => b.addEventListener("click", () => { const e = b.dataset.id && allEntries().find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
   const more = $("#genMore"); if (more) more.addEventListener("click", () => { GEN.shown += 10; renderGen(); });
   // previsioni mancanti: una partita alla volta, senza bloccare la pagina
@@ -4275,7 +4302,7 @@ function renderMatchTrend(home, away) {
   const opt = Object.entries(GEN3).map(([k, d]) => `<option value="${k}"${k === MTR.mk ? " selected" : ""}>${k === "gol" ? "Over e Gol" : d.lab}</option>`).join("");
   box.innerHTML = `<h2>Rendimento · ${esc(L.name)}</h2>
     <div class="mtrc"><label for="mtrMk" class="sr">Statistica</label><select id="mtrMk">${opt}</select>
-      <div class="seg" role="group" aria-label="Sede" id="mtrVen"><button class="segb" data-v="home" aria-pressed="${MTR.ven === "home"}">Casa</button><button class="segb" data-v="away" aria-pressed="${MTR.ven === "away"}">Trasferta</button></div></div>
+      <div class="seg" role="group" aria-label="Sede" id="mtrVen"><button type="button" class="segb" data-v="home" aria-pressed="${MTR.ven === "home"}">Casa</button><button type="button" class="segb" data-v="away" aria-pressed="${MTR.ven === "away"}">Trasferta</button></div></div>
     <div class="stdleg"><span class="mh">${crest(S.league, home)}${esc(home)}${MTR.ven === "home" ? " · gioca in casa" : ""}</span><span class="ma">${crest(S.league, away)}${esc(away)}${MTR.ven === "away" ? " · gioca fuori" : ""}</span></div>
     ${body}<p class="lt-ref">${note}</p>`;
   $("#mtrMk").addEventListener("change", ev => { MTR.mk = ev.target.value; renderMatchTrend(home, away); });
@@ -4531,7 +4558,7 @@ function confRowHTML(r, i, withInfo) {
   return `<div class="crow">
     <div class="cl"><span class="cmk">${esc(confLab(r))}</span><span class="cp num">${pc(r.q)}<small> probabilità · modello ${pc(r.p)}</small></span></div>
     <div class="cm">${confBar(r.score, r.cls, clsRate(r))}</div>
-    <div class="cd small"><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${confSolid(r)}${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button class="info" data-ci="${i}" aria-label="Come si legge il Grado">i</button>` : ""}</div>
+    <div class="cd small"><span class="st-${r.status}">${CONF_STATUS[r.status]}</span>${confSolid(r)}${r.qt ? `<span>${oddsTxt(r.qt)}</span>` : ""}${r.why && r.why.length ? `<span class="muted">A+ non confermato: ${esc(r.why.join(", "))}</span>` : ""}${withInfo ? `<button type="button" class="info" data-ci="${i}" aria-label="Come si legge il Grado">i</button>` : ""}</div>
   </div>`;
 }
 let REFCTX = null;
@@ -4613,7 +4640,7 @@ function gradeNums(r, i) {   // dietro "Perché questo grado": solo controlli a 
   return `<div class="gnums small">
       ${confSolid(r)}${r.qt ? `<span class="gck q">${oddsTxt(r.qt)}</span>` : ""}
       ${r.why && r.why.length ? `<span class="gck why">Non è A+ perché: ${esc(r.why.join(", "))}</span>` : ""}
-      <button class="info" data-ci="${i}" aria-label="Da dove viene il numero">i</button></div>`;
+      <button type="button" class="info" data-ci="${i}" aria-label="Da dove viene il numero">i</button></div>`;
 }
 function renderMatchConf(home, away, e, cfg) {
   const box = $("#mconf"); if (!box) return;
@@ -4677,7 +4704,7 @@ function renderSelBk(ents, cfg, when) {
   SEL.bkN = L.length; box.hidden = SEL.tab !== "bk"; radarTabs();
   box.innerHTML = `<div class="selhead"><h2><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato</h2><span class="vtag">in verifica</span></div>
     
-    ${L.length ? `<div class="bklist">${L.slice(0, 15).map(({ e, c }) => `<button class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
+    ${L.length ? `<div class="bklist">${L.slice(0, 15).map(({ e, c }) => `<button type="button" class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
       <span class="bkp"><span class="bkmk">${lab(c)}</span><b class="${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} ${th1(c.L)}</b></span>
       <span class="bkn"><b class="num">${pc(c.p)}</b><small class="num">@${f2(c.odd)}</small><em class="num">+${Math.round(c.ev * 100)}%</em></span></button>`).join("")}</div>${L.length > 15 ? `<p class="small muted" style="margin:0">Le prime 15 su ${L.length}, per valore.</p>` : ""}` : `<p class="apnone">${todo.length ? "Calcolo in corso…" : "NESSUNA LINEA CON VALORE"}</p>`}`;
   box.insertAdjacentHTML("beforeend", RG_LINE);
@@ -4709,7 +4736,7 @@ function renderSel() {
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
   try { renderSelBk(ents, cfg, when); } catch (x) { console.warn(x); }
   aBox.innerHTML = `<div class="selhead"><h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
-    apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button class="apcard" data-id="${esc(e.id)}">
+    apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button type="button" class="apcard" data-id="${esc(e.id)}">
       <span class="aptag"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
       ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(plainLab(r))}</span><small class="muted">${esc(confLab(r))}</small>
@@ -4719,7 +4746,7 @@ function renderSel() {
       </button>`).join("")}</div>` : `<p class="apnone">NESSUN SEGNALE A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
   list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime ${SEL.h} ore.</p>` :
-    (rows.length ? rows.map(([e, L]) => `<button class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
+    (rows.length ? rows.map(([e, L]) => `<button type="button" class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
       ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}</span><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
@@ -4732,7 +4759,7 @@ $("#selWin").addEventListener("change", () => { SEL.h = +$("#selWin").value; ren
 { // periodo del Radar come striscia (24 / 48 / 72 ore), come i giorni nella pagina Partite
   const lab = $("#selWin").closest("label"), seg = document.createElement("div");
   seg.className = "daystrip winstrip"; seg.setAttribute("role", "tablist"); seg.setAttribute("aria-label", "Periodo");
-  seg.innerHTML = [["24", "24 ore", "prossime"], ["48", "48 ore", "prossime"], ["72", "72 ore", "prossime"]].map(([v, b, sm]) => `<button class="day" role="tab" data-w="${v}" aria-selected="${$("#selWin").value === v}"><b>${b}</b><small>${sm}</small></button>`).join("");
+  seg.innerHTML = [["24", "24 ore", "prossime"], ["48", "48 ore", "prossime"], ["72", "72 ore", "prossime"]].map(([v, b, sm]) => `<button type="button" class="day" role="tab" data-w="${v}" aria-selected="${$("#selWin").value === v}"><b>${b}</b><small>${sm}</small></button>`).join("");
   lab.hidden = true; lab.after(seg);
   seg.querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { $("#selWin").value = b.dataset.w; seg.querySelectorAll(".day").forEach(x => x.setAttribute("aria-selected", String(x === b))); $("#selWin").dispatchEvent(new Event("change")); }));
 }
@@ -4754,21 +4781,65 @@ $("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option>` + 
 $("#sigMode").addEventListener("change", () => { $("#decay").value = $("#sigMode").value; renderSignals(); renderNext(); });
 $("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; });
 document.querySelectorAll(".sstat").forEach(b => b.addEventListener("click", () => { b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); renderSignals(); }));
-$("#navStats").addEventListener("click", () => { showView("stats"); scrollTo({ top: 0 }); });
-$("#back").addEventListener("click", () => { showView("stats"); });
-$("#navSig").addEventListener("click", () => showView("sig"));
-$("#navGen").addEventListener("click", () => showView("gen"));
-$("#navRit").addEventListener("click", () => showView("rit"));
-$("#navSel").addEventListener("click", () => showView("sel"));
+$("#navStats").addEventListener("click", () => { navTab("stats"); scrollTo({ top: 0 }); });
+$("#back").addEventListener("click", () => { if (history.state && history.state.m) history.back(); else closeMatch(); });
+$("#navSig").addEventListener("click", () => navTab("sig"));
+$("#navGen").addEventListener("click", () => navTab("gen"));
+$("#navRit").addEventListener("click", () => navTab("rit"));
+$("#navSel").addEventListener("click", () => navTab("sel"));
+
+/* ===== Indietro del telefono (history): chiude la scheda partita e torna dove eri; dalle altre sezioni torna a Partite;
+   chiude i fogli "i". Ogni partita ha il suo link (#p=…), che si può condividere. ===== */
+const NAV = { from: "stats", y: 0, skip: 0 };
+const curView = () => ["stats", "sig", "gen", "rit", "sel", "match"].find(v => !$("#view" + { stats: "Stats", sig: "Sig", gen: "Gen", rit: "Rit", sel: "Sel", match: "Match" }[v]).hidden) || "stats";
+function navMatch(e) {
+  const st = { m: e.id, v: (history.state && history.state.v) || null }, url = "#p=" + encodeURIComponent(e.id);
+  if (curView() === "match" && history.state && history.state.m) history.replaceState(st, "", url);
+  else { NAV.from = curView(); NAV.y = scrollY; history.pushState(st, "", url); }
+}
+function closeMatch() { showView(NAV.from === "match" ? "stats" : NAV.from); requestAnimationFrame(() => scrollTo({ top: NAV.y })); }
+function navTab(v) {
+  if (curView() === "match" && history.state && history.state.m) { NAV.skip++; history.back(); }   // dalla scheda: via la partita dalla cronologia
+  const st = v === "stats" ? null : { v };
+  if (v === "stats") { if (history.state && history.state.v) { NAV.skip++; history.back(); } }
+  else if (history.state && history.state.v) history.replaceState(st, "", location.pathname + location.search);
+  else history.pushState(st, "", location.pathname + location.search);
+  showView(v);
+}
+addEventListener("popstate", ev => {
+  if (NAV.skip) { NAV.skip--; return; }
+  if (!SHEET.hidden) { NAV.sheetPop = true; SHEET.hidden = true; return; }
+  const st = ev.state || {};
+  if (st.m) {   // avanti verso una partita
+    const e = allEntries(localIso(), 30).find(x => x.id === st.m); if (e) openEntry(e, true); return;
+  }
+  if (curView() === "match") { closeMatch(); return; }
+  showView(st.v || "stats");
+});
+
 
 
 /* ===== Descrizioni dietro le ⓘ: ogni testo esplicativo (p.small.muted, legende, avvisi) viene nascosto e si apre dalla ⓘ
    del suo riquadro; la pagina "Dati e metodo" resta com'è (è la spiegazione completa). ===== */
 const DZ_SEL = "p.small.muted, .schedlegend, .warnbox";
 const SHEET = (() => { const d = document.createElement("div"); d.className = "sheet"; d.hidden = true;
-  d.innerHTML = `<div class="sh" role="dialog" aria-modal="true" aria-label="Informazioni"><div class="sh-h"><b></b><button class="sh-x" aria-label="Chiudi">✕</button></div><div class="sh-b"></div></div>`;
+  d.innerHTML = `<div class="sh" role="dialog" aria-modal="true" aria-label="Informazioni"><div class="sh-h"><b></b><button type="button" class="sh-x" aria-label="Chiudi">✕</button></div><div class="sh-b"></div></div>`;
   document.body.appendChild(d); d.addEventListener("click", ev => { if (ev.target === d || ev.target.closest(".sh-x")) d.hidden = true; });
   addEventListener("keydown", ev => { if (ev.key === "Escape") d.hidden = true; }); return d; })();
+// fogli "i": Indietro li chiude; chiusi con la ✕ tolgono il loro passo dalla cronologia
+new MutationObserver(() => {
+  if (!SHEET.hidden) { history.pushState(Object.assign({}, history.state, { sheet: 1 }), "", location.href); const x = SHEET.querySelector(".sh-x"); if (x) x.focus(); }
+  else if (NAV.sheetPop) NAV.sheetPop = false;
+  else if (history.state && history.state.sheet) { NAV.skip++; history.back(); }
+}).observe(SHEET, { attributes: true, attributeFilter: ["hidden"] });
+addEventListener("keydown", ev => {
+  if (SHEET.hidden) return;
+  if (ev.key === "Tab") {   // il focus resta dentro il foglio
+    const f = [...SHEET.querySelectorAll("button, [href], select, input, [tabindex]:not([tabindex='-1'])")].filter(x => !x.disabled && x.offsetParent);
+    if (!f.length) return; const a = f[0], z = f[f.length - 1];
+    if (ev.shiftKey && document.activeElement === a) { ev.preventDefault(); z.focus(); } else if (!ev.shiftKey && document.activeElement === z) { ev.preventDefault(); a.focus(); }
+  }
+});
 function openSheet(title, els) {
   SHEET.querySelector(".sh-h b").textContent = title || "Legenda";
   SHEET.querySelector(".sh-b").innerHTML = els.filter(e => e.textContent.trim()).map(e => `<p>${e.innerHTML}</p>`).join("") || "<p>Nessuna informazione.</p>";
@@ -4815,13 +4886,20 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   if (online) document.body.classList.add("booting");
   loadEmbedded(); if (!online) refreshAll();
   $("#sigMode").value = $("#decay").value;
-  const ok = await Promise.race([tryHosted(), new Promise(r => setTimeout(() => r(null), 20000))]);
+  // 10/10/2026: niente più gara a 20 secondi (scaduta, mostrava i dati inclusi del 26/09 e quelli veri arrivati dopo non si
+  // ridisegnavano). Si aspetta il download con l'avanzamento a schermo; se la rete è lenta lo si dice, ma i dati vecchi non si mostrano.
+  const slow = setTimeout(() => { const s = $("#boot small"); if (s) s.dataset.slow = "1"; bootProgress(BOOTN); }, 15000);
+  const ok = await tryHosted(); clearTimeout(slow);
   if (!ok) { $("#importBtn").hidden = false; const ih = $("#importHelp"); ih.hidden = false; ih.innerHTML = IMPORT_HELP; }   // caricare CSV a mano serve solo senza il sito aggiornato
   document.body.classList.remove("booting");
   if (ok) refreshAll();
   else if (loadStored()) refreshAll();
   else if (online) refreshAll();
   if (!$("#viewSig").hidden) renderSignals();
+  // link a una partita (#p=…): si apre la scheda
+  const hm = /^#p=(.+)$/.exec(location.hash);
+  if (hm) { const id = decodeURIComponent(hm[1]), e = allEntries(localIso(), 30).find(x => x.id === id);
+    if (e) { history.replaceState(null, "", location.pathname + location.search); openEntry(e); } }
 })();
 </script>
 <script>
