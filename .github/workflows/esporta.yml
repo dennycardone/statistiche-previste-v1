@@ -19,4 +19,7 @@ jobs:
           mkdir -p pub && git fetch -q --depth 1 origin pages && git show FETCH_HEAD:data/bundle.json > pub/bundle.json && git show FETCH_HEAD:data/extra.json > pub/extra.json
       - uses: actions/setup-node@v4
         with: { node-version: "22" }
+      - name: Mercati di nicchia per campionato (1xBet)
+        run: python3 tools/mercati_nicchia.py
       - run: node tools/analisi_quote.js .
+        continue-on-error: true
