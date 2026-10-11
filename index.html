@@ -498,6 +498,16 @@ h2.dzh{display:flex;align-items:center;gap:8px}
 .sheet .sh-h b{font-family:var(--display);font-stretch:75%;font-size:19px;letter-spacing:.06em;text-transform:uppercase}
 .sheet .sh-x{width:34px;height:34px;border-radius:50%;padding:0;font-size:18px}
 .sheet .sh-b{display:flex;flex-direction:column;gap:10px;font-size:14.5px;color:var(--ink-2);line-height:1.5}
+/* tendine dell'app al posto di quelle del telefono */
+select{pointer-events:none}
+.ddsheet .sh{gap:6px}.ddsheet .sh-b{gap:0}
+.ddsheet .ddg{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:12px 4px 4px}
+.ddsheet .ddo{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:12px 12px;min-height:46px;border:0;border-bottom:1px solid var(--line);background:none;border-radius:0;font-family:var(--body);font-stretch:88%;font-size:16px;font-weight:500;color:var(--ink)}
+.ddsheet .ddo:last-child{border-bottom:0}
+.ddsheet .ddo[aria-selected="true"]{color:#D4FF3F;font-weight:700}
+.ddsheet .ddo[aria-selected="true"]::after{content:"";width:9px;height:9px;border-radius:50%;background:#D4FF3F;box-shadow:0 0 0 3px rgba(212,255,63,.18);flex:0 0 auto}
+.ddsheet .ddo:disabled{opacity:.45}
+.ddsheet .ddo:active{background:var(--surface-2)}
 .sheet .sh-b>p{margin:0}.sheet .sh-b h3{font-family:var(--display);font-stretch:75%;font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:6px}.kgrid>span{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;background:var(--surface-2);min-width:0}.kgrid small{font-size:11px;color:var(--ink-2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kgrid b{font-family:var(--display);font-stretch:75%;font-size:22px}
 .kfac{display:flex;flex-direction:column;gap:4px}.kfac small{font-family:var(--display);font-stretch:75%;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}.kfac ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13.5px}.kfac .up{color:var(--ink)}.kfac .up::first-letter{color:var(--warn)}.kfac .dn::first-letter{color:var(--accent)}.kfac .wa{color:var(--ink-2)}.kfac .wa::first-letter{color:var(--gold)}
@@ -626,6 +636,13 @@ h2 .ic,h3 .ic{margin-right:7px;width:1.05em;height:1.05em}
 .chv{display:inline-block;width:14px;height:14px;vertical-align:-2px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9.5l6 6 6-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}.chv.up{transform:rotate(180deg)}
 .info{display:inline-grid;place-items:center;font:600 13px/1 var(--body);font-style:normal;background:var(--surface-2);border-color:var(--line)}
 .tabbar svg.ic{stroke-width:1.9}
+.qmv h2{display:flex;align-items:center;gap:8px}.qmv .qsub{font-size:12px;color:var(--ink-3);margin:-4px 0 4px}
+.qmv .qg{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:10px 0 2px}
+.qmv .qr{display:grid;grid-template-columns:minmax(0,1fr) 54px 54px 62px 64px;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;font-variant-numeric:tabular-nums}
+.qmv .qr.h{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:2px 0}
+.qmv .qr span:not(:first-child){text-align:right}.qmv .qr b{font-weight:700}
+.qmv .dn{color:#D4FF3F}.qmv .up{color:#ff9f6b}.qmv .eq{color:var(--ink-3)}
+.qmv svg{width:64px;height:18px;display:block;margin-left:auto}
 .rgline{margin:10px 12px 4px;font-size:11.5px;line-height:1.4;color:var(--ink-3);text-align:center;letter-spacing:.01em}
 .rgcard .rgfull{margin:0;color:var(--ink-2);line-height:1.5}
 .sigf .chk input[type=checkbox],input[type=checkbox]{accent-color:var(--accent);width:22px;height:22px;flex:0 0 22px;margin:0}
@@ -872,11 +889,10 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <div class="view" id="viewSel" hidden>
     <label class="fl selwin" for="selWin">Periodo<select id="selWin"><option value="24" selected>Prossime 24 ore</option><option value="48">Prossime 48 ore</option><option value="72">Prossime 72 ore</option></select></label>
     <div class="seg rtabs" role="tablist" aria-label="Sezioni del Radar" id="selTabs">
-      <button type="button" class="segb" data-rt="aplus" aria-pressed="true"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnali A+ <b id="rtA"></b></button>
+      <button type="button" class="segb" data-rt="all" aria-pressed="true"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Grado <b id="rtC"></b></button>
       <button type="button" class="segb" data-rt="bk" aria-pressed="false"><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato <b id="rtB"></b></button>
-      <button type="button" class="segb" data-rt="all" aria-pressed="false"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>In arrivo <b id="rtC"></b></button>
     </div>
-    <section class="card aplus" id="selAplus" aria-label="A+ sul radar"></section>
+    <section class="card aplus" id="selAplus" aria-label="A+ sul radar" hidden></section>
     <section class="card" id="selBk" aria-label="Linea 1xBet" hidden></section>
     <section class="card" id="selAll" aria-label="Partite in arrivo">
       <div class="selhead"><h2><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Partite in arrivo</h2></div>
@@ -1001,6 +1017,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
       <section class="card" id="mcmp" aria-label="Confronto con la partita giocata" hidden></section>
       <main id="out" class="wrap" style="padding:0;margin:0;width:100%"></main>
+      <section class="card" id="mquote" aria-label="Quote 1xBet" hidden></section>
     </div>
     <div class="mpane" data-mp="sig" hidden>
       <section class="card mconf" id="mconf" aria-label="Grado"></section>
@@ -2865,6 +2882,7 @@ function staleNoteDays(sm) {
 }
 
 function render() {
+  setTimeout(renderQuote, 0);
   const home = $("#home").value, away = $("#away").value, mode = $("#decay").value, hl = MODES[mode] || MODES.dyn;
   const out = $("#out");
   { let sv = {}; try { sv = JSON.parse(lsGet(PICK_KEY) || "{}") || {}; } catch (e) {}
@@ -3912,6 +3930,43 @@ const BK_ROWS = [["Gol", "g", "hg", "ag"], ["Tiri totali", "s", null, null], ["T
 const BK_MIN = 0.05;   // valore minimo per segnalare la giocata
 /* giocata con valore: corner, tiri, tiri in porta, falli e cartellini (tiri totali e falli: linee di 1xBet e altri, spesso poche ore prima). I gol sono esclusi: sulla stagione 2025-26 (Over/Under 2,5, 7.634 partite)
    le giocate "con valore" del modello gol perdevano il 7,5% contro le quote reali (audit del 7/10/2026). */
+/* ===== Quote 1xBet della partita, con il loro movimento (data/quote_mov.json, una tappa a ogni giro in cui cambiano) ===== */
+let QMOV = null;
+const QM_GROUPS = [["Esito finale", "1x2"], ["Gol Over/Under 2,5", "ou2.5"], ["Gol Over/Under 1,5", "ou1.5"], ["Gol Over/Under 3,5", "ou3.5"], ["Gol/No gol", "gg"],
+  ["Corner 1X2", "x.c1x2"], ["Corner doppia chance", "x.cdc"], ["Tiri 1X2", "x.s1x2"], ["Tiri in porta 1X2", "x.st1x2"], ["Falli 1X2", "x.f1x2"], ["Falli doppia chance", "x.fdc"],
+  ["Gialli 1X2", "x.y1x2"], ["Gialli doppia chance", "x.ydc"]];
+const QM_SEL = v => ({ Home: "1", Draw: "X", Away: "2", "Home/Draw": "1X", "Home/Away": "12", "Draw/Away": "X2", O: "Over", U: "Under", S: "Gol", N: "No gol" }[v] || v);
+function qSpark(vals) {
+  if (vals.length < 2) return "";
+  const mn = Math.min(...vals), mx = Math.max(...vals), w = 64, h = 18, sp = mx - mn || 1;
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * (w - 4) + 2).toFixed(1)},${(h - 3 - (v - mn) / sp * (h - 6)).toFixed(1)}`).join(" ");
+  const last = vals[vals.length - 1], first = vals[0], col = last < first ? "#D4FF3F" : last > first ? "#ff9f6b" : "var(--ink-3)";
+  return `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+function renderQuote() {
+  const box = $("#mquote"); if (!box) return;
+  const e = CUR; if (!e || e.m || $("#home").value !== e.home || $("#away").value !== e.away) { box.hidden = true; return; }
+  const ser = QMOV && QMOV.partite && QMOV.partite[e.id];
+  if (!ser || !ser.length) { box.hidden = false; box.className = "card qmv"; box.innerHTML = `<h2>Quote 1xBet</h2><p class="muted" style="margin:0">${QMOV ? "Quote 1xBet non ancora disponibili per questa partita (di solito arrivano 1-7 giorni prima; tiri, tiri in porta e falli poche ore prima)." : "Carico le quote…"}</p>` + RG_LINE; return; }
+  const fmt = v => v.toFixed(2).replace(".", ","), hm = t => t.slice(11, 16), dshort = t => `${t.slice(8, 10)}/${t.slice(5, 7)} ${hm(t)}`;
+  let html = "";
+  for (const [lab, mk] of QM_GROUPS) {
+    const keys = [...new Set(ser.flatMap(([, q]) => Object.keys(q)).filter(k => k.split(":")[0] === mk))];
+    if (!keys.length) continue;
+    const ord = s => ["1", "X", "2", "1X", "12", "X2", "Over", "Under", "Gol", "No gol"].indexOf(s);
+    keys.sort((a, b) => ord(QM_SEL(a.split(":")[1])) - ord(QM_SEL(b.split(":")[1])));
+    html += `<div class="qg">${lab}</div>` + keys.map(k => {
+      const pts = ser.filter(([, q]) => q[k] > 1).map(([t, q]) => [t, q[k]]); if (!pts.length) return "";
+      const v = pts.map(p => p[1]), a = v[0], z = v[v.length - 1], d = z - a, cls = Math.abs(d) < 0.005 ? "eq" : d < 0 ? "dn" : "up";
+      return `<div class="qr"><span>${esc(QM_SEL(k.split(":")[1]))}</span><span title="prima quota vista: ${dshort(pts[0][0])}">${fmt(a)}</span><span><b>${fmt(z)}</b></span><span class="${cls}">${cls === "eq" ? "=" : (d < 0 ? "▼ " : "▲ ") + fmt(Math.abs(d))}</span><span>${qSpark(v)}</span></div>`;
+    }).join("");
+  }
+  const last = ser[ser.length - 1][0], first = ser[0][0];
+  box.hidden = false; box.className = "card qmv";
+  box.innerHTML = `<h2>Quote 1xBet</h2><p class="qsub">Prima vista ${dshort(first)} · ultimo cambio ${dshort(last)} · controllo ogni 30 minuti circa nel giorno della partita</p>
+    <div class="qr h"><span>Esito</span><span>Apertura</span><span>Ora</span><span>Variaz.</span><span>Andamento</span></div>${html || `<p class="muted">Nessun mercato.</p>`}
+    <p class="small muted" style="margin:0">▼ quota in calo (il bookmaker la ritiene più probabile) · ▲ quota in salita.</p>` + RG_LINE;
+}
 const RG_LINE = `<p class="rgline">Quote solo informative · Prevista non è un bookmaker · 18+ · Gioca responsabilmente</p>`;
 const isVal = c => !!(c && c.po != null && !c.gol && c.ev >= BK_MIN);
 const bkLines = e => (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null;
@@ -4731,13 +4786,13 @@ function renderSelBk(ents, cfg, when) {
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelBk(selEntries(), cfg, when); }, 30);
 }
-/* Radar a tre schede: Segnali A+ · Mercato · In arrivo (il Mercato non resta in fondo alla pagina) */
+/* Radar a due schede: Grado · Mercato (11/10/2026: tolta "Segnali A+", gli A+ sono già nel Grado) */
 function radarTabs() {
-  if (!SEL.tab) SEL.tab = "aplus";
+  if (!SEL.tab || SEL.tab === "aplus") SEL.tab = "all";
   const set = (id, n) => { const el = $(id); if (el) el.textContent = n == null ? "" : n; };
-  set("#rtA", SEL.aN); set("#rtB", SEL.bkN); set("#rtC", SEL.cN);
+  set("#rtB", SEL.bkN); set("#rtC", SEL.cN);
   document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.rt === SEL.tab)));
-  $("#selAplus").hidden = SEL.tab !== "aplus"; $("#selAll").hidden = SEL.tab !== "all";
+  $("#selAplus").hidden = true; $("#selAll").hidden = SEL.tab !== "all";
   const bk = $("#selBk"); if (bk && bk.innerHTML) bk.hidden = SEL.tab !== "bk";
 }
 document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { SEL.tab = b.dataset.rt; radarTabs(); }));
@@ -4828,6 +4883,7 @@ function navTab(v) {
 }
 addEventListener("popstate", ev => {
   if (NAV.skip) { NAV.skip--; return; }
+  if (!DDS.hidden) { NAV.ddPop = true; DDS.hidden = true; return; }
   if (!SHEET.hidden) { NAV.sheetPop = true; SHEET.hidden = true; return; }
   const st = ev.state || {};
   if (st.m) {   // avanti verso una partita
@@ -4846,6 +4902,45 @@ const SHEET = (() => { const d = document.createElement("div"); d.className = "s
   d.innerHTML = `<div class="sh" role="dialog" aria-modal="true" aria-label="Informazioni"><div class="sh-h"><b></b><button type="button" class="sh-x" aria-label="Chiudi">✕</button></div><div class="sh-b"></div></div>`;
   document.body.appendChild(d); d.addEventListener("click", ev => { if (ev.target === d || ev.target.closest(".sh-x")) d.hidden = true; });
   addEventListener("keydown", ev => { if (ev.key === "Escape") d.hidden = true; }); return d; })();
+/* ===== Tendine dell'app (11/10/2026): al posto della lista del telefono si apre un foglio con i colori dell'app.
+   Le <select> restano (valori, eventi "change"); non ricevono il tocco (pointer-events:none) e il tocco sul loro riquadro apre il foglio. ===== */
+const DDS = (() => { const d = document.createElement("div"); d.className = "sheet ddsheet"; d.hidden = true;
+  d.innerHTML = `<div class="sh" role="dialog" aria-modal="true"><div class="sh-h"><b></b><button type="button" class="sh-x" aria-label="Chiudi">✕</button></div><div class="sh-b" role="listbox"></div></div>`;
+  document.body.appendChild(d); d.addEventListener("click", ev => { if (ev.target === d || ev.target.closest(".sh-x")) d.hidden = true; }); return d; })();
+let DD_SEL = null;
+function ddTitle(sel) {   // testo dell'etichetta, senza le voci della tendina
+  for (const lab of [sel.closest("label"), sel.id && document.querySelector(`label[for="${sel.id}"]`)]) {
+    if (!lab) continue; const c = lab.cloneNode(true); c.querySelectorAll("select, .ibtn").forEach(x => x.remove());
+    const t = c.textContent.replace(/\s+/g, " ").trim(); if (t) return t;
+  }
+  return sel.getAttribute("aria-label") || sel.title || "Scegli";
+}
+function ddOpen(sel) {
+  DD_SEL = sel; DDS.querySelector(".sh-h b").textContent = ddTitle(sel);
+  const opt = o => `<button type="button" class="ddo" role="option" data-v="${esc(o.value)}" aria-selected="${o.selected}"${o.disabled ? " disabled" : ""}>${esc(o.textContent)}</button>`;
+  DDS.querySelector(".sh-b").innerHTML = [...sel.children].map(c => c.tagName === "OPTGROUP" ? `<div class="ddg">${esc(c.label)}</div>` + [...c.children].map(opt).join("") : opt(c)).join("");
+  DDS.hidden = false;
+  const cur = DDS.querySelector('.ddo[aria-selected="true"]'); if (cur) { cur.scrollIntoView({ block: "center" }); cur.focus(); }
+}
+DDS.addEventListener("click", ev => {
+  const b = ev.target.closest(".ddo"); if (!b || !DD_SEL) return;
+  const sel = DD_SEL, changed = sel.value !== b.dataset.v; sel.value = b.dataset.v; DDS.hidden = true;
+  if (changed) sel.dispatchEvent(new Event("change", { bubbles: true }));
+});
+document.addEventListener("click", ev => {   // tocco sul riquadro di una tendina
+  if (ev.target.closest(".sheet")) return;
+  const x = ev.clientX, y = ev.clientY;
+  const sel = [...document.querySelectorAll("select")].find(s => { if (s.disabled || !s.offsetParent) return false; const r = s.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; });
+  if (sel) { ev.preventDefault(); ev.stopPropagation(); ddOpen(sel); }
+}, true);
+document.addEventListener("keydown", ev => {   // da tastiera: Invio, spazio o frecce sulla tendina aprono il foglio
+  if (ev.target.tagName === "SELECT" && ["Enter", " ", "ArrowDown", "ArrowUp"].includes(ev.key)) { ev.preventDefault(); ddOpen(ev.target); }
+  else if (!DDS.hidden && ev.key === "Escape") DDS.hidden = true;
+}, true);
+new MutationObserver(() => {   // Indietro chiude anche la tendina
+  if (!DDS.hidden) history.pushState(Object.assign({}, history.state, { dd: 1 }), "", location.href);
+  else { if (DD_SEL) { try { DD_SEL.focus({ preventScroll: true }); } catch (e) {} } if (NAV.ddPop) NAV.ddPop = false; else if (history.state && history.state.dd) { NAV.skip++; history.back(); } }
+}).observe(DDS, { attributes: true, attributeFilter: ["hidden"] });
 // fogli "i": Indietro li chiude; chiusi con la ✕ tolgono il loro passo dalla cronologia
 new MutationObserver(() => {
   if (!SHEET.hidden) { history.pushState(Object.assign({}, history.state, { sheet: 1 }), "", location.href); const x = SHEET.querySelector(".sh-x"); if (x) x.focus(); }
@@ -4916,6 +5011,8 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   else if (loadStored()) refreshAll();
   else if (online) refreshAll();
   if (!$("#viewSig").hidden) renderSignals();
+  // movimento delle quote 1xBet: dopo l'avvio, senza rallentarlo
+  if (online) fetch("data/quote_mov.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { QMOV = j || { partite: {} }; if (!$("#viewMatch").hidden) renderQuote(); }).catch(() => { QMOV = { partite: {} }; });
   // link a una partita (#p=…): si apre la scheda
   const hm = /^#p=(.+)$/.exec(location.hash);
   if (hm) { const id = decodeURIComponent(hm[1]), e = allEntries(localIso(), 30).find(x => x.id === id);

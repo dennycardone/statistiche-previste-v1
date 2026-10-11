@@ -1,7 +1,7 @@
 """Scarica da football-data.co.uk i CSV dei campionati della dashboard nella cartella data/.
 Campionati europei: stagione corrente sempre, le 5 precedenti solo se mancano (servono per gli H2H).
 """
-import datetime, json, os, urllib.request, math
+import datetime, json, os, urllib.request, math, re
 
 LEAGUES = ["I1", "I2", "E0", "SP1", "F1", "D1", "N1", "P1",
            "E1", "E2", "E3", "EC", "SC0", "SC1", "SC2", "SC3", "D2", "F2", "SP2", "B1", "T1", "G1"]
@@ -966,17 +966,21 @@ odds_path = os.path.join(OUT, "odds.json")
 try: OD = json.load(open(odds_path))
 except Exception: OD = {}
 rome_now = datetime.datetime.now(ROME)
-def _odds_due():   # gratis: una volta al giorno dalle 7; a pagamento (OD["pro"]): ogni 3 ore
-    if OD.get("errore") and not OD.get("partite"): return True
-    if OD.get("giorno") != rome_now.strftime("%Y-%m-%d"): return rome_now.hour >= 7
-    if OD.get("pro"):
-        try: return (rome_now - datetime.datetime.strptime(OD["aggiornate"], "%d/%m/%Y %H:%M").replace(tzinfo=ROME)).total_seconds() >= 3 * 3600
-        except Exception: return True
-    return False
-ODDS_FULL = bool(AF_KEY and (_odds_due() or os.environ.get("ODDS_FORCE")))
-# Vicino al calcio d'inizio: 1xBet pubblica 1X2 e doppia chance di tiri, tiri in porta e falli poche ore prima. A ogni giro (piano a pagamento)
-# si chiedono le quote, partita per partita, delle sole partite dei nostri campionati che iniziano nelle prossime 3 ore: vanno nell'archivio.
-ODDS_NEAR = bool(AF_KEY and not ODDS_FULL and OD.get("pro"))
+# 11/10/2026: quote a fasce (piano a pagamento), a ogni giro dell'app (circa ogni 30 minuti):
+#   oggi (e domani dopo le 18, per le partite della notte) a ogni giro · domani ogni 2 ore · da dopodomani a +6 giorni ogni 6 ore.
+#   Conti (giornata piena, sabato 10/10): ~25-40 richieste per giorno di quote → ~2.400 al giorno, più ~1.500 del resto dell'app,
+#   ben sotto 7.500 meno la riserva per le prove (tools/af_budget.py).
+def _tier_due(name, hours):
+    try: return (rome_now - datetime.datetime.strptime(OD.get("fasce", {})[name], "%d/%m/%Y %H:%M").replace(tzinfo=ROME)).total_seconds() >= hours * 3600 - 300
+    except Exception: return True
+ODDS_DAYS = []
+if AF_KEY and (OD.get("pro") or not OD):
+    ODDS_DAYS.append(0)
+    if rome_now.hour >= 18 or _tier_due("domani", 2): ODDS_DAYS.append(1)
+    if _tier_due("settimana", 6): ODDS_DAYS += [2, 3, 4, 5, 6]
+elif AF_KEY and (OD.get("giorno") != rome_now.strftime("%Y-%m-%d") and rome_now.hour >= 7 or os.environ.get("ODDS_FORCE")):
+    ODDS_DAYS = [0, 1]   # piano gratuito: una volta al giorno, oggi e domani
+ODDS_FULL = bool(ODDS_DAYS); ODDS_NEAR = False
 if ODDS_FULL or ODDS_NEAR:
     af_used = [0]
     def af(path, **q):
@@ -1041,6 +1045,9 @@ if ODDS_FULL or ODDS_NEAR:
                     nm, val = bet["name"], str(v["value"])
                     if nm in XBETS: xacc.setdefault(XBETS[nm] + ":" + val, {})[b["name"]] = o   # mercati secondari: solo archivio (mediana, per le analisi)
                     if nm in XBETS and b["name"] == "1xBet": xacc.setdefault("x." + XBETS[nm] + ":" + val, {})[b["name"]] = o   # 1xBet: linee dell'app
+                    # 11/10/2026: mercati del primo tempo di 1xBet (corner, tiri, falli, cartellini…): solo archivio, per studiarli (nessuna richiesta in più)
+                    if b["name"] == "1xBet" and re.search(r"1st half|first half|half time", nm, re.I) and re.search(r"corner|shot|foul|card|booking", nm, re.I):
+                        xacc.setdefault("x.h1." + re.sub(r"[^a-z0-9]+", "_", nm.lower()).strip("_") + ":" + val, {})[b["name"]] = o
                     # 1X2 e doppia chance dei mercati di nicchia: quote di 1xBet (il book usato da Denny) e Pinnacle (riferimento), solo archivio
                     if nm in NICHE and b["name"] in BOOK_TAG:
                         xacc.setdefault(BOOK_TAG[b["name"]] + NICHE[nm] + ":" + val, {})[b["name"]] = o
@@ -1066,18 +1073,8 @@ if ODDS_FULL or ODDS_NEAR:
         paid = int(stt.get("limit_day", 100)) > 100
         # Il piano gratuito non accetta la stagione in corso come parametro: quote chieste per data (tutte le partite, 10 per pagina)
         # oppure per singola partita, scegliendo la via con meno richieste.
-        if ODDS_NEAR and budget > 50:
-            F = af("fixtures", date=str(rome_now.date()), timezone="Europe/Rome").get("response", []); budget -= 1
-            now_utc = datetime.datetime.now(datetime.timezone.utc)
-            near = {f["fixture"]["id"]: f for f in F if f["league"]["id"] in BY_ID and f["fixture"]["status"]["short"] in ("NS", "TBD")
-                    and 0 <= (datetime.datetime.fromisoformat(f["fixture"]["date"]) - now_utc).total_seconds() <= 3 * 3600}
-            for i, f in near.items():
-                if budget < 20: break
-                for e in af("odds", fixture=i).get("response", []): take(e, f)
-                budget -= 1
-            print("quote vicino al calcio d'inizio:", len(near), "partite")
-        for k in (range(7 if paid else 2) if ODDS_FULL else []):   # piano gratuito: quote solo da ieri a domani → oggi e domani; a pagamento: 7 giorni
-            if budget < 2: break
+        for k in ODDS_DAYS:
+            if budget < 30: break   # margine per il resto della giornata
             dd = rome_now.date() + datetime.timedelta(days=k)
             F = af("fixtures", date=str(dd), timezone="Europe/Rome").get("response", []); budget -= 1
             fx = {f["fixture"]["id"]: f for f in F if f["league"]["id"] in BY_ID and f["fixture"]["status"]["short"] in ("NS", "TBD")}
@@ -1103,11 +1100,18 @@ if ODDS_FULL or ODDS_NEAR:
     if ODDS_NEAR:   # giro leggero: aggiorno solo le partite vicine, senza toccare l'ora dell'aggiornamento completo
         if res: OD.setdefault("partite", {}).update(res); json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
     elif res:   # senza quote (errore o richieste del giorno finite): il file precedente resta, si riprova al giro dopo
-        OD = {"giorno": rome_now.strftime("%Y-%m-%d"), "aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football)",
-              "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "pro": bool(locals().get("paid")), "partite": res}
+        _t0 = rome_now.strftime("%Y-%m-%d"); ts_ = rome_now.strftime("%d/%m/%Y %H:%M")
+        keep_ = {kk: v for kk, v in (OD.get("partite") or {}).items() if kk.split("|")[1] >= _t0}   # le partite dei giorni non riscaricati restano
+        keep_.update(res)
+        fas = dict(OD.get("fasce") or {}); fas["oggi"] = ts_
+        if 1 in ODDS_DAYS: fas["domani"] = ts_
+        if 2 in ODDS_DAYS: fas["settimana"] = ts_
+        OD = {"giorno": _t0, "aggiornate": ts_, "fonte": "1xBet (via API-Football)", "fasce": fas,
+              "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "pro": bool(locals().get("paid")), "partite": keep_}
         json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
     # Archivio per verificare in futuro i mercati (corner, cartellini, tiri in porta…): per ogni partita la prima quota vista e l'ultima
     # prima del calcio d'inizio, con l'ora. Non si cancella mai: serve proprio a misurare a posteriori.
+    MOV_KEYS = {"1x2", "ou1.5", "ou2.5", "ou3.5", "gg", "x.c1x2", "x.cdc", "x.s1x2", "x.st1x2", "x.f1x2", "x.fdc", "x.y1x2", "x.ydc"}
     if allq:
         hp = os.path.join(OUT, "odds_hist.json")
         try: OH = json.load(open(hp))
@@ -1120,6 +1124,11 @@ if ODDS_FULL or ODDS_NEAR:
                 for qk, qv in q.items():
                     if qk not in x["prima"]["q"]: x["prima"]["q"][qk] = qv; x["prima"].setdefault("ore", {})[qk] = ts
             x["ultima"] = {"ora": ts, "q": {**x.get("ultima", {}).get("q", {}), **q}}
+            # movimento delle quote 1xBet (sezione "Quote 1xBet" della Lettura): una tappa per ogni giro in cui qualcosa cambia
+            snap = {qk: qv[0] for qk, qv in q.items() if qk.split(":")[0] in MOV_KEYS}
+            if snap:
+                ser = x.setdefault("serie", [])
+                if not ser or ser[-1][1] != snap: ser.append([ts, snap]); del ser[:-60]
         json.dump(OH, open(hp, "w"), separators=(",", ":"), ensure_ascii=False)
         print("archivio quote:", len(OH), "partite")
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
@@ -1161,6 +1170,13 @@ try:
     json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football): ultima quota vista prima del calcio d'inizio", "partite": LN},
               open(os.path.join(OUT, "linee.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("linee bookmaker:", len(LN), "partite")
+    # movimento delle quote 1xBet delle partite da oggi in avanti (data/quote_mov.json, pubblico: solo partite non ancora giocate)
+    _t0 = rome_now.strftime("%Y-%m-%d"); QM = {}
+    for kk, x in OH.items():
+        if kk.split("|")[1] >= _t0 and x.get("serie"): QM[kk] = x["serie"]
+    json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football)", "partite": QM},
+              open(os.path.join(OUT, "quote_mov.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+    print("movimento quote:", len(QM), "partite")
 except Exception as e:
     print("linee bookmaker:", e)
 
