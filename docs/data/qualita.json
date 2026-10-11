@@ -1,0 +1,28 @@
+{
+ "partite_non_api": [],
+ "giocate_mancanti": [],
+ "squadre_non_riconosciute": [],
+ "partite_scadute": [
+  "IRL 09/10 Derry City - St Patrick's Athl.",
+  "IRL 09/10 Waterford - Galway United"
+ ],
+ "statistiche_scartate": [
+  "BUL 10/10 Botev Vratsa - Spartak Varna: falli",
+  "BUL 10/10 Lokomotiv Sofia - Lokomotiv Plovdiv: falli",
+  "BUL 10/10 Botev Plovdiv - Slavia Sofia: falli"
+ ],
+ "calendario_da_espn": [],
+ "quote": {
+  "aggiornate": "10/10/2026 23:43",
+  "abbinate": 174,
+  "non_abbinate": 0,
+  "esempi_non_abbinate": []
+ },
+ "api_aggiornata": "2026-10-11 06:31",
+ "avvisi": [
+  "2 partite non giocate con data passata (rinviate o calendario non aggiornato)",
+  "3 partite con statistiche API impossibili (usato football-data o vuoto)"
+ ],
+ "stato": "da controllare",
+ "giro": "11/10/2026 06:58"
+}
