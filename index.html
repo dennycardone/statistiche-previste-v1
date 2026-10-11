@@ -2074,8 +2074,11 @@ function eloAt(div, team, D) {   // Elo prima del giorno della partita (solo ris
 }
 function goalDate(home, away) {   // giorno della partita: data limite (partite giocate) o data in calendario
   if (S.cutoff) return +S.cutoff;
+  // 11/10/2026: la partita aperta ha la sua data; prima una partita serale finiva al giorno dopo se quel giorno se n'era già giocata
+  // un'altra dello stesso campionato (arbitro, cartellini e forbice non si trovavano più)
+  if (typeof CUR !== "undefined" && CUR && !CUR.m && CUR.home === home && CUR.away === away && CUR.lg && CUR.lg.code === S.league) return +CUR.date;
   const last = leagueMatches().reduce((x, m) => Math.max(x, +m.date), 0);
-  const f = S.fixtures.filter(x => x.div === S.league && x.home === home && x.away === away && +x.date > last).sort((a, b) => a.date - b.date)[0];
+  const f = S.fixtures.filter(x => x.div === S.league && x.home === home && x.away === away && +x.date >= last).sort((a, b) => a.date - b.date)[0];
   if (f) return +f.date;
   const t = new Date(); return Math.max(last + DAYMS, Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()));
 }
