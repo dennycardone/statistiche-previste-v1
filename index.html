@@ -526,7 +526,7 @@ select{pointer-events:none}
 .spin{width:38px;height:38px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--hot);animation:spin .9s linear infinite;margin-bottom:6px}@keyframes spin{to{transform:rotate(360deg)}}
 .tlogo{display:inline-block;flex:none;width:18px;height:18px;object-fit:contain;margin-right:7px;vertical-align:-4px}.tlogo.big{display:block;width:30px;height:30px;margin:0 auto 6px}
 .mhead .bdg.lg{background:radial-gradient(circle,#ffffff 0 62%,#e6ebf3 100%);padding:9px}.mhead .bdg.lg img{width:100%;height:100%;object-fit:contain}
-.winstrip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-inline:0;padding-inline:0}.winstrip .day{min-width:0}
+.winstrip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-inline:0;padding-inline:0}.winstrip .day{min-width:0}
 .morebtn{display:block;width:100%;margin:0;padding:10px 12px;border:0;border-top:1px solid var(--line,rgba(255,255,255,.08));background:transparent;color:var(--accent,#7cf);font:inherit;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
 .morebtn:hover{background:rgba(255,255,255,.04)}
 .mhead .hsw{display:flex;flex-direction:column;align-items:center;gap:5px;background:transparent;border:0;padding:0 0 4px;cursor:pointer;color:var(--accent);font:inherit}
@@ -587,7 +587,7 @@ select{pointer-events:none}
 .gitem .gil{display:flex;flex-direction:column;min-width:0}.gitem .gil b{font-size:15px}.gitem .gil small{font-size:12px}
 .gitem .gir{display:flex;align-items:center;gap:10px;flex:0 0 auto}.gitem .gin{font-size:13px;color:var(--ink-2);white-space:nowrap}.gitem .gin b{font-size:16px;color:var(--ink)}
 .gitem[open] summary .gil b{color:var(--accent)}
-.rtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--hot);min-height:20px}
+.rtabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--hot);min-height:20px}
 .gword.sm{font-size:16px}.gsay.sm{font-size:13.5px}
 .selp2{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:14px}.selp2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp2 .gin{font-size:12.5px;color:var(--ink-2);white-space:nowrap}.selp2 .gin b{font-size:15px;color:var(--ink)}
 .mhead .hsw-n{max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;font-family:var(--body);font-stretch:88%;font-size:11px;font-weight:700;color:var(--gold-ink);background:var(--gold);border-radius:999px;padding:2px 8px;white-space:nowrap;animation:hswp 2.4s ease-in-out 3}
@@ -4558,7 +4558,7 @@ document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("clic
 /* ===== Confidence Score: interfaccia (Radar, scheda partita) ===== */
 const CONF_C = new Map();   // previsioni con punteggio per partita e metodo (sessione)
 const CONF_STATUS = { aplus: `<svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnale A+`, watch: `<i class="sdot on"></i>Da seguire`, none: `<i class="sdot"></i>Nessun segnale` };
-const SEL = { f: "all", h: 24 };
+const SEL = { f: "all", h: 24, days: new Set(["0"]) };   // Radar: Oggi e/o Domani (12/10/2026, al posto di 24/48/72 ore)
 function entryOdds(e) {
   if (e.m) return e.m.odds || null;
   const f = S.fixtures.find(x => x.div === e.lg.code && x.home === e.home && x.away === e.away && isoD(x.date) === e.d);
@@ -4749,13 +4749,8 @@ function koStarted(d, time) {
   const [y, mo, dd] = d.split("-").map(Number); return new Date(y, mo - 1, dd, +t[1], +t[2]).getTime() <= Date.now();
 }
 function selEntries() {   // partite da giocare nelle prossime SEL.h ore (orario del calcio d'inizio se c'è, altrimenti il giorno)
-  const now = Date.now(), end = now + SEL.h * 36e5, t0 = localIso(), lim = localIso(new Date(end));
-  return allEntries().filter(e => {
-    if (e.m || e.d < t0 || e.d > lim) return false;
-    const t = /^(\d{1,2}):(\d{2})/.exec(e.time || ""); if (!t) return true;
-    const [y, mo, d] = e.d.split("-").map(Number), ko = new Date(y, mo - 1, d, +t[1], +t[2]).getTime();
-    return ko > now && ko <= end;   // 10/10/2026: una partita iniziata esce dal Radar
-  });
+  const t0 = localIso(), want = new Set([...SEL.days].map(k => addDays(t0, +k)));
+  return allEntries().filter(e => !e.m && want.has(e.d) && !koStarted(e.d, e.time));   // giorni scelti; una partita iniziata esce dal Radar
 }
 /* Radar: giocate con valore sulla linea dei bookmaker (stesse probabilità della scheda match), solo partite con la linea disponibile */
 const BK_C = new Map();
@@ -4813,7 +4808,7 @@ function renderSel() {
     .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
   try { renderSelBk(ents, cfg, when); } catch (x) { console.warn(x); }
-  aBox.innerHTML = `<div class="selhead"><h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${SEL.h} ore</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
+  aBox.innerHTML = `<div class="selhead"><h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${selDaysTxt()}</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button type="button" class="apcard" data-id="${esc(e.id)}">
       <span class="aptag"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
       <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
@@ -4823,7 +4818,7 @@ function renderSel() {
         ${r.qt ? `<span class="small muted">${oddsTxt(r.qt)}</span>` : ""}</span>`).join("")}
       </button>`).join("")}</div>` : `<p class="apnone">NESSUN SEGNALE A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
-  list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">Nessuna partita nelle prossime ${SEL.h} ore.</p>` :
+  list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">${SEL.days.size ? `Nessuna partita ${selDaysTxt().toLowerCase()} ancora da giocare.` : "Scegli Oggi, Domani o entrambi."}</p>` :
     (rows.length ? rows.map(([e, L]) => `<button type="button" class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
       ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}</span><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
@@ -4833,13 +4828,15 @@ function renderSel() {
   clearTimeout(SEL_T);
   if (todo.length) SEL_T = setTimeout(() => { const t = performance.now(); for (const e of todo) { try { confEntry(e, cfg); } catch (x) { CONF_C.set(e.id + "|" + cfg.key, []); } if (performance.now() - t > 250) break; } if (!$("#viewSel").hidden) renderSel(); }, 20);
 }
-$("#selWin").addEventListener("change", () => { SEL.h = +$("#selWin").value; renderSel(); });
-{ // periodo del Radar come striscia (24 / 48 / 72 ore), come i giorni nella pagina Partite
+const selDaysTxt = () => SEL.days.size === 2 ? "Oggi e domani" : SEL.days.has("1") ? "Domani" : "Oggi";
+{ // periodo del Radar: Oggi e Domani, si possono scegliere insieme (al posto di 24 / 48 / 72 ore)
   const lab = $("#selWin").closest("label"), seg = document.createElement("div");
-  seg.className = "daystrip winstrip"; seg.setAttribute("role", "tablist"); seg.setAttribute("aria-label", "Periodo");
-  seg.innerHTML = [["24", "24 ore", "prossime"], ["48", "48 ore", "prossime"], ["72", "72 ore", "prossime"]].map(([v, b, sm]) => `<button type="button" class="day" role="tab" data-w="${v}" aria-selected="${$("#selWin").value === v}"><b>${b}</b><small>${sm}</small></button>`).join("");
+  seg.className = "daystrip winstrip"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Giorni");
+  const dl = k => { const d = new Date(addDays(localIso(), k) + "T00:00:00Z"); return `${DAYS_SHORT[d.getUTCDay()]} ${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}`; };
+  seg.innerHTML = [["0", "Oggi"], ["1", "Domani"]].map(([v, b]) => `<button type="button" class="day" data-w="${v}" aria-pressed="${SEL.days.has(v)}" aria-selected="${SEL.days.has(v)}"><b>${b}</b><small>${dl(+v)}</small></button>`).join("");
   lab.hidden = true; lab.after(seg);
-  seg.querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { $("#selWin").value = b.dataset.w; seg.querySelectorAll(".day").forEach(x => x.setAttribute("aria-selected", String(x === b))); $("#selWin").dispatchEvent(new Event("change")); }));
+  seg.querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { const k = b.dataset.w; if (SEL.days.has(k)) SEL.days.delete(k); else SEL.days.add(k);
+    seg.querySelectorAll(".day").forEach(x => { x.setAttribute("aria-selected", String(SEL.days.has(x.dataset.w))); x.setAttribute("aria-pressed", String(SEL.days.has(x.dataset.w))); }); renderSel(); }));
 }
 document.querySelectorAll("#selF .chip").forEach(b => b.addEventListener("click", () => { SEL.f = b.dataset.sf; document.querySelectorAll("#selF .chip").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderSel(); }));
 document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null) + ($("#selNote") && !$("#viewSel").hidden ? `<p class="small" style="margin:0">${$("#selNote").innerHTML}</p>` : ""); P.scrollIntoView({ block: "nearest" }); } }));
