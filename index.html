@@ -3766,7 +3766,8 @@ function renderSched() {
       <button type="button" class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">${FLAGS[L.country] || "⚽"}</span><span class="nm"><small>${esc(L.country)}</small><b>${esc(L.name)}</b></span><span class="cnt" data-cnt>${n}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       ${today.filter(e => e.lg.code === L.code).map(e => rowHTML(e, rowCached(e))).join("")}
     </section>`; };
-  const topL = shown.filter(L => TOP_LG.includes(L.code)), altL = shown.filter(L => !TOP_LG.includes(L.code));
+  const topL = shown.filter(L => TOP_LG.includes(L.code)),
+    altL = shown.filter(L => !TOP_LG.includes(L.code)).sort((a, b) => a.country.localeCompare(b.country, "it") || a.name.localeCompare(b.name, "it"));   // altri campionati: in ordine alfabetico (nazione, poi campionato)
   box.innerHTML = `<div id="daysumBox">${todo.length ? "" : daySum()}</div>` +
     (topL.length ? `<div class="lgsec">Top campionati<small>${topL.reduce((a, L) => a + today.filter(e => e.lg.code === L.code).length, 0)} partite</small></div>` + topL.map(block).join("") : "") +
     (altL.length ? `<div class="lgsec">Altri campionati<small>${altL.reduce((a, L) => a + today.filter(e => e.lg.code === L.code).length, 0)} partite</small></div>` + altL.map(block).join("") : "");
