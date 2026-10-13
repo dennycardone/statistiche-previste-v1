@@ -728,6 +728,10 @@ try:
     for lg, L in by_lg.items():
         L.sort(key=lambda v: v[0])
         MAPS[lg] = apif_extra.learn_map([(datetime.date.fromisoformat(v[0][:10]), v[2], v[3], v[4], v[5]) for v in L if v[9] in ("FT", "AET", "PEN")], ours.get(lg, []), lg)
+        # 13/10/2026: campionati solo API-Football (e coppe): i nostri nomi SONO quelli di API-Football. Una squadra con meno di 2 partite
+        # già abbinate (es. esordienti in Champions: Sabah, Viking, Como…) restava senza nome → partita fuori dal calendario e senza quote
+        if lg in API_ONLY:
+            for v in L: MAPS[lg].setdefault(v[2], v[2]); MAPS[lg].setdefault(v[3], v[3])
     # loghi con i nostri nomi di squadra (data/loghi.json): prima API-Football, poi gli stemmi di football-data.org
     try:
         _cr = json.load(open(os.path.join(OUT, "crests.json"))).get("teams", {}) if os.path.exists(os.path.join(OUT, "crests.json")) else {}
