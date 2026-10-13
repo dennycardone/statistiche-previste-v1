@@ -617,7 +617,8 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
 .mrow,.mrow{grid-template-columns:50px minmax(0,1fr)}
 .uh{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;text-align:center}
 .uh .ut{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;font-weight:600;font-size:15px;line-height:1.2}
-.uh .ut img{width:44px;height:44px;object-fit:contain}
+.uh{align-items:start}.uh .us{align-self:center}
+.uh .ulg{display:block;width:44px;height:44px}.uh .ulg img{display:block;width:44px;height:44px;object-fit:contain}
 .uh .us{font-family:var(--display);font-stretch:75%;font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
 .uh .us small{display:block;font-family:var(--body);font-stretch:100%;font-size:12px;font-weight:500;color:var(--ink-2)}
 .umeta{text-align:center;font-size:12px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
@@ -3836,7 +3837,9 @@ function uclRound(r) {
   const m = /League Stage - (\d+)/.exec(r || ""); if (m) return `Fase campionato · ${m[1]}ª giornata`;
   return { "Knockout Round Play-offs": "Spareggi fase a eliminazione", "Round of 16": "Ottavi di finale", "Quarter-finals": "Quarti di finale", "Semi-finals": "Semifinali", "Final": "Finale" }[r] || r || "";
 }
-const uLogo = (u, big) => u && /^https:\/\//.test(u) ? `<img class="tlogo${big ? " big" : ""}" src="${esc(u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">` : "";
+const uLogo = (u, big) => { const ok = u && /^https:\/\//.test(u);
+  if (big) return `<span class="ulg">${ok ? `<img src="${esc(u)}" alt="" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}</span>`;   // spazio fisso: l'intestazione non si sposta se il logo manca
+  return ok ? `<img class="tlogo" src="${esc(u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">` : ""; };
 function uclRowHTML(e) {
   const x = e.ucl, r = x.ris && x.ris.g, live = !r && Date.now() >= +e.date;
   return `<button type="button" class="mrow urow" data-uid="${esc(e.id)}">
