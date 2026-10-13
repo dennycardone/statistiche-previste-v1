@@ -252,7 +252,7 @@ def block(e, s):
     if not P or CHOICE[s] not in P: return None
     ph, pa = P[CHOICE[s]]; al = 0.0 if s == "g" else alpha_for(e, s); K = 80 if s in ("s", "f") else 40
     a, b = pmf(ph, al, K), pmf(pa, al, K); t = np.convolve(a, b)[:K]
-    return [round(ph, 2), round(pa, 2), interval(a), interval(b), interval(t)]
+    return [round(ph, 2), round(pa, 2), interval(a), interval(b), interval(t), round(al, 4)]   # ultima: dispersione (Binomiale Negativa) per le probabilità dell app
 def goals(e):
     P = e["P"].get("g")
     if not P or CHOICE["g"] not in P: return None
