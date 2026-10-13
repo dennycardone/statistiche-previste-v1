@@ -49,6 +49,11 @@ jobs:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
       - name: Previsioni della home
         run: node precalc.js
+      - name: Previsioni Champions League (ramo champions, preparate da champions.yml)
+        run: |
+          if git ls-remote --exit-code origin champions >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin champions && git show FETCH_HEAD:ucl.json > /tmp/ucl.json && mv /tmp/ucl.json data/ucl.json || true
+          fi
       - name: Pubblica sul ramo pages (un solo commit, la cronologia non cresce)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -56,7 +61,7 @@ jobs:
           rm -rf _site && mkdir _site
           # sul sito solo i file che l'app usa: gli archivi grezzi (API-Football, quote storiche, ESPN, CSV) restano nel magazzino privato
           APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
-          DATA="bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json"
+          DATA="bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json"
           for d in _site _site/docs; do
             mkdir -p $d/data && cp $APP $d/ && touch $d/.nojekyll
             for f in $DATA; do if [ -f data/$f ]; then cp data/$f $d/data/; fi; done

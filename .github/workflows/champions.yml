@@ -1,0 +1,45 @@
+name: Champions League
+# Previsioni Champions (tools/ucl_model.py): scarica i risultati nuovi da API-Football (solo le richieste oltre la riserva dell'app),
+# ricalcola i modelli e pubblica ucl.json sul ramo champions; il giro "Aggiorna dati corner" lo mette sul sito.
+on:
+  schedule:
+    - cron: "20 4,10,15 * * *"   # in UTC: mattina, primo pomeriggio, prima delle partite delle 18:45 / 21:00 italiane
+    - cron: "10 21,23 * * *"     # dopo le partite (risultati e statistiche)
+  workflow_dispatch: {}
+concurrency:
+  group: champions
+  cancel-in-progress: false
+permissions:
+  contents: write
+  actions: write
+jobs:
+  ucl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivio (ramo storico)
+        run: |
+          mkdir -p storico
+          git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy scipy
+      - run: python tools/ucl_model.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Salva l'archivio (ramo storico) e le previsioni (ramo champions)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          R="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          (cd storico && git init -q -b storico && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
+            && git add -A && git commit -q -m "Storico $(date -u '+%F %H:%M')" && git push -q -f "$R" storico)
+          mkdir _c && cp ucl.json _c/ && cd _c && git init -q -b champions && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
+            && git add -A && git commit -q -m "Champions $(date -u '+%F %H:%M')" && git push -q -f "$R" champions
+      - name: Mette subito le previsioni sul sito
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -s -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/update.yml/dispatches" -d '{"ref":"main"}'
