@@ -615,6 +615,31 @@ select optgroup{color:var(--accent);background:var(--bg);font-family:var(--body)
 .gck{display:flex;gap:8px;align-items:baseline;color:var(--ink-2);line-height:1.35}.gck i{font-style:normal;font-weight:700;width:14px;flex:0 0 14px;text-align:center}
 .gck.ok i{color:#5ee08a}.gck.mid i{color:var(--gold)}.gck.ko i{color:#ff7a7a}.gck.why{color:var(--ink-3)}
 .mrow,.mrow{grid-template-columns:50px minmax(0,1fr)}
+.uh{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;text-align:center}
+.uh .ut{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;font-weight:600;font-size:15px;line-height:1.2}
+.uh .ut img{width:44px;height:44px;object-fit:contain}
+.uh .us{font-family:var(--display);font-stretch:75%;font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
+.uh .us small{display:block;font-family:var(--body);font-stretch:100%;font-size:12px;font-weight:500;color:var(--ink-2)}
+.umeta{text-align:center;font-size:12px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
+.u3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.u4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ucell{background:var(--surface-2);border-radius:8px;padding:8px 4px;text-align:center;display:flex;flex-direction:column;gap:2px;font-variant-numeric:tabular-nums}
+.ucell small{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.ucell b{font-size:18px}
+.ucell.best b{color:var(--accent)}
+.ucell.ok{box-shadow:inset 0 0 0 1.5px var(--good)}.ucell.ko b{color:var(--ink-3)}
+.utop{display:flex;flex-wrap:wrap;gap:6px}
+.utop span{background:var(--surface-2);border-radius:999px;padding:3px 10px;font-size:13px;font-variant-numeric:tabular-nums}
+.utop span.hit{box-shadow:inset 0 0 0 1.5px var(--good)}
+.utbl{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:0;font-variant-numeric:tabular-nums}
+.utbl>div{padding:8px 4px;border-top:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:1px}
+.utbl>div:nth-child(-n+3){border-top:none}
+.utbl .ul{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.utbl .uv{font-size:17px;font-weight:700}
+.utbl .ur{font-size:11.5px;color:var(--ink-2)}
+.utbl .ux{font-size:12px;font-weight:600;color:var(--ink-3)}.utbl .ux.in{color:var(--good)}
+.utbl .mid{min-width:118px}
+.utbl .hd{font-size:12px;color:var(--ink-2);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .mrow .tmc{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
 .mrow .tmc .dots{align-items:flex-start;gap:3px}
 .mrow .tmc .dots.presi{flex-direction:row;align-items:baseline;gap:3px}.mrow .tmc .dots.presi b{font-size:12px}.mrow .tmc .dots.presi small{font-size:10px}.mrow .tm.fin{font-size:10px}
@@ -998,6 +1023,14 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <div class="lgchips" id="lgChips" role="group" aria-label="Campionati" hidden></div>
     <div id="sched" class="sched"></div>
     <span id="dataStamp" hidden></span>
+  </div>
+
+  <div class="view" id="viewUcl" hidden>
+    <div class="mtop">
+      <button type="button" id="uclBack" class="backbtn" aria-label="Torna al palinsesto">‹ Partite</button>
+      <span class="tag">Champions League</span>
+    </div>
+    <div id="uclOut" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
 
   <div class="view" id="viewMatch" hidden>
@@ -3720,25 +3753,26 @@ function renderSched() {
   const box = $("#sched"); if (!box) return;
   // 30 giorni indietro: con 10 le partite giocate prima di una pausa (es. nazionali) sparivano dalla lista
   const all = allEntries(localIso(), 30), t0 = localIso();
-  const dayset = new Set(all.map(e => e.d)); dayset.add(t0);
+  const UE = uclEntries().filter(e => e.d >= addDays(t0, -30) && e.d <= addDays(t0, 14));   // Champions League (data/ucl.json)
+  const dayset = new Set(all.map(e => e.d).concat(UE.map(e => e.d))); dayset.add(t0);
   const days = [...dayset].sort();
   if (!SCHED.day || !dayset.has(SCHED.day)) SCHED.day = t0;   // si parte sempre da oggi, anche senza partite
   $("#days").innerHTML = days.map(d => {
-    const dt = new Date(d + "T00:00:00Z"), n = all.filter(e => e.d === d).length;
+    const dt = new Date(d + "T00:00:00Z"), n = all.filter(e => e.d === d).length + UE.filter(e => e.d === d).length;
     return `<button type="button" class="day${d < t0 ? " past" : ""}" role="tab" data-d="${d}" aria-selected="${d === SCHED.day}"><b>${d === t0 ? "Oggi" : DAYS_SHORT[dt.getUTCDay()]}</b><span>${String(dt.getUTCDate()).padStart(2, "0")}.${String(dt.getUTCMonth() + 1).padStart(2, "0")}</span><small>${n ? n + " partite" : "—"}</small></button>`;
   }).join("");
   $("#days").querySelectorAll(".day").forEach(b => b.addEventListener("click", () => { SCHED.day = b.dataset.d; SCHED.open.clear(); renderSched(); }));
   const strip = $("#days"), sel = strip.querySelector('[aria-selected="true"]');
   if (SCHED.day === t0 && sel) { const r = sel.getBoundingClientRect(), b = strip.getBoundingClientRect(); strip.scrollLeft += (r.left + r.width / 2) - (b.left + b.width / 2); }   // oggi al centro: prima i giorni passati, dopo i prossimi
   else if (sel) sel.scrollIntoView({ block: "nearest", inline: "nearest" });
-  const today = all.filter(e => e.d === SCHED.day);
+  const today = all.filter(e => e.d === SCHED.day), todayU = UE.filter(e => e.d === SCHED.day);
   const lgs = LEAGUES.filter(L => today.some(e => e.lg.code === L.code));
   SCHED.lg = "all";   // la home mostra sempre tutti i campionati del giorno
   $("#lgChips").innerHTML = [`<button type="button" class="chip" data-lg="all" aria-pressed="${SCHED.lg === "all"}">Tutti · ${today.length}</button>`]
     .concat(lgs.map(L => `<button type="button" class="chip" data-lg="${L.code}" aria-pressed="${SCHED.lg === L.code}">${esc(lgName(L))} · ${today.filter(e => e.lg.code === L.code).length}</button>`)).join("");
   $("#lgChips").querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => { SCHED.lg = b.dataset.lg; lsSet("statPreviste.lg", SCHED.lg); renderSched(); }));
   const shown = lgs.filter(L => SCHED.lg === "all" || SCHED.lg === L.code);
-  if (!today.length) { const nx = days.find(d => d > SCHED.day && all.some(e => e.d === d));
+  if (!today.length && !todayU.length) { const nx = days.find(d => d > SCHED.day && (all.some(e => e.d === d) || UE.some(e => e.d === d)));
     box.innerHTML = `<div class="empty">${SCHED.day === t0 ? "Oggi nessuna partita" : "Nessuna partita"} di questi campionati.<br><span class="small">${nx ? `Prossime partite: <button type="button" class="linkbtn" id="goNextDay">${DAYS_SHORT[new Date(nx + "T00:00:00Z").getUTCDay()]} ${+nx.slice(8)} ${MONTHS[+nx.slice(5, 7) - 1]}</button>` : "Scegli un altro giorno qui sopra."}</span></div>`;
     const gb = $("#goNextDay"); if (gb) gb.addEventListener("click", () => { SCHED.day = nx; renderSched(); }); return; }
   const playedToday = today.filter(e => e.m && shown.some(L => L.code === e.lg.code));
@@ -3768,10 +3802,11 @@ function renderSched() {
     </section>`; };
   const topL = shown.filter(L => TOP_LG.includes(L.code)),
     altL = shown.filter(L => !TOP_LG.includes(L.code)).sort((a, b) => a.country.localeCompare(b.country, "it") || a.name.localeCompare(b.name, "it"));   // altri campionati: in ordine alfabetico (nazione, poi campionato)
-  box.innerHTML = `<div id="daysumBox">${todo.length ? "" : daySum()}</div>` +
+  box.innerHTML = `<div id="daysumBox">${todo.length ? "" : daySum()}</div>` + (todayU.length ? uclBlockHTML(todayU) : "") +
     (topL.length ? `<div class="lgsec">Top campionati<small>${topL.reduce((a, L) => a + today.filter(e => e.lg.code === L.code).length, 0)} partite</small></div>` + topL.map(block).join("") : "") +
     (altL.length ? `<div class="lgsec">Altri campionati<small>${altL.reduce((a, L) => a + today.filter(e => e.lg.code === L.code).length, 0)} partite</small></div>` + altL.map(block).join("") : "");
-  box.querySelectorAll(".mrow").forEach(bind);
+  box.querySelectorAll(".mrow:not(.urow)").forEach(bind);
+  box.querySelectorAll(".urow").forEach(b => b.addEventListener("click", () => { const e = UE.find(x => x.id === b.dataset.uid); if (e) openUcl(e); }));
   box.querySelectorAll(".lghead").forEach(h => h.addEventListener("click", () => { const sec = h.parentElement, lg = sec.dataset.lg;
     if (SCHED.open.has(lg)) SCHED.open.delete(lg); else SCHED.open.add(lg);
     sec.classList.toggle("closed", !SCHED.open.has(lg)); h.setAttribute("aria-expanded", String(SCHED.open.has(lg))); }));
@@ -3790,6 +3825,67 @@ function renderSched() {
   };
   if (todo.length) setTimeout(step, 0);
   $("#dataStamp").textContent = `Dati ${S.meta.mode} ${S.meta.fetched}.`;
+}
+
+/* ===== Champions League (13/10/2026): previsioni per squadra da data/ucl.json (tools/ucl_model.py su GitHub: rating comune campionati + coppe,
+   ricalcolato a ogni giro con i risultati nuovi; per ogni statistica il modello con l'errore più basso sulle partite già giocate) ===== */
+let UCL = null;
+const uclEntries = () => !UCL || !UCL.partite ? [] : UCL.partite.map(x => { const dt = new Date(x.dt + "Z");
+  return { id: "UCL|" + x.id, ucl: x, date: dt, d: localIso(dt), time: `${String(dt.getHours()).padStart(2, "0")}:${String(dt.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a }; });
+function uclRound(r) {
+  const m = /League Stage - (\d+)/.exec(r || ""); if (m) return `Fase campionato · ${m[1]}ª giornata`;
+  return { "Knockout Round Play-offs": "Spareggi fase a eliminazione", "Round of 16": "Ottavi di finale", "Quarter-finals": "Quarti di finale", "Semi-finals": "Semifinali", "Final": "Finale" }[r] || r || "";
+}
+const uLogo = (u, big) => u && /^https:\/\//.test(u) ? `<img class="tlogo${big ? " big" : ""}" src="${esc(u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">` : "";
+function uclRowHTML(e) {
+  const x = e.ucl, r = x.ris && x.ris.g, live = !r && Date.now() >= +e.date;
+  return `<button type="button" class="mrow urow" data-uid="${esc(e.id)}">
+    <span class="tmc"><span class="tm${r ? " fin" : ""}">${r ? "Finale" : live ? "In corso" : esc(e.time)}</span></span>
+    <span class="tt"><span class="${r && r[0] > r[1] ? "w" : ""}">${uLogo(x.lh)}${esc(x.h)}</span><b>${r ? r[0] : ""}</b><span class="${r && r[1] > r[0] ? "w" : ""}">${uLogo(x.la)}${esc(x.a)}</span><b>${r ? r[1] : ""}</b></span>
+  </button>`;
+}
+function uclBlockHTML(list) {
+  const cl = !SCHED.open.has("UCL");
+  return `<div class="lgsec">Coppe europee<small>${list.length} partite</small></div><section class="lgblock${cl ? " closed" : ""}" aria-label="Champions League" data-lg="UCL">
+    <button type="button" class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">🏆</span><span class="nm"><small>Europa</small><b>Champions League</b></span><span class="cnt">${list.length}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+    ${list.map(uclRowHTML).join("")}</section>`;
+}
+const uf1 = v => v == null ? "N/D" : (Math.round(v * 10) / 10).toFixed(1).replace(".", ",");
+const upc = p => p == null ? "N/D" : Math.round(p * 100) + "%";
+const U_ROWS = [["g", "Gol"], ["s", "Tiri"], ["st", "Tiri in porta"], ["c", "Calci d'angolo"], ["f", "Falli"], ["k", "Cartellini"]];
+function renderUcl(e) {
+  const x = e.ucl, R = x.ris, G = x.gol, r = R && R.g, dt = e.date;
+  const when = `${DAYS_SHORT[dt.getDay()]} ${dt.getDate()} ${MONTHS[dt.getMonth()]} · ${e.time}`;
+  let html = `<section class="card"><div class="umeta">${esc(uclRound(x.round))}</div>
+    <div class="uh"><div class="ut">${uLogo(x.lh, true)}<span>${esc(x.h)}</span></div>
+    <div class="us">${r ? `${r[0]} - ${r[1]}<small>Finale · ${when}</small>` : `<small>${when}</small>`}</div>
+    <div class="ut">${uLogo(x.la, true)}<span>${esc(x.a)}</span></div></div></section>`;
+  if (G) {
+    const res = r ? (r[0] > r[1] ? "1" : r[0] === r[1] ? "X" : "2") : null, best = ["1", "X", "2"].reduce((a, b) => G[b] > G[a] ? b : a);
+    const tg = r ? r[0] + r[1] : null, gg = r ? r[0] > 0 && r[1] > 0 : null;
+    const cell = (lab, p, hit, b) => `<div class="ucell${b ? " best" : ""}${hit == null ? "" : hit ? " ok" : " ko"}"><small>${lab}</small><b>${upc(p)}</b></div>`;
+    const side = (p, out) => r ? (p >= 0.5) === out : null;
+    html += `<section class="card"><h2>Esito e gol</h2>
+      <div class="u3">${["1", "X", "2"].map(k => cell(k, G[k], res ? (res === k ? true : null) : null, k === best)).join("")}</div>
+      <div class="u4">${[1.5, 2.5, 3.5].map((L, i) => cell(`Over ${String(L).replace(".", ",")}`, G.ov[i], side(G.ov[i], tg > L), G.ov[i] >= 0.6)).join("")}${cell("Gol", G.gg, side(G.gg, gg), G.gg >= 0.6)}</div>
+      <div><div class="umeta" style="text-align:left;margin-bottom:6px">Risultati più probabili</div><div class="utop">${G.top.map(([k, p]) => `<span class="${r && k === `${r[0]}-${r[1]}` ? "hit" : ""}">${k} · ${upc(p)}</span>`).join("")}</div></div>
+    </section>`;
+  }
+  const inR = (v, rg) => v != null && rg && v >= rg[0] && v <= rg[1];
+  const cellS = (v, rg, real) => `<div><span class="uv">${uf1(v)}</span><span class="ur">${rg ? `${rg[0]}–${rg[1]}` : ""}</span>${real != null ? `<span class="ux${inR(real, rg) ? " in" : ""}">reale ${real}</span>` : ""}</div>`;
+  html += `<section class="card"><h2>Statistiche attese</h2><div class="utbl">
+    <div><span class="hd">${esc(x.h)}</span></div><div class="mid"><span class="ul">Totale</span></div><div><span class="hd">${esc(x.a)}</span></div>
+    ${U_ROWS.map(([k, lab]) => { const p = x.p && x.p[k], y = R && R[k];
+      if (!p) return `<div><span class="uv">N/D</span></div><div class="mid"><span class="ul">${lab}</span><span class="uv">N/D</span></div><div><span class="uv">N/D</span></div>`;
+      return cellS(p[0], p[2], y ? y[0] : null) + `<div class="mid"><span class="ul">${lab}</span><span class="uv">${uf1(p[0] + p[1])}</span><span class="ur">${p[4][0]}–${p[4][1]}</span>${y ? `<span class="ux${inR(y[0] + y[1], p[4]) ? " in" : ""}">reale ${y[0] + y[1]}</span>` : ""}</div>` + cellS(p[1], p[3], y ? y[1] : null); }).join("")}
+    </div><p class="ur" style="margin:0;color:var(--ink-2);font-size:12px">Valori attesi; sotto, la forbice in cui il valore reale cade 8 volte su 10.${r ? " Previsione fatta prima del calcio d'inizio." : ""} Il modello si ricalcola a ogni risultato nuovo${UCL.updated ? ` (ultimo calcolo ${new Date(UCL.updated).toLocaleString("it-IT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })})` : ""}.</p></section>`;
+  $("#uclOut").innerHTML = html;
+}
+function openUcl(e, fromNav) {
+  if (!fromNav) { const st = { u: e.id }, url = "#u=" + encodeURIComponent(e.ucl.id);
+    if (curView() === "ucl" && history.state && history.state.u) history.replaceState(st, "", url);
+    else { NAV.from = curView(); NAV.y = scrollY; history.pushState(st, "", url); } }
+  showView("ucl"); renderUcl(e); scrollTo({ top: 0, behavior: "auto" });
 }
 
 /* ===== Scheda partita ===== */
@@ -4843,9 +4939,9 @@ document.querySelectorAll("#selF .chip").forEach(b => b.addEventListener("click"
 document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null) + ($("#selNote") && !$("#viewSel").hidden ? `<p class="small" style="margin:0">${$("#selNote").innerHTML}</p>` : ""); P.scrollIntoView({ block: "nearest" }); } }));
 
 function showView(v) {
-  $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewGen").hidden = v !== "gen"; $("#viewRit").hidden = v !== "rit"; $("#viewSel").hidden = v !== "sel"; $("#viewMatch").hidden = v !== "match";
-  $("#navStats").setAttribute("aria-pressed", String(v === "stats" || v === "match")); $("#navSig").setAttribute("aria-pressed", String(v === "sig")); $("#navGen").setAttribute("aria-pressed", String(v === "gen")); $("#navRit").setAttribute("aria-pressed", String(v === "rit")); $("#navSel").setAttribute("aria-pressed", String(v === "sel"));
-  if (v !== "match") { S.cutoff = null; lsSet("statPreviste.view", v); }
+  $("#viewStats").hidden = v !== "stats"; $("#viewSig").hidden = v !== "sig"; $("#viewGen").hidden = v !== "gen"; $("#viewRit").hidden = v !== "rit"; $("#viewSel").hidden = v !== "sel"; $("#viewMatch").hidden = v !== "match"; $("#viewUcl").hidden = v !== "ucl";
+  $("#navStats").setAttribute("aria-pressed", String(v === "stats" || v === "match" || v === "ucl")); $("#navSig").setAttribute("aria-pressed", String(v === "sig")); $("#navGen").setAttribute("aria-pressed", String(v === "gen")); $("#navRit").setAttribute("aria-pressed", String(v === "rit")); $("#navSel").setAttribute("aria-pressed", String(v === "sel"));
+  if (v !== "match") { S.cutoff = null; if (v !== "ucl") lsSet("statPreviste.view", v); }
   if (v === "stats") renderSched();
   if (v === "sig") renderSignals();
   if (v === "gen") renderGen();
@@ -4860,6 +4956,7 @@ document.querySelectorAll(".sstat").forEach(b => b.addEventListener("click", () 
 $("#navStats").addEventListener("click", () => { navTab("stats"); scrollTo({ top: 0 }); });
 $("#back").addEventListener("click", () => { if (history.state && history.state.m) history.back(); else closeMatch(); });
 $("#navSig").addEventListener("click", () => navTab("sig"));
+$("#uclBack").addEventListener("click", () => { if (history.state && history.state.u) history.back(); else closeMatch(); });
 $("#navGen").addEventListener("click", () => navTab("gen"));
 $("#navRit").addEventListener("click", () => navTab("rit"));
 $("#navSel").addEventListener("click", () => navTab("sel"));
@@ -4867,15 +4964,15 @@ $("#navSel").addEventListener("click", () => navTab("sel"));
 /* ===== Indietro del telefono (history): chiude la scheda partita e torna dove eri; dalle altre sezioni torna a Partite;
    chiude i fogli "i". Ogni partita ha il suo link (#p=…), che si può condividere. ===== */
 const NAV = { from: "stats", y: 0, skip: 0 };
-const curView = () => ["stats", "sig", "gen", "rit", "sel", "match"].find(v => !$("#view" + { stats: "Stats", sig: "Sig", gen: "Gen", rit: "Rit", sel: "Sel", match: "Match" }[v]).hidden) || "stats";
+const curView = () => ["stats", "sig", "gen", "rit", "sel", "match", "ucl"].find(v => !$("#view" + { stats: "Stats", sig: "Sig", gen: "Gen", rit: "Rit", sel: "Sel", match: "Match", ucl: "Ucl" }[v]).hidden) || "stats";
 function navMatch(e) {
   const st = { m: e.id, v: (history.state && history.state.v) || null }, url = "#p=" + encodeURIComponent(e.id);
   if (curView() === "match" && history.state && history.state.m) history.replaceState(st, "", url);
   else { NAV.from = curView(); NAV.y = scrollY; history.pushState(st, "", url); }
 }
-function closeMatch() { showView(NAV.from === "match" ? "stats" : NAV.from); requestAnimationFrame(() => scrollTo({ top: NAV.y })); }
+function closeMatch() { showView(NAV.from === "match" || NAV.from === "ucl" ? "stats" : NAV.from); requestAnimationFrame(() => scrollTo({ top: NAV.y })); }
 function navTab(v) {
-  if (curView() === "match" && history.state && history.state.m) { NAV.skip++; history.back(); }   // dalla scheda: via la partita dalla cronologia
+  if ((curView() === "match" && history.state && history.state.m) || (curView() === "ucl" && history.state && history.state.u)) { NAV.skip++; history.back(); }   // dalla scheda: via la partita dalla cronologia
   const st = v === "stats" ? null : { v };
   if (v === "stats") { if (history.state && history.state.v) { NAV.skip++; history.back(); } }
   else if (history.state && history.state.v) history.replaceState(st, "", location.pathname + location.search);
@@ -4887,10 +4984,11 @@ addEventListener("popstate", ev => {
   if (!DDS.hidden) { NAV.ddPop = true; DDS.hidden = true; return; }
   if (!SHEET.hidden) { NAV.sheetPop = true; SHEET.hidden = true; return; }
   const st = ev.state || {};
+  if (st.u) { const e = uclEntries().find(x => x.id === st.u); if (e) openUcl(e, true); return; }
   if (st.m) {   // avanti verso una partita
     const e = allEntries(localIso(), 30).find(x => x.id === st.m); if (e) openEntry(e, true); return;
   }
-  if (curView() === "match") { closeMatch(); return; }
+  if (curView() === "match" || curView() === "ucl") { closeMatch(); return; }
   showView(st.v || "stats");
 });
 
@@ -5014,6 +5112,11 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   if (!$("#viewSig").hidden) renderSignals();
   // movimento delle quote 1xBet: dopo l'avvio, senza rallentarlo
   if (online) fetch("data/quote_mov.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { QMOV = j || { partite: {} }; if (!$("#viewMatch").hidden) renderQuote(); }).catch(() => { QMOV = { partite: {} }; });
+  // Champions League: previsioni pronte (dopo l'avvio); link #u=… alla partita
+  if (online) fetch("data/ucl.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { if (!j) return; UCL = j;
+    if (!$("#viewStats").hidden) renderSched();
+    const hu = /^#u=(.+)$/.exec(location.hash), e = hu && uclEntries().find(x => x.ucl.id === decodeURIComponent(hu[1]));
+    if (e) { history.replaceState(null, "", location.pathname + location.search); openUcl(e); } }).catch(() => {});
   // link a una partita (#p=…): si apre la scheda
   const hm = /^#p=(.+)$/.exec(location.hash);
   if (hm) { const id = decodeURIComponent(hm[1]), e = allEntries(localIso(), 30).find(x => x.id === id);
