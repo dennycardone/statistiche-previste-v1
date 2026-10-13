@@ -1681,8 +1681,10 @@ const LEAGUES = [
 const LG = Object.fromEntries(LEAGUES.map(l => [l.code, l]));
 // Champions League (13/10/2026): solo per la scheda partita e il blocco "Coppe europee" di Partite; non è in LEAGUES, quindi resta fuori da Radar, Segnali, Tendenze e Digiuni
 LG.UCL = { code: "UCL", name: "Champions League", country: "Europa", file: "api/UCL.csv", newCountry: "UCL", api: true };
+LG.UEL = { code: "UEL", name: "Europa League", country: "Europa", file: "api/UEL.csv", newCountry: "UEL", api: true };   // 13/10/2026
+const CUPS = [{ code: "UCL", file: "ucl.json" }, { code: "UEL", file: "uel.json" }], CUPD = {}, isCup = c => CUPS.some(x => x.code === c);
 const lgName = l => `${l.country} · ${l.name}`;   // prima la nazione, poi il campionato
-const NEW_BY_COUNTRY = Object.fromEntries(LEAGUES.filter(l => l.newCountry).flatMap(l => [[l.newCountry, l.code], [l.code, l.code]])); NEW_BY_COUNTRY.UCL = "UCL";   // nome del paese o codice (GitHub riscrive la colonna con il codice)
+const NEW_BY_COUNTRY = Object.fromEntries(LEAGUES.filter(l => l.newCountry).flatMap(l => [[l.newCountry, l.code], [l.code, l.code]])); NEW_BY_COUNTRY.UCL = "UCL"; NEW_BY_COUNTRY.UEL = "UEL";   // nome del paese o codice (GitHub riscrive la colonna con il codice)
 const seasonLabel = (y, cal) => cal ? String(y) : `${y}/${String((y + 1) % 100).padStart(2, "0")}`;
 const numOrNull = v => (v === undefined || v === null || String(v).trim() === "") ? null : (isFinite(+v) ? +v : null);
 
@@ -2523,7 +2525,7 @@ function extraFor(home, away) {
   if (EXC.has(ck)) return EXC.get(ck);
   let x = null;
   try { x = EXTRA.partite[`${S.league}|${isoD(new Date(goalDate(home, away)))}|${home}|${away}`] || null; } catch (e) {}
-  if (S.league === "UCL") {   // Champions: arbitro da extra.json, cartellini attesi da data/ucl.json
+  if (isCup(S.league)) {   // coppe: arbitro da extra.json, cartellini attesi da data/ucl.json · uel.json
     const u = uclPredFor(home, away), k = u && u.p && u.p.k;
     if (k) { x = x ? x.slice() : []; x[6] = k[0]; x[7] = k[1]; x[4] = k[0] + k[1]; x[9] = null; }
     else if (x) { x = x.slice(); x[4] = x[6] = x[7] = null; x[9] = null; }
@@ -2547,7 +2549,7 @@ function model(home, away, cfg, k = "c") {
   return { ...M, lh, la, tot: lh + la, refF: f, pmf: pmfTotal(lh + la, M.r, 90) };
 }
 function modelBase(home, away, cfg, k = "c") {
-  if (S.league === "UCL") return uclModel(home, away, k);   // Champions: modello comune campionati + coppe (tools/ucl_model.py)
+  if (isCup(S.league)) return uclModel(home, away, k);   // Champions: modello comune campionati + coppe (tools/ucl_model.py)
   const list = metricMatches(k); let L = league(list, k);
   const gdyn = cfg.dyn && (k === "gm" || k === "c" || k === "f" || k === "s" || k === "st");   // gol, corner, falli e tiri in Media dinamica: modelli verificati, funzionano anche a inizio stagione
   if (!L && !gdyn) return null;
@@ -3159,7 +3161,7 @@ function computeSignals(o) {
   const wantGoals = mks.some(k => k in GOAL_LINE || k === "gg");
   const th = k => o.th && o.th[k] != null ? o.th[k] : o.minP;   // soglia per mercato (Segnali) o unica
   // o.ucl (Segnali): anche la Champions League, con le probabilità del suo modello (data/ucl.json)
-  for (const L of o.ucl && UCL ? LEAGUES.concat([LG.UCL]) : LEAGUES) {
+  for (const L of o.ucl ? LEAGUES.concat(CUPS.filter(c => CUPD[c.code]).map(c => LG[c.code])) : LEAGUES) {
     if (o.lgSel && o.lgSel !== "all" && o.lgSel !== L.code) continue;
     withLeague(L.code, () => {
       const sm = seasonMatches(); if (!sm.length) return;
@@ -3180,7 +3182,7 @@ function computeSignals(o) {
         const G = MM ? MM.G : wantGoals ? modelGoals(f.home, f.away, o.cfg) : null;
         const gk = o.cfg.classic ? "g" : "gm";
         // Champions: il modello usa tutte le partite delle squadre (campionati e coppe), il minimo di 3 partite in casa e in trasferta non serve
-        const g3of = k => L.code === "UCL" || (venueCount(f.home, "C", k) >= 3 && venueCount(f.away, "T", k) >= 3);
+        const g3of = k => isCup(L.code) || (venueCount(f.home, "C", k) >= 3 && venueCount(f.away, "T", k) >= 3);
         const push = (mk, k, R, extra) => {
           const g3 = g3of(k === "g" ? gk : k);
           if (o.needGames && !g3) return;
@@ -3192,8 +3194,8 @@ function computeSignals(o) {
             if (p >= th(mk)) push(mk, "g", G, { line: GOAL_LINE[mk], fav: "Over " + th1(GOAL_LINE[mk]), p });
           } else if (mk === "k") {
             // cartellini: la linea più alta con Over sopra la soglia, altrimenti la più bassa con Under sopra la soglia
-            const x = EXTRA && EXTRA.partite && EXTRA.partite[`${L.code}|${isoD(f.date)}|${f.home}|${f.away}`], uk = L.code === "UCL" ? (uclPredFor(f.home, f.away) || {}).p : null,
-              mu = L.code === "UCL" ? (uk && uk.k ? uk.k[0] + uk.k[1] : null) : x && x[4];
+            const x = EXTRA && EXTRA.partite && EXTRA.partite[`${L.code}|${isoD(f.date)}|${f.home}|${f.away}`], uk = isCup(L.code) ? (uclPredFor(f.home, f.away) || {}).p : null,
+              mu = isCup(L.code) ? (uk && uk.k ? uk.k[0] + uk.k[1] : null) : x && x[4];
             if (!mu) continue;
             const P = cardProbs(mu); let pick = null;
             for (let i = CARD_LINES.length - 1; i >= 0; i--) if (P[i] >= th("kO" + CARD_LINES[i])) { pick = { line: CARD_LINES[i], fav: "Over " + th1(CARD_LINES[i]), p: P[i] }; break; }
@@ -3576,7 +3578,7 @@ $("#resetBtn").addEventListener("click", () => { lsDel(STORE_KEY); loadEmbedded(
 $("#swap").addEventListener("click", () => { CUR = null; S.cutoff = null; const h = $("#home").value; $("#home").value = $("#away").value; $("#away").value = h; render(); });
 ["#home", "#away"].forEach(s => $(s).addEventListener("change", () => { CUR = null; S.cutoff = null; render(); }));
 $("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; if (!$("#viewMatch").hidden) render(); renderNext(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewGen").hidden) renderGen(); if (!$("#viewRit").hidden) renderRit(); if (!$("#viewSel").hidden) renderSel(); });
-$("#league").innerHTML = LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("") + `<option value="UCL" hidden>Champions League</option>`;
+$("#league").innerHTML = LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("") + `<option value="UCL" hidden>Champions League</option><option value="UEL" hidden>Europa League</option>`;
 $("#league").addEventListener("change", e => { CUR = null; S.cutoff = null; S.league = e.target.value; let sv = {}; try { sv = JSON.parse(lsGet(PICK_KEY) || "{}") || {}; } catch (x) {} sv.league = S.league; lsSet(PICK_KEY, JSON.stringify(sv)); refreshAll(); });
 
 /* ===== Quote inserite dall'utente (salvate solo su questo telefono) ===== */
@@ -3807,8 +3809,7 @@ function renderSched() {
 
 /* ===== Champions League (13/10/2026): previsioni per squadra da data/ucl.json (tools/ucl_model.py su GitHub: rating comune campionati + coppe,
    ricalcolato a ogni giro con i risultati nuovi; per ogni statistica il modello con l'errore più basso sulle partite già giocate) ===== */
-let UCL = null;
-const uclEntries = () => !UCL || !UCL.partite ? [] : UCL.partite.map(uclEntry);
+const uclEntries = () => CUPS.flatMap(c => CUPD[c.code] && CUPD[c.code].partite ? CUPD[c.code].partite.map(x => uclEntry(x, c.code)) : []);
 function uclRound(r) {
   const m = /League Stage - (\d+)/.exec(r || ""); if (m) return `Fase campionato · ${m[1]}ª giornata`;
   return { "Knockout Round Play-offs": "Spareggi fase a eliminazione", "Round of 16": "Ottavi di finale", "Quarter-finals": "Quarti di finale", "Semi-finals": "Semifinali", "Final": "Finale" }[r] || r || "";
@@ -3823,25 +3824,27 @@ function uclRowHTML(e) {
     <span class="tt"><span class="${r && r[0] > r[1] ? "w" : ""}">${uLogo(x.lh)}${esc(x.h)}</span><b>${r ? r[0] : ""}</b><span class="${r && r[1] > r[0] ? "w" : ""}">${uLogo(x.la)}${esc(x.a)}</span><b>${r ? r[1] : ""}</b></span>
   </button>`;
 }
-function uclBlockHTML(list) {
-  const cl = !SCHED.open.has("UCL");
-  return `<div class="lgsec">Coppe europee<small>${list.length} partite</small></div><section class="lgblock${cl ? " closed" : ""}" aria-label="Champions League" data-lg="UCL">
-    <button type="button" class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">🏆</span><span class="nm"><small>Europa</small><b>Champions League</b></span><span class="cnt">${list.length}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-    ${list.map(uclRowHTML).join("")}</section>`;
+function uclBlockHTML(list) {   // "Coppe europee": un blocco per coppa (Champions, poi Europa League)
+  return `<div class="lgsec">Coppe europee<small>${list.length} partite</small></div>` + CUPS.map(c => {
+    const L = list.filter(e => e.lg.code === c.code); if (!L.length) return "";
+    const cl = !SCHED.open.has(c.code);
+    return `<section class="lgblock${cl ? " closed" : ""}" aria-label="${esc(LG[c.code].name)}" data-lg="${c.code}">
+    <button type="button" class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">🏆</span><span class="nm"><small>Europa</small><b>${esc(LG[c.code].name)}</b></span><span class="cnt">${L.length}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+    ${L.map(uclRowHTML).join("")}</section>`; }).join("");
 }
 /* partita di Champions come voce del palinsesto: stessa scheda dei campionati (Lettura, Precedenti, Classifica, Rendimento, quote 1xBet).
    Precedenti, classifica e rendimento dal file UCL (API-Football, solo fase principale); i valori attesi da data/ucl.json. */
-function uclEntry(x) {
+function uclEntry(x, comp = "UCL") {
   const k = new Date(x.dt + "Z"), d = localIso(k), date = new Date(d + "T00:00:00Z");
-  const m = [...S.matches.values()].find(q => q.div === "UCL" && q.home === x.h && q.away === x.a && isoD(q.date) === d) || null;
-  return { id: `UCL|${d}|${x.h}|${x.a}`, lg: LG.UCL, date, d, time: `${String(k.getHours()).padStart(2, "0")}:${String(k.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a, m, ucl: x };
+  const m = [...S.matches.values()].find(q => q.div === comp && q.home === x.h && q.away === x.a && isoD(q.date) === d) || null;
+  return { id: `${comp}|${d}|${x.h}|${x.a}`, lg: LG[comp], date, d, time: `${String(k.getHours()).padStart(2, "0")}:${String(k.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a, m, ucl: x };
 }
-const entryById = id => allEntries(localIso(), 30).find(x => x.id === id) || (UCL && UCL.partite ? UCL.partite.map(uclEntry).find(x => x.id === id) : null);
+const entryById = id => allEntries(localIso(), 30).find(x => x.id === id) || uclEntries().find(x => x.id === id) || null;
 /* previsione Champions della partita (quella congelata prima del calcio d'inizio se è già giocata) */
 function uclPredFor(home, away) {
-  if (!UCL || !UCL.partite) return null;
-  const c = UCL.partite.filter(x => x.h === home && x.a === away); if (!c.length) return null;
-  const ref = CUR && CUR.home === home && CUR.away === away && CUR.lg.code === "UCL" ? +CUR.date : Date.now();
+  const D = CUPD[S.league]; if (!D || !D.partite) return null;   // coppa della partita (S.league)
+  const c = D.partite.filter(x => x.h === home && x.a === away); if (!c.length) return null;
+  const ref = CUR && CUR.home === home && CUR.away === away && CUR.lg.code === S.league ? +CUR.date : Date.now();
   return c.sort((a, b) => Math.abs(+new Date(a.dt + "Z") - ref) - Math.abs(+new Date(b.dt + "Z") - ref))[0];
 }
 const UCL_K = { c: "c", f: "f", s: "s", st: "st", gm: "g", g: "g" };
@@ -3860,12 +3863,12 @@ function openEntry(e, fromNav) {
   for (const t of [e.home, e.away]) if (![...$("#home").options].some(o => o.value === t)) { $("#home").add(new Option(t, t)); $("#away").add(new Option(t, t)); }
   $("#home").value = e.home; $("#away").value = e.away;
   S.cutoff = e.m ? e.date : null;
-  const gt = document.querySelector('.mtab[data-mt="sig"]'); if (gt) gt.style.display = e.lg.code === "UCL" ? "none" : "";   // Champions: Grado non ancora verificato
+  const gt = document.querySelector('.mtab[data-mt="sig"]'); if (gt) gt.style.display = isCup(e.lg.code) ? "none" : "";   // Champions: Grado non ancora verificato
   showView("match"); setMTab("prev"); render();
   scrollTo({ top: 0, behavior: "auto" });
 }
 function openMatch(lg, h, a, d) {
-  if (lg === "UCL") { const U = uclEntries().filter(x => x.home === h && x.away === a), e = U.find(x => !d || x.d === d) || U[0]; if (e) return openEntry(e); }
+  if (isCup(lg)) { const U = uclEntries().filter(x => x.lg.code === lg && x.home === h && x.away === a), e = U.find(x => !d || x.d === d) || U[0]; if (e) return openEntry(e); }
   const AE = allEntries(localIso(), 30), e = AE.find(x => x.lg.code === lg && x.home === h && x.away === a && (!d || x.d === d)) || AE.find(x => x.lg.code === lg && x.home === h && x.away === a);
   if (e) return openEntry(e);
   const dt = d ? new Date(d + "T00:00:00Z") : new Date();
@@ -3996,7 +3999,7 @@ const BK_MIN = 0.05;   // valore minimo per segnalare la giocata
    le giocate "con valore" del modello gol perdevano il 7,5% contro le quote reali (audit del 7/10/2026). */
 /* ===== Quote 1xBet della partita, con il loro movimento (data/quote_mov.json, una tappa a ogni giro in cui cambiano) ===== */
 let QMOV = null;
-const QM_GROUPS = [["Esito finale", "1x2"], ["Gol Over/Under 2,5", "ou2.5"], ["Gol Over/Under 1,5", "ou1.5"], ["Gol Over/Under 3,5", "ou3.5"], ["Gol/No gol", "gg"],
+const QM_GROUPS = [["Esito finale", "1x2"], ["Gol Over/Under 1,5", "ou1.5"], ["Gol Over/Under 2,5", "ou2.5"], ["Gol Over/Under 3,5", "ou3.5"], ["Gol/No gol", "gg"],
   ["Corner 1X2", "x.c1x2"], ["Corner doppia chance", "x.cdc"], ["Tiri 1X2", "x.s1x2"], ["Tiri in porta 1X2", "x.st1x2"], ["Falli 1X2", "x.f1x2"], ["Falli doppia chance", "x.fdc"],
   ["Gialli 1X2", "x.y1x2"], ["Gialli doppia chance", "x.ydc"]];
 const QM_SEL = v => ({ Home: "1", Draw: "X", Away: "2", "Home/Draw": "1X", "Home/Away": "12", "Draw/Away": "X2", O: "Over", U: "Under", S: "Gol", N: "No gol" }[v] || v);
@@ -4133,7 +4136,7 @@ function renderMatchExtras(home, away) {
   const G = home && away && home !== away ? modelGoals(home, away, cfg) : null;
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}` : "Confronto libero";
   $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G); HEROCTX = { home, away, e, cfg, G };
-  if (S.league !== "UCL") renderMatchConf(home, away, e, cfg);
+  if (!isCup(S.league)) renderMatchConf(home, away, e, cfg);
   $("#mref").hidden = true; REFCTX = { home, away, e };   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
   // confronto previsione / partita giocata
   const cmp = $("#mcmp");
@@ -4417,7 +4420,7 @@ function renderGen() {
 const MTR = { mk: "c", ven: "home" };
 function renderMatchTrend(home, away) {
   const box = $("#mtrend"); if (!box) return;
-  const L = LEAGUES.find(x => x.code === S.league); if (!L || !home || !away || home === away) { box.hidden = true; return; }
+  const L = LEAGUES.find(x => x.code === S.league) || LG[S.league]; if (!L || !home || !away || home === away) { box.hidden = true; return; }   // anche Champions ed Europa League
   box.hidden = false;
   const D = GEN3[MTR.mk], hi = new Map([[home, "mh"], [away, "ma"]]);
   const { body, note } = gen3Body(L, MTR.mk, MTR.ven, null, hi);
@@ -4912,7 +4915,7 @@ function showView(v) {
   if (v === "rit") renderRit();
   if (v === "sel") renderSel();
 }
-$("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option><option value="UCL">Champions League</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
+$("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option><option value="UCL">Champions League</option><option value="UEL">Europa League</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#sigLeague", "#sigGames", "#sigC3"].forEach(id => $(id).addEventListener("change", renderSignals));
 $("#sigMode").addEventListener("change", () => { $("#decay").value = $("#sigMode").value; renderSignals(); renderNext(); });
 $("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; });
@@ -5075,12 +5078,12 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   // movimento delle quote 1xBet: dopo l'avvio, senza rallentarlo
   if (online) fetch("data/quote_mov.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { QMOV = j || { partite: {} }; if (!$("#viewMatch").hidden) renderQuote(); }).catch(() => { QMOV = { partite: {} }; });
   // Champions League: previsioni pronte (dopo l'avvio); link #u=… alla partita
-  if (online) fetch("data/ucl.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { if (!j) return; UCL = j; if (typeof clearCache === "function") clearCache(); GEN_NEXT.clear();
+  if (online) for (const C of CUPS) fetch("data/" + C.file, { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { if (!j) return; CUPD[C.code] = j; if (typeof clearCache === "function") clearCache(); GEN_NEXT.clear();
     if (!$("#viewSig").hidden) renderSignals();
     if (!$("#viewStats").hidden) renderSched();
-    const hm = /^#p=(UCL.+)$/.exec(location.hash), e = hm && entryById(decodeURIComponent(hm[1]));
+    const hm = new RegExp("^#p=(" + C.code + ".+)$").exec(location.hash), e = hm && entryById(decodeURIComponent(hm[1]));
     if (e) { history.replaceState(null, "", location.pathname + location.search); openEntry(e); }
-    else if (!$("#viewMatch").hidden && S.league === "UCL") render(); }).catch(() => {});
+    else if (!$("#viewMatch").hidden && S.league === C.code) render(); }).catch(() => {});
   // link a una partita (#p=…): si apre la scheda
   const hm = /^#p=(.+)$/.exec(location.hash);
   if (hm) { const id = decodeURIComponent(hm[1]), e = entryById(id);
