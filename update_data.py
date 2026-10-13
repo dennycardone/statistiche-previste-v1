@@ -14,7 +14,7 @@ API_ONLY = {"SRB": (286, "Super Liga", False), "CRO": (210, "HNL", False), "HUN"
             "ISR": (383, "Ligat Ha'al", False), "BUL": (172, "First League", False),
             # 13/10/2026: Champions League come un campionato per la scheda partita (precedenti, classifica, rendimento, quote 1xBet);
             # solo fase principale (le qualificazioni di giugno-agosto restano fuori). Le previsioni vengono da data/ucl.json (tools/ucl_model.py).
-            "UCL": (2, "Champions League", False)}
+            "UCL": (2, "Champions League", False), "UEL": (3, "Europa League", False)}   # 13/10/2026: anche l'Europa League
 # esclusi (verifica 6/10/2026 sullo storico): Cipro (statistiche solo sul 22-35% delle partite 2024-2026), Bielorussia (nessuna statistica);
 # Slovacchia e Ucraina tolte su richiesta (stagione 2026/27 quasi senza statistiche): i loro file vengono cancellati
 for _f in ("SVK.csv", "UKR.csv"):
@@ -697,7 +697,7 @@ try:
     # campionati solo su API-Football: file dell'app costruito dall'archivio (stesse colonne dei file "new" di football-data)
     for lg_, (lid_, nm_, cal_) in API_ONLY.items():
         try:
-            _src = AP["partite"].values() if lg_ != "UCL" else [v for v in AP["partite"].values() if v[1] == "UCL" and v[0][5:7] not in ("06", "07", "08")]   # Champions: senza qualificazioni
+            _src = AP["partite"].values() if lg_ not in ("UCL", "UEL") else [v for v in AP["partite"].values() if v[1] == lg_ and v[0][5:7] not in ("06", "07", "08")]   # coppe: senza qualificazioni
             rows_ = apif_extra.build_csv(lg_, nm_, _src, cal_, ROME, today.year - 6)
             if len(rows_) > 1:
                 buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(rows_); save(f"{lg_}.csv", buf.getvalue())
@@ -806,7 +806,7 @@ try:
             _miss = []
             for lg, L in by_lg.items():
                 for v in L:
-                    if v[9] not in ("FT", "AET", "PEN") or (lg == "UCL" and v[0][5:7] in ("06", "07", "08")): continue
+                    if v[9] not in ("FT", "AET", "PEN") or (lg in ("UCL", "UEL") and v[0][5:7] in ("06", "07", "08")): continue
                     d = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(ROME).date()
                     if not (_now.date() - datetime.timedelta(days=14) <= d <= _now.date()): continue
                     h, a = MAPS[lg].get(v[2]), MAPS[lg].get(v[3])
@@ -821,7 +821,7 @@ try:
         for lg, L in by_lg.items():
             for v in L:
                 # anche le partite in corso (1H, HT, 2H…): prima sparivano dalla lista finché non finivano
-                if v[9] not in ("NS", "TBD") + LIVE_ST or (lg == "UCL" and v[0][5:7] in ("06", "07", "08")): continue   # Champions: senza qualificazioni
+                if v[9] not in ("NS", "TBD") + LIVE_ST or (lg in ("UCL", "UEL") and v[0][5:7] in ("06", "07", "08")): continue   # coppe: senza qualificazioni
                 loc = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(ROME)
                 if not (_now.date() <= loc.date() <= _now.date() + datetime.timedelta(days=21)): continue
                 h, a = MAPS[lg].get(v[2]), MAPS[lg].get(v[3])

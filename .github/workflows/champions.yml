@@ -35,7 +35,7 @@ jobs:
           R="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           (cd storico && git init -q -b storico && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
             && git add -A && git commit -q -m "Storico $(date -u '+%F %H:%M')" && git push -q -f "$R" storico)
-          mkdir _c && cp ucl.json _c/ && cd _c && git init -q -b champions && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
+          mkdir _c && cp ucl.json uel.json _c/ && cd _c && git init -q -b champions && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
             && git add -A && git commit -q -m "Champions $(date -u '+%F %H:%M')" && git push -q -f "$R" champions
       - name: Mette subito le previsioni sul sito
         env:
