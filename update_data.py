@@ -648,7 +648,10 @@ try:
         if D["lega"] in _have or D["lega"] not in AF_LEAGUES_X: continue   # coppe europee: solo per i backtest
         for fid, v in D["partite"].items(): AP["partite"].setdefault(fid, [v[0], D["lega"], v[1], v[2], v[3], v[4], v[5], v[6], v[7], "FT"])
     if len(AP["partite"]) > _n0: print("arbitri: dallo storico", len(AP["partite"]) - _n0, "partite")
-    KS_ = ["Total Shots", "Shots on Goal", "Corner Kicks", "Fouls", "Yellow Cards", "Red Cards", "expected_goals"]
+    # 14/10/2026: in coda (indici 7-12) anche tiri in area/fuori area, bloccati, fuori porta, possesso e parate: arrivano nella stessa
+    # risposta (nessuna richiesta in più), solo archivio per i test futuri. Le posizioni 0-6 non cambiano.
+    KS_ = ["Total Shots", "Shots on Goal", "Corner Kicks", "Fouls", "Yellow Cards", "Red Cards", "expected_goals",
+           "Shots insidebox", "Shots outsidebox", "Blocked Shots", "Shots off Goal", "Ball Possession", "Goalkeeper Saves"]
     def _af(path, **q):
         req = urllib.request.Request("https://v3.football.api-sports.io/" + path + ("?" + _up.urlencode(q) if q else ""), headers={"x-apisports-key": _key})
         with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
@@ -692,6 +695,8 @@ try:
                     if x: x[7] = [_stat(H, k) for k in KS_]; x[8] = [_stat(A, k) for k in KS_]; n_new += 1
             AP["agg"] = _now.strftime("%Y-%m-%d %H:%M")
             print("arbitri: aggiornate", n_new, "statistiche,", len(AP["partite"]), "partite in archivio")
+            _nx = sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None)
+            print(f"::notice title=Statistiche in più (tiri in area, bloccati, possesso)::{_nx} partite in archivio")
         for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR")]: del AP["partite"][_k]   # campionati tolti
         json.dump(AP, open(ap_path, "w"), separators=(",", ":"), ensure_ascii=False)
     # campionati solo su API-Football: file dell'app costruito dall'archivio (stesse colonne dei file "new" di football-data)
