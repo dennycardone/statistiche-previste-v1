@@ -3755,7 +3755,7 @@ function renderSched() {
   if (!today.length && !todayU.length) { const nx = days.find(d => d > SCHED.day && (all.some(e => e.d === d) || UE.some(e => e.d === d)));
     box.innerHTML = `<div class="empty">${SCHED.day === t0 ? "Oggi nessuna partita" : "Nessuna partita"} di questi campionati.<br><span class="small">${nx ? `Prossime partite: <button type="button" class="linkbtn" id="goNextDay">${DAYS_SHORT[new Date(nx + "T00:00:00Z").getUTCDay()]} ${+nx.slice(8)} ${MONTHS[+nx.slice(5, 7) - 1]}</button>` : "Scegli un altro giorno qui sopra."}</span></div>`;
     const gb = $("#goNextDay"); if (gb) gb.addEventListener("click", () => { SCHED.day = nx; renderSched(); }); return; }
-  const playedToday = today.filter(e => e.m && shown.some(L => L.code === e.lg.code));
+  const playedToday = today.filter(e => e.m && shown.some(L => L.code === e.lg.code)).concat(todayU.filter(e => e.m));   // anche le coppe
   // righe calcolate un po' alla volta: con tanti campionati il calcolo completo bloccherebbe la pagina
   const pv = (lab, p, hit) => `<span class="pv${hit == null || p == null ? (p != null && p >= 0.6 ? " hi" : "") : hit ? " ok" : " ko"}"><small>${lab}</small><b>${p == null ? "N/D" : Math.round(p * 100)}</b></span>`;
   const rowHTML = (e, R) => {
@@ -3820,7 +3820,7 @@ const uLogo = (u, big) => { const ok = u && /^https:\/\//.test(u);
 function uclRowHTML(e) {
   const x = e.ucl, r = e.m ? [e.m.hg, e.m.ag] : x.ris && x.ris.g, live = !r && Date.now() >= +new Date(x.dt + "Z");
   return `<button type="button" class="mrow urow" data-uid="${esc(e.id)}">
-    <span class="tmc"><span class="tm${r ? " fin" : ""}">${r ? "Finale" : live ? "In corso" : esc(e.time)}</span></span>
+    <span class="tmc"><span class="tm${r ? " fin" : ""}">${r ? "Finale" : live ? "In corso" : esc(e.time)}</span>${e.m ? presiHTML(rowCalc(e)) : ""}</span>
     <span class="tt"><span class="${r && r[0] > r[1] ? "w" : ""}">${uLogo(x.lh)}${esc(x.h)}</span><b>${r ? r[0] : ""}</b><span class="${r && r[1] > r[0] ? "w" : ""}">${uLogo(x.la)}${esc(x.a)}</span><b>${r ? r[1] : ""}</b></span>
   </button>`;
 }
