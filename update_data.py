@@ -697,9 +697,10 @@ try:
             print("arbitri: aggiornate", n_new, "statistiche,", len(AP["partite"]), "partite in archivio")
             _nx = sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None)
             print(f"::notice title=Statistiche in più (tiri in area, bloccati, possesso)::{_nx} partite in archivio")
-            QUAL["stat_extra"] = {"partite": _nx, "giro": _now.strftime("%d/%m/%Y %H:%M")}   # solo il conteggio (verifica dei nomi dei campi)
         for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR")]: del AP["partite"][_k]   # campionati tolti
         json.dump(AP, open(ap_path, "w"), separators=(",", ":"), ensure_ascii=False)
+    # conteggio delle partite con le statistiche in più (tiri in area, bloccati, possesso, parate) a ogni giro: solo il numero, per verificare i nomi dei campi
+    QUAL["stat_extra"] = {"partite": sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None), "archivio": AP.get("agg")}
     # campionati solo su API-Football: file dell'app costruito dall'archivio (stesse colonne dei file "new" di football-data)
     for lg_, (lid_, nm_, cal_) in API_ONLY.items():
         try:
