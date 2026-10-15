@@ -1095,7 +1095,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <p><b>Due metodi.</b> <i>Media dinamica</i> (predefinita): modelli di regressione verificati sulle stagioni passate, descritti qui sotto. <i>Media classica</i>: squadra di casa = (quanto fa in casa + quanto concede in trasferta l'ospite) ÷ 2; ospite = (quanto fa in trasferta + quanto concede in casa la squadra di casa) ÷ 2. Per i gol la classica usa 65% xG + 35% gol veri (solo gol dove l'xG manca).</p>
       <p><b>Probabilità.</b> Il totale segue una Binomiale Negativa (gol: Poisson), con la variabilità misurata sugli errori reali: ogni partita già giocata viene prevista senza usarla e confrontata con il risultato vero.</p>
       <p><b>Media dinamica.</b> Previsto casa = normale in casa del campionato × attacco della squadra di casa × difesa dell'ospite (e viceversa). Attacco e difesa sono voti (1,00 = normale) calcolati su tutte le partite, casa e trasferta, tenendo conto degli avversari. Ogni voto parte da 1,00 e si sposta verso i dati della squadra con peso partite ÷ (partite + P). P la sceglie l'app da sola per ogni statistica: prova 2, 3, 5, 8, 12 e 20 prevedendo ogni partita giocata solo con i giorni precedenti, e usa quella con l'errore più basso (tra le partite giocate prima della data della previsione, così le previsioni passate non cambiano). Falli: difesa = falli subiti.</p>
-      <p><b>Media dinamica – corner.</b> Anche per i corner la Media dinamica usa un modello verificato: regressione di Poisson con corner medi del campionato per sede (365 giorni), fattore campo, un rating attacco × difesa dei corner sugli ultimi 4 anni (una partita di 2 anni fa pesa il 37%, prudenza P = 20), differenza di Elo calcolato dall'app e corner delle ultime 5 partite (fatti dalla squadra, concessi dall'avversario). Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in ogni stagione. Il totale segue una Binomiale Negativa con r = 60 (i corner di casa e ospite sono correlati negativamente, quindi il totale varia meno della somma); per il 1X2 corner ogni squadra ha la sua Binomiale Negativa con r = 12. I tiri non cambiano.</p>
+      <p><b>Media dinamica – corner.</b> Anche per i corner la Media dinamica usa un modello verificato: regressione di Poisson con corner medi del campionato per sede (365 giorni), fattore campo, un rating attacco × difesa dei corner sugli ultimi 4 anni (una partita di 2 anni fa pesa il 37%, prudenza P = 20), differenza di Elo calcolato dall'app e corner delle ultime 5 partite (fatti dalla squadra, concessi dall'avversario). Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in ogni stagione. Il totale segue una Binomiale Negativa con r = 60 (i corner di casa e ospite sono correlati negativamente, quindi il totale varia meno della somma); per il 1X2 corner ogni squadra ha la sua Binomiale Negativa con r = 12. Dal 15/10/2026 i corner attesi di ogni squadra tengono conto anche dei tiri non in porta (tiri − tiri in porta: respinti e fuori) fatti dalla squadra e concessi dall'avversario negli ultimi 365 giorni, e il 1X2 corner e il 1X2 tiri usano la correlazione negativa tra casa e ospite (copula gaussiana, −0,20 corner, −0,24 tiri): nel test walk-forward su circa 16.000 partite (luglio 2025 – ottobre 2026, parametri stimati sulle partite precedenti) le previsioni sono migliorate in ogni stagione.</p>
       <p><b>Media dinamica – falli.</b> Anche per i falli la Media dinamica usa un modello verificato: due regressioni di Poisson, una per la squadra di casa e una per l'ospite, con falli medi del campionato per sede (365 giorni), un rating falli commessi × subiti sugli ultimi 2 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4), falli delle ultime 5 partite (commessi dalla squadra, subiti dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 (chi va spesso in vantaggio fa meno falli) e tiri delle ultime 15. Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in 67 stagioni su 73 (nelle altre 6 peggiore di pochi centesimi). Il totale segue una Binomiale Negativa con r = 150, ogni squadra con r = 200 (i falli sono quasi Poisson). Sopra il modello si applica il <b>fattore arbitro</b>: falli reali ÷ previsti nelle sue partite precedenti (dati API-Football), ristretto verso 1 quando ha poche partite e con un tetto di +4% (nel test del 7/10/2026 gli arbitri "severi" non portavano davvero tanti falli in più quanti ne indicava il loro storico; il tetto è stato scelto sulle partite fino al 30/6/2026 e verificato su quelle dopo). Nel test su 12.584 partite migliora la precisione sugli Over falli dell'1,3% circa e l'errore medio dell'1,1%. Nella scheda Disciplina si vede quanto pesa, partita per partita.</p>
       <p><b>Media dinamica – cartellini.</b> Modello cartellini v2 (gialli + rossi), scelto con un test walk-forward su 47.955 partite API-Football 2022-2026: regressione con media del campionato, cartellini presi e provocati dalle due squadre (media mobile), <b>arbitro</b> (cartellini reali ÷ attesi in tutte le sue partite precedenti e nelle ultime 10, ristretto verso 1), falli fatti e subiti in stagione, scontri diretti degli ultimi 3 anni e avvio di stagione. Pesi ristimati ogni mese con le sole partite precedenti. Il totale segue una Binomiale Negativa. Se l'arbitro non è ancora stato designato la previsione è senza il suo effetto, e la scheda lo dice.</p>
       <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote di 1xBet, unico bookmaker di riferimento), aggiornata due volte all'ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football.</p>
@@ -2231,6 +2231,31 @@ function cornerLast5(div, team, D) {   // ultime 5 partite di campionato (anche 
   if (!g.length) return null;
   return { f: g.reduce((x, m) => x + (m.home === team ? m.hc : m.ac), 0) / g.length, c: g.reduce((x, m) => x + (m.home === team ? m.ac : m.hc), 0) / g.length, n: g.length };
 }
+/* 15/10/2026: corner × rating dei tiri non in porta (tiri − tiri in porta: bloccati + fuori). Per la partita del giorno D, partite del
+   campionato dei giorni precedenti con tiri e tiri in porta, peso e^(−giorni/365); attacco = non in porta fatti / media di lega,
+   difesa = concessi / media; x = ln(attacco squadra × difesa avversario); corner attesi × e^(CNS_B·x).
+   Test walk-forward (41.575 partite, stima fino a giugno 2025, prova luglio 2025 – ottobre 2026): log-loss −0,0019 per partita,
+   coefficiente stabile (0,174 stimato sul solo 2023-24, 0,166 fino al 2024-25). Senza dati sufficienti (< 5 partite pesate) x = 0. */
+const CNS_B = 0.166, CNS_TAU = 365;
+function nsFit(div, D) {
+  const key = "cns|" + div + "|" + D; if (CACHE.has(key)) return CACHE.get(key);
+  const T = new Map(); let ls = 0, lw = 0;
+  for (const m of S.matches.values()) {
+    if (m.div !== div || !(+m.date < D) || m.hs == null || m.as == null || m.hst == null || m.ast == null) continue;
+    const w = Math.exp(-Math.round((D - +m.date) / DAYMS) / CNS_TAU), nh = m.hs - m.hst, na = m.as - m.ast;
+    for (const [t, f, c] of [[m.home, nh, na], [m.away, na, nh]]) { const x = T.get(t) || [0, 0, 0]; x[0] += w * f; x[1] += w * c; x[2] += w; T.set(t, x); }
+    ls += w * (nh + na); lw += 2 * w;
+  }
+  const res = { T, mu: lw > 20 ? ls / lw : null };
+  CACHE.set(key, res); return res;
+}
+function nsAdj(div, D, home, away) {
+  const F = nsFit(div, D), h = F.T.get(home), a = F.T.get(away);
+  if (!F.mu || !h || !a || !(h[2] > 4) || !(a[2] > 4)) return null;
+  const mu = F.mu, L = v => Math.log(Math.max(1e-3, v));
+  return { xh: L((h[0] / h[2] / mu) * (a[1] / a[2] / mu)), xa: L((a[0] / a[2] / mu) * (h[1] / h[2] / mu)),
+    aH: h[0] / h[2] / mu, dH: h[1] / h[2] / mu, aA: a[0] / a[2] / mu, dA: a[1] / a[2] / mu };
+}
 function cornerDynParts(home, away) {
   const D = goalDate(home, away), F = cdynFit(S.league, D); if (!F) return null;
   const ix = t => F.idx.has(t) ? F.idx.get(t) : -1, ih = ix(home), ia = ix(away);
@@ -2241,8 +2266,9 @@ function cornerDynParts(home, away) {
   const l5H = cornerLast5(S.league, home, D), l5A = cornerLast5(S.league, away, D);
   const lg = (v, mean) => v != null && v > 0 ? Math.log(v) : mean;
   const fH = lg(l5H && l5H.f, C.mf5), cA = lg(l5A && l5A.c, C.mc5), fA = lg(l5A && l5A.f, C.mf5), cH = lg(l5H && l5H.c, C.mc5);
-  const lh = Math.exp(C.b0 + C.lmu * Math.log(F.muH) + C.home + C.lrc * Math.log(rcH) + (withElo ? C.elo * ed : 0) + C.f5 * fH + C.c5 * cA);
-  const la = Math.exp(C.b0 + C.lmu * Math.log(F.muA) + C.lrc * Math.log(rcA) - (withElo ? C.elo * ed : 0) + C.f5 * fA + C.c5 * cH);
+  const lh0 = Math.exp(C.b0 + C.lmu * Math.log(F.muH) + C.home + C.lrc * Math.log(rcH) + (withElo ? C.elo * ed : 0) + C.f5 * fH + C.c5 * cA);
+  const la0 = Math.exp(C.b0 + C.lmu * Math.log(F.muA) + C.lrc * Math.log(rcA) - (withElo ? C.elo * ed : 0) + C.f5 * fA + C.c5 * cH);
+  const NS = nsAdj(S.league, D, home, away), lh = NS ? lh0 * Math.exp(CNS_B * NS.xh) : lh0, la = NS ? la0 * Math.exp(CNS_B * NS.xa) : la0;
   if (!isFinite(lh) || !isFinite(la)) return null;
   const cur = [...S.matches.values()].filter(m => m.div === S.league && m.season === S.season && +m.date < D && m.hc != null);
   const nHt = cur.filter(m => m.home === home || m.away === home).length, nAt = cur.filter(m => m.home === away || m.away === away).length;
@@ -2255,10 +2281,12 @@ rating corner (4 anni, ${F.n} partite): ${esc(home)} attacco ${f2(aH)} · difesa
 corner attesi dal rating: ${esc(home)} ${f2(rcH)} · ${esc(away)} ${f2(rcA)}
 ultime 5: ${esc(home)} fatti ${l5t(l5H, "f")}, concessi ${l5t(l5H, "c")} — ${esc(away)} fatti ${l5t(l5A, "f")}, concessi ${l5t(l5A, "c")}
 Elo (calcolato dai risultati): ${withElo ? `${esc(home)} ${Math.round(eH.elo)} · ${esc(away)} ${Math.round(eA.elo)}` : "non disponibile: uso la versione senza Elo"}
-${esc(home)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muH)}${sg(C.home)}${sg(C.lrc)}·ln ${f2(rcH)}${withElo ? `${sg(C.elo)}·(${f2(ed)})` : ""}${sg(C.f5)}·ln F5${sg(C.c5)}·ln C5) = ${f2(lh)}
-${esc(away)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muA)}${sg(C.lrc)}·ln ${f2(rcA)}${withElo ? `${sg(C.elo)}·(${f2(-ed)})` : ""}${sg(C.f5)}·ln F5${sg(C.c5)}·ln C5) = ${f2(la)}
-distribuzione: Binomiale Negativa sul totale r = ${CD_R_TOT}; per squadra r = ${CD_R_TEAM}`;
-  return { lh, la, dynText: text, cdyn: true, withElo, r: CD_R_TOT, rTeam: CD_R_TEAM, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
+${esc(home)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muH)}${sg(C.home)}${sg(C.lrc)}·ln ${f2(rcH)}${withElo ? `${sg(C.elo)}·(${f2(ed)})` : ""}${sg(C.f5)}·ln F5${sg(C.c5)}·ln C5) = ${f2(lh0)}
+${esc(away)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muA)}${sg(C.lrc)}·ln ${f2(rcA)}${withElo ? `${sg(C.elo)}·(${f2(-ed)})` : ""}${sg(C.f5)}·ln F5${sg(C.c5)}·ln C5) = ${f2(la0)}
+tiri non in porta (tiri − tiri in porta, 365 giorni): ${NS ? `${esc(home)} attacco ${f2(NS.aH)} · difesa ${f2(NS.dH)} — ${esc(away)} attacco ${f2(NS.aA)} · difesa ${f2(NS.dA)}
+corner attesi: ${esc(home)} ${f2(lh0)} × e^(${c3(CNS_B)}·${sd(NS.xh)}) = ${f2(lh)} · ${esc(away)} ${f2(la0)} × e^(${c3(CNS_B)}·${sd(NS.xa)}) = ${f2(la)}` : "dati insufficienti, nessuna correzione"}
+distribuzione: Binomiale Negativa sul totale r = ${CD_R_TOT}; per squadra r = ${CD_R_TEAM}; 1X2 con correlazione casa-ospite ${String(COP_C).replace(".", ",").replace("-", "−")}`;
+  return { lh, la, dynText: text, cdyn: true, withElo, r: CD_R_TOT, rTeam: CD_R_TEAM, cop: COP_C, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
     muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
 }
 
@@ -2437,8 +2465,8 @@ ${k === "s" ? "tiri" : "tiri in porta"} medi di lega (365 giorni): casa ${f2(muH
 ${extra}
 Elo (calcolato dai risultati): ${eH && eA ? `${esc(home)} ${Math.round(eH.elo)} · ${esc(away)} ${Math.round(eA.elo)}` : "non disponibile: uso il valore medio"}
 attesi: ${esc(home)} ${f2(lh)} · ${esc(away)} ${f2(la)} · totale ${f2(lh + la)}
-distribuzione: Binomiale Negativa sul totale r = ${R.tot}; per squadra r = ${R.team}`;
-  return { lh, la, dynText: text, tdyn: true, r: R.tot, rTeam: R.team, W: { cl: 0 }, cl: { lh, la }, lg: { lh: muH, la: muA }, av: { lh, la }, tt: { lh, la },
+distribuzione: Binomiale Negativa sul totale r = ${R.tot}; per squadra r = ${R.team}${k === "s" ? `; 1X2 con correlazione casa-ospite ${String(COP_S).replace(".", ",").replace("-", "−")}` : ""}`;
+  return { lh, la, dynText: text, tdyn: true, r: R.tot, rTeam: R.team, cop: k === "s" ? COP_S : 0, W: { cl: 0 }, cl: { lh, la }, lg: { lh: muH, la: muA }, av: { lh, la }, tt: { lh, la },
     muH, muA, n: FS.n, nH, nA, nHt, nAt };
 }
 
@@ -2566,7 +2594,7 @@ function modelBase(home, away, cfg, k = "c") {
   const lh = Bp.lh, la = Bp.la;
   if (!L) L = { n: 0, muH: Bp.muH, muA: Bp.muA, mean: Bp.muH + Bp.muA, v: null };
   const rr = Bp.r != null ? Bp.r : D.r;
-  return { L, Bp, nH: Bp.nH, nA: Bp.nA, nHt: Bp.nHt, nAt: Bp.nAt, rTeam: Bp.rTeam,
+  return { L, Bp, nH: Bp.nH, nA: Bp.nA, nHt: Bp.nHt, nAt: Bp.nAt, rTeam: Bp.rTeam, cop: Bp.cop || 0,
     base: { lh, la }, lh, la, tot: lh + la, h: 0, h2hN: 0, r: rr, rUsed: D.used, pmf: pmfTotal(lh + la, rr, maxK) };
 }
 
@@ -3122,12 +3150,93 @@ function nbTeam(mean, r, maxK) {
   for (let k = 0; k <= maxK; k++) p.push(Math.exp(lgamma(k + r) - lgamma(r) - lgamma(k + 1) + r * Math.log(q) + k * Math.log(1 - q)));
   return p;
 }
-function headToHeadProb(lh, la, r, rTeam) {
+/* 15/10/2026: correlazione casa-ospite nel 1X2 delle statistiche (copula gaussiana su due Binomiali Negative: le distribuzioni delle
+   singole squadre non cambiano). Corner θ = −0,20 (con i tiri non in porta), tiri θ = −0,24: i corner e i tiri di una squadra tolgono
+   spazio a quelli dell'altra. Test walk-forward (stima fino a giugno 2025, prova luglio 2025 – ottobre 2026, ~16.000 partite):
+   1X2 corner log-loss −0,0018, tiri −0,0012, migliori in ogni stagione. Falli e tiri in porta: nessun guadagno, restano indipendenti. */
+const COP_C = -0.20, COP_S = -0.24;
+const BVN_W = [.04717533638651177, .1069393259953183, .1600783285433464, .2031674267230659, .2334925365383547, .2491470458134029],
+  BVN_X = [.9815606342467191, .9041172563704750, .7699026741943050, .5873179542866171, .3678314989981802, .1252334085114692];
+function normCdf(z) {   // Φ(z) dall'erfc di W. J. Cody (errore relativo < 1e-14)
+  if (z === Infinity) return 1; if (z === -Infinity) return 0;
+  const y = Math.abs(z) / Math.SQRT2; let r;
+  if (y < 0.5) {
+    const a = [3.16112374387056560, 113.864154151050156, 377.485237685302021, 3209.37758913846947, 0.185777706184603153],
+      b = [23.6012909523441209, 244.024637934444173, 1282.61652607737228, 2844.23683343917062], t = y * y;
+    let xn = a[4] * t, xd = t; for (let i = 0; i < 3; i++) { xn = (xn + a[i]) * t; xd = (xd + b[i]) * t; }
+    r = 1 - y * (xn + a[3]) / (xd + b[3]);
+  } else if (y < 4) {
+    const c = [0.564188496988670089, 8.88314979438837594, 66.1191906371416295, 298.635138197400131, 881.952221241769090, 1712.04761263407058, 2051.07837782607147, 1230.33935479799725, 2.15311535474403846e-8],
+      d = [15.7449261107098347, 117.693950891312499, 537.181101862009858, 1621.38957456669019, 3290.79923573345963, 4362.61909014324716, 3439.36767414372164, 1230.33935480374942];
+    let xn = c[8] * y, xd = y; for (let i = 0; i < 7; i++) { xn = (xn + c[i]) * y; xd = (xd + d[i]) * y; }
+    r = Math.exp(-y * y) * (xn + c[7]) / (xd + d[7]);
+  } else {
+    const p = [0.305326634961232344, 0.360344899949804439, 0.125781726111229246, 0.0160837851487422766, 6.58749161529837803e-4, 0.0163153871373020978],
+      q = [2.56852019228982242, 1.87295284992346725, 0.527905102951428412, 0.0605183413124413191, 2.33520497626869185e-3], t = 1 / (y * y);
+    let xn = p[5] * t, xd = t; for (let i = 0; i < 4; i++) { xn = (xn + p[i]) * t; xd = (xd + q[i]) * t; }
+    r = Math.exp(-y * y) * (0.56418958354775628695 - t * (xn + p[4]) / (xd + q[4])) / y;
+  }
+  return z >= 0 ? 1 - r / 2 : r / 2;   // r = erfc(|z|/√2)
+}
+function normInv(p) {   // Φ⁻¹(p): Acklam + un passo di Halley
+  if (p <= 0) return -Infinity; if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.383577518672690e2, -3.066479806614716e1, 2.506628277459239],
+    b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1],
+    c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783],
+    d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996, 3.754408661907416];
+  let x;
+  if (p < 0.02425) { const q = Math.sqrt(-2 * Math.log(p)); x = (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  else if (p > 1 - 0.02425) { const q = Math.sqrt(-2 * Math.log(1 - p)); x = -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  else { const q = p - 0.5, t = q * q; x = (((((a[0] * t + a[1]) * t + a[2]) * t + a[3]) * t + a[4]) * t + a[5]) * q / (((((b[0] * t + b[1]) * t + b[2]) * t + b[3]) * t + b[4]) * t + 1); }
+  const e = normCdf(x) - p, u = e * Math.sqrt(2 * Math.PI) * Math.exp(x * x / 2);
+  return x - u / (1 + x * u / 2);
+}
+function bvnCdf(h, k, rho) {   // P(X ≤ h, Y ≤ k), normali standard con correlazione rho (|rho| < 0,75; metodo di Drezner–Wesolowsky/Genz, 12 punti)
+  if (h === -Infinity || k === -Infinity) return 0;
+  if (h === Infinity) return normCdf(k); if (k === Infinity) return normCdf(h);
+  if (rho === 0) return normCdf(h) * normCdf(k);
+  const hk = h * k, hs = (h * h + k * k) / 2, asr = Math.asin(rho) / 2; let s = 0;
+  for (let i = 0; i < 6; i++) for (const x of [1 - BVN_X[i], 1 + BVN_X[i]]) { const sn = Math.sin(asr * x); s += BVN_W[i] * Math.exp((sn * hk - hs) / (1 - sn * sn)); }
+  return s * asr / (2 * Math.PI) + normCdf(h) * normCdf(k);
+}
+const H2H_MEMO = new Map();
+function h2hCop(ph, pa, maxK, cop) {   // P(x, y) = C(F(x), G(y)) − C(F(x−1), G(y)) − C(F(x), G(y−1)) + C(F(x−1), G(y−1))
+  // code < 1e-13 trascurate (z = ±∞): stesso risultato a meno di 1e-12, molti meno calcoli
+  const z = p => { const o = []; let c = 0; for (const v of p) { c += v; o.push(c >= 1 - 1e-13 ? Infinity : c < 1e-13 ? -Infinity : normInv(c)); } return o; };
+  const zh = z(ph), za = z(pa), n = maxK + 1, C = [];
+  // stessa formula di bvnCdf, con seni e Φ calcolati una volta sola per tutta la griglia
+  const asr = Math.asin(cop) / 2, SN = [], WI = [], IV = [];
+  for (let i = 0; i < 6; i++) for (const x of [1 - BVN_X[i], 1 + BVN_X[i]]) { const sn = Math.sin(asr * x); SN.push(sn); WI.push(BVN_W[i]); IV.push(1 / (1 - sn * sn)); }
+  const Fh = zh.map(normCdf), Fa = za.map(normCdf), K2 = asr / (2 * Math.PI);
+  for (let i = 0; i <= n; i++) {
+    const row = new Float64Array(n + 1);
+    if (i > 0) { const h = zh[i - 1];
+      for (let j = 1; j <= n; j++) { const k = za[j - 1];
+        if (h === -Infinity || k === -Infinity) continue;
+        if (h === Infinity) { row[j] = Fa[j - 1]; continue; } if (k === Infinity) { row[j] = Fh[i - 1]; continue; }
+        const hk = h * k, hs = (h * h + k * k) / 2; let t = 0;
+        for (let q = 0; q < 12; q++) t += WI[q] * Math.exp((SN[q] * hk - hs) * IV[q]);
+        row[j] = t * K2 + Fh[i - 1] * Fa[j - 1];
+      } }
+    C.push(row);
+  }
+  let home = 0, draw = 0, tot = 0;
+  for (let i = 1; i <= n; i++) for (let j = 1; j <= n; j++) {
+    const p = Math.max(0, C[i][j] - C[i - 1][j] - C[i][j - 1] + C[i - 1][j - 1]); tot += p;
+    if (i === j) draw += p; else if (i > j) home += p;
+  }
+  return { home: home / tot, draw: draw / tot, away: Math.max(0, 1 - (home + draw) / tot) };
+}
+function headToHeadProb(lh, la, r, rTeam, cop) {
   const m = lh + la, maxK = Math.max(40, Math.ceil(m * 3));
   if (!(m > 0)) return { home: 0, draw: 1, away: 0 };
   const rt = isFinite(r) ? r : Infinity;
   // rTeam (modelli verificati): ogni squadra con la sua Binomiale Negativa; altrimenti r del totale diviso in proporzione
   const ph = rTeam ? nbTeam(lh, rTeam, maxK) : nbTeam(lh, isFinite(rt) ? rt * lh / m : Infinity, maxK), pa = rTeam ? nbTeam(la, rTeam, maxK) : nbTeam(la, isFinite(rt) ? rt * la / m : Infinity, maxK);
+  if (cop) {   // probabilità congiunta (memorizzata: la stessa partita torna in Segnali, Lettura e Radar)
+    const ck = lh + "|" + la + "|" + r + "|" + rTeam + "|" + cop, hit = H2H_MEMO.get(ck); if (hit) return { ...hit };
+    const res = h2hCop(ph, pa, maxK, cop); if (H2H_MEMO.size > 20000) H2H_MEMO.clear(); H2H_MEMO.set(ck, res); return { ...res };
+  }
   // con la stessa q: q = r/(r+m) per entrambe (r_i/(r_i+λ_i) = r/(r+m))
   let home = 0, eq = 0;
   for (let y = 0; y <= maxK; y++) { eq += ph[y] * pa[y]; }
@@ -3208,7 +3317,7 @@ function computeSignals(o) {
           } else {
             // corner, falli, tiri, tiri in porta: 1 = la squadra di casa ne fa di più, 2 = l'ospite (il pari fa perdere)
             const R = res[mk]; if (!R || !isFinite(R.lh) || !isFinite(R.la)) continue;
-            const P = R.P || headToHeadProb(R.lh, R.la, R.r, R.rTeam), one = P.home >= P.away, p = one ? P.home : P.away;
+            const P = R.P || headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop), one = P.home >= P.away, p = one ? P.home : P.away;
             if (p >= th(mk)) push(mk, mk, R, { sel: one ? "1" : "2", fav: one ? "1" : "2", team: one ? f.home : f.away, p, draw: P.draw, p1: P.home, px: P.draw, p2: P.away });
           }
         }
@@ -3280,7 +3389,7 @@ function matchPicks(home, away, cfg, m) {
   const T = modelShots(home, away, cfg);
   for (const [k, R] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
     const { h: kh, a: ka } = MET[k]; if (!R || m[kh] == null || m[ka] == null) continue;
-    const P = headToHeadProb(R.lh, R.la, R.r, R.rTeam);
+    const P = headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop);
     const [pick, p] = [["1", P.home], ["X", P.draw], ["2", P.away]].sort((a, b) => b[1] - a[1])[0];
     const real = m[kh] > m[ka] ? "1" : m[kh] < m[ka] ? "2" : "X";
     out.push({ lab: `1X2 ${SIG_LABEL[k].toLowerCase()}`, pick, p, ok: pick === real, txt: `${m[kh]}-${m[ka]}` });
@@ -3292,7 +3401,7 @@ function matchStats(home, away, cfg) {
   const out = {}, T = modelShots(home, away, cfg);
   for (const [k, M] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
     if (!M || !isFinite(M.lh) || !isFinite(M.la)) continue;
-    const P = headToHeadProb(M.lh, M.la, M.r, M.rTeam); out[k] = [M.lh, M.la, P.home, P.draw, P.away];
+    const P = headToHeadProb(M.lh, M.la, M.r, M.rTeam, M.cop); out[k] = [M.lh, M.la, P.home, P.draw, P.away];
   }
   return out;
 }
@@ -3333,7 +3442,7 @@ function confModes(home, away) {
     const T = modelShots(home, away, cfg);
     for (const [k, M] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
       if (!M || !isFinite(M.lh) || !isFinite(M.la)) continue;
-      const P = headToHeadProb(M.lh, M.la, M.r, M.rTeam); R.st[k] = { p1: P.home, px: P.draw, p2: P.away };
+      const P = headToHeadProb(M.lh, M.la, M.r, M.rTeam, M.cop); R.st[k] = { p1: P.home, px: P.draw, p2: P.away };
     }
     out[mk] = R;
   }
