@@ -1014,6 +1014,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </div>
     <div class="mpane" data-mp="prev">
       <section class="mhead" id="mhead" aria-label="Lettura della partita"></section>
+      <section class="card" id="mhalf" aria-label="Chi ne fa di più per tempo" hidden></section>
       <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
       <section class="card" id="mcmp" aria-label="Confronto con la partita giocata" hidden></section>
       <main id="out" class="wrap" style="padding:0;margin:0;width:100%"></main>
@@ -3632,7 +3633,7 @@ async function tryHosted() {
       return JSON.parse(await new Blob(parts).text());
     }).catch(() => null);
     const P = { bundle: getBundle(), crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
-                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json") };
+                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json") };
     let man = null, texts = null;
     const b = await P.bundle;
     if (b && b.files) { man = { updated: b.updated }; texts = b.files.map(f => f.text); }
@@ -3643,7 +3644,8 @@ async function tryHosted() {
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
-    const [cr, lo, od, li, ex, qu, pr] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre]);
+    const [cr, lo, od, li, ex, qu, pr, hf] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half]);
+    if (hf && hf.campionati) HALF = hf;
     if (cr) CRESTS = cr.colors || {};
     if (lo) LOGOS = lo;
     if (od) ODDS = od;
@@ -4239,12 +4241,39 @@ function matchHeroHTML(home, away, e, cfg, G) {
       ${se ? `<p class="sx-fb"><b>Forbice</b> · i numeri piccoli sotto gol e cartellini: dove cade la media di quella squadra 8 volte su 10</p>` : ""}`}
     </div>`;
 }
+/* ===== 1X2 per tempo (chi ne fa di più nel 1° e nel 2° tempo) di corner, tiri e tiri in porta (15/10/2026) =====
+   Valori attesi della partita (Media dinamica) × quota del tempo nel campionato, per sede, dai soli dati REALI per tempo di
+   API-Football (data/tempi.json, tools/half_shares.py, dalla stagione 2024-25; campionati con almeno 200 partite). Ogni squadra:
+   Binomiale Negativa con la dispersione del tempo. Backtest: scelto sul 2024-25, verificato sul 2025-26 e sul 2026-27, migliore
+   delle frequenze di lega e delle medie per tempo delle squadre in tutti e sei i mercati. Solo partite da giocare; niente coppe. */
+let HALF = null;
+function halfHTML(home, away) {
+  const H = HALF && HALF.campionati && HALF.campionati[S.league]; if (!H || isCup(S.league)) return null;
+  const cfg = MODES.dyn; let M = null, T = null;
+  try { M = model(home, away, cfg, "c"); T = modelShots(home, away, cfg); } catch (err) { return null; }
+  const ok = v => v != null && isFinite(v) && v > 0;
+  const src = [["c", "Corner", statMissing(S.league, "hc") ? null : M], ["s", "Tiri", T && !statMissing(S.league, "hs") ? T.MS : null],
+    ["st", "Tiri in porta", T && !statMissing(S.league, "hst") ? { lh: T.lh, la: T.la } : null]];
+  const rows = [];
+  for (const [k, lab, X] of src) {
+    if (!H[k] || !X || !ok(X.lh) || !ok(X.la)) continue;
+    for (const t of [1, 2]) {
+      const fh = t === 1 ? H[k][0] : 1 - H[k][0], fa = t === 1 ? H[k][1] : 1 - H[k][1], lh = X.lh * fh, la = X.la * fa;
+      const P = headToHeadProb(lh, la, Infinity, HALF.r[k][t - 1]), v = [P.home, P.draw, P.away], mx = Math.max(...v);
+      rows.push([`${lab}<br><span class="muted small">${t}° tempo</span>`, `${f1(lh)}–${f1(la)}`, ...v.map(p => p === mx ? `<b>${pc(p)}</b>` : pc(p))]);
+    }
+  }
+  if (!rows.length) return null;
+  return `<h2>Chi ne fa di più · per tempo</h2>${rowsTable(["", "Attesi", "1", "X", "2"], rows)}
+    <p class="small muted" style="margin:0">Media dinamica: valori attesi della partita divisi tra i due tempi con la quota reale del campionato (dati per tempo di API-Football dalla stagione 2024-25). Nel test sulle stagioni 2025-26 e 2026-27 l'esito più probabile è uscito nel 52–53% dei casi per corner e tiri in porta, 59–62% per i tiri; il pari fa perdere l'1 e il 2. Falli: dati per tempo non disponibili.</p>`;
+}
 function renderMatchExtras(home, away) {
   const e = CUR && CUR.home === home && CUR.away === away && CUR.lg.code === S.league ? CUR : null;
   const cfg = MODES[$("#decay").value] || MODES.dyn, m = e && e.m;
   const G = home && away && home !== away ? modelGoals(home, away, cfg) : null;
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}` : "Confronto libero";
   $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G); HEROCTX = { home, away, e, cfg, G };
+  { const hb = $("#mhalf"), h = e && !m && home && away && home !== away ? halfHTML(home, away) : null; hb.hidden = !h; hb.innerHTML = h || ""; }
   if (!isCup(S.league)) renderMatchConf(home, away, e, cfg);
   $("#mref").hidden = true; REFCTX = { home, away, e };   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
   // confronto previsione / partita giocata
