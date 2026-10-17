@@ -22,6 +22,11 @@ for m, nm in NAMES.items():
     good = [f"{lg} {round(100*n/t)}%" for lg, n, t in lst if n / t >= 0.5]
     weak = [f"{lg} {round(100*n/t)}%" for lg, n, t in lst if n / t < 0.5]
     lines.append(f"{nm}: {len(good)} campionati ≥50% → " + (", ".join(good) or "nessuno") + (" | sotto 50%: " + ", ".join(weak) if weak else ""))
+# mercati del primo tempo (x.h1.*) e dei fuorigioco (x.off.*, dal 17/10/2026): nomi come arrivano da API-Football
+for m in sorted(k for k in has if k.startswith(("h1.", "off."))):
+    c = has[m]; lst = sorted(((lg, n, tot[lg]) for lg, n in c.items()), key=lambda x: -x[1] / x[2])
+    good = [f"{lg} {round(100*n/t)}%" for lg, n, t in lst if n / t >= 0.5]
+    lines.append(f"{m}: {len(good)} campionati ≥50% → " + (", ".join(good) or "nessuno") + f" | presenti in {len(lst)} campionati")
 print(f"::notice title=Base::partite con quote 1xBet dal {since}: {sum(tot.values())} in {len(tot)} campionati: " + ", ".join(f"{lg} {n}" for lg, n in tot.most_common()))
 for i in range(0, len(lines), 2):
     print("::notice title=Mercati " + str(i // 2 + 1) + "::" + " ‖ ".join(lines[i:i + 2]))

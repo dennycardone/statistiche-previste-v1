@@ -651,7 +651,7 @@ try:
     # 14/10/2026: in coda (indici 7-12) anche tiri in area/fuori area, bloccati, fuori porta, possesso e parate: arrivano nella stessa
     # risposta (nessuna richiesta in più), solo archivio per i test futuri. Le posizioni 0-6 non cambiano.
     KS_ = ["Total Shots", "Shots on Goal", "Corner Kicks", "Fouls", "Yellow Cards", "Red Cards", "expected_goals",
-           "Shots insidebox", "Shots outsidebox", "Blocked Shots", "Shots off Goal", "Ball Possession", "Goalkeeper Saves"]
+           "Shots insidebox", "Shots outsidebox", "Blocked Shots", "Shots off Goal", "Ball Possession", "Goalkeeper Saves", "Offsides"]   # 17/10: fuorigioco (indice 13)
     def _af(path, **q):
         req = urllib.request.Request("https://v3.football.api-sports.io/" + path + ("?" + _up.urlencode(q) if q else ""), headers={"x-apisports-key": _key})
         with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
@@ -700,7 +700,8 @@ try:
         for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR")]: del AP["partite"][_k]   # campionati tolti
         json.dump(AP, open(ap_path, "w"), separators=(",", ":"), ensure_ascii=False)
     # conteggio delle partite con le statistiche in più (tiri in area, bloccati, possesso, parate) a ogni giro: solo il numero, per verificare i nomi dei campi
-    QUAL["stat_extra"] = {"partite": sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None), "archivio": AP.get("agg")}
+    QUAL["stat_extra"] = {"partite": sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None),
+                          "fuorigioco": sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 13 and v[7][13] is not None and v[8] and len(v[8]) > 13 and v[8][13] is not None), "archivio": AP.get("agg")}
     # campionati solo su API-Football: file dell'app costruito dall'archivio (stesse colonne dei file "new" di football-data)
     for lg_, (lid_, nm_, cal_) in API_ONLY.items():
         try:
@@ -1065,6 +1066,9 @@ if ODDS_FULL or ODDS_NEAR:
                     if b["name"] == "1xBet" and re.search(r"1st half|first half|half time", nm, re.I) and re.search(r"corner|shot|foul|card|booking", nm, re.I):
                         xacc.setdefault("x.h1." + re.sub(r"[^a-z0-9]+", "_", nm.lower()).strip("_") + ":" + val, {})[b["name"]] = o
                     # 1X2 e doppia chance dei mercati di nicchia: quote di 1xBet (il book usato da Denny) e Pinnacle (riferimento), solo archivio
+                    # 17/10/2026: mercati sui fuorigioco di 1xBet (se l'API li dà): solo archivio privato, per misurarne la copertura (nessuna richiesta in più)
+                    if b["name"] == "1xBet" and re.search(r"offside", nm, re.I):
+                        xacc.setdefault("x.off." + re.sub(r"[^a-z0-9]+", "_", nm.lower()).strip("_") + ":" + val, {})[b["name"]] = o
                     if nm in NICHE and b["name"] in BOOK_TAG:
                         xacc.setdefault(BOOK_TAG[b["name"]] + NICHE[nm] + ":" + val, {})[b["name"]] = o
                     if nm == "Match Winner": key = "1x2:" + {"Home": "1", "Draw": "X", "Away": "2"}.get(val, "")
