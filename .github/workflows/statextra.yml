@@ -1,0 +1,48 @@
+name: Recupero statistiche in più (API-Football)
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: [tools/extra_stats_apifootball.py]   # parte subito quando lo script cambia
+  schedule:
+    - cron: "40 23 * * *"   # dopo l'ultimo giro dell'app e dopo i tempi (23:25): solo richieste avanzate (tools/af_budget.py)
+permissions:
+  contents: write
+concurrency:
+  group: statextra
+  cancel-in-progress: false
+jobs:
+  statextra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivio partite dal magazzino privato di GitHub Actions (solo lettura)
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Elenco partite (ramo storico) e statistiche già recuperate (ramo statextra)
+        run: |
+          mkdir -p storico statextra
+          git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
+          if git ls-remote --exit-code origin statextra >/dev/null 2>&1; then
+            git fetch -q --depth 1 origin statextra && git archive FETCH_HEAD | tar -x -C statextra
+          fi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python tools/extra_stats_apifootball.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Salva sul ramo statextra
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd statextra
+          if ls *.json >/dev/null 2>&1; then
+            git init -q -b statextra && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+            git add -A && git commit -q -m "Statistiche in più $(date -u '+%F %H:%M')"
+            git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" statextra
+          fi
