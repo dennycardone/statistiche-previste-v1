@@ -1,0 +1,46 @@
+{
+ "stat_extra": {
+  "partite": 273,
+  "fuorigioco": 190,
+  "archivio": "2026-10-17 23:55"
+ },
+ "partite_non_api": [],
+ "giocate_mancanti": [],
+ "squadre_non_riconosciute": [],
+ "partite_scadute": [
+  "BRA 17/10 Atletico Paranaense - Palmeiras",
+  "MEX 17/10 Santos Laguna - Club Queretaro",
+  "MEX 17/10 Guadalajara Chivas - Tigres UANL",
+  "USA 17/10 Orlando City SC - DC United",
+  "USA 17/10 New York Red Bulls - Toronto FC",
+  "USA 17/10 New York City FC - Los Angeles FC",
+  "USA 17/10 Atlanta United FC - Inter Miami",
+  "USA 17/10 New England Revolution - Chicago Fire",
+  "ARG 17/10 Velez Sarsfield - Gimnasia M.",
+  "ARG 17/10 Atletico Tucuman - Rosario Central"
+ ],
+ "statistiche_scartate": [
+  "SC0 11/10 Motherwell - Celtic: falli",
+  "BUL 10/10 Botev Vratsa - Spartak Varna: falli",
+  "BUL 10/10 Lokomotiv Sofia - Lokomotiv Plovdiv: falli",
+  "BUL 10/10 Botev Plovdiv - Slavia Sofia: falli",
+  "BUL 11/10 Septemvri Sofia - Dunav Ruse: falli",
+  "BUL 11/10 Cherno More Varna - Levski Sofia: falli",
+  "BUL 11/10 CSKA 1948 - CSKA Sofia: falli",
+  "BUL 12/10 Ludogorets - Arda Kardzhali: falli"
+ ],
+ "calendario_da_espn": [],
+ "quote": {
+  "aggiornate": "18/10/2026 00:44",
+  "abbinate": 218,
+  "non_abbinate": 0,
+  "esempi_non_abbinate": []
+ },
+ "api_aggiornata": "2026-10-17 23:55",
+ "avvisi": [
+  "10 partite non giocate con data passata (rinviate o calendario non aggiornato)",
+  "8 partite con statistiche API impossibili (usato football-data o vuoto)"
+ ],
+ "stato": "da controllare",
+ "giro": "18/10/2026 00:52"
+}
