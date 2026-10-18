@@ -1,0 +1,17 @@
+name: Prova quote MLS
+on:
+  push:
+    branches: [main]
+    paths: [tools/probe_mls.py]
+permissions:
+  contents: read
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python tools/probe_mls.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
