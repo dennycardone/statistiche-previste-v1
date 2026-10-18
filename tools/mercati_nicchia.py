@@ -23,12 +23,25 @@ for m, nm in NAMES.items():
     weak = [f"{lg} {round(100*n/t)}%" for lg, n, t in lst if n / t < 0.5]
     lines.append(f"{nm}: {len(good)} campionati ≥50% → " + (", ".join(good) or "nessuno") + (" | sotto 50%: " + ", ".join(weak) if weak else ""))
 # mercati del primo tempo (x.h1.*) e dei fuorigioco (x.off.*, dal 17/10/2026): nomi come arrivano da API-Football
+first = {}; bydate = []
+for k, v in OH.items():
+    lg, d = k.split("|")[:2]; ks = set()
+    for part in ("prima", "ultima"):
+        for q in (v.get(part) or {}).get("q", {}):
+            if q.startswith("x."): ks.add(q[2:].split(":")[0])
+    if not ks: continue
+    bydate.append((lg, d, ks))
+    for m in ks:
+        if m not in first or d < first[m]: first[m] = d
+def tot_from(d0): return collections.Counter(lg for lg, d, ks in bydate if d >= d0)
+def has_from(m, d0): return collections.Counter(lg for lg, d, ks in bydate if d >= d0 and m in ks)
 # (GitHub mostra al massimo 10 annotazioni per passo: primo tempo e fuorigioco in due righe compatte, una voce per mercato)
 for pref, title in (("h1.", "Primo tempo"), ("off.", "Fuorigioco")):
     ms = sorted(k for k in has if k.startswith(pref)); parts = []
     for m in ms:
-        c = has[m]; good = sorted(lg for lg, n in c.items() if n / tot[lg] >= 0.5)
-        parts.append(f"{m[len(pref):]} [{len(good)} camp. ≥50%: {' '.join(good)}; presente in {len(c)}]")
+        c = has[m]; d0 = first[m]; den = tot_from(d0)   # copertura contata solo dalle partite successive alla prima volta che il mercato è stato raccolto
+        lst = sorted(((lg, c2, den[lg]) for lg, c2 in has_from(m, d0).items() if den[lg]), key=lambda x: -x[1] / x[2])
+        parts.append(f"{m[len(pref):]} dal {d0} [" + " ".join(f"{lg} {n}/{t}" for lg, n, t in lst) + "]")
     print(f"::notice title={title}::" + (f"{len(ms)} mercati · " + " ‖ ".join(parts) if ms else "nessun mercato nell'archivio"))
 print(f"::notice title=Base::partite con quote 1xBet dal {since}: {sum(tot.values())} in {len(tot)} campionati: " + ", ".join(f"{lg} {n}" for lg, n in tot.most_common()))
 for i in range(0, len(lines), 2):
