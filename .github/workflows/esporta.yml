@@ -3,7 +3,7 @@ on:
   workflow_dispatch: {}
   push:
     branches: [main]
-    paths: [tools/mercati_nicchia.py]   # riparte quando lo script cambia (nessuna richiesta API)
+    paths: [tools/mercati_nicchia.py, tools/analisi_quote.js, tools/analisi_1x2.js, tools/esiti_extra.py]   # riparte quando uno script cambia (nessuna richiesta API)
 permissions:
   contents: read
 jobs:
@@ -19,10 +19,22 @@ jobs:
           restore-keys: dati-
       - name: Dati pubblicati (bundle ed extra)
         run: |
-          mkdir -p pub && git fetch -q --depth 1 origin pages && git show FETCH_HEAD:data/bundle.json > pub/bundle.json && git show FETCH_HEAD:data/extra.json > pub/extra.json
+          mkdir -p pub && git fetch -q --depth 1 origin pages
+          for f in bundle extra tiri_area fuorigioco tempi; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+      - name: Statistiche per tempo (ramo tempi)
+        run: |
+          mkdir -p tempi && git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
       - uses: actions/setup-node@v4
         with: { node-version: "22" }
       - name: Mercati di nicchia per campionato (1xBet)
         run: python3 tools/mercati_nicchia.py
       - run: node tools/analisi_quote.js .
+        continue-on-error: true
+      - name: Esiti reali in più (gialli per squadra, 1° tempo)
+        run: python3 tools/esiti_extra.py pub/bundle.json
+        continue-on-error: true
+      - name: 1X2 delle statistiche contro 1xBet
+        run: node tools/analisi_1x2.js .
         continue-on-error: true

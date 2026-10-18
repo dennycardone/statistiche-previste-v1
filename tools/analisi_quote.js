@@ -13,6 +13,8 @@ vm.runInContext(html.slice(start, end) + ";globalThis.API={S,MODES,parseCSV,addP
 const A = ctx.API;
 const EX = JSON.parse(fs.readFileSync(path.join(DIR, "pub", "extra.json"), "utf8"));
 vm.runInContext("EXTRA = " + JSON.stringify(EX) + "; clearCache();", ctx);
+// 19/10/2026: qualità dei tiri nel modello gol (come l'app), se pubblicata
+try { vm.runInContext("TAREA = " + fs.readFileSync(path.join(DIR, "pub", "tiri_area.json"), "utf8") + "; clearCache();", ctx); } catch (e) { console.log("tiri_area.json non disponibile"); }
 const B = JSON.parse(fs.readFileSync(path.join(DIR, "pub", "bundle.json"), "utf8"));
 A.resetState(); for (const f of B.files) A.addParsed(A.parseCSV(f.text));
 const OH = JSON.parse(fs.readFileSync(path.join(DATA, "odds_hist.json"), "utf8"));
