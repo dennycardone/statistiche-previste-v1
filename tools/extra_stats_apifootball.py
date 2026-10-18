@@ -2,7 +2,7 @@
 dell'app e nelle coppe europee, tutte le statistiche per squadra di API-Football nella stessa forma dell'archivio giornaliero
 (update_data.py, KS_): tiri, tiri in porta, corner, falli, gialli, rossi, xG, tiri in area, fuori area, bloccati, fuori porta,
 possesso, parate, fuorigioco. fixtures?ids= (20 partite per richiesta). Partite: ramo storico (storico/*_AAAA.json) e, se c'è,
-data/apif.json. Riprende da statextra/*.json; usa SOLO le richieste che avanzano dopo la riserva dell'app (tools/af_budget.py)."""
+data/apif.json. Riprende da statextra/*.json (gira anche alle 00:20 UTC, quando restano più richieste libere); usa SOLO le richieste che avanzano dopo la riserva dell'app (tools/af_budget.py)."""
 import json, os, time, glob, datetime, urllib.request, urllib.parse, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import af_budget
 KEY = os.environ["APIFOOTBALL_KEY"].strip()

@@ -6,6 +6,7 @@ on:
     paths: [tools/extra_stats_apifootball.py]   # parte subito quando lo script cambia
   schedule:
     - cron: "40 23 * * *"   # dopo l'ultimo giro dell'app e dopo i tempi (23:25): solo richieste avanzate (tools/af_budget.py)
+    - cron: "20 0 * * *"    # appena azzerate le richieste (mezzanotte UTC): la riserva dell'app lascia ~1.200 richieste libere
 permissions:
   contents: write
 concurrency:
