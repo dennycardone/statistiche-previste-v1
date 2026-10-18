@@ -46,6 +46,12 @@ for _g in (_ieri, _oggi):
                 if m.startswith("off."): _o[m[4:]].add(lg)
     _w = collections.Counter(lg for lg, d, ks in bydate if d == _g and any(m.startswith("off.") for m in ks))
     print(f"::notice title=Fuorigioco {_g}::partite con mercati fuorigioco per campionato: " + (", ".join(f"{lg} {n}/{_t[lg]}" for lg, n in _w.most_common()) or "nessuna") + " · mercati: " + (", ".join(sorted(_o)) or "nessuno"))
+_lab = collections.defaultdict(collections.Counter)   # etichette dei valori dei mercati fuorigioco (solo nomi, nessuna quota)
+for k, v in OH.items():
+    for part in ("prima", "ultima"):
+        for q in (v.get(part) or {}).get("q", {}):
+            if q.startswith("x.off."): m, _, val = q[6:].partition(":"); _lab[m][val] += 1
+print("::notice title=Etichette fuorigioco::" + " ‖ ".join(f"{m}: " + ", ".join(f"{x} ({n})" for x, n in c.most_common(12)) for m, c in sorted(_lab.items())))
 # (GitHub mostra al massimo 10 annotazioni per passo: primo tempo e fuorigioco in due righe compatte, una voce per mercato)
 for pref, title in (("h1.", "Primo tempo"), ("off.", "Fuorigioco")):
     ms = sorted(k for k in has if k.startswith(pref)); parts = []
