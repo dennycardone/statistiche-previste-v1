@@ -49,4 +49,4 @@ for (const mode of ["dyn"]) {   // 19/10/2026: solo la Media dinamica (la Classi
   console.log(mode, "fatto", Math.round((Date.now() - t) / 1000), "s");
 }
 fs.writeFileSync(path.join(DATA, "precalc.json"), JSON.stringify({ v: 1, updated: man.updated, st: { markets, minP }, rows }));
-console.log("precalc:", entries.length, "partite ×2 metodi,", Math.round((Date.now() - t) / 1000), "s");
+console.log("precalc:", entries.length, "partite (Media dinamica),", Math.round((Date.now() - t) / 1000), "s");
