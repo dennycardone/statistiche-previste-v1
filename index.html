@@ -3046,7 +3046,7 @@ ${parts.filter(([, , w]) => w > 0).map(([t, o, w]) => `${t}  ${r2(o)}   × ${Mat
   $("#methodLive").innerHTML = `<p class="small muted" style="margin:0">Statistica richiesta: <b>${hl.label}</b>. ${hl.dyn ? "Ogni valore = normale del campionato × attacco della squadra × difesa dell'avversaria. I voti usano tutte le partite, tengono conto degli avversari e partono da 1,00: pesano i dati della squadra per partite ÷ (partite + P)." : `Ogni valore è la somma pesata di 4 pezzi: media classica 50%, media del campionato 25%, correttivo avversari 20%, media totale della squadra 5%. Falli: classica 20% e totale squadra 80% finché una delle due squadre ha giocato 10 partite o meno, poi 50% e 50%.`}</p>
     <div class="formula">${[
       G ? blk("GOL", G.M) + `\n${G.M.Bp && G.M.Bp.gdyn ? "" : "(xG mancante in una partita = gol veri di quella partita) · "}risultati: Poisson(${f2(G.lh)}) × Poisson(${f2(G.la)})` : "GOL: N/D",
-      blk("CORNER", M), blk("FALLI", MF), blk("TIRI", MT && MT.MS), blk("TIRI IN PORTA", MT && MT.MD)].join("\n\n")}</div>`;
+      blk("CORNER", M), blk("FALLI", MF), blk("TIRI", MT && MT.MS), blk("TIRI IN PORTA", MT && MT.MD), offText(home, away)].join("\n\n")}</div>`;
 }
 
 let QUALITA = null;
@@ -3611,6 +3611,67 @@ function confMatch(home, away, date, odds, baseKey) {
 const confPack = r => [r.mk, r.side, Math.round(r.p * 1e4) / 1e4, r.score, r.cls, r.status, r.agreeN, Math.round(r.spread * 1e3) / 1e3, r.n.tot, r.n.venue, r.stab, r.samp, r.contra, Math.round(r.q * 1e4) / 1e4];
 const confUnpack = a => ({ mk: a[0], side: a[1], p: a[2], score: a[3], cls: a[4], status: a[5], agreeN: a[6], spread: a[7], n: { tot: a[8], venue: a[9] }, stab: a[10], samp: a[11], contra: a[12], q: a[13], packed: true });
 
+/* ===== Fuorigioco (18/10/2026): data/fuorigioco.json (API-Football, dal 2024-25; regola dei doppi null in update_data.py) =====
+   ln λ = b0 + lmu·ln(fuorigioco medi del campionato per sede, peso e^(−giorni/365)) + att·ln(rating fuorigioco commessi dalla squadra,
+   365 giorni, prudenza P = 20) + def·ln(rating fuorigioco provocati dalla difesa avversaria, 90 giorni, prudenza P = 5).
+   Test walk-forward (stima fino a giugno 2025, prova luglio 2025 – ottobre 2026, 16.629 partite): contro le medie delle squadre −0,058 di
+   log-loss per partita, contro la media del campionato −0,110; scelta di emivite e prudenze identica nel controllo 2023-24 → 2024-25.
+   Elo, tiri e tiri non in porta non aggiungono nulla. Binomiale Negativa: squadra r = 10,68, totale r = 21,56; 1X2 a squadre indipendenti.
+   N/D se nelle ultime 20 partite del campionato meno di 15 hanno i fuorigioco (dato non coperto) o nelle coppe. */
+let OFFS = null;
+const OFFC = { b0: 0.1354244, lmu: 0.7332036, att: 0.9284822, def: 1.1294708 }, OFF_TA = 365, OFF_PA = 20, OFF_TD = 90, OFF_PD = 5, OFF_R_TEAM = 10.68, OFF_R_TOT = 21.56;
+function offIdx(div) {
+  if (!OFFS || !OFFS.campionati || !OFFS.campionati[div]) return null;
+  if (!OFFS._p) OFFS._p = {};
+  if (!OFFS._p[div]) { const L = OFFS.campionati[div].map(r => ({ d: r[0], t: Date.parse(r[0] + "T00:00:00Z"), h: r[1], a: r[2], oh: r[3], oa: r[4] })).sort((x, y) => x.t - y.t);
+    const K = new Map(); for (const e of L) K.set(e.d + "|" + e.h + "|" + e.a, e); OFFS._p[div] = { L, K }; }
+  return OFFS._p[div];
+}
+function offFind(div, home, away, date) {   // partita giocata: fuorigioco reali (stesse squadre, giorno ±1)
+  const I = offIdx(div); if (!I) return null; const t = Date.parse(isoD(date) + "T00:00:00Z");
+  for (const k of [0, -1, 1]) { const e = I.K.get(isoD(new Date(t + k * DAYMS)) + "|" + home + "|" + away); if (e) return e; }
+  return null;
+}
+function offFit(div, D) {
+  const key = "off|" + div + "|" + D; if (CACHE.has(key)) return CACHE.get(key);
+  const I = offIdx(div); let res = null;
+  if (I) {
+    const Dd = Date.parse(isoD(new Date(D)) + "T00:00:00Z"), T = new Map(); let sH = 0, sA = 0, n = 0;
+    for (const e of I.L) {
+      const days = Math.round((Dd - e.t) / DAYMS); if (days < 1) break;
+      const w = Math.exp(-days / OFF_TA), wd = Math.exp(-days / OFF_TD);
+      sH += w * e.oh; sA += w * e.oa; n += w;
+      for (const [t, f, c] of [[e.h, e.oh, e.oa], [e.a, e.oa, e.oh]]) { const x = T.get(t) || [0, 0, 0, 0]; x[0] += w * f; x[1] += w; x[2] += wd * c; x[3] += wd; T.set(t, x); }
+    }
+    // copertura: ultime 20 partite del campionato (giorni precedenti) con i fuorigioco in almeno 15
+    const last = [...S.matches.values()].filter(m => m.div === div && m.hg != null && Date.parse(isoD(m.date) + "T00:00:00Z") < Dd).sort((a, b) => b.date - a.date).slice(0, 20);
+    const cov = last.length >= 15 && last.filter(m => offFind(div, m.home, m.away, m.date)).length >= 15;
+    res = n > 20 ? { muH: sH / n, muA: sA / n, T, cov, n: I.L.length } : { cov: false };
+  }
+  CACHE.set(key, res); return res;
+}
+function offModel(home, away) {
+  if (!OFFS || isCup(S.league)) return null;
+  const F = offFit(S.league, goalDate(home, away)); if (!F || !F.cov) return { nd: true };
+  const m = (F.muH + F.muA) / 2, g = t => F.T.get(t) || [0, 0, 0, 0];
+  const att = t => (g(t)[0] + OFF_PA * m) / (g(t)[1] + OFF_PA) / m, def = t => (g(t)[2] + OFF_PD * m) / (g(t)[3] + OFF_PD) / m;
+  const aH = att(home), dH = def(home), aA = att(away), dA = def(away);
+  const lh = Math.exp(OFFC.b0 + OFFC.lmu * Math.log(F.muH) + OFFC.att * Math.log(aH) + OFFC.def * Math.log(dA));
+  const la = Math.exp(OFFC.b0 + OFFC.lmu * Math.log(F.muA) + OFFC.att * Math.log(aA) + OFFC.def * Math.log(dH));
+  return { lh, la, tot: lh + la, aH, dH, aA, dA, muH: F.muH, muA: F.muA, n: F.n };
+}
+function offText(home, away) {
+  const O = offModel(home, away), c3 = v => v.toFixed(3).replace(".", ",");
+  if (!O) return "FUORIGIOCO: N/D (coppe o dati non ancora caricati)";
+  if (O.nd) return "FUORIGIOCO: N/D (in questo campionato API-Football non dà i fuorigioco con regolarità)";
+  return `FUORIGIOCO (regressione di Poisson; dati API-Football, 0-0 registrati come doppio null riconosciuti)
+fuorigioco medi di lega (365 giorni): casa ${f2(O.muH)} · fuori ${f2(O.muA)}
+rating attacco (fuorigioco commessi, 365 giorni, P = ${OFF_PA}): ${esc(home)} ${f2(O.aH)} · ${esc(away)} ${f2(O.aA)}
+rating difesa (fuorigioco provocati, linea difensiva, 90 giorni, P = ${OFF_PD}): ${esc(home)} ${f2(O.dH)} · ${esc(away)} ${f2(O.dA)}
+${esc(home)} = e^(${c3(OFFC.b0)} + ${c3(OFFC.lmu)}·ln ${f2(O.muH)} + ${c3(OFFC.att)}·ln ${f2(O.aH)} + ${c3(OFFC.def)}·ln ${f2(O.dA)}) = ${f2(O.lh)}
+${esc(away)} = e^(${c3(OFFC.b0)} + ${c3(OFFC.lmu)}·ln ${f2(O.muA)} + ${c3(OFFC.att)}·ln ${f2(O.aA)} + ${c3(OFFC.def)}·ln ${f2(O.dH)}) = ${f2(O.la)}
+totale ${f2(O.tot)} · Binomiale Negativa r = ${String(OFF_R_TOT).replace(".", ",")} (per squadra r = ${String(OFF_R_TEAM).replace(".", ",")})`;
+}
 /* ===== FINE MODELLO: tutto ciò che sta sopra è usato anche da storico.js su GitHub ===== */
 
 /* ===== Caricamento dati ===== */
@@ -4112,7 +4173,7 @@ const BK_MIN = 0.05;   // valore minimo per segnalare la giocata
 let QMOV = null;
 const QM_GROUPS = [["Esito finale", "1x2"], ["Gol Over/Under 1,5", "ou1.5"], ["Gol Over/Under 2,5", "ou2.5"], ["Gol Over/Under 3,5", "ou3.5"], ["Gol/No gol", "gg"],
   ["Corner 1X2", "x.c1x2"], ["Corner doppia chance", "x.cdc"], ["Tiri 1X2", "x.s1x2"], ["Tiri in porta 1X2", "x.st1x2"], ["Falli 1X2", "x.f1x2"], ["Falli doppia chance", "x.fdc"],
-  ["Gialli 1X2", "x.y1x2"], ["Gialli doppia chance", "x.ydc"]];
+  ["Gialli 1X2", "x.y1x2"], ["Gialli doppia chance", "x.ydc"], ["Fuorigioco 1X2", "x.off.offsides_1x2"]];
 const QM_SEL = v => ({ Home: "1", Draw: "X", Away: "2", "Home/Draw": "1X", "Home/Away": "12", "Draw/Away": "X2", O: "Over", U: "Under", S: "Gol", N: "No gol" }[v] || v);
 function qSpark(vals) {
   if (vals.length < 2) return "";
@@ -4149,7 +4210,7 @@ const RG_LINE = `<p class="rgline">Quote solo informative · Prevista non è un 
 const isVal = c => !!(c && c.po != null && !c.gol && c.ev >= BK_MIN);
 const bkLines = e => (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null;
 function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u, n, po, side, p, odd, ev, real, hit} o null (N.D.)
-  const { G, M, MT, x, MF } = Mods, ok = v => v != null && isFinite(v) && v > 0;
+  const { G, M, MT, x, MF, O } = Mods, ok = v => v != null && isFinite(v) && v > 0;
   const al = EXTRA && EXTRA.alpha, rk = al > 2e-4 ? 1 / al : Infinity;
   const pO = (mean, r, L) => ok(mean) ? pOver(pmfTotal(mean, r, Math.ceil(L) + 2), L) : null;
   const D = {
@@ -4159,17 +4220,24 @@ function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u,
     s: L => MT && MT.MS ? pO(MT.MS.lh + MT.MS.la, MT.MS.r, L) : null,
     f: L => MF ? pO(MF.tot, MF.r, L) : null, hf: L => MF ? pO(MF.lh, MF.rTeam != null ? MF.rTeam : MF.r, L) : null, af: L => MF ? pO(MF.la, MF.rTeam != null ? MF.rTeam : MF.r, L) : null,
     c: L => M ? pO(M.tot, M.r, L) : null, hc: L => M ? pO(M.lh, M.r, L) : null, ac: L => M ? pO(M.la, M.r, L) : null,
-    k: L => x ? pO(x[4], rk, L) : null, hk: L => x ? pO(x[6], rk, L) : null, ak: L => x ? pO(x[7], rk, L) : null };
-  const REAL = { g: m && [m.hg, m.ag], s: m && [m.hs, m.as], st: m && [m.hst, m.ast], c: m && [m.hc, m.ac], f: m && [m.hf, m.af], k: m && [m.hk, m.ak] };
+    k: L => x ? pO(x[4], rk, L) : null, hk: L => x ? pO(x[6], rk, L) : null, ak: L => x ? pO(x[7], rk, L) : null,
+    o: L => O ? pO(O.tot, OFF_R_TOT, L) : null, ho: L => O ? pO(O.lh, OFF_R_TEAM, L) : null, ao: L => O ? pO(O.la, OFF_R_TEAM, L) : null };
+  const REAL = { o: Mods.offR ? [Mods.offR.oh, Mods.offR.oa] : null, g: m && [m.hg, m.ag], s: m && [m.hs, m.as], st: m && [m.hst, m.ast], c: m && [m.hc, m.ac], f: m && [m.hf, m.af], k: m && [m.hk, m.ak] };
   const cell = (k, base, i) => {
     const c = k && LB && LB[k]; if (!c) return null;
     const [L, o, u, n] = c, po = D[k](L);
     const R = REAL[base], real = R && R[0] != null && R[1] != null ? (i === 0 ? R[0] : i === 2 ? R[1] : R[0] + R[1]) : null;
-    if (po == null || !isFinite(po)) return { L, o, u, n, po: null, real, gol: base === "g" };
+    if (po == null || !isFinite(po)) return { L, o, u, n, po: null, real, gol: base === "g" || base === "o" };
     const eo = po * o - 1, eu = (1 - po) * u - 1, side = eo >= eu ? "O" : "U";
-    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, ev: Math.max(eo, eu), real, gol: base === "g", hit: real == null ? null : side === "O" ? real > L : real < L };
+    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, ev: Math.max(eo, eu), real, gol: base === "g" || base === "o", hit: real == null ? null : side === "O" ? real > L : real < L };
   };
-  return BK_ROWS.map(([lab, t, h, a]) => ({ lab, t: cell(t, t, 1), h: cell(h, t, 0), a: cell(a, t, 2), mk: t }));
+  return ("O" in Mods ? BK_ROWS.concat([["Fuorigioco", "o", "ho", "ao"]]) : BK_ROWS).map(([lab, t, h, a]) => ({ lab, t: cell(t, t, 1), h: cell(h, t, 0), a: cell(a, t, 2), mk: t }));
+}
+function off1x2HTML(O, LB, offR) {   // fuorigioco 1X2: modello (squadre indipendenti, Binomiale Negativa r = 10,68) contro 1xBet
+  if (!O || O.nd || !LB || !LB.o1x2) return "";
+  const P = headToHeadProb(O.lh, O.la, Infinity, OFF_R_TEAM), p = [P.home, P.draw, P.away], q = LB.o1x2, ev = p.map((x, i) => x * q[i] - 1), b = ev.indexOf(Math.max(...ev));
+  const real = offR ? (offR.oh > offR.oa ? 0 : offR.oh === offR.oa ? 1 : 2) : null, lab = ["1", "X", "2"];
+  return `<p class="small" style="margin:6px 10px 2px"><b>Fuorigioco 1X2</b> · ${p.map((x, i) => `${lab[i]} ${pc(x)} <span class="muted">@${f2(q[i])}</span>`).join(" · ")}${real != null ? ` · reale ${lab[real]} (${offR.oh}-${offR.oa})` : ""}</p>`;
 }
 function bkCellHTML(c, center, lab) {
   const head = center ? `<small>${lab}</small>` : "";
@@ -4193,6 +4261,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
   const x = extraFor(home, away);
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}` : "Confronto libero";
   let M = null, MF = null, MT = null; try { M = model(home, away, cfg); MF = model(home, away, cfg, "f"); MT = modelShots(home, away, cfg); } catch (err) {}
+  let O = null, offR = null; try { O = offModel(home, away); offR = m ? offFind(S.league, home, away, e.date) : null; } catch (err) {}
   // statistica senza nessun dato reale nella stagione in corso (es. falli in Bulgaria): N/D, niente previsioni dalle stagioni passate
   const lgS = S.league;
   if (statMissing(lgS, "hc")) M = null;
@@ -4219,11 +4288,11 @@ function matchHeroHTML(home, away, e, cfg, G) {
     return P.map((x, i) => `<div class="sx-r sx-sub"><span class="sx-v">${f1(x[0])}</span><span class="sx-m"><small>${i + 1}° tempo</small><b>${f1(x[0] + x[1])}</b></span><span class="sx-v">${f1(x[1])}</span></div>`).join(""); };
   const BK = MV.hero === "bk";
   let bkBody = "", nValAny = 0;
-  try { const LB0 = bkLines(e); if (LB0) nValAny = bkCalc({ G, M, MT, x, MF }, LB0, m).reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0); } catch (err) {}
+  try { const LB0 = bkLines(e); if (LB0) nValAny = bkCalc({ G, M, MT, x, MF, O: O && !O.nd ? O : null, offR }, LB0, m).reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0); } catch (err) {}
   if (BK) {
-    const LB = bkLines(e), R = bkCalc({ G, M, MT, x, MF }, LB, m);
+    const LB = bkLines(e), R = bkCalc({ G, M, MT, x, MF, O: O && !O.nd ? O : null, offR }, LB, m);
     const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0);
-    bkBody = (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
+    bkBody = (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("") + off1x2HTML(O, LB, offR)
         : `<p class="bk-none">Linea 1xBet non disponibile per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + RG_LINE
       ;
   }
@@ -4243,6 +4312,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
       ${row("Calci d'angolo", M && M.lh, M && M.la, M && M.tot, 1, null, null, m && m.hc, m && m.ac)}
       ${M ? halves("c", M.lh, M.la) : ""}
       ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot, 1, null, null, m && m.hf, m && m.af)}
+      ${row("Fuorigioco", O && !O.nd ? O.lh : null, O && !O.nd ? O.la : null, O && !O.nd ? O.tot : null, 1, null, null, m && offR ? offR.oh : null, m && offR ? offR.oa : null)}
       ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
       ${se ? `<p class="sx-fb"><b>Forbice</b> · i numeri piccoli sotto gol e cartellini: dove cade la media di quella squadra 8 volte su 10</p>` : ""}`}
     </div>`;
@@ -5204,6 +5274,7 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   else if (online) refreshAll();
   if (!$("#viewSig").hidden) renderSignals();
   // movimento delle quote 1xBet: dopo l'avvio, senza rallentarlo
+  if (online) fetch("data/fuorigioco.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { if (j && j.campionati) { OFFS = j; clearCache(); if (!$("#viewMatch").hidden && HEROCTX) { const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); } } }).catch(() => {});
   if (online) fetch("data/quote_mov.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { QMOV = j || { partite: {} }; if (!$("#viewMatch").hidden) renderQuote(); }).catch(() => { QMOV = { partite: {} }; });
   // Champions League: previsioni pronte (dopo l'avvio); link #u=… alla partita
   if (online) for (const C of CUPS) fetch("data/" + C.file, { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { if (!j) return; CUPD[C.code] = j; if (typeof clearCache === "function") clearCache(); GEN_NEXT.clear();
