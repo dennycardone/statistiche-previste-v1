@@ -25,25 +25,31 @@ jobs:
           path: data
           key: dati-${{ github.run_id }}
           restore-keys: dati-
-      - name: Riserva - dati dal ramo pages (solo se il magazzino è vuoto, es. il primo giro)
+      - name: Riserva - magazzino vuoto (cache scaduta o cancellata) - archivi dalla copia cifrata del ramo backup, poi i dati del sito
         if: steps.dati.outputs.cache-matched-key == ''
+        env:
+          BK: ${{ secrets.BACKUP_KEY || secrets.APIFOOTBALL_KEY }}
         run: |
           if git ls-remote --exit-code origin pages >/dev/null 2>&1; then
             git fetch -q --depth 1 origin pages
             rm -rf data && git checkout FETCH_HEAD -- data && git reset -q -- data
           fi
-      - name: Storico API-Football (la prima volta o per i campionati nuovi)
+          if git ls-remote --exit-code origin backup >/dev/null 2>&1; then
+            rm -rf _bk && mkdir _bk && git fetch -q --depth 1 origin backup && git archive FETCH_HEAD | tar -x -C _bk
+            cat _bk/archivio.enc.* | openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:BK | tar -xz -C data
+            echo "::warning title=Archivi ripristinati::magazzino vuoto: archivi ripresi dalla copia cifrata del $(cat _bk/data.txt)"
+          else echo "::warning title=Magazzino vuoto::nessuna copia degli archivi: archivio quote ripartito da zero"; fi
+      - name: Storico API-Football (campionati nuovi, buchi di football-data come il Giappone feb–giu 2026), statistiche in più (fuorigioco), tempi
         run: |
-          # anche quando l'archivio non ha ancora i campionati solo API-Football aggiunti dopo (es. Serbia, codice SRB)
-          if { [ ! -f data/apif.json ] || ! grep -q '"SRB"' data/apif.json || ! grep -q '"UCL"' data/apif.json || ! grep -q '"UEL"' data/apif.json; } && git ls-remote --exit-code origin storico >/dev/null 2>&1; then
-            mkdir -p storico && git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
-          fi
-      - name: Statistiche in più dal 2022 (ramo statextra, recuperate da statextra.yml) per i fuorigioco
-        run: |
-          rm -rf statextra && mkdir -p statextra
-          if git ls-remote --exit-code origin statextra >/dev/null 2>&1; then
-            git fetch -q --depth 1 origin statextra && git archive FETCH_HEAD | tar -x -C statextra
-          fi
+          ramo() {   # 19/10/2026: $1 = ramo, $2 = cartella. Ramo che c'è: scaricato (se il download fallisce il giro si ferma);
+                     # ramo che non esiste (risposta 2 di ls-remote): cartella vuota; errore di rete o altro: il giro si ferma (mai ripartire da vuoto)
+            rc=0; git ls-remote --exit-code origin "$1" >/dev/null 2>&1 || rc=$?
+            if [ $rc -eq 0 ]; then git fetch -q --depth 1 origin "$1" && git archive FETCH_HEAD | tar -x -C "$2" || { echo "::error title=Ramo $1::download fallito"; exit 1; }
+            elif [ $rc -ne 2 ]; then echo "::error title=Ramo $1::ls-remote fallito (codice $rc)"; exit 1; fi
+          }
+          rm -rf storico statextra && mkdir -p storico statextra
+          ramo storico storico
+          ramo statextra statextra
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - uses: actions/setup-node@v4
@@ -55,10 +61,10 @@ jobs:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
       - name: 1X2 per tempo - quota del 1° tempo per campionato dai dati reali per tempo (ramo tempi, preparato da halves.yml)
         run: |
-          if git ls-remote --exit-code origin tempi >/dev/null 2>&1; then
-            rm -rf tempi && mkdir -p tempi && git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
+          rm -rf tempi && mkdir -p tempi
+          if git ls-remote --exit-code origin tempi >/dev/null 2>&1 && git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi && ls tempi/*.json >/dev/null 2>&1; then
             python tools/half_shares.py tempi data/tempi.json || echo "::warning title=Tempi::quote per tempo non calcolate"
-          fi
+          else echo "::warning title=Tempi::ramo tempi non scaricato: resta il tempi.json del giro precedente"; fi
       - name: Previsioni della home
         run: node precalc.js
       - name: Previsioni Champions League (ramo champions, preparate da champions.yml)
@@ -74,7 +80,16 @@ jobs:
           rm -rf _site && mkdir _site
           # sul sito solo i file che l'app usa: gli archivi grezzi (API-Football, quote storiche, ESPN, CSV) restano nel magazzino privato
           APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
-          DATA="bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
+          DATA="bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
+          # 19/10/2026: data/stato.json = ora del giro + impronta (sha1) di ogni file. L'app chiede i file come data/x.json?v=impronta:
+          # un file uguale al giro prima ha la stessa impronta e il telefono lo riprende dalla sua copia, senza riscaricarlo
+          python3 - $DATA <<'PY'
+          import hashlib, json, os, sys
+          man = json.load(open("data/manifest.json"))
+          v = {f[:-5]: hashlib.sha1(open("data/" + f, "rb").read()).hexdigest()[:12] for f in sys.argv[1:] if os.path.exists("data/" + f)}
+          json.dump({"updated": man["updated"], "v": v}, open("data/stato.json", "w"), separators=(",", ":"))
+          PY
+          DATA="$DATA stato.json"
           for d in _site _site/docs; do
             mkdir -p $d/data && cp $APP $d/ && touch $d/.nojekyll
             for f in $DATA; do if [ -f data/$f ]; then cp data/$f $d/data/; fi; done
@@ -87,8 +102,29 @@ jobs:
           git commit -q -m "Sito $(date -u '+%F %H:%M')"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages
       - name: Salva gli archivi nel magazzino privato (per il prossimo giro)
-        if: always() && hashFiles('data/bundle.json') != ''
+        if: success()   # 19/10/2026: solo dopo un giro riuscito (un giro fallito a metà non sostituisce gli archivi buoni)
         uses: actions/cache/save@v4
         with:
           path: data
           key: dati-${{ github.run_id }}
+      - name: Copia cifrata degli archivi privati (archivio quote, archivio partite) sul ramo backup, una volta al giorno
+        # 19/10/2026: la cache di GitHub sparisce dopo 7 giorni senza giri; il ramo è pubblico ma il file è cifrato (AES-256) con un segreto.
+        # Le due copie più recenti (oggi e la precedente). Ripristino automatico nel passo "Riserva" qui sopra.
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BK: ${{ secrets.BACKUP_KEY || secrets.APIFOOTBALL_KEY }}
+        run: |
+          last=0
+          if git ls-remote --exit-code origin backup >/dev/null 2>&1; then
+            rm -rf _bk && mkdir _bk && git fetch -q --depth 1 origin backup && git archive FETCH_HEAD | tar -x -C _bk && last=$(git log -1 --format=%ct FETCH_HEAD)
+          fi
+          if [ $(( $(date +%s) - last )) -lt 72000 ]; then echo "copia di oggi già fatta"; exit 0; fi
+          F=""; for f in odds_hist.json apif.json odds.json; do [ -f data/$f ] && F="$F $f"; done
+          [ -n "$F" ] || exit 0
+          mkdir -p _bk2 && tar -czf - -C data $F | openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -pass env:BK | split -b 90m - _bk2/archivio.enc.
+          if ls _bk/archivio.enc.* >/dev/null 2>&1; then mkdir -p _bk2/precedente && cp _bk/archivio.enc.* _bk/data.txt _bk2/precedente/ 2>/dev/null || true; fi
+          date -u '+%F %H:%M UTC' > _bk2/data.txt; du -ch _bk2/archivio.enc.* | tail -1
+          cd _bk2 && git init -q -b backup && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
+            && git add -A && git commit -q -m "Copia cifrata archivi $(date -u '+%F %H:%M')" && git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" backup
+          echo "::notice title=Copia archivi::fatta ($(cat data.txt)): $F" 

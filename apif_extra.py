@@ -16,7 +16,9 @@ def _sim(a, b):
     if a == b: return 1.0
     if a and b and (a in b or b in a): return 0.9
     return difflib.SequenceMatcher(None, a, b).ratio()
-MANUAL = {"NOR": {"Ham-Kam": "HamKam"}, "AUT": {"WSG Wattens": "Tirol"}}   # nomi che l'abbinamento automatico non riconosce
+# 19/10/2026: grafie API-Football della stagione speciale giapponese (febbraio–giugno 2026) che l'abbinamento non impara (poche partite)
+ALSO = {"JPN": {"V-varen Nagasaki": "V-Varen Nagasaki", "Mito Hollyhock": "Mito", "JEF United Chiba": "Chiba"}}
+MANUAL = {"NOR": {"Ham-Kam": "HamKam"}, "AUT": {"WSG Wattens": "Tirol"}, "ROU": {"Dinamo Bucuresti": "Dinamo Bucuresti"}}   # nomi che l'abbinamento automatico non riconosce
 def learn_map(api, ours, lg=None):
     """api: [(date, home, away, hg, ag)], ours: [(date, home, away, hg, ag)] di un campionato -> {nome API: nostro nome}"""
     byd = collections.defaultdict(list)
@@ -47,6 +49,7 @@ def learn_map(api, ours, lg=None):
             for k in ks: out[k] = v
     for k, v in MANUAL.get(lg, {}).items():
         out = {x: y for x, y in out.items() if y != v}; out[k] = v
+    for k, v in ALSO.get(lg, {}).items(): out.setdefault(k, v)   # grafie in più, senza togliere quelle imparate
     return out
 def refkey(name):   # "Daniele Doveri", "D. Doveri", "Doveri, Italy" → "d doveri" (API-Football non scrive sempre allo stesso modo)
     if not name: return None
@@ -149,9 +152,11 @@ def fill_stats(rd, lg, api_rows, mp, override=False):
                 n += done; break
     return [hdr] + body, n
 
-def add_results(rd, lg, api_rows, mp, today, tz):
+def add_results(rd, lg, api_rows, mp, today, tz, gap=None):
     """Aggiunge le partite giocate che API-Football ha e il nostro file non ancora (dopo l'ultima data del file e se la stessa
-    sfida non c'è già entro 3 giorni), con gol, statistiche e cartellini. Formati football-data (HomeTeam…) e "new" (Home…)."""
+    sfida non c'è già entro 3 giorni), con gol, statistiche e cartellini. Formati football-data (HomeTeam…) e "new" (Home…).
+    gap = (dal, al, stagione): 19/10/2026, buco di football-data in mezzo al file (Giappone, stagione speciale febbraio–giugno 2026):
+    le partite di quel periodo entrano anche se sono più vecchie di 21 giorni dall'ultima data del file, con la stagione indicata."""
     hdr = [h.strip() for h in rd[0]]; body = [list(r) for r in rd[1:] if any(x.strip() for x in r)]
     new = "HomeTeam" not in hdr
     for c in STAT_COLS + ["HK", "AK"]:
@@ -178,7 +183,8 @@ def add_results(rd, lg, api_rows, mp, today, tz):
         loc = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(tz); d = loc.date()
         # prima: solo dopo l'ultima data del file (d <= last → scartata). Se il file aveva già partite di quel giorno o dopo, una
         # partita finita non entrava più né nel calendario né nei risultati e spariva dall'app. Ora basta che la sfida non ci sia (±3 giorni).
-        if d < last - datetime.timedelta(days=21) or d > today or any(abs((x - d).days) <= 3 for x in pairs.get((h, a), [])): continue
+        in_gap = bool(gap) and gap[0] <= d <= gap[1]
+        if (d < last - datetime.timedelta(days=21) and not in_gap) or d > today or any(abs((x - d).days) <= 3 for x in pairs.get((h, a), [])): continue
         r = [""] * len(hdr)
         r[iD] = d.strftime("%d/%m/%Y"); r[iH], r[iA], r[iG1], r[iG2] = h, a, str(v[4]), str(v[5])
         if "Time" in ix: r[ix["Time"]] = loc.strftime("%H:%M")
@@ -189,7 +195,7 @@ def add_results(rd, lg, api_rows, mp, today, tz):
             if "Season" in ix:
                 ss = lastrow[ix["Season"]]
                 if ss.strip().isdigit() and d.year != int(ss) and d.month <= 6 and int(ss) < d.year: ss = str(d.year)   # campionati per anno solare: nuova stagione
-                r[ix["Season"]] = ss
+                r[ix["Season"]] = gap[2] if in_gap else ss
             if "Res" in ix: r[ix["Res"]] = res
         else:
             r[ix.get("Div", 0)] = lg

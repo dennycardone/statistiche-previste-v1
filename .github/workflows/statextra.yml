@@ -26,11 +26,16 @@ jobs:
           restore-keys: dati-
       - name: Elenco partite (ramo storico) e statistiche già recuperate (ramo statextra)
         run: |
+          ramo() {   # 19/10/2026: $1 = ramo, $2 = cartella. Ramo che c'è: scaricato (se il download fallisce il giro si ferma);
+                     # ramo che non esiste (risposta 2 di ls-remote): cartella vuota; errore di rete o altro: il giro si ferma (mai ripartire da vuoto)
+            rc=0; git ls-remote --exit-code origin "$1" >/dev/null 2>&1 || rc=$?
+            if [ $rc -eq 0 ]; then git fetch -q --depth 1 origin "$1" && git archive FETCH_HEAD | tar -x -C "$2" || { echo "::error title=Ramo $1::download fallito"; exit 1; }
+            elif [ $rc -ne 2 ]; then echo "::error title=Ramo $1::ls-remote fallito (codice $rc)"; exit 1; fi
+          }
           mkdir -p storico statextra
-          git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C storico
-          if git ls-remote --exit-code origin statextra >/dev/null 2>&1; then
-            git fetch -q --depth 1 origin statextra && git archive FETCH_HEAD | tar -x -C statextra
-          fi
+          ramo storico storico
+          ramo statextra statextra
+          echo "N0=$(python3 -c 'import json,glob; print(sum(len(json.load(open(f))) for f in glob.glob("statextra/*.json")))')" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: python tools/extra_stats_apifootball.py
@@ -42,6 +47,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cd statextra
+          N1=$(python3 -c 'import json,glob; print(sum(len(json.load(open(f))) for f in glob.glob("*.json")))')
+          if [ "$N1" -lt "${N0:-0}" ]; then echo "::error title=statextra::partite scese da $N0 a $N1: ramo NON salvato"; exit 1; fi
           if ls *.json >/dev/null 2>&1; then
             git init -q -b statextra && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
             git add -A && git commit -q -m "Statistiche in più $(date -u '+%F %H:%M')"

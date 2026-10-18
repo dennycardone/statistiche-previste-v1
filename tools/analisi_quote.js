@@ -15,8 +15,11 @@ const EX = JSON.parse(fs.readFileSync(path.join(DIR, "pub", "extra.json"), "utf8
 vm.runInContext("EXTRA = " + JSON.stringify(EX) + "; clearCache();", ctx);
 // 19/10/2026: qualità dei tiri nel modello gol (come l'app), se pubblicata
 try { vm.runInContext("TAREA = " + fs.readFileSync(path.join(DIR, "pub", "tiri_area.json"), "utf8") + "; clearCache();", ctx); } catch (e) { console.log("tiri_area.json non disponibile"); }
-const B = JSON.parse(fs.readFileSync(path.join(DIR, "pub", "bundle.json"), "utf8"));
-A.resetState(); for (const f of B.files) A.addParsed(A.parseCSV(f.text));
+A.resetState();
+for (const bf of ["bundle_storico.json", "bundle.json"]) {   // dal 19/10/2026 le stagioni chiuse sono in bundle_storico.json
+  let B = null; try { B = JSON.parse(fs.readFileSync(path.join(DIR, "pub", bf), "utf8")); } catch (e) { continue; }
+  for (const f of B.files) A.addParsed(A.parseCSV(f.text));
+}
 const OH = JSON.parse(fs.readFileSync(path.join(DATA, "odds_hist.json"), "utf8"));
 const cdf = (pmf, L) => { let o = 0, eq = 0; pmf.forEach((p, k) => { if (k > L) o += p; else if (k === L) eq += p; }); return { o, eq }; };
 const conv = (ph, pa) => { const out = new Array(ph.length + pa.length).fill(0); ph.forEach((x, i) => pa.forEach((y, j) => out[i + j] += x * y)); return out; };

@@ -20,8 +20,8 @@ for (const [v, f] of [["EXTRA", "extra.json"], ["TAREA", "tiri_area.json"], ["OF
   const t = rd(PUB, f); if (t) vm.runInContext(`${v} = ${t}; clearCache();`, ctx); else console.log("manca", f);
 }
 const HALF = JSON.parse(rd(PUB, "tempi.json") || "{}");
-const B = JSON.parse(rd(PUB, "bundle.json"));
-A.resetState(); for (const f of B.files) A.addParsed(A.parseCSV(f.text));
+A.resetState();
+for (const bf of ["bundle_storico.json", "bundle.json"]) { const t = rd(PUB, bf); if (t) for (const f of JSON.parse(t).files) A.addParsed(A.parseCSV(f.text)); }
 const OH = JSON.parse(fs.readFileSync(path.join(DATA, "odds_hist.json"), "utf8"));
 const ES = JSON.parse(rd(DIR, "esiti.json") || "{}");
 const SEL = { Home: 0, "1": 0, Draw: 1, X: 1, Away: 2, "2": 2 };

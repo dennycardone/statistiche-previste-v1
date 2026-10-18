@@ -40,6 +40,22 @@ def save(name, txt):
     open(os.path.join(OUT, name), "w", encoding="utf-8").write(txt)
 
 
+def jdump(obj, path):
+    """19/10/2026: scrittura sicura degli archivi: prima un file temporaneo, poi lo scambio (un giro interrotto non lascia un file a metà)."""
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh: json.dump(obj, fh, separators=(",", ":"), ensure_ascii=False)
+    os.replace(tmp, path)
+
+
+def jload_archive(path):
+    """Archivio privato che non deve mai ripartire da vuoto: se manca → {} (primo giro); se c'è ma non si legge → il giro si ferma."""
+    if not os.path.exists(path): return {}
+    try: return json.load(open(path))
+    except Exception as e:
+        print(f"::error title=Archivio illeggibile::{os.path.basename(path)}: {e} — giro fermato, l'archivio non viene sovrascritto")
+        raise SystemExit(1)
+
+
 today = datetime.date.today()
 cur = today.year if today.month >= 7 else today.year - 1
 files = []
@@ -59,6 +75,7 @@ for lg in LEAGUES:
             files.append(name)
 
 import csv, io, collections
+FD_RENAME = {"ROU": {"Din. Bucuresti": "Dinamo Bucuresti"}}
 for lg in NEW_LEAGUES:
     name = f"{lg}.csv"
     try:
@@ -66,13 +83,25 @@ for lg in NEW_LEAGUES:
         if "Home" in txt:
             rd = list(csv.reader(io.StringIO(txt)))
             hdr, body = rd[0], [r for r in rd[1:] if r]
+            # 19/10/2026: football-data a volte cambia la grafia di una squadra a metà stagione (Romania, 9/10/2026: "Dinamo Bucuresti"
+            # → "Din. Bucuresti"): la squadra si spezzava in due e la stessa partita compariva due volte. Un solo nome per squadra.
+            ren = FD_RENAME.get(lg, {})
+            if ren and "Home" in hdr and "Away" in hdr:
+                iH_, iA_ = hdr.index("Home"), hdr.index("Away")
+                for r in body:
+                    if len(r) > max(iH_, iA_): r[iH_] = ren.get(r[iH_].strip(), r[iH_]); r[iA_] = ren.get(r[iA_].strip(), r[iA_])
             iS = hdr.index("Season") if "Season" in hdr else -1
-            keep = []
+            keep, seen_ = [], set()
+            iD_ = hdr.index("Date") if "Date" in hdr else -1
             for r in body:
                 try: y = int(str(r[iS]).strip()[:4]) if iS >= 0 else None
                 except Exception: y = None
                 if y is None or y >= today.year - 6:        # ultime stagioni, come per gli altri campionati
                     r[0] = lg                                # colonna Country = codice del campionato (l'app lo riconosce)
+                    if ren and iD_ >= 0:                     # dopo il cambio di nome: la stessa partita una volta sola
+                        kd_ = (r[iD_].strip(), r[iH_].strip(), r[iA_].strip())
+                        if kd_ in seen_: continue
+                        seen_.add(kd_)
                     keep.append(r)
             buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows([hdr] + keep)
             save(name, buf.getvalue())
@@ -637,8 +666,7 @@ try:
     import apif_extra, glob as _glob, urllib.parse as _up
     _key = os.environ.get("APIFOOTBALL_KEY", "").strip()
     ap_path = os.path.join(OUT, "apif.json")
-    try: AP = json.load(open(ap_path))
-    except Exception: AP = {}
+    AP = jload_archive(ap_path)
     AP.setdefault("partite", {}); AP.setdefault("agg", "")
     # storico dal ramo storico (scaricato dal workflow in storico/): al primo giro, poi per i campionati nuovi che l'archivio non ha
     _have = {v[1] for v in AP["partite"].values()}; _n0 = len(AP["partite"])
@@ -647,6 +675,18 @@ try:
         if not isinstance(D, dict) or "lega" not in D or "partite" not in D: continue   # ucl_log.json e altri file non di archivio
         if D["lega"] in _have or D["lega"] not in AF_LEAGUES_X: continue   # coppe europee: solo per i backtest
         for fid, v in D["partite"].items(): AP["partite"].setdefault(fid, [v[0], D["lega"], v[1], v[2], v[3], v[4], v[5], v[6], v[7], "FT"])
+    # 19/10/2026: Giappone, stagione speciale febbraio–giugno 2026 (J1 100 Year Vision League) assente nel file di football-data:
+    # le partite arrivano dal ramo storico (API-Football) e add_results le aggiunge. Stagione "2025" nel file: è una mezza stagione a sé,
+    # così non si mescola con la 2026-27 (classifica, partite in stagione); i modelli usano le date, non la stagione.
+    GAP_FILL = {"JPN": (datetime.date(2026, 1, 1), datetime.date(2026, 7, 15), "2025")}
+    for _lg in GAP_FILL:
+        for fn in _glob.glob(os.path.join(os.path.dirname(OUT), "storico", _lg + "_*.json")):
+            try: D = json.load(open(fn))
+            except Exception: continue
+            if not isinstance(D, dict) or D.get("lega") != _lg: continue
+            for fid, v in D.get("partite", {}).items():
+                if GAP_FILL[_lg][0].isoformat() <= v[0][:10] <= GAP_FILL[_lg][1].isoformat():
+                    AP["partite"].setdefault(fid, [v[0], _lg, v[1], v[2], v[3], v[4], v[5], v[6], v[7], "FT" if v[3] is not None else "NS"])
     if len(AP["partite"]) > _n0: print("arbitri: dallo storico", len(AP["partite"]) - _n0, "partite")
     # 14/10/2026: in coda (indici 7-12) anche tiri in area/fuori area, bloccati, fuori porta, possesso e parate: arrivano nella stessa
     # risposta (nessuna richiesta in più), solo archivio per i test futuri. Le posizioni 0-6 non cambiano.
@@ -663,22 +703,47 @@ try:
         _sr = _af("status").get("response"); st_ = (_sr.get("requests") or {}) if isinstance(_sr, dict) else {}   # richieste finite: "response" è una lista vuota
         print("::notice title=API-Football richieste::" + (f"{st_.get('current')} su {st_.get('limit_day')} oggi" if st_ else "stato non disponibile (richieste finite?)"))
         if int(st_.get("limit_day", 100)) > 100:   # serve il piano a pagamento
-            cur_season = {}
-            for x in _af("leagues", current="true").get("response", []):
-                for ss in x.get("seasons", []):
-                    if ss.get("current"): cur_season[x["league"]["id"]] = ss["year"]
-            need, n_new = [], 0
-            for lg, lid in AF_LEAGUES_X.items():
-                sy = cur_season.get(lid)
-                if not sy: continue
-                for f in _af("fixtures", league=lid, season=sy).get("response", []):
-                    fid = str(f["fixture"]["id"]); stt = f["fixture"]["status"]["short"]; old = AP["partite"].get(fid)
-                    base = [f["fixture"]["date"][:16], lg, f["teams"]["home"]["name"], f["teams"]["away"]["name"], f["goals"]["home"], f["goals"]["away"],
-                            f["fixture"].get("referee") or (old[6] if old else None), old[7] if old else [None] * 7, old[8] if old else [None] * 7, stt]
-                    AP["partite"][fid] = base
-                    for side_ in ("home", "away"):   # loghi delle squadre (immagini gratuite di API-Football, non consumano richieste)
-                        if f["teams"][side_].get("logo"): AP.setdefault("loghi", {}).setdefault(lg, {})[f["teams"][side_]["name"]] = f["teams"][side_]["logo"]
-                    if stt in ("FT", "AET", "PEN") and (base[7][4] is None or (_now.date() - datetime.date.fromisoformat(base[0][:10])).days <= 2): need.append(fid)
+            # 19/10/2026: meno richieste (prima ~80 a ogni aggiornamento, ~1.600 al giorno). Calendario completo di ogni campionato
+            # (46 richieste) solo una volta al giorno; negli altri giri le partite per data (ieri, oggi, domani, dopodomani in UTC: 4 richieste,
+            # tutti i campionati insieme). Statistiche di una partita finita: appena finita (ritentate fino a 3 giorni se API-Football non le ha
+            # ancora), poi una volta 12 ore e una volta 36 ore dopo il calcio d'inizio (correzioni dei dati); le partite vecchie senza
+            # statistiche non vengono più richieste ogni ora.
+            _utc = datetime.datetime.now(datetime.timezone.utc)
+            full = AP.get("agg_full", "")[:10] != _now.strftime("%Y-%m-%d") or not AP.get("stagioni") or bool(os.environ.get("APIF_FORCE"))
+            ID2LG = {v: k for k, v in AF_LEAGUES_X.items()}
+            need, n_new, n_req0 = [], 0, 0
+            def _take(f, lg):
+                fid = str(f["fixture"]["id"]); stt = f["fixture"]["status"]["short"]; old = AP["partite"].get(fid)
+                base = [f["fixture"]["date"][:16], lg, f["teams"]["home"]["name"], f["teams"]["away"]["name"], f["goals"]["home"], f["goals"]["away"],
+                        f["fixture"].get("referee") or (old[6] if old else None), old[7] if old else [None] * 7, old[8] if old else [None] * 7, stt]
+                AP["partite"][fid] = base
+                for side_ in ("home", "away"):   # loghi delle squadre (immagini gratuite di API-Football, non consumano richieste)
+                    if f["teams"][side_].get("logo"): AP.setdefault("loghi", {}).setdefault(lg, {})[f["teams"][side_]["name"]] = f["teams"][side_]["logo"]
+                if stt not in ("FT", "AET", "PEN"): return
+                ko = datetime.datetime.fromisoformat(base[0] + ":00+00:00"); age = (_utc - ko).total_seconds() / 3600
+                last = AP.setdefault("stats_at", {}).get(fid)
+                if base[7][4] is None: due = age <= 72                       # statistiche non ancora arrivate
+                else: due = any(age >= m and (not last or last < (ko + datetime.timedelta(hours=m)).strftime("%Y-%m-%dT%H:%M")) for m in (12, 36) if age <= m + 24)
+                if due: need.append(fid)
+            if full:
+                cur_season = {}
+                for x in _af("leagues", current="true").get("response", []):
+                    for ss in x.get("seasons", []):
+                        if ss.get("current"): cur_season[x["league"]["id"]] = ss["year"]
+                n_req0 += 1
+                for lg, lid in AF_LEAGUES_X.items():
+                    sy = cur_season.get(lid)
+                    if not sy: continue
+                    for f in _af("fixtures", league=lid, season=sy).get("response", []): _take(f, lg)
+                    n_req0 += 1
+                AP["stagioni"] = {str(k): v for k, v in cur_season.items()}; AP["agg_full"] = _now.strftime("%Y-%m-%d %H:%M")
+            else:
+                SY = {int(k): v for k, v in AP["stagioni"].items()}
+                for k in (-1, 0, 1, 2):
+                    for f in _af("fixtures", date=(_utc.date() + datetime.timedelta(days=k)).isoformat()).get("response", []):
+                        lid = f["league"]["id"]
+                        if lid in ID2LG and f["league"].get("season") == SY.get(lid): _take(f, ID2LG[lid])
+                    n_req0 += 1
             def _stat(t, k):
                 for s_ in t.get("statistics", []):
                     if s_["type"] == k:
@@ -687,18 +752,25 @@ try:
                         try: return float(str(v).replace("%", ""))
                         except Exception: return None
                 return None
+            n_req1 = 0
             for i in range(0, min(len(need), 2000), 20):
+                n_req1 += 1
                 for f in _af("fixtures", ids="-".join(need[i:i + 20])).get("response", []):
-                    stt_ = {t["team"]["id"]: t for t in f.get("statistics", [])}
+                    fid = str(f["fixture"]["id"]); stt_ = {t["team"]["id"]: t for t in f.get("statistics", [])}
                     H, A = stt_.get(f["teams"]["home"]["id"], {}), stt_.get(f["teams"]["away"]["id"], {})
-                    x = AP["partite"].get(str(f["fixture"]["id"]))
-                    if x: x[7] = [_stat(H, k) for k in KS_]; x[8] = [_stat(A, k) for k in KS_]; n_new += 1
+                    x = AP["partite"].get(fid)
+                    if x and H and A:   # risposta senza statistiche: restano quelle che c'erano (non si cancellano)
+                        x[7] = [_stat(H, k) for k in KS_]; x[8] = [_stat(A, k) for k in KS_]; n_new += 1
+                        AP["stats_at"][fid] = _utc.strftime("%Y-%m-%dT%H:%M")
+            _old = (_utc - datetime.timedelta(days=10)).strftime("%Y-%m-%dT%H:%M")
+            AP["stats_at"] = {k: v for k, v in AP.get("stats_at", {}).items() if v >= _old}
+            print(f"::notice title=API-Football · aggiornamento partite::{'calendario completo' if full else 'partite per data'}: {n_req0} richieste · statistiche: {len(need)} partite, {n_req1} richieste")
             AP["agg"] = _now.strftime("%Y-%m-%d %H:%M")
             print("arbitri: aggiornate", n_new, "statistiche,", len(AP["partite"]), "partite in archivio")
             _nx = sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None)
             print(f"::notice title=Statistiche in più (tiri in area, bloccati, possesso)::{_nx} partite in archivio")
         for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR")]: del AP["partite"][_k]   # campionati tolti
-        json.dump(AP, open(ap_path, "w"), separators=(",", ":"), ensure_ascii=False)
+        jdump(AP, ap_path)
     # conteggio delle partite con le statistiche in più (tiri in area, bloccati, possesso, parate) a ogni giro: solo il numero, per verificare i nomi dei campi
     QUAL["stat_extra"] = {"partite": sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None),
                           "fuorigioco": sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 13 and v[7][13] is not None and v[8] and len(v[8]) > 13 and v[8][13] is not None), "archivio": AP.get("agg")}
@@ -778,7 +850,7 @@ try:
                     _l20.append(1 if _has else 0)
                     if _has: _l200.append(1 if _z else 0)
                 _i = _j
-        json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "campionati": _OFF}, open(os.path.join(OUT, "fuorigioco.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+        json.dump({"campionati": _OFF}, open(os.path.join(OUT, "fuorigioco.json"), "w"), separators=(",", ":"), ensure_ascii=False)
         # 18/10/2026: tiri in area e tiri in porta per squadra (data/tiri_area.json) per la qualità dei tiri nel modello gol: solo valori reali
         # di entrambe le squadre (nessuna regola sui null), dalla stagione 2023-24
         _TA = collections.defaultdict(list)
@@ -791,7 +863,7 @@ try:
                 if _h and _a:
                     _loc = datetime.datetime.fromisoformat(_x[1][:16] + ":00+00:00").astimezone(ROME).strftime("%Y-%m-%d")
                     _TA[_lg].append([_loc, _h, _a, int(_H[7]), int(_A[7]), int(_H[1]), int(_A[1])])
-        json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "campionati": _TA}, open(os.path.join(OUT, "tiri_area.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+        json.dump({"campionati": _TA}, open(os.path.join(OUT, "tiri_area.json"), "w"), separators=(",", ":"), ensure_ascii=False)
         print("tiri_area.json:", len(_TA), "campionati,", sum(len(v) for v in _TA.values()), "partite")
         QUAL["fuorigioco"] = {"campionati": len(_OFF), "partite": sum(len(v) for v in _OFF.values()), "da_doppio_null": _nd["0-0 da doppio null"]}
         print("fuorigioco.json:", len(_OFF), "campionati,", sum(len(v) for v in _OFF.values()), "partite")
@@ -837,7 +909,7 @@ try:
             if fn not in files: continue
             try:
                 rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, fn), encoding="utf-8-sig").read())))
-                rd2, k = apif_extra.add_results(rd, lg, by_lg[lg], MAPS[lg], _now.date(), ROME)
+                rd2, k = apif_extra.add_results(rd, lg, by_lg[lg], MAPS[lg], _now.date(), ROME, gap=GAP_FILL.get(lg))
                 if k:
                     buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(rd2); save(fn, buf.getvalue()); n_res += k
             except Exception as e:
@@ -1018,7 +1090,7 @@ try:
             else: ent = [x["ref"], x["n"], x["ff"], None, None, real, None, None, None]
             ent.append(TR.get((lg, v[0], v[2], v[3])))   # [9] errori standard per il range: gol casa, gol ospite, cartellini casa, cartellini ospite
             for z in ds: EX[f"{lg}|{z}|{h}|{a}"] = ent
-    json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "partite": EX, "alpha": _alpha if CMP else None, "modello": cards_model.VERSION if CMP else "cartellini-v1"},
+    json.dump({"partite": EX, "alpha": _alpha if CMP else None, "modello": cards_model.VERSION if CMP else "cartellini-v1"},
               open(os.path.join(OUT, "extra.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("arbitri e cartellini:", len(EX), "partite abbinate")
 except Exception as e:
@@ -1061,7 +1133,7 @@ if ODDS_FULL or ODDS_NEAR:
         af_used[0] += 1
         req = urllib.request.Request("https://v3.football.api-sports.io/" + path + "?" + urllib.parse.urlencode(q), headers={"x-apisports-key": AF_KEY})
         with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
-        time.sleep(6.5)
+        time.sleep(0.25)   # 19/10/2026: era 6,5 s (limite del piano gratuito, 10 al minuto); il piano Pro ne ammette 300 al minuto
         if d.get("errors"): raise RuntimeError(str(d["errors"]))
         return d
     import urllib.parse, statistics
@@ -1175,7 +1247,7 @@ if ODDS_FULL or ODDS_NEAR:
     except Exception as e:
         err = str(e); print("quote API-Football:", e)
     if ODDS_NEAR:   # giro leggero: aggiorno solo le partite vicine, senza toccare l'ora dell'aggiornamento completo
-        if res: OD.setdefault("partite", {}).update(res); json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
+        if res: OD.setdefault("partite", {}).update(res); jdump(OD, odds_path)
     elif res:   # senza quote (errore o richieste del giorno finite): il file precedente resta, si riprova al giro dopo
         _t0 = rome_now.strftime("%Y-%m-%d"); ts_ = rome_now.strftime("%d/%m/%Y %H:%M")
         keep_ = {kk: v for kk, v in (OD.get("partite") or {}).items() if kk.split("|")[1] >= _t0}   # le partite dei giorni non riscaricati restano
@@ -1185,14 +1257,13 @@ if ODDS_FULL or ODDS_NEAR:
         if 2 in ODDS_DAYS: fas["settimana"] = ts_
         OD = {"giorno": _t0, "aggiornate": ts_, "fonte": "1xBet (via API-Football)", "fasce": fas,
               "richieste": af_used[0], "errore": err, "non_abbinate": nomatch[:80], "pro": bool(locals().get("paid")), "partite": keep_}
-        json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
+        jdump(OD, odds_path)
     # Archivio per verificare in futuro i mercati (corner, cartellini, tiri in porta…): per ogni partita la prima quota vista e l'ultima
     # prima del calcio d'inizio, con l'ora. Non si cancella mai: serve proprio a misurare a posteriori.
     MOV_KEYS = {"1x2", "ou1.5", "ou2.5", "ou3.5", "gg", "x.c1x2", "x.cdc", "x.s1x2", "x.st1x2", "x.f1x2", "x.fdc", "x.y1x2", "x.ydc", "x.off.offsides_1x2"}
     if allq:
         hp = os.path.join(OUT, "odds_hist.json")
-        try: OH = json.load(open(hp))
-        except Exception: OH = {}
+        OH = jload_archive(hp)
         ts = rome_now.strftime("%Y-%m-%d %H:%M")
         for kk, q in allq.items():
             x = OH.setdefault(kk, {})
@@ -1206,7 +1277,7 @@ if ODDS_FULL or ODDS_NEAR:
             if snap:
                 ser = x.setdefault("serie", [])
                 if not ser or ser[-1][1] != snap: ser.append([ts, snap]); del ser[:-60]
-        json.dump(OH, open(hp, "w"), separators=(",", ":"), ensure_ascii=False)
+        jdump(OH, hp)
         print("archivio quote:", len(OH), "partite")
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
 elif not AF_KEY:
@@ -1291,18 +1362,30 @@ json.dump({"updated": now.strftime("%d/%m/%Y %H:%M"), "files": files},
 KEEP = {"Div", "Date", "Time", "HomeTeam", "AwayTeam", "FTHG", "FTAG", "HTHG", "HTAG", "HS", "AS", "HST", "AST", "HF", "AF", "HC", "AC", "HxG", "AxG", "Round",
         "AvgH", "AvgD", "AvgA", "B365H", "B365D", "B365A", "Avg>2.5", "Avg<2.5", "B365>2.5", "B365<2.5",
         "Country", "League", "Season", "Home", "Away", "HG", "AG", "HK", "AK", "AvgCH", "AvgCD", "AvgCA", "PSCH", "PSCD", "PSCA", "AvgC>2.5", "AvgC<2.5"}
-bundle = []
+# 19/10/2026: due file. bundle_storico.json = righe prima del 1° gennaio dell'anno di inizio della stagione in corso (stagioni chiuse:
+# cambia una volta l'anno, il telefono lo scarica una volta sola); bundle.json = il resto (stagione in corso e calendario). Nessuna
+# ora del giro dentro i file: l'ora e le impronte dei file stanno in data/stato.json (scritto alla pubblicazione).
+CUT_ST = datetime.date(cur, 1, 1)
+def _rowdate(x):
+    try: dd = x.strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; return datetime.date(int(y), int(dd[1]), int(dd[0]))
+    except Exception: return None
+bundle, bundle_st = [], []
 for f in files:
     try:
         rd = list(csv.reader(io.StringIO(open(os.path.join(OUT, f), encoding="utf-8-sig").read())))
         if not rd: continue
-        hdr = [h.strip() for h in rd[0]]; idx = [i for i, h in enumerate(hdr) if h in KEEP]
-        buf = io.StringIO(); w = csv.writer(buf, lineterminator="\n")
-        w.writerow([hdr[i] for i in idx])
+        hdr = [h.strip() for h in rd[0]]; idx = [i for i, h in enumerate(hdr) if h in KEEP]; iD = hdr.index("Date") if "Date" in hdr else -1
+        parts = {"st": io.StringIO(), "cur": io.StringIO()}; ws = {k: csv.writer(v, lineterminator="\n") for k, v in parts.items()}; n = {"st": 0, "cur": 0}
+        for w in ws.values(): w.writerow([hdr[i] for i in idx])
         for r in rd[1:]:
-            if any(x.strip() for x in r): w.writerow([r[i] if i < len(r) else "" for i in idx])
-        bundle.append({"name": f, "text": buf.getvalue()})
+            if not any(x.strip() for x in r): continue
+            d = _rowdate(r[iD]) if iD >= 0 and iD < len(r) else None
+            k = "st" if d and d < CUT_ST and "fixtures" not in f else "cur"
+            ws[k].writerow([r[i] if i < len(r) else "" for i in idx]); n[k] += 1
+        if n["st"]: bundle_st.append({"name": f, "text": parts["st"].getvalue()})
+        if n["cur"] or not n["st"]: bundle.append({"name": f, "text": parts["cur"].getvalue()})
     except Exception as e:
         print("bundle: salto", f, e)
-json.dump({"updated": now.strftime("%d/%m/%Y %H:%M"), "files": bundle}, open(os.path.join(OUT, "bundle.json"), "w"), separators=(",", ":"))
+json.dump({"files": bundle_st}, open(os.path.join(OUT, "bundle_storico.json"), "w"), separators=(",", ":"))
+json.dump({"files": bundle}, open(os.path.join(OUT, "bundle.json"), "w"), separators=(",", ":"))
 print("ok", len(files), "file")

@@ -7,9 +7,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))));
 from zoneinfo import ZoneInfo
 ROME = ZoneInfo("Europe/Rome")
 AP = json.load(open("data/apif.json"))["partite"]
-B = json.load(open(sys.argv[1] if len(sys.argv) > 1 else "pub/bundle.json"))
+FILES = []
+for bp in (sys.argv[1:] or ["pub/bundle_storico.json", "pub/bundle.json"]):   # dal 19/10/2026 le stagioni chiuse sono in bundle_storico.json
+    if os.path.exists(bp): FILES += json.load(open(bp))["files"]
 ours = collections.defaultdict(list)
-for f in B["files"]:
+for f in FILES:
     if "fixtures" in f["name"]: continue
     for r in csv.DictReader(io.StringIO(f["text"])):
         lg = (r.get("Div") or r.get("Country") or "").strip(); h = (r.get("HomeTeam") or r.get("Home") or "").strip(); a = (r.get("AwayTeam") or r.get("Away") or "").strip()

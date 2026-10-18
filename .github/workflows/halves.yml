@@ -19,13 +19,16 @@ jobs:
           restore-keys: dati-
       - name: Partite (sito pubblicato) e statistiche per tempo già scaricate
         run: |
+          ramo() {   # 19/10/2026: $1 = ramo, $2 = cartella. Ramo che c'è: scaricato (se il download fallisce il giro si ferma);
+                     # ramo che non esiste (risposta 2 di ls-remote): cartella vuota; errore di rete o altro: il giro si ferma (mai ripartire da vuoto)
+            rc=0; git ls-remote --exit-code origin "$1" >/dev/null 2>&1 || rc=$?
+            if [ $rc -eq 0 ]; then git fetch -q --depth 1 origin "$1" && git archive FETCH_HEAD | tar -x -C "$2" || { echo "::error title=Ramo $1::download fallito"; exit 1; }
+            elif [ $rc -ne 2 ]; then echo "::error title=Ramo $1::ls-remote fallito (codice $rc)"; exit 1; fi
+          }
           mkdir -p tempi
-          if [ ! -f data/apif.json ]; then   # riserva: vecchio sito (prima del 7/10 l'archivio era sul ramo pages)
-            git fetch -q --depth 1 origin pages && git checkout FETCH_HEAD -- data/apif.json && git reset -q -- data || true
-          fi
-          if git ls-remote --exit-code origin tempi >/dev/null 2>&1; then
-            git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
-          fi
+          if [ ! -f data/apif.json ]; then echo "::error title=Tempi::archivio partite (magazzino privato) non trovato"; exit 1; fi
+          ramo tempi tempi
+          echo "N0=$(ls tempi/*.json 2>/dev/null | wc -l) S0=$(cat tempi/*.json 2>/dev/null | wc -c)" | tr ' ' '\n' >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: python tools/halves_apifootball.py
@@ -37,6 +40,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cd tempi
+          S1=$(cat *.json 2>/dev/null | wc -c)
+          if [ "$S1" -lt "${S0:-0}" ]; then echo "::error title=Tempi::archivio sceso da $S0 a $S1 byte: ramo NON salvato"; exit 1; fi
           git init -q -b tempi && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
           git add -A && git commit -q -m "Tempi $(date -u '+%F %H:%M')"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" tempi

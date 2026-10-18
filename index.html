@@ -1093,13 +1093,15 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <div id="methodLive"></div>
     <details>
       <summary>Il modello, passo per passo</summary>
-      <p><b>Due metodi.</b> <i>Media dinamica</i> (predefinita): modelli di regressione verificati sulle stagioni passate, descritti qui sotto. <i>Media classica</i>: squadra di casa = (quanto fa in casa + quanto concede in trasferta l'ospite) ÷ 2; ospite = (quanto fa in trasferta + quanto concede in casa la squadra di casa) ÷ 2. Per i gol la classica usa 65% xG + 35% gol veri (solo gol dove l'xG manca).</p>
-      <p><b>Probabilità.</b> Il totale segue una Binomiale Negativa (gol: Poisson), con la variabilità misurata sugli errori reali: ogni partita già giocata viene prevista senza usarla e confrontata con il risultato vero.</p>
+      <p><b>Due metodi.</b> <i>Media dinamica</i> (predefinita): modelli di regressione verificati sulle stagioni passate, descritti qui sotto. <i>Media classica</i>: squadra di casa = (quanto fa in casa + quanto concede in trasferta l'ospite) ÷ 2; ospite = (quanto fa in trasferta + quanto concede in casa la squadra di casa) ÷ 2. I gol sono sempre quelli della Media dinamica, anche quando scegli la classica: nel controllo sulle stagioni 2023-24 – 2025-26 la media classica sui gol prevedeva peggio di una percentuale fissa.</p>
+      <p><b>Probabilità.</b> Il totale segue una Binomiale Negativa (gol: Poisson), con la variabilità misurata sugli errori reali: ogni partita già giocata viene prevista senza usarla e confrontata con il risultato vero. <b>1X2 delle statistiche</b> (chi ne fa di più): ogni squadra ha la sua Binomiale Negativa; per corner e tiri si tiene conto che i numeri delle due squadre sono correlati negativamente (copula gaussiana, −0,20 corner, −0,24 tiri: i corner e i tiri di una squadra tolgono spazio a quelli dell'altra, quindi il pari è un po' meno probabile che con squadre indipendenti). Tiri in porta, falli, cartellini e fuorigioco: squadre indipendenti, perché nel test la correlazione non migliorava le previsioni.</p>
       <p><b>Media dinamica.</b> Previsto casa = normale in casa del campionato × attacco della squadra di casa × difesa dell'ospite (e viceversa). Attacco e difesa sono voti (1,00 = normale) calcolati su tutte le partite, casa e trasferta, tenendo conto degli avversari. Ogni voto parte da 1,00 e si sposta verso i dati della squadra con peso partite ÷ (partite + P). P la sceglie l'app da sola per ogni statistica: prova 2, 3, 5, 8, 12 e 20 prevedendo ogni partita giocata solo con i giorni precedenti, e usa quella con l'errore più basso (tra le partite giocate prima della data della previsione, così le previsioni passate non cambiano). Falli: difesa = falli subiti.</p>
       <p><b>Media dinamica – corner.</b> Anche per i corner la Media dinamica usa un modello verificato: regressione di Poisson con corner medi del campionato per sede (365 giorni), fattore campo, un rating attacco × difesa dei corner sugli ultimi 4 anni (una partita di 2 anni fa pesa il 37%, prudenza P = 20), differenza di Elo calcolato dall'app e corner delle ultime 5 partite (fatti dalla squadra, concessi dall'avversario). Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in ogni stagione. Il totale segue una Binomiale Negativa con r = 60 (i corner di casa e ospite sono correlati negativamente, quindi il totale varia meno della somma); per il 1X2 corner ogni squadra ha la sua Binomiale Negativa con r = 12. Dal 15/10/2026 i corner attesi di ogni squadra tengono conto anche dei tiri non in porta (tiri − tiri in porta: respinti e fuori) fatti dalla squadra e concessi dall'avversario negli ultimi 365 giorni, e il 1X2 corner e il 1X2 tiri usano la correlazione negativa tra casa e ospite (copula gaussiana, −0,20 corner, −0,24 tiri): nel test walk-forward su circa 16.000 partite (luglio 2025 – ottobre 2026, parametri stimati sulle partite precedenti) le previsioni sono migliorate in ogni stagione.</p>
       <p><b>Media dinamica – falli.</b> Anche per i falli la Media dinamica usa un modello verificato: due regressioni di Poisson, una per la squadra di casa e una per l'ospite, con falli medi del campionato per sede (365 giorni), un rating falli commessi × subiti sugli ultimi 2 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4), falli delle ultime 5 partite (commessi dalla squadra, subiti dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 (chi va spesso in vantaggio fa meno falli) e tiri delle ultime 15. Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in 67 stagioni su 73 (nelle altre 6 peggiore di pochi centesimi). Il totale segue una Binomiale Negativa con r = 150, ogni squadra con r = 200 (i falli sono quasi Poisson). Sopra il modello si applica il <b>fattore arbitro</b>: falli reali ÷ previsti nelle sue partite precedenti (dati API-Football), ristretto verso 1 quando ha poche partite e con un tetto di +4% (nel test del 7/10/2026 gli arbitri "severi" non portavano davvero tanti falli in più quanti ne indicava il loro storico; il tetto è stato scelto sulle partite fino al 30/6/2026 e verificato su quelle dopo). Nel test su 12.584 partite migliora la precisione sugli Over falli dell'1,3% circa e l'errore medio dell'1,1%. Nella scheda Disciplina si vede quanto pesa, partita per partita.</p>
       <p><b>Media dinamica – cartellini.</b> Modello cartellini v2 (gialli + rossi), scelto con un test walk-forward su 47.955 partite API-Football 2022-2026: regressione con media del campionato, cartellini presi e provocati dalle due squadre (media mobile), <b>arbitro</b> (cartellini reali ÷ attesi in tutte le sue partite precedenti e nelle ultime 10, ristretto verso 1), falli fatti e subiti in stagione, scontri diretti degli ultimi 3 anni e avvio di stagione. Pesi ristimati ogni mese con le sole partite precedenti. Il totale segue una Binomiale Negativa. Se l'arbitro non è ancora stato designato la previsione è senza il suo effetto, e la scheda lo dice.</p>
-      <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote di 1xBet, unico bookmaker di riferimento), aggiornata due volte all'ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football.</p>
+      <p><b>Fuorigioco.</b> Fuorigioco attesi di ogni squadra = regressione di Poisson con fuorigioco medi del campionato per sede (365 giorni), rating dei fuorigioco commessi dalla squadra (365 giorni, prudenza P = 20) e rating dei fuorigioco provocati dalla difesa avversaria (90 giorni, prudenza P = 5); Binomiale Negativa per squadra (r = 10,68) e sul totale (r = 21,56), 1X2 a squadre indipendenti. Dati API-Football dalla stagione 2023-24: API-Football scrive lo 0-0 di fuorigioco come dato vuoto per entrambe le squadre; un doppio vuoto diventa 0-0 solo se la partita ha le altre statistiche avanzate e il campionato, nelle partite dei giorni precedenti, ha i fuorigioco con regolarità e quasi mai uno 0-0 scritto in chiaro (altrimenti resta un dato mancante). N/D nelle coppe e nei campionati dove nelle ultime 20 partite meno di 15 hanno i fuorigioco. Nel test walk-forward (luglio 2025 – ottobre 2026, 16.629 partite) prevede meglio delle medie delle squadre; Elo e tiri non aggiungono nulla. Il confronto con le quote 1xBet è mostrato senza bollino "valore" finché non è verificato.</p>
+      <p><b>Valori per tempo.</b> Sotto tiri, tiri in porta e corner la Lettura mostra i valori attesi del 1° e del 2° tempo: valore atteso della partita × quota del 1° tempo del campionato per sede, calcolata dai soli dati reali per tempo di API-Football (dalla stagione 2024-25, solo partite in cui i due tempi sommati coincidono con il totale; campionati con almeno 200 partite). Falli: API-Football non dà i dati per tempo.</p>
+      <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote di 1xBet, unico bookmaker di riferimento): quote controllate circa ogni 30 minuti, risultati e statistiche circa ogni ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football.</p>
       <p><b>Media dinamica – tiri e tiri in porta.</b> Anche tiri e tiri in porta usano modelli verificati: regressioni di Poisson che partono dalla media di lega per sede (365 giorni). Tiri: rating tiri fatti × concessi degli ultimi 4 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4) con una parte casa/trasferta, tiri delle ultime 10 (fatti dalla squadra, concessi dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 ed Elo. Tiri in porta: rating tiri in porta (una partita di un anno fa pesa il 37%, prudenza P = 8), rating dei tiri totali (chi tira molto finisce per avere più tiri in porta), tiri delle ultime 8 ed Elo. Coefficienti stimati su 8 campionati, solo stagioni in cui football-data misura i tiri nello stesso modo (quota in porta fino al 40%); nel test walk-forward migliori della versione precedente in tutti gli 8 campionati e, per squadra, in ogni stagione. Totale: Binomiale Negativa r = 150 per i tiri e r = 100 per i tiri in porta; per squadra r = 25 e r = 40.</p>
       <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre, calcolato dall'app dai risultati delle partite dei giorni precedenti (le stesse stagioni caricate): nel test rende quasi quanto l'Elo ufficiale di ClubElo. Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è ancora, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG). Dal 18/10/2026 i gol attesi tengono conto anche della qualità dei tiri: a parità di tiri in porta, chi arriva più spesso al tiro dentro l'area (e l'avversario che lo concede) segna di più (tiri in area di API-Football, 365 giorni; nel test walk-forward con il codice dell'app su 17.119 partite da luglio 2025 le previsioni dei gol sono migliorate in entrambe le stagioni).</p>
       <p><b>Perché non c'è più la Media ponderata.</b> Nel controllo su 21 campionati (2023-24 – 2025-26) su Over 2,5 e Gol/No gol prevedeva peggio di una percentuale fissa, e negli altri mercati era quasi identica alla Media classica ma meno precisa della Dinamica.</p>
@@ -3643,7 +3645,7 @@ function confMatch(home, away, date, odds, baseKey) {
 const confPack = r => [r.mk, r.side, Math.round(r.p * 1e4) / 1e4, r.score, r.cls, r.status, r.agreeN, Math.round(r.spread * 1e3) / 1e3, r.n.tot, r.n.venue, r.stab, r.samp, r.contra, Math.round(r.q * 1e4) / 1e4];
 const confUnpack = a => ({ mk: a[0], side: a[1], p: a[2], score: a[3], cls: a[4], status: a[5], agreeN: a[6], spread: a[7], n: { tot: a[8], venue: a[9] }, stab: a[10], samp: a[11], contra: a[12], q: a[13], packed: true });
 
-/* ===== Fuorigioco (18/10/2026): data/fuorigioco.json (API-Football, dal 2024-25; regola dei doppi null in update_data.py) =====
+/* ===== Fuorigioco (18/10/2026): data/fuorigioco.json (API-Football, dal 2023-24; regola dei doppi null in update_data.py) =====
    ln λ = b0 + lmu·ln(fuorigioco medi del campionato per sede, peso e^(−giorni/365)) + att·ln(rating fuorigioco commessi dalla squadra,
    365 giorni, prudenza P = 20) + def·ln(rating fuorigioco provocati dalla difesa avversaria, 90 giorni, prudenza P = 5).
    Test walk-forward (stima fino a giugno 2025, prova luglio 2025 – ottobre 2026, 16.629 partite): contro le medie delle squadre −0,058 di
@@ -3713,23 +3715,34 @@ function bootProgress(n) {   // avanzamento del download a schermo (MB già arri
   BOOTN = n; const s = $("#boot small"); if (!s) return;
   s.textContent = `${(n / 1048576).toFixed(1).replace(".", ",")} MB scaricati${s.dataset.slow ? " · la rete è lenta, continuo a scaricare" : ""}`;
 }
-async function tryHosted() {
-  // Versione GitHub Pages: i file li aggiorna una GitHub Action in data/. Tutti i file partono insieme; "no-cache" = il telefono
-  // chiede al sito se il file è cambiato e, se no, riusa la copia che ha già (risposta 304, quasi nessun dato scaricato).
-  const get = (f, as = "json") => fetch("data/" + f, { cache: "no-cache" }).then(r => r.ok ? (as === "text" ? r.text() : r.json()) : null).catch(() => null);
+/* 19/10/2026: data/stato.json (ora del giro e impronta di ogni file, sempre chiesto alla rete) → i file si chiedono come data/x.json?v=impronta.
+   Un file che non è cambiato ha la stessa impronta: il service worker lo riprende dalla copia sul telefono, senza scaricarlo (prima
+   bundle, extra, tiri in area e fuorigioco si riscaricavano interi a ogni giro, ~4 MB). Senza stato.json: come prima. */
+let STATO = null;
+const getStato = () => fetch("data/stato.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => j && j.updated && j.v ? j : null).catch(() => null);
+const dataUrl = (f, ST = STATO) => { const k = f.replace(/\.json$/, ""), h = ST && ST.v && ST.v[k]; return "data/" + f + (h ? "?v=" + h : ""); };
+const getData = (f, as = "json", ST = STATO) => fetch(dataUrl(f, ST), { cache: ST && ST.v && ST.v[f.replace(/\.json$/, "")] ? "default" : "no-cache" })
+  .then(r => r.ok ? (as === "text" ? r.text() : r.json()) : null).catch(() => null);
+async function tryHosted(ST0) {
+  // Versione GitHub Pages: i file li aggiorna una GitHub Action in data/. Tutti i file partono insieme.
+  const ST = ST0 !== undefined ? ST0 : await getStato();
+  const get = (f, as = "json") => getData(f, as, ST);
   try {
-    const getBundle = () => fetch("data/bundle.json", { cache: "no-cache" }).then(async r => {
+    let got = 0;
+    const getBundle = f => fetch(dataUrl(f, ST), { cache: ST && ST.v && ST.v[f.replace(/\.json$/, "")] ? "default" : "no-cache" }).then(async r => {
       if (!r.ok) return null;
       if (!r.body || !r.body.getReader) return r.json();
-      const rd = r.body.getReader(), parts = []; let n = 0;
-      for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); n += value.length; bootProgress(n); }
+      const rd = r.body.getReader(), parts = [];
+      for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; bootProgress(got); }
       return JSON.parse(await new Blob(parts).text());
     }).catch(() => null);
-    const P = { bundle: getBundle(), crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
+    const P = { bundle: getBundle("bundle.json"), storico: ST && ST.v && ST.v.bundle_storico ? getBundle("bundle_storico.json") : Promise.resolve(null),
+                crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
                 extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json") };
     let man = null, texts = null;
-    const b = await P.bundle;
-    if (b && b.files) { man = { updated: b.updated }; texts = b.files.map(f => f.text); }
+    const [b, bs] = await Promise.all([P.bundle, P.storico]);
+    if (ST && ST.v && ST.v.bundle_storico && !(bs && bs.files)) return false;   // stagioni chiuse non arrivate: meglio non mostrare dati a metà
+    if (b && b.files) { man = { updated: ST ? ST.updated : b.updated }; texts = (bs && bs.files ? bs.files : []).concat(b.files).map(f => f.text); }
     if (!texts) {   // riserva: i singoli CSV (versione con i file separati)
       man = await get("manifest.json"); if (!man) return false;
       texts = await Promise.all((man.files || []).map(f => get(f, "text").then(x => x || "")));
@@ -3748,6 +3761,7 @@ async function tryHosted() {
     if (qu) QUALITA = qu;
     S.meta = { source: "API-Football (risultati, calendario, statistiche, arbitri, cartellini, quote) · football-data.co.uk (archivio delle stagioni passate e riserva) · aggiornamento automatico", fetched: man.updated || "N/D", mode: "scaricati il" };
     if (pr && pr.updated === S.meta.fetched) PRECALC = pr;   // previsioni della home già calcolate da GitHub con questi stessi dati
+    STATO = ST;
     return true;
   } catch (e) { return false; }
 }
@@ -4246,13 +4260,15 @@ function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u,
   const { G, M, MT, x, MF, O } = Mods, ok = v => v != null && isFinite(v) && v > 0;
   const al = EXTRA && EXTRA.alpha, rk = al > 2e-4 ? 1 / al : Infinity;
   const pO = (mean, r, L) => ok(mean) ? pOver(pmfTotal(mean, r, Math.ceil(L) + 2), L) : null;
+  // 19/10/2026: linee per squadra con la dispersione della squadra (corner r = 12, tiri in porta r = 40), non quella del totale
+  const rT = R => R ? (R.rTeam != null ? R.rTeam : R.r) : null;
   const D = {
     g: L => G && ok(G.tot) ? ([1.5, 2.5, 3.5].indexOf(L) >= 0 && G.over ? G.over[[1.5, 2.5, 3.5].indexOf(L)] : pO(G.tot, Infinity, L)) : null,
     hg: L => G ? pO(G.lh, Infinity, L) : null, ag: L => G ? pO(G.la, Infinity, L) : null,
-    st: L => MT ? pO(MT.tot, MT.MD && MT.MD.r, L) : null, hst: L => MT ? pO(MT.lh, MT.MD && MT.MD.r, L) : null, ast: L => MT ? pO(MT.la, MT.MD && MT.MD.r, L) : null,
+    st: L => MT ? pO(MT.tot, MT.MD && MT.MD.r, L) : null, hst: L => MT ? pO(MT.lh, rT(MT.MD), L) : null, ast: L => MT ? pO(MT.la, rT(MT.MD), L) : null,
     s: L => MT && MT.MS ? pO(MT.MS.lh + MT.MS.la, MT.MS.r, L) : null,
     f: L => MF ? pO(MF.tot, MF.r, L) : null, hf: L => MF ? pO(MF.lh, MF.rTeam != null ? MF.rTeam : MF.r, L) : null, af: L => MF ? pO(MF.la, MF.rTeam != null ? MF.rTeam : MF.r, L) : null,
-    c: L => M ? pO(M.tot, M.r, L) : null, hc: L => M ? pO(M.lh, M.r, L) : null, ac: L => M ? pO(M.la, M.r, L) : null,
+    c: L => M ? pO(M.tot, M.r, L) : null, hc: L => M ? pO(M.lh, rT(M), L) : null, ac: L => M ? pO(M.la, rT(M), L) : null,
     k: L => x ? pO(x[4], rk, L) : null, hk: L => x ? pO(x[6], rk, L) : null, ak: L => x ? pO(x[7], rk, L) : null,
     o: L => O ? pO(O.tot, OFF_R_TOT, L) : null, ho: L => O ? pO(O.lh, OFF_R_TEAM, L) : null, ao: L => O ? pO(O.la, OFF_R_TEAM, L) : null };
   const REAL = { o: Mods.offR ? [Mods.offR.oh, Mods.offR.oa] : null, g: m && [m.hg, m.ag], s: m && [m.hs, m.as], st: m && [m.hst, m.ast], c: m && [m.hc, m.ac], f: m && [m.hf, m.af], k: m && [m.hk, m.ak] };
@@ -4732,19 +4748,28 @@ function ritDist(L, e, k) {   // [distribuzione squadra di casa, ospite] oppure 
         }
       } else if (k === "k") {
         const x = EXTRA && EXTRA.partite && EXTRA.partite[e.id], a = EXTRA && EXTRA.alpha, r = a > 2e-4 ? 1 / a : Infinity;
-        if (x && x[6] && x[7]) R = [pmfTotal(x[6], r, 15), pmfTotal(x[7], r, 15)];
+        if (x && x[6] && x[7]) R = { ph: pmfTotal(x[6], r, 15), pa: pmfTotal(x[7], r, 15), pt: x[4] ? pmfTotal(x[4], r, 25) : null };
       } else {
         const M = k === "s" || k === "st" ? (T => T && (k === "s" ? T.MS : T.MD))(modelShots(e.home, e.away, cfg)) : model(e.home, e.away, cfg, k);
-        if (M && isFinite(M.lh) && isFinite(M.la)) { const rt = M.rTeam != null ? M.rTeam : M.r, mx = k === "c" || k === "st" ? 30 : 60; R = [pmfTotal(M.lh, rt, mx), pmfTotal(M.la, rt, mx)]; }
+        // 19/10/2026: come la Lettura. Squadra: la sua Binomiale Negativa; "più dell'avversario": headToHeadProb (con la correlazione
+        // casa-ospite dove l'app la usa); totale partita: la Binomiale Negativa del totale (r del totale), non la somma delle due squadre
+        if (M && isFinite(M.lh) && isFinite(M.la)) { const rt = M.rTeam != null ? M.rTeam : M.r, mx = k === "c" || k === "st" ? 30 : 60;
+          R = { ph: pmfTotal(M.lh, rt, mx), pa: pmfTotal(M.la, rt, mx), pt: pmfTotal(M.lh + M.la, M.r, 2 * mx), M: { lh: M.lh, la: M.la, r: M.r, rTeam: M.rTeam, cop: M.cop } }; }
       }
     } catch (err) { R = null; } finally { S.cutoff = c0; } });
   RIT_P.set(key, R); return R;
 }
-function ritProb(L, nx, k, fn) {
+function ritProb(L, nx, k, fn, lab) {
   const D = ritDist(L, nx.e, k); if (!D) return null;
   let p = 0;
-  if (D.mat) D.mat.forEach((row, x) => row.forEach((q, y) => { const [f, a] = nx.home ? [x, y] : [y, x]; if (fn(f, a)) p += q; }));
-  else { const [ph, pa] = D; ph.forEach((qh, x) => { if (qh < 1e-7) return; pa.forEach((qa, y) => { const [f, a] = nx.home ? [x, y] : [y, x]; if (fn(f, a)) p += qh * qa; }); }); }
+  if (D.mat) { D.mat.forEach((row, x) => row.forEach((q, y) => { const [f, a] = nx.home ? [x, y] : [y, x]; if (fn(f, a)) p += q; })); return p; }
+  if (/più .*dell'avversario/.test(lab || "")) {   // stesso 1X2 della Lettura e dei Segnali
+    if (!D.M) return null; const P = headToHeadProb(D.M.lh, D.M.la, D.M.r, D.M.rTeam, D.M.cop); return nx.home ? P.home : P.away;
+  }
+  if (/partita con Over/.test(lab || "")) {   // totale partita: stessa distribuzione del totale della Lettura
+    if (!D.pt) return null; D.pt.forEach((q, t) => { if (fn(t, 0)) p += q; }); return p;
+  }
+  const mine = nx.home ? D.ph : D.pa; mine.forEach((q, x) => { if (fn(x, 0)) p += q; });   // evento della sola squadra
   return p;
 }
 /* grado della previsione che coincide con la fine del digiuno (stessa partita, stesso esito), se il Grado ce l'ha */
@@ -4797,7 +4822,7 @@ function renderRit() {
     const nx = NX.get(k); r.nx = nx; r.p = null;
     if (nx && !nx.skip && !nx.started) {
       if ((RIT.sortP || onlyDot) && performance.now() - t0 > 300 && !RIT_P.has(`${nx.e.id}|${r.k}|${cfgK}`)) { Q.push([r.L, nx.e, r.k]); continue; }
-      r.p = ritProb(r.L, nx, r.k, r.fn);
+      r.p = ritProb(r.L, nx, r.k, r.fn, r.lab);
     }
   }
   shown = shown.filter(r => !(r.nx && r.nx.started));   // la prossima partita è già iniziata: fuori dalla lista
@@ -4921,12 +4946,23 @@ function confRowHTML(r, i, withInfo) {
 }
 let REFCTX = null;
 /* statistiche reali dell'arbitro nelle sue partite precedenti presenti nei dati (ultimi 12 mesi circa): cartellini, Over, falli */
+/* 19/10/2026: stesso nome dell'arbitro del modello cartellini (apif_extra.refkey): API-Football scrive "D. England" e "Darren England";
+   iniziale del nome + cognome, senza accenti e parole come "de"; partite dello stesso paese (le coppe europee valgono per tutti) */
+const REF_STOP = new Set(["fc", "afc", "cf", "sc", "ac", "fk", "sk", "the", "club", "de", "calcio", "cd", "ud", "rc", "sd", "ca", "ss", "as", "us", "1", "sv", "vfl", "vfb", "tsg", "fsv"]);
+function refKey(name) {
+  if (!name) return null;
+  const w = String(name).split(",")[0].normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^\x00-\x7f]/g, "").toLowerCase().replace(/'/g, "")
+    .replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter(x => x && !REF_STOP.has(x));
+  if (!w.length) return null;
+  return w.length > 1 ? w[0][0] + " " + w[w.length - 1] : w[0];
+}
 function refStats(ref, before) {
   if (!ref || !EXTRA || !EXTRA.partite) return null;
   const idx = refStats.idx || (refStats.idx = new Map([...S.matches.values()].map(m => [`${m.div}|${isoD(m.date)}|${m.home}|${m.away}`, m])));
-  const L = [];
+  const L = [], rk = refKey(ref), cty = c => (LG[c] && LG[c].country) || c, here = cty(S.league);
   for (const [k, v] of Object.entries(EXTRA.partite)) {
-    if (v[0] !== ref || v[5] == null) continue;
+    if (v[5] == null || !v[0] || refKey(v[0]) !== rk) continue;
+    const lg = k.split("|")[0]; if (!isCup(S.league) && !isCup(lg) && cty(lg) !== here) continue;
     const d = k.split("|")[1]; if (before && d >= isoD(before)) continue;
     const m = idx.get(k); L.push({ c: v[5], f: m && m.hf != null && m.af != null ? m.hf + m.af : null, d });
   }
@@ -5307,10 +5343,10 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   else if (online) refreshAll();
   if (!$("#viewSig").hidden) renderSignals();
   // movimento delle quote 1xBet: dopo l'avvio, senza rallentarlo
-  if (online) fetch("data/fuorigioco.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { if (j && j.campionati) { OFFS = j; clearCache(); if (!$("#viewMatch").hidden && HEROCTX) { const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); } } }).catch(() => {});
-  if (online) fetch("data/quote_mov.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { QMOV = j || { partite: {} }; if (!$("#viewMatch").hidden) renderQuote(); }).catch(() => { QMOV = { partite: {} }; });
+  if (online) getData("fuorigioco.json").then(j => { if (j && j.campionati) { OFFS = j; clearCache(); if (!$("#viewMatch").hidden && HEROCTX) { const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); } } }).catch(() => {});
+  if (online) getData("quote_mov.json").then(j => { QMOV = j || { partite: {} }; if (!$("#viewMatch").hidden) renderQuote(); }).catch(() => { QMOV = { partite: {} }; });
   // Champions League: previsioni pronte (dopo l'avvio); link #u=… alla partita
-  if (online) for (const C of CUPS) fetch("data/" + C.file, { cache: "no-cache" }).then(r => r.ok ? r.json() : null).then(j => { if (!j) return; CUPD[C.code] = j; if (typeof clearCache === "function") clearCache(); GEN_NEXT.clear();
+  if (online) for (const C of CUPS) getData(C.file).then(j => { if (!j) return; CUPD[C.code] = j; if (typeof clearCache === "function") clearCache(); GEN_NEXT.clear();
     if (!$("#viewSig").hidden) renderSignals();
     if (!$("#viewStats").hidden) renderSched();
     const hm = new RegExp("^#p=(" + C.code + ".+)$").exec(location.hash), e = hm && entryById(decodeURIComponent(hm[1]));
@@ -5321,6 +5357,38 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   if (hm) { const id = decodeURIComponent(hm[1]), e = entryById(id);
     if (e) { history.replaceState(null, "", location.pathname + location.search); openEntry(e); } }
 })();
+/* 19/10/2026: app riaperta dallo sfondo (telefono): se nel frattempo c'è stato un giro nuovo, i dati si aggiornano da soli.
+   Solo quote, linee, previsioni della home e controllo qualità cambiati → si ricaricano solo quelli (pochi KB); risultati,
+   statistiche o arbitri cambiati → si ricarica tutto (i file uguali li ridà la copia sul telefono). Al massimo un controllo ogni 2 minuti. */
+let VIS_T = Date.now(), VIS_BUSY = false;
+async function reloadIfNew() {
+  if (document.hidden || VIS_BUSY || !/^https?:$/.test(location.protocol) || !STATO || Date.now() - VIS_T < 120000) return;
+  VIS_T = Date.now(); VIS_BUSY = true;
+  try {
+    const ST = await getStato(); if (!ST || ST.updated === STATO.updated) return;
+    const ch = k => (ST.v || {})[k] !== (STATO.v || {})[k];
+    const keep = { h: $("#home").value, a: $("#away").value, lg: S.league };
+    if (["bundle_storico", "bundle", "extra", "tiri_area", "fuorigioco", "tempi"].some(ch)) {
+      if (!(await tryHosted(ST))) return;
+      const of = await getData("fuorigioco.json", "json", ST); if (of && of.campionati) OFFS = of;
+    } else {
+      const [od, li, pr, qu] = await Promise.all(["odds.json", "linee.json", "precalc.json", "qualita.json"].map(f => ch(f.slice(0, -5)) ? getData(f, "json", ST) : Promise.resolve(undefined)));
+      if (od) ODDS = od; if (li) LINEE = li; if (qu) QUALITA = qu;
+      S.meta = { ...S.meta, fetched: ST.updated };
+      const P2 = pr !== undefined ? pr : PRECALC; PRECALC = P2 && P2.updated === ST.updated ? P2 : null;
+      STATO = ST;
+    }
+    if (ch("quote_mov")) { const q = await getData("quote_mov.json", "json", ST); if (q) QMOV = q; }
+    for (const C of CUPS) if (ch(C.file.slice(0, -5))) { const j = await getData(C.file, "json", ST); if (j) CUPD[C.code] = j; }
+    try { BK_C.clear(); RIT_P.clear(); CONF_MR.clear(); GEN_NEXT.clear(); refStats.idx = null; clearCache(); } catch (e) {}
+    const inMatch = !$("#viewMatch").hidden;
+    refreshAll();
+    if (inMatch && S.league === keep.lg && keep.h && keep.a && ($("#home").value !== keep.h || $("#away").value !== keep.a)) { $("#home").value = keep.h; $("#away").value = keep.a; render(); }
+    if (inMatch) renderQuote();
+    if (!$("#viewSel").hidden) renderSel(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewGen").hidden) renderGen(); if (!$("#viewRit").hidden) renderRit();
+  } catch (e) { console.warn(e); } finally { VIS_BUSY = false; }
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) reloadIfNew(); });
 </script>
 <script>
 /* funziona anche senza rete: il service worker conserva l'ultima versione dell'app e dei dati (prima prova sempre la rete) */
