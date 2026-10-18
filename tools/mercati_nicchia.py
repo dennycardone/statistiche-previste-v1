@@ -35,6 +35,17 @@ for k, v in OH.items():
         if m not in first or d < first[m]: first[m] = d
 def tot_from(d0): return collections.Counter(lg for lg, d, ks in bydate if d >= d0)
 def has_from(m, d0): return collections.Counter(lg for lg, d, ks in bydate if d >= d0 and m in ks)
+import datetime as _dt
+_oggi = _dt.date.today().isoformat(); _ieri = (_dt.date.today() - _dt.timedelta(days=1)).isoformat()
+for _g in (_ieri, _oggi):
+    _t = collections.Counter(lg for lg, d, ks in bydate if d == _g)
+    _o = collections.defaultdict(set)
+    for lg, d, ks in bydate:
+        if d == _g:
+            for m in ks:
+                if m.startswith("off."): _o[m[4:]].add(lg)
+    _w = collections.Counter(lg for lg, d, ks in bydate if d == _g and any(m.startswith("off.") for m in ks))
+    print(f"::notice title=Fuorigioco {_g}::partite con mercati fuorigioco per campionato: " + (", ".join(f"{lg} {n}/{_t[lg]}" for lg, n in _w.most_common()) or "nessuna") + " · mercati: " + (", ".join(sorted(_o)) or "nessuno"))
 # (GitHub mostra al massimo 10 annotazioni per passo: primo tempo e fuorigioco in due righe compatte, una voce per mercato)
 for pref, title in (("h1.", "Primo tempo"), ("off.", "Fuorigioco")):
     ms = sorted(k for k in has if k.startswith(pref)); parts = []
