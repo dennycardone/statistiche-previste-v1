@@ -983,7 +983,10 @@ try:
             for r in _prev:
                 try: d_ = datetime.datetime.strptime(r[1], "%d/%m/%Y").date()
                 except Exception: continue
+                ren_ = FD_RENAME.get(r[0], {}); r = list(r); r[3] = ren_.get(r[3], r[3]); r[4] = ren_.get(r[4], r[4])   # squadra rinominata (19/10/2026)
                 if d_ < _now.date() or (r[0], r[3], r[4]) in _now_k: continue
+                _cur_t = set(MAPS.get(r[0], {}).values())
+                if _cur_t and (r[3] not in _cur_t or r[4] not in _cur_t): continue   # nome che il campionato non usa più: non rimetterla
                 if any(g[:3] == (r[0], r[3], r[4]) and abs((datetime.date.fromisoformat(g[3]) - d_).days) <= 2 for g in _gone): continue
                 if any(o[1] == r[3] and o[2] == r[4] and abs((o[0] - d_).days) <= 3 for o in ours.get(r[0], [])): continue   # già giocata
                 cal.append(r); _back.append(f"{r[0]} {r[1]} {r[3]}-{r[4]}")
