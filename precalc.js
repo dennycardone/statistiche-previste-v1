@@ -27,7 +27,7 @@ const t0 = process.env.PRECALC_DAY || A.isoD(new Date());
 const all = A.allEntries(A.addDays(t0, 1)).concat(A.allEntries(A.addDays(t0, -1)));   // finestra un po' più larga (fusi orari)
 const seen = new Set(), entries = all.filter(e => !seen.has(e.id) && seen.add(e.id));
 const rows = {}, r4 = x => x == null ? null : Math.round(x * 10000) / 10000, t = Date.now();
-for (const mode of ["dyn", "classic"]) {   // i due metodi dell'app
+for (const mode of ["dyn"]) {   // 19/10/2026: solo la Media dinamica (la Classica è stata tolta)
   const cfg = A.MODES[mode];
   for (const e of entries) {
     try {
