@@ -1101,7 +1101,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <p><b>Media dinamica – cartellini.</b> Modello cartellini v2 (gialli + rossi), scelto con un test walk-forward su 47.955 partite API-Football 2022-2026: regressione con media del campionato, cartellini presi e provocati dalle due squadre (media mobile), <b>arbitro</b> (cartellini reali ÷ attesi in tutte le sue partite precedenti e nelle ultime 10, ristretto verso 1), falli fatti e subiti in stagione, scontri diretti degli ultimi 3 anni e avvio di stagione. Pesi ristimati ogni mese con le sole partite precedenti. Il totale segue una Binomiale Negativa. Se l'arbitro non è ancora stato designato la previsione è senza il suo effetto, e la scheda lo dice.</p>
       <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote di 1xBet, unico bookmaker di riferimento), aggiornata due volte all'ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football.</p>
       <p><b>Media dinamica – tiri e tiri in porta.</b> Anche tiri e tiri in porta usano modelli verificati: regressioni di Poisson che partono dalla media di lega per sede (365 giorni). Tiri: rating tiri fatti × concessi degli ultimi 4 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4) con una parte casa/trasferta, tiri delle ultime 10 (fatti dalla squadra, concessi dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 ed Elo. Tiri in porta: rating tiri in porta (una partita di un anno fa pesa il 37%, prudenza P = 8), rating dei tiri totali (chi tira molto finisce per avere più tiri in porta), tiri delle ultime 8 ed Elo. Coefficienti stimati su 8 campionati, solo stagioni in cui football-data misura i tiri nello stesso modo (quota in porta fino al 40%); nel test walk-forward migliori della versione precedente in tutti gli 8 campionati e, per squadra, in ogni stagione. Totale: Binomiale Negativa r = 150 per i tiri e r = 100 per i tiri in porta; per squadra r = 25 e r = 40.</p>
-      <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre, calcolato dall'app dai risultati delle partite dei giorni precedenti (le stesse stagioni caricate): nel test rende quasi quanto l'Elo ufficiale di ClubElo. Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è ancora, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG).</p>
+      <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre, calcolato dall'app dai risultati delle partite dei giorni precedenti (le stesse stagioni caricate): nel test rende quasi quanto l'Elo ufficiale di ClubElo. Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è ancora, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG). Dal 18/10/2026 i gol attesi tengono conto anche della qualità dei tiri: a parità di tiri in porta, chi arriva più spesso al tiro dentro l'area (e l'avversario che lo concede) segna di più (tiri in area di API-Football, 365 giorni; nel test walk-forward con il codice dell'app su 17.119 partite da luglio 2025 le previsioni dei gol sono migliorate in entrambe le stagioni).</p>
       <p><b>Perché non c'è più la Media ponderata.</b> Nel controllo su 21 campionati (2023-24 – 2025-26) su Over 2,5 e Gol/No gol prevedeva peggio di una percentuale fissa, e negli altri mercati era quasi identica alla Media classica ma meno precisa della Dinamica.</p>
       <p class="small muted">Con poche partite (2–3 per sede a inizio stagione) i valori possono essere estremi: nessun numero viene aggiunto per "addolcirli".</p>
     </details>
@@ -2114,6 +2114,36 @@ function gdynFit(div, D) {
   }
   CACHE.set(key, res); return res;
 }
+/* ===== Qualità dei tiri nel modello gol (18/10/2026): data/tiri_area.json (API-Football, tiri in area e tiri in porta, dal 2023-24) =====
+   x = ln(rating tiri in area: attacco squadra × difesa avversaria) − ln(rating tiri in porta: attacco × difesa), 365 giorni, prudenza P = 4,
+   solo partite dei giorni precedenti; gol attesi × e^(QB·x). A parità di tiri in porta, chi arriva più spesso al tiro dentro l'area segna di più.
+   Test walk-forward (stima fino a giugno 2025, prova luglio 2025 – ottobre 2026, ~17.000 partite): log-loss gol −0,0015 nel 2025-26 e
+   −0,0018 nel 2026-27 (significativi); 1X2 −0,0008, Over/Under 2,5 −0,0004; coefficiente 0,32 stimato sul solo 2023-24. */
+let TAREA = null;
+const QB = 0.295, Q_TAU = 365, Q_P = 4;
+function qualFit(div, D) {
+  const key = "qual|" + div + "|" + D; if (CACHE.has(key)) return CACHE.get(key);
+  let res = null; const L = TAREA && TAREA.campionati && TAREA.campionati[div];
+  if (L) {
+    const Dd = Date.parse(isoD(new Date(D)) + "T00:00:00Z"), T = new Map(); let si = 0, ss = 0, n = 0;
+    for (const r of L) {
+      const days = Math.round((Dd - Date.parse(r[0] + "T00:00:00Z")) / DAYMS); if (days < 1) continue;
+      const w = Math.exp(-days / Q_TAU); si += w * (r[3] + r[4]); ss += w * (r[5] + r[6]); n += 2 * w;
+      for (const [t, fi, ci, fs, cs] of [[r[1], r[3], r[4], r[5], r[6]], [r[2], r[4], r[3], r[6], r[5]]]) {
+        const x = T.get(t) || [0, 0, 0, 0, 0]; x[0] += w * fi; x[1] += w * ci; x[2] += w * fs; x[3] += w * cs; x[4] += w; T.set(t, x); }
+    }
+    if (n >= 40) res = { mi: si / n, ms: ss / n, T };
+  }
+  CACHE.set(key, res); return res;
+}
+function qualX(div, D, home, away) {   // [x casa, x ospite] oppure null
+  const F = qualFit(div, D); if (!F) return null;
+  const g = t => F.T.get(t) || [0, 0, 0, 0, 0], r = (v, w, m) => (v + Q_P * m) / (w + Q_P) / m;
+  const h = g(home), a = g(away);
+  const xh = Math.log(r(h[0], h[4], F.mi) * r(a[1], a[4], F.mi)) - Math.log(r(h[2], h[4], F.ms) * r(a[3], a[4], F.ms));
+  const xa = Math.log(r(a[0], a[4], F.mi) * r(h[1], h[4], F.mi)) - Math.log(r(a[2], a[4], F.ms) * r(h[3], h[4], F.ms));
+  return isFinite(xh) && isFinite(xa) ? [xh, xa] : null;
+}
 function goalDynParts(home, away) {
   const D = goalDate(home, away), F = gdynFit(S.league, D); if (!F) return null;
   const ix = t => F.idx.has(t) ? F.idx.get(t) : -1, ih = ix(home), ia = ix(away);
@@ -2121,8 +2151,9 @@ function goalDynParts(home, away) {
   const tpH = F.sH * aH * dA * F.conv, tpA = F.sA * aA * dH * F.conv;
   const eH = eloAt(S.league, home, D), eA = eloAt(S.league, away, D), withElo = !!(eH && eA);
   const C = withElo ? GDYN : GDYN0, ed = withElo ? (eH.elo - eA.elo) / 100 : 0;
-  const lh = Math.exp(C.b0 + C.lmu * Math.log(F.muH) + C.home + C.lst * Math.log(tpH) + (withElo ? C.elo * ed : 0));
-  const la = Math.exp(C.b0 + C.lmu * Math.log(F.muA) + C.lst * Math.log(tpA) - (withElo ? C.elo * ed : 0));
+  const lh0 = Math.exp(C.b0 + C.lmu * Math.log(F.muH) + C.home + C.lst * Math.log(tpH) + (withElo ? C.elo * ed : 0));
+  const la0 = Math.exp(C.b0 + C.lmu * Math.log(F.muA) + C.lst * Math.log(tpA) - (withElo ? C.elo * ed : 0));
+  const QX = qualX(S.league, D, home, away), lh = QX ? lh0 * Math.exp(QB * QX[0]) : lh0, la = QX ? la0 * Math.exp(QB * QX[1]) : la0;
   if (!isFinite(lh) || !isFinite(la)) return null;
   const cur = [...S.matches.values()].filter(m => m.div === S.league && m.season === S.season && +m.date < D);
   const nHt = cur.filter(m => m.home === home || m.away === home).length, nAt = cur.filter(m => m.home === away || m.away === away).length;
@@ -2133,8 +2164,9 @@ gol medi di lega (365 giorni): casa ${f2(F.muH)} · fuori ${f2(F.muA)} · gol pe
 rating tiri in porta (4 anni, ${F.n} partite): ${esc(home)} attacco ${f2(aH)} · difesa ${f2(dH)} — ${esc(away)} attacco ${f2(aA)} · difesa ${f2(dA)}
 gol attesi dai tiri in porta: ${esc(home)} ${f2(tpH)} · ${esc(away)} ${f2(tpA)}
 Elo (calcolato dai risultati): ${withElo ? `${esc(home)} ${Math.round(eH.elo)} · ${esc(away)} ${Math.round(eA.elo)} (differenza ${ed >= 0 ? "+" : "−"}${Math.round(Math.abs(ed) * 100)})` : "non disponibile per " + [eH ? null : home, eA ? null : away].filter(Boolean).map(esc).join(" e ") + ": uso la versione senza Elo"}
-${esc(home)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muH)}${sg(C.home)}${sg(C.lst)}·ln ${f2(tpH)}${withElo ? `${sg(C.elo)}·(${f2(ed)})` : ""}) = ${f2(lh)}
-${esc(away)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muA)}${sg(C.lst)}·ln ${f2(tpA)}${withElo ? `${sg(C.elo)}·(${f2(-ed)})` : ""}) = ${f2(la)}`;
+${esc(home)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muH)}${sg(C.home)}${sg(C.lst)}·ln ${f2(tpH)}${withElo ? `${sg(C.elo)}·(${f2(ed)})` : ""}) = ${f2(lh0)}
+${esc(away)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muA)}${sg(C.lst)}·ln ${f2(tpA)}${withElo ? `${sg(C.elo)}·(${f2(-ed)})` : ""}) = ${f2(la0)}
+qualità dei tiri (tiri in area rispetto ai tiri in porta, 365 giorni): ${QX ? `${esc(home)} ${f2(lh0)} × e^(${c3(QB)}·${sd(QX[0])}) = ${f2(lh)} · ${esc(away)} ${f2(la0)} × e^(${c3(QB)}·${sd(QX[1])}) = ${f2(la)}` : "dati dei tiri in area non disponibili, nessuna correzione"}`;
   return { lh, la, dynText: text, gdyn: true, withElo, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
     muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
 }
@@ -3694,7 +3726,7 @@ async function tryHosted() {
       return JSON.parse(await new Blob(parts).text());
     }).catch(() => null);
     const P = { bundle: getBundle(), crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
-                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json") };
+                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json") };
     let man = null, texts = null;
     const b = await P.bundle;
     if (b && b.files) { man = { updated: b.updated }; texts = b.files.map(f => f.text); }
@@ -3705,7 +3737,8 @@ async function tryHosted() {
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
-    const [cr, lo, od, li, ex, qu, pr, hf] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half]);
+    const [cr, lo, od, li, ex, qu, pr, hf, qa] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2]);
+    if (qa && qa.campionati) { TAREA = qa; clearCache(); }
     if (hf && hf.campionati) HALF = hf;
     if (cr) CRESTS = cr.colors || {};
     if (lo) LOGOS = lo;
