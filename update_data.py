@@ -740,6 +740,49 @@ try:
         # già abbinate (es. esordienti in Champions: Sabah, Viking, Como…) restava senza nome → partita fuori dal calendario e senza quote
         if lg in API_ONLY:
             for v in L: MAPS[lg].setdefault(v[2], v[2]); MAPS[lg].setdefault(v[3], v[3])
+    # 18/10/2026: fuorigioco per squadra (data/fuorigioco.json, per il modello fuorigioco dell'app). Fonti: ramo statextra (storico dal 2022,
+    # recuperato da tools/extra_stats_apifootball.py) e archivio giornaliero (indice 13). API-Football registra lo 0-0 di fuorigioco come null per
+    # entrambe le squadre: un doppio null diventa 0-0 SOLO se (a) nella partita ci sono tiri in area o possesso, (b) nelle ultime 20 partite del
+    # campionato con statistiche avanzate dei giorni precedenti i fuorigioco erano valorizzati in almeno 15, (c) nelle ultime 200 partite valorizzate
+    # dei giorni precedenti lo 0-0 scritto in chiaro è sotto l'1% (altrimenti il doppio null è un dato mancante). Solo dati passati.
+    try:
+        _SX = {}
+        for _fn in _glob.glob(os.path.join(os.path.dirname(OUT), "statextra", "*.json")):
+            _lgx = os.path.basename(_fn)[:-5]
+            for _fid, _r in json.load(open(_fn)).items():
+                if _r[3] and _r[4] and len(_r[3]) > 13: _SX[_fid] = (_lgx, _r[0], _r[1], _r[2], _r[3], _r[4])
+        for _fid, _v in AP["partite"].items():
+            if _v[9] in ("FT", "AET", "PEN") and _v[7] and _v[8] and len(_v[7]) > 13 and len(_v[8]) > 13: _SX[_fid] = (_v[1], _v[0], _v[2], _v[3], _v[7], _v[8])
+        _OFF = collections.defaultdict(list); _nd = collections.Counter()
+        _bylg = collections.defaultdict(list)
+        for _x in _SX.values(): _bylg[_x[0]].append(_x)
+        for _lg, _L in _bylg.items():
+            if _lg not in MAPS or _lg in ("UCL", "UEL", "UECL"): continue
+            _mp = MAPS[_lg]; _L.sort(key=lambda z: z[1]); _l20 = collections.deque(maxlen=20); _l200 = collections.deque(maxlen=200); _i = 0
+            while _i < len(_L):
+                _j = _i
+                while _j < len(_L) and _L[_j][1][:10] == _L[_i][1][:10]: _j += 1
+                _upd = []
+                for _x in _L[_i:_j]:
+                    _H, _A = _x[4], _x[5]; _adv = _H[7] is not None or _H[11] is not None; _oh, _oa = _H[13], _A[13]
+                    if _oh is None and _oa is None and _adv:
+                        _cov = len(_l20) >= 15 and sum(_l20) >= 15; _expl = len(_l200) >= 50 and sum(_l200) / len(_l200) >= 0.01
+                        if _cov and not _expl: _oh, _oa = 0.0, 0.0; _nd["0-0 da doppio null"] += 1
+                    if _oh is not None and _oa is not None and _x[1][:10] >= "2023-07-01":
+                        _h, _a = _mp.get(_x[2]), _mp.get(_x[3])
+                        if _h and _a:
+                            _loc = datetime.datetime.fromisoformat(_x[1][:16] + ":00+00:00").astimezone(ROME).strftime("%Y-%m-%d")
+                            _OFF[_lg].append([_loc, _h, _a, int(_oh), int(_oa)])
+                    if _adv: _upd.append((_H[13] is not None and _A[13] is not None, _H[13] == 0 and _A[13] == 0))
+                for _has, _z in _upd:
+                    _l20.append(1 if _has else 0)
+                    if _has: _l200.append(1 if _z else 0)
+                _i = _j
+        json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "campionati": _OFF}, open(os.path.join(OUT, "fuorigioco.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+        QUAL["fuorigioco"] = {"campionati": len(_OFF), "partite": sum(len(v) for v in _OFF.values()), "da_doppio_null": _nd["0-0 da doppio null"]}
+        print("fuorigioco.json:", len(_OFF), "campionati,", sum(len(v) for v in _OFF.values()), "partite")
+    except Exception as e_:
+        import traceback; traceback.print_exc(); print("::warning title=Fuorigioco::non calcolati: " + str(e_))
     # loghi con i nostri nomi di squadra (data/loghi.json): prima API-Football, poi gli stemmi di football-data.org
     try:
         _cr = json.load(open(os.path.join(OUT, "crests.json"))).get("teams", {}) if os.path.exists(os.path.join(OUT, "crests.json")) else {}
@@ -1131,7 +1174,7 @@ if ODDS_FULL or ODDS_NEAR:
         json.dump(OD, open(odds_path, "w"), separators=(",", ":"), ensure_ascii=False)
     # Archivio per verificare in futuro i mercati (corner, cartellini, tiri in porta…): per ogni partita la prima quota vista e l'ultima
     # prima del calcio d'inizio, con l'ora. Non si cancella mai: serve proprio a misurare a posteriori.
-    MOV_KEYS = {"1x2", "ou1.5", "ou2.5", "ou3.5", "gg", "x.c1x2", "x.cdc", "x.s1x2", "x.st1x2", "x.f1x2", "x.fdc", "x.y1x2", "x.ydc"}
+    MOV_KEYS = {"1x2", "ou1.5", "ou2.5", "ou3.5", "gg", "x.c1x2", "x.cdc", "x.s1x2", "x.st1x2", "x.f1x2", "x.fdc", "x.y1x2", "x.ydc", "x.off.offsides_1x2"}
     if allq:
         hp = os.path.join(OUT, "odds_hist.json")
         try: OH = json.load(open(hp))
@@ -1163,6 +1206,7 @@ try:
     LMK = {"g": "gou", "hg": "hgou", "ag": "agou", "c": "cou", "hc": "hcou", "ac": "acou", "k": "kou", "hk": "hk", "ak": "ak", "st": "sot", "hst": "hsot", "ast": "asot",
            "s": "sou", "f": "fou", "hf": "hfou", "af": "afou"}
     LMK = {k: "x." + v for k, v in LMK.items()}   # 10/10/2026: linee solo di 1xBet
+    LMK.update({"o": "x.off.offsides_total", "ho": "x.off.offsides_home_total", "ao": "x.off.offsides_away_total"})   # 18/10/2026: fuorigioco
     LN = {}
     for kk, x in OH.items():
         q = x.get("ultima", {}).get("q", {}); ent = {}
@@ -1186,6 +1230,8 @@ try:
                     if best is None or d < best[0] - 1e-9 or (abs(d - best[0]) < 1e-9 and min(o["O"][1], o["U"][1]) > best[4]):
                         best = (d, ln, o["O"][0], o["U"][0], min(o["O"][1], o["U"][1]))
             if best: ent[short] = [best[1], best[2], best[3], best[4]]
+        _o3 = [q.get("x.off.offsides_1x2:" + s_, [None])[0] for s_ in ("Home", "Draw", "Away")]   # fuorigioco 1X2 (1xBet)
+        if all(v_ and v_ > 1 for v_ in _o3): ent["o1x2"] = _o3
         if ent: ent["t"] = x["ultima"].get("ora", ""); LN[kk] = ent
     json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football): ultima quota vista prima del calcio d'inizio", "partite": LN},
               open(os.path.join(OUT, "linee.json"), "w"), separators=(",", ":"), ensure_ascii=False)
