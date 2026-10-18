@@ -779,6 +779,20 @@ try:
                     if _has: _l200.append(1 if _z else 0)
                 _i = _j
         json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "campionati": _OFF}, open(os.path.join(OUT, "fuorigioco.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+        # 18/10/2026: tiri in area e tiri in porta per squadra (data/tiri_area.json) per la qualità dei tiri nel modello gol: solo valori reali
+        # di entrambe le squadre (nessuna regola sui null), dalla stagione 2023-24
+        _TA = collections.defaultdict(list)
+        for _lg, _L in _bylg.items():
+            if _lg not in MAPS or _lg in ("UCL", "UEL", "UECL"): continue
+            for _x in _L:
+                _H, _A = _x[4], _x[5]
+                if _x[1][:10] < "2023-07-01" or None in (_H[7], _A[7], _H[1], _A[1]): continue
+                _h, _a = MAPS[_lg].get(_x[2]), MAPS[_lg].get(_x[3])
+                if _h and _a:
+                    _loc = datetime.datetime.fromisoformat(_x[1][:16] + ":00+00:00").astimezone(ROME).strftime("%Y-%m-%d")
+                    _TA[_lg].append([_loc, _h, _a, int(_H[7]), int(_A[7]), int(_H[1]), int(_A[1])])
+        json.dump({"agg": _now.strftime("%d/%m/%Y %H:%M"), "campionati": _TA}, open(os.path.join(OUT, "tiri_area.json"), "w"), separators=(",", ":"), ensure_ascii=False)
+        print("tiri_area.json:", len(_TA), "campionati,", sum(len(v) for v in _TA.values()), "partite")
         QUAL["fuorigioco"] = {"campionati": len(_OFF), "partite": sum(len(v) for v in _OFF.values()), "da_doppio_null": _nd["0-0 da doppio null"]}
         print("fuorigioco.json:", len(_OFF), "campionati,", sum(len(v) for v in _OFF.values()), "partite")
     except Exception as e_:

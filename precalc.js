@@ -18,6 +18,8 @@ const minP = +((html.match(/id="sigMin"[^>]*value="(\d+)"/) || [])[1] || 55) / 1
 const man = JSON.parse(fs.readFileSync(path.join(DATA, "manifest.json"), "utf8"));
 // arbitro (fattore sui falli) e cartellini da API-Football, come nell'app
 try { const ex = fs.readFileSync(path.join(DATA, "extra.json"), "utf8"); vm.runInContext("EXTRA = " + ex + "; clearCache();", ctx); } catch (e) { console.log("extra.json non disponibile"); }
+// qualità dei tiri nel modello gol (tiri in area e in porta), come nell'app
+try { const ta = fs.readFileSync(path.join(DATA, "tiri_area.json"), "utf8"); vm.runInContext("TAREA = " + ta + "; clearCache();", ctx); } catch (e) { console.log("tiri_area.json non disponibile"); }
 A.resetState();
 for (const f of man.files || []) { const p = path.join(DATA, f); if (fs.existsSync(p)) A.addParsed(A.parseCSV(fs.readFileSync(p, "utf8"))); }
 A.S.meta = { fetched: man.updated };
