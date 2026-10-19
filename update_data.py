@@ -1290,6 +1290,25 @@ if ODDS_FULL or ODDS_NEAR:
                 if not ser or ser[-1][1] != snap: ser.append([ts, snap]); del ser[:-60]
         jdump(OH, hp)
         print("archivio quote:", len(OH), "partite")
+        # 19/10/2026: dove 1xBet quota gli 1X2 dei mercati di nicchia (data/mercati.json, solo nomi di campionato, nessuna quota).
+        # Per campionato e mercato: partite con quella quota / partite con mercati 1xBet di nicchia, fino a oggi (le partite dei giorni
+        # dopo non sono ancora quotate). Un mercato è "giocabile" in un campionato con almeno 1 partita su 2 (minimo 8 partite).
+        # Radar, Segnali e pallini della home mostrano gli 1X2 di nicchia solo dove sono giocabili; la scheda partita li mostra sempre.
+        try:
+            _MK = {"c": "x.c1x2", "s": "x.s1x2", "st": "x.st1x2", "f": "x.f1x2", "y": "x.y1x2", "c1": "x.h1.corners_1x2_1st_half", "y1": "x.h1.yellow_cards_1x2_1st_half"}
+            _tot, _has, _t0 = collections.Counter(), collections.defaultdict(collections.Counter), rome_now.strftime("%Y-%m-%d")
+            for kk, x in OH.items():
+                lg_, d_ = kk.split("|")[:2]
+                if d_ > _t0: continue
+                ks = {q.split(":")[0] for part in ("prima", "ultima") for q in (x.get(part) or {}).get("q", {}) if q.startswith("x.")}
+                if not ks: continue
+                _tot[lg_] += 1
+                for m_, key_ in _MK.items():
+                    if key_ in ks: _has[m_][lg_] += 1
+            _mer = {m_: sorted(lg_ for lg_, n_ in _has[m_].items() if _tot[lg_] >= 8 and n_ / _tot[lg_] >= 0.5) for m_ in _MK}
+            jdump({"soglia": 0.5, "dal": min((k.split("|")[1] for k in OH), default=None), "giocabili": _mer}, os.path.join(OUT, "mercati.json"))
+            print("mercati 1X2 giocabili:", {m_: len(v_) for m_, v_ in _mer.items()})
+        except Exception as e_: print("::warning title=Mercati giocabili::" + str(e_))
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
 elif not AF_KEY:
     print("APIFOOTBALL_KEY non impostata: quote saltate")

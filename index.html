@@ -1105,7 +1105,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <p><b>Media dinamica – cartellini.</b> Modello cartellini v2 (gialli + rossi), scelto con un test walk-forward su 47.955 partite API-Football 2022-2026: regressione con media del campionato, cartellini presi e provocati dalle due squadre (media mobile), <b>arbitro</b> (cartellini reali ÷ attesi in tutte le sue partite precedenti e nelle ultime 10, ristretto verso 1), falli fatti e subiti in stagione, scontri diretti degli ultimi 3 anni e avvio di stagione. Pesi ristimati ogni mese con le sole partite precedenti. Il totale segue una Binomiale Negativa. Se l'arbitro non è ancora stato designato la previsione è senza il suo effetto, e la scheda lo dice. Dal 19/10/2026 la divisione dei cartellini tra le due squadre tiene conto del possesso palla atteso (media del possesso della squadra e di quello concesso dall'avversario, 365 giorni): chi tiene più palla ne prende meno, chi rincorre di più; il totale della partita, e quindi l'Over/Under, non cambia (test walk-forward su 47.336 partite 2022-2026: previsioni per squadra e 1X2 cartellini migliori sia nel 2024-25 sia da luglio 2025).</p>
       <p><b>Fuorigioco.</b> Fuorigioco attesi di ogni squadra = regressione di Poisson con fuorigioco medi del campionato per sede (365 giorni), rating dei fuorigioco commessi dalla squadra (365 giorni, prudenza P = 20) e rating dei fuorigioco provocati dalla difesa avversaria (90 giorni, prudenza P = 5); Binomiale Negativa per squadra (r = 10,68) e sul totale (r = 21,56), 1X2 a squadre indipendenti. Dati API-Football dalla stagione 2023-24: API-Football scrive lo 0-0 di fuorigioco come dato vuoto per entrambe le squadre; un doppio vuoto diventa 0-0 solo se la partita ha le altre statistiche avanzate e il campionato, nelle partite dei giorni precedenti, ha i fuorigioco con regolarità e quasi mai uno 0-0 scritto in chiaro (altrimenti resta un dato mancante). N/D nelle coppe e nei campionati dove nelle ultime 20 partite meno di 15 hanno i fuorigioco. Nel test walk-forward (luglio 2025 – ottobre 2026, 16.629 partite) prevede meglio delle medie delle squadre; Elo e tiri non aggiungono nulla. Il confronto con le quote 1xBet è mostrato senza bollino "valore" finché non è verificato.</p>
       <p><b>Valori per tempo.</b> Sotto tiri, tiri in porta e corner la Lettura mostra i valori attesi del 1° e del 2° tempo: valore atteso della partita × quota del 1° tempo del campionato per sede, calcolata dai soli dati reali per tempo di API-Football (dalla stagione 2024-25, solo partite in cui i due tempi sommati coincidono con il totale; campionati con almeno 200 partite). Falli: API-Football non dà i dati per tempo.</p>
-      <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote di 1xBet, unico bookmaker di riferimento): quote controllate circa ogni 30 minuti, risultati e statistiche circa ogni ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football.</p>
+      <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote di 1xBet, unico bookmaker di riferimento): quote controllate circa ogni 30 minuti, risultati e statistiche circa ogni ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football. In Radar, Segnali e pallini della home gli 1X2 di corner, tiri, tiri in porta e falli compaiono solo nei campionati dove 1xBet li quota (almeno 1 partita su 2, calcolato a ogni aggiornamento sull'archivio delle quote); nella scheda partita ci sono sempre.</p>
       <p><b>Media dinamica – tiri e tiri in porta.</b> Anche tiri e tiri in porta usano modelli verificati: regressioni di Poisson che partono dalla media di lega per sede (365 giorni). Tiri: rating tiri fatti × concessi degli ultimi 4 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4) con una parte casa/trasferta, tiri delle ultime 10 (fatti dalla squadra, concessi dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 ed Elo. Tiri in porta: rating tiri in porta (una partita di un anno fa pesa il 37%, prudenza P = 8), rating dei tiri totali (chi tira molto finisce per avere più tiri in porta), tiri delle ultime 8 ed Elo. Coefficienti stimati su 8 campionati, solo stagioni in cui football-data misura i tiri nello stesso modo (quota in porta fino al 40%); nel test walk-forward migliori della versione precedente in tutti gli 8 campionati e, per squadra, in ogni stagione. Totale: Binomiale Negativa r = 150 per i tiri e r = 100 per i tiri in porta; per squadra r = 25 e r = 40.</p>
       <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre, calcolato dall'app dai risultati delle partite dei giorni precedenti (le stesse stagioni caricate): nel test rende quasi quanto l'Elo ufficiale di ClubElo. Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è ancora, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG). Dal 18/10/2026 i gol attesi tengono conto anche della qualità dei tiri: a parità di tiri in porta, chi arriva più spesso al tiro dentro l'area (e l'avversario che lo concede) segna di più (tiri in area di API-Football, 365 giorni; nel test walk-forward con il codice dell'app su 17.119 partite da luglio 2025 le previsioni dei gol sono migliorate in entrambe le stagioni).</p>
       <p><b>Perché non c'è più la Media classica.</b> Fino al 19/10/2026 c'era anche la Media classica (casa = quanto fa in casa + quanto concede in trasferta l'ospite, diviso 2). Nel controllo su 44 campionati (stagioni 2023-24 – 2026-27, circa 32.000 partite per mercato, sempre con i soli dati dei giorni precedenti) prevedeva peggio della Dinamica in tutti i mercati (log-loss sul lato favorito: corner +0,029, falli +0,016, tiri +0,029, tiri in porta +0,026); i suoi gol erano già quelli della Dinamica. Anche la "concordanza" tra i due metodi non aiutava: le previsioni forti della Dinamica (dal 70%) che la Classica contraddiceva, il 7–11%, uscivano quanto le altre in corner, tiri e tiri in porta (nei falli un po' meno, su soli 264 casi).</p>
@@ -3305,6 +3305,11 @@ function leagueStale(code, last, now) {
   const played = new Set(seasonMatches().map(m => m.home + "|" + m.away + "|" + isoD(m.date)));
   return S.fixtures.some(f => f.div === code && f.date > last && (now - f.date) > 2 * 864e5 && !played.has(f.home + "|" + f.away + "|" + isoD(f.date)));
 }
+/* 19/10/2026: 1X2 di nicchia (corner, tiri, tiri in porta, falli) in Radar, Segnali e pallini solo nei campionati dove 1xBet li quota
+   in almeno 1 partita su 2 (data/mercati.json, ricalcolato da GitHub sull'archivio quote). La scheda partita li mostra sempre. */
+let MERCATI = null;
+const NICHE_MK = new Set(["c", "s", "st", "f"]);
+const mkOk = (lg, mk) => !NICHE_MK.has(mk) || !(MERCATI && MERCATI.giocabili && MERCATI.giocabili[mk]) || MERCATI.giocabili[mk].includes(lg);
 function computeSignals(o) {
   const rows = [], skipped = [], noCal = [], now = o.now || Date.now(), pick = o.pick || nextRound, mks = o.markets;
   const wantGoals = mks.some(k => k in GOAL_LINE || k === "gg");
@@ -3356,6 +3361,7 @@ function computeSignals(o) {
             else if (1 - G.btts >= th("ng")) push(mk, "g", G, { sel: "No gol", fav: "No gol", p: 1 - G.btts });
           } else {
             // corner, falli, tiri, tiri in porta: 1 = la squadra di casa ne fa di più, 2 = l'ospite (il pari fa perdere)
+            if (!mkOk(L.code, mk)) continue;   // 1X2 non quotato da 1xBet in questo campionato
             const R = res[mk]; if (!R || !isFinite(R.lh) || !isFinite(R.la)) continue;
             const P = R.P || headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop), one = P.home >= P.away, p = one ? P.home : P.away;
             if (p >= th(mk)) push(mk, mk, R, { sel: one ? "1" : "2", fav: one ? "1" : "2", team: one ? f.home : f.away, p, draw: P.draw, p1: P.home, px: P.draw, p2: P.away });
@@ -3637,6 +3643,7 @@ function confMatch(home, away, date, odds, baseKey) {
   const out = [];
   for (const mk of CONF_MKS) {
     if (MK_STAT[mk] && statMissing(S.league, MK_STAT[mk])) continue;   // nessun dato reale in stagione per questo mercato
+    if (!mkOk(S.league, mk)) continue;   // 1X2 non quotato da 1xBet in questo campionato (19/10/2026)
     if (mk === "g15") continue;   // Over/Under 1,5: quasi sempre Over, poca informazione → solo come percentuale nella lista partite
     const F = confFeatures(home, away, date, odds, mk, baseKey, MR); if (!F) continue;
     if (F.side === "U" && mk !== "g25") continue;   // Under: solo 2,5 (l'Under 3,5 è quasi sempre il lato probabile)
@@ -3744,7 +3751,7 @@ async function tryHosted(ST0) {
     }).catch(() => null);
     const P = { bundle: getBundle("bundle.json"), storico: ST && ST.v && ST.v.bundle_storico ? getBundle("bundle_storico.json") : Promise.resolve(null),
                 crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
-                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json") };
+                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json") };
     let man = null, texts = null;
     const [b, bs] = await Promise.all([P.bundle, P.storico]);
     if (ST && ST.v && ST.v.bundle_storico && !(bs && bs.files)) return false;   // stagioni chiuse non arrivate: meglio non mostrare dati a metà
@@ -3756,7 +3763,8 @@ async function tryHosted(ST0) {
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
-    const [cr, lo, od, li, ex, qu, pr, hf, qa] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2]);
+    const [cr, lo, od, li, ex, qu, pr, hf, qa, me] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer]);
+    if (me && me.giocabili) MERCATI = me;
     if (qa && qa.campionati) { TAREA = qa; clearCache(); }
     if (hf && hf.campionati) HALF = hf;
     if (cr) CRESTS = cr.colors || {};
@@ -5411,8 +5419,8 @@ async function reloadIfNew() {
       if (!(await tryHosted(ST))) return;
       const of = await getData("fuorigioco.json", "json", ST); if (of && of.campionati) OFFS = of;
     } else {
-      const [od, li, pr, qu] = await Promise.all(["odds.json", "linee.json", "precalc.json", "qualita.json"].map(f => ch(f.slice(0, -5)) ? getData(f, "json", ST) : Promise.resolve(undefined)));
-      if (od) ODDS = od; if (li) LINEE = li; if (qu) QUALITA = qu;
+      const [od, li, pr, qu, me] = await Promise.all(["odds.json", "linee.json", "precalc.json", "qualita.json", "mercati.json"].map(f => ch(f.slice(0, -5)) ? getData(f, "json", ST) : Promise.resolve(undefined)));
+      if (od) ODDS = od; if (li) LINEE = li; if (qu) QUALITA = qu; if (me && me.giocabili) MERCATI = me;
       S.meta = { ...S.meta, fetched: ST.updated };
       const P2 = pr !== undefined ? pr : PRECALC; PRECALC = P2 && P2.updated === ST.updated ? P2 : null;
       STATO = ST;
