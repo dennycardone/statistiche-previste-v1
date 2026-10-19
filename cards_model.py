@@ -146,3 +146,37 @@ def run(matches, cache, today, since, fit_exclude=()):
         else: b, a = b_now, a_now
         p = predict(f, b); p['alpha'] = a; p['rN'] = f['rN']; out.append(p)
     return out, a_now, b_now
+
+# 19/10/2026: possesso palla nella ripartizione casa/ospite dei cartellini (il totale della partita non cambia).
+# Test walk-forward su 47.336 partite 2022-2026 (stima fino a giugno 2025, prova luglio 2025 – ottobre 2026): log-loss per squadra
+# −0,0013 (stabilità 2024-25: −0,0019), 1X2 cartellini −0,0011 (−0,0021); coefficiente −0,079 / −0,080 nei due periodi.
+POSS_B = -0.080
+
+def possession_x(matches, poss):
+    """matches: dict(lg, d, h, a); poss: {(lg, d, h, a): (possesso casa, possesso ospite)} delle partite giocate.
+    Per ogni partita: (possesso atteso della squadra di casa − 50) / 10, con possesso atteso = (media della squadra + 100 − media
+    dell'avversario) / 2, medie con peso e^(−giorni/365) sulle sole partite dei giorni precedenti (almeno 3 per squadra); altrimenti None."""
+    order = sorted(range(len(matches)), key=lambda i: matches[i]['d'])
+    acc = collections.defaultdict(lambda: [0.0, 0.0, None]); out = [None] * len(matches)
+    def dec(x, d):
+        if x[2] is not None and x[2] != d: f = math.exp(-(d - x[2]).days / 365); x[0] *= f; x[1] *= f
+        x[2] = d
+    i = 0
+    while i < len(order):
+        j = i; day = matches[order[i]]['d'][:10]
+        while j < len(order) and matches[order[j]]['d'][:10] == day: j += 1
+        d = datetime.date.fromisoformat(day)
+        for k in order[i:j]:
+            m = matches[k]; th, ta = acc[(m['lg'], m['h'])], acc[(m['lg'], m['a'])]; dec(th, d); dec(ta, d)
+            if th[1] >= 3 and ta[1] >= 3: out[k] = ((th[0] / th[1] + (100 - ta[0] / ta[1])) / 2 - 50) / 10
+        for k in order[i:j]:
+            m = matches[k]; p = poss.get((m['lg'], m['d'], m['h'], m['a']))
+            if p:
+                for t, v in ((m['h'], p[0]), (m['a'], p[1])): x = acc[(m['lg'], t)]; dec(x, d); x[0] += v; x[1] += 1
+        i = j
+    return out
+
+def split_possession(p, x, beta=POSS_B):
+    """Cartellini attesi di casa e ospite corretti col possesso atteso x, con lo stesso totale p['mu']."""
+    h, a = p['mh'] * math.exp(beta * x), p['ma'] * math.exp(-beta * x); s = p['mu'] / (h + a)
+    return h * s, a * s

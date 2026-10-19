@@ -1042,6 +1042,14 @@ try:
                 _ms.append(dict(lg=lg, d=v[0], h=v[2], a=v[3], ref=v[6], hc=(H[4] + (H[5] or 0)) if played else None, ac=(A[4] + (A[5] or 0)) if played else None,
                                 hf=H[3] if played else None, af=A[3] if played else None)); _keys.append((lg, v[0], v[2], v[3]))
         _pr, _alpha, _coef = cards_model.run(_ms, _cm, _now.date(), lim, fit_exclude=set(API_ONLY))
+        # 19/10/2026: possesso palla nella ripartizione casa/ospite (totale invariato): possesso delle partite giocate da statextra
+        # e dall'archivio giornaliero (indice 11), stesse chiavi (campionato, data, squadre API-Football)
+        _pv = {(x_[0], x_[1], x_[2], x_[3]): (x_[4][11], x_[5][11]) for x_ in (globals().get("_SX") or {}).values()
+               if len(x_[4]) > 11 and len(x_[5]) > 11 and x_[4][11] is not None and x_[5][11] is not None}
+        _np = 0
+        for p_, xx_ in zip(_pr, cards_model.possession_x(_ms, _pv)):
+            if p_ and xx_ is not None: p_["mh"], p_["ma"] = cards_model.split_possession(p_, xx_); p_["poss"] = round(50 + 10 * xx_, 1); _np += 1
+        print("cartellini: ripartizione col possesso su", _np, "partite (possesso di", len(_pv), "partite giocate)")
         CMP = {k: p for k, p in zip(_keys, _pr) if p}
         _cm["attuale"] = {"pesi": dict(zip(["b0"] + cards_model.FEATS, _coef)), "alpha": _alpha}
         json.dump(_cm, open(_cm_path, "w"), separators=(",", ":"))
