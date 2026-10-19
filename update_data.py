@@ -1306,7 +1306,11 @@ if ODDS_FULL or ODDS_NEAR:
                 for m_, key_ in _MK.items():
                     if key_ in ks: _has[m_][lg_] += 1
             _mer = {m_: sorted(lg_ for lg_, n_ in _has[m_].items() if _tot[lg_] >= 8 and n_ / _tot[lg_] >= 0.5) for m_ in _MK}
-            jdump({"soglia": 0.5, "dal": min((k.split("|")[1] for k in OH), default=None), "giocabili": _mer}, os.path.join(OUT, "mercati.json"))
+            # 1X2 del 1° tempo di tiri, tiri in porta e falli: 1xBet li offre dove offre quello della partita intera (verifica di Denny,
+            # 19/10/2026), ma API-Football non li passa: stessi campionati della partita intera, segnati come presunti
+            for m_ in ("s", "st", "f"): _mer[m_ + "1"] = list(_mer[m_])
+            jdump({"soglia": 0.5, "dal": min((k.split("|")[1] for k in OH), default=None), "giocabili": _mer,
+                   "presunti": ["s1", "st1", "f1"]}, os.path.join(OUT, "mercati.json"))
             print("mercati 1X2 giocabili:", {m_: len(v_) for m_, v_ in _mer.items()})
         except Exception as e_: print("::warning title=Mercati giocabili::" + str(e_))
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
