@@ -1,5 +1,6 @@
 """Quali campionati hanno i mercati di nicchia su 1xBet (archivio quote privato data/odds_hist.json).
 Gira solo in GitHub Actions; stampa solo conteggi aggregati come annotazioni (nessuna quota, nessuna richiesta API)."""
+# Rilanciato il 19/10/2026 per il promemoria del lunedì (1X2 partita intera e 1° tempo, fuorigioco).
 import json, collections, sys
 OH = json.load(open("data/odds_hist.json"))
 NAMES = {"c1x2": "Corner 1X2", "cdc": "Corner doppia chance", "s1x2": "Tiri 1X2", "st1x2": "Tiri in porta 1X2", "f1x2": "Falli 1X2",
