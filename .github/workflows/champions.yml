@@ -33,10 +33,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           R="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          # 24/10/2026: il salvataggio falliva ogni tanto (2 giri su 23 dal 19/10): fino a 3 tentativi per ramo
+          spingi() { for t in 1 2 3; do git push -q -f "$R" "$1" && return 0; echo "push $1 non riuscito (tentativo $t)"; sleep 20; done; return 1; }
           (cd storico && git init -q -b storico && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
-            && git add -A && git commit -q -m "Storico $(date -u '+%F %H:%M')" && git push -q -f "$R" storico)
+            && git add -A && git commit -q -m "Storico $(date -u '+%F %H:%M')" && spingi storico) || echo "::warning title=Champions::ramo storico non salvato in questo giro"
           mkdir _c && cp ucl.json uel.json _c/ && cd _c && git init -q -b champions && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
-            && git add -A && git commit -q -m "Champions $(date -u '+%F %H:%M')" && git push -q -f "$R" champions
+            && git add -A && git commit -q -m "Champions $(date -u '+%F %H:%M')" && spingi champions
       - name: Mette subito le previsioni sul sito
         env:
           GH_TOKEN: ${{ github.token }}

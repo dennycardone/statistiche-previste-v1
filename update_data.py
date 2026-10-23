@@ -1,7 +1,7 @@
 """Scarica da football-data.co.uk i CSV dei campionati della dashboard nella cartella data/.
 Campionati europei: stagione corrente sempre, le 5 precedenti solo se mancano (servono per gli H2H).
 """
-import datetime, json, os, urllib.request, math, re
+import datetime, json, os, urllib.request, urllib.parse, math, re
 
 LEAGUES = ["I1", "I2", "E0", "SP1", "F1", "D1", "N1", "P1",
            "E1", "E2", "E3", "EC", "SC0", "SC1", "SC2", "SC3", "D2", "F2", "SP2", "B1", "T1", "G1"]
@@ -30,10 +30,24 @@ def code(y):
     return f"{y % 100:02d}{(y + 1) % 100:02d}"
 
 
+_FD_FAIL = {}
+
+
 def get(url):
+    """24/10/2026: un giro del 22/10 è durato 48 minuti per i download lenti di football-data. Attesa massima 25 s per file e,
+    dopo 4 errori di fila, il giro smette di scaricare e usa i file già salvati (rimane l'ultima versione buona, niente stime)."""
+    host = urllib.parse.urlsplit(url).netloc
+    if _FD_FAIL.get(host, 0) >= 4: raise RuntimeError(host + " non risponde in questo giro: tengo i file salvati")
     req = urllib.request.Request(url, headers={"User-Agent": "statistiche-previste/1.0"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return r.read().decode("utf-8-sig", errors="replace")
+    try:
+        with urllib.request.urlopen(req, timeout=25) as r:
+            txt = r.read().decode("utf-8-sig", errors="replace")
+    except Exception:
+        _FD_FAIL[host] = _FD_FAIL.get(host, 0) + 1
+        if _FD_FAIL[host] == 4: print("::warning title=Download lenti::" + host + ": 4 download falliti di fila, il giro usa i file già salvati")
+        raise
+    _FD_FAIL[host] = 0
+    return txt
 
 
 def save(name, txt):
@@ -1310,6 +1324,11 @@ if ODDS_FULL or ODDS_NEAR:
                     win = [ks for d_, ks in L_ if d_ < _t0 or key_ in ks][-10:]   # oggi: solo le partite che hanno già quella quota
                     if len(win) >= 4: _tot[(lg_, m_)] = len(win); _has[m_][lg_] = sum(1 for ks in win if key_ in ks)
             _mer = {m_: sorted(lg_ for lg_, n_ in _has[m_].items() if n_ / _tot[(lg_, m_)] >= 0.5) for m_ in _MK}
+            # 24/10/2026: falli 1X2 di Championship, Segunda e 2. Bundesliga visti da Denny su 1xBet dal 23/10 (archivio: E1 1/1, SP2 1/1,
+            # D2 2/2 il 23/10). Inseriti subito fino al 2/11, poi decide solo la regola delle ultime 10 (a quel punto hanno le partite).
+            if _t0 <= "2026-11-02":
+                for lg_ in ("E1", "SP2", "D2"):
+                    if lg_ not in _mer["f"]: _mer["f"] = sorted(_mer["f"] + [lg_])
             # 1X2 del 1° tempo di tiri, tiri in porta e falli: 1xBet li offre dove offre quello della partita intera (verifica di Denny,
             # 19/10/2026), ma API-Football non li passa: stessi campionati della partita intera, segnati come presunti
             for m_ in ("s", "st", "f"): _mer[m_ + "1"] = list(_mer[m_])
