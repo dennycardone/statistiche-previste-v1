@@ -3,7 +3,7 @@ on:
   workflow_dispatch: {}
   push:
     branches: [main]
-    paths: [tools/mercati_nicchia.py, tools/analisi_quote.js, tools/analisi_1x2.js, tools/esiti_extra.py]   # riparte quando uno script cambia (nessuna richiesta API)
+    paths: [tools/mercati_nicchia.py, tools/analisi_quote.js, tools/analisi_1x2.js, tools/esiti_extra.py, tools/mercati_recenti.py]   # riparte quando uno script cambia (nessuna richiesta API)
 permissions:
   contents: read
 jobs:
@@ -31,6 +31,9 @@ jobs:
         with: { node-version: "22" }
       - name: Mercati di nicchia per campionato (1xBet)
         run: python3 tools/mercati_nicchia.py
+      - name: Mercati di nicchia negli ultimi giorni (aggiunti o tolti da 1xBet)
+        run: python3 tools/mercati_recenti.py
+        continue-on-error: true
       - run: node tools/analisi_quote.js .
         continue-on-error: true
       - name: Esiti reali in più (gialli per squadra, 1° tempo)

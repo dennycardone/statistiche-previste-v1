@@ -1291,25 +1291,29 @@ if ODDS_FULL or ODDS_NEAR:
         jdump(OH, hp)
         print("archivio quote:", len(OH), "partite")
         # 19/10/2026: dove 1xBet quota gli 1X2 dei mercati di nicchia (data/mercati.json, solo nomi di campionato, nessuna quota).
-        # Per campionato e mercato: partite con quella quota / partite con mercati 1xBet di nicchia, fino a oggi (le partite dei giorni
-        # dopo non sono ancora quotate). Un mercato è "giocabile" in un campionato con almeno 1 partita su 2 (minimo 8 partite).
+        # 24/10/2026: conta le ULTIME 10 partite di ogni campionato (fino a ieri, più quelle di oggi che hanno già la quota: falli, tiri e
+        # tiri in porta arrivano poche ore prima), non tutto l'archivio: un mercato che 1xBet aggiunge (es. falli di Championship, Segunda,
+        # 2. Bundesliga dal 23/10) entra in pochi giorni, uno che toglie esce. "Giocabile" = almeno 5 delle ultime 10 (minimo 4 partite).
         # Radar, Segnali e pallini della home mostrano gli 1X2 di nicchia solo dove sono giocabili; la scheda partita li mostra sempre.
         try:
             _MK = {"c": "x.c1x2", "s": "x.s1x2", "st": "x.st1x2", "f": "x.f1x2", "y": "x.y1x2", "c1": "x.h1.corners_1x2_1st_half", "y1": "x.h1.yellow_cards_1x2_1st_half"}
-            _tot, _has, _t0 = collections.Counter(), collections.defaultdict(collections.Counter), rome_now.strftime("%Y-%m-%d")
+            _t0 = rome_now.strftime("%Y-%m-%d"); _byl = collections.defaultdict(list)
             for kk, x in OH.items():
                 lg_, d_ = kk.split("|")[:2]
                 if d_ > _t0: continue
                 ks = {q.split(":")[0] for part in ("prima", "ultima") for q in (x.get(part) or {}).get("q", {}) if q.startswith("x.")}
-                if not ks: continue
-                _tot[lg_] += 1
+                if ks: _byl[lg_].append((d_, ks))
+            _tot, _has = collections.Counter(), collections.defaultdict(collections.Counter)
+            for lg_, L_ in _byl.items():
+                L_.sort(key=lambda z: z[0])
                 for m_, key_ in _MK.items():
-                    if key_ in ks: _has[m_][lg_] += 1
-            _mer = {m_: sorted(lg_ for lg_, n_ in _has[m_].items() if _tot[lg_] >= 8 and n_ / _tot[lg_] >= 0.5) for m_ in _MK}
+                    win = [ks for d_, ks in L_ if d_ < _t0 or key_ in ks][-10:]   # oggi: solo le partite che hanno già quella quota
+                    if len(win) >= 4: _tot[(lg_, m_)] = len(win); _has[m_][lg_] = sum(1 for ks in win if key_ in ks)
+            _mer = {m_: sorted(lg_ for lg_, n_ in _has[m_].items() if n_ / _tot[(lg_, m_)] >= 0.5) for m_ in _MK}
             # 1X2 del 1° tempo di tiri, tiri in porta e falli: 1xBet li offre dove offre quello della partita intera (verifica di Denny,
             # 19/10/2026), ma API-Football non li passa: stessi campionati della partita intera, segnati come presunti
             for m_ in ("s", "st", "f"): _mer[m_ + "1"] = list(_mer[m_])
-            jdump({"soglia": 0.5, "dal": min((k.split("|")[1] for k in OH), default=None), "giocabili": _mer,
+            jdump({"soglia": "almeno 5 delle ultime 10 partite", "giocabili": _mer,
                    "presunti": ["s1", "st1", "f1"]}, os.path.join(OUT, "mercati.json"))
             print("mercati 1X2 giocabili:", {m_: len(v_) for m_, v_ in _mer.items()})
         except Exception as e_: print("::warning title=Mercati giocabili::" + str(e_))
