@@ -1110,7 +1110,7 @@ try:
             p = CMP.get((lg, v[0], v[2], v[3]))
             if p:   # [arbitro, sue partite, fattore falli, effetto arbitro sui cartellini, cartellini attesi, reali, casa, ospite, fattori]
                 ent = [x["ref"], p["rN"], x["ff"], round(p["ref"], 4), round(p["mu"], 3), real, round(p["mh"], 3), round(p["ma"], 3),
-                       [round(p["team"], 3), round(p["ref"], 3), round(p["fouls"], 3), round(p["h2h"], 3), round(p["early"], 3)]]
+                       [round(p["team"], 3), round(p["ref"], 3), round(p["fouls"], 3), round(p["h2h"], 3), round(p["early"], 3), round(p["derby"], 3)]]
             elif not CMP: ent = [x["ref"], x["n"], x["ff"], x["fc"], x["mu"], real, x["mh"], x["ma"], None]
             else: ent = [x["ref"], x["n"], x["ff"], None, None, real, None, None, None]
             ent.append(TR.get((lg, v[0], v[2], v[3])))   # [9] errori standard per il range: gol casa, gol ospite, cartellini casa, cartellini ospite

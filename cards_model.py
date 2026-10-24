@@ -9,18 +9,20 @@ Previsione: log(cartellini attesi) = log(media del campionato) + b0 + somma dei 
   FF   falli fatti e subiti dalle due squadre in stagione, rispetto al campionato (ristretti verso la media con 3 partite fittizie)
   H    scontri diretti degli ultimi 3 anni: cartellini reali / attesi, ristretti verso 1 (K=12)
   nlo  1 se una delle due squadre ha meno di 5 partite nella stagione
+  DB   1 se è un derby (derby.py; aggiunto il 24/10/2026, v3: circa +20% di cartellini, vedi derby.py per il test)
 Distribuzione: Binomiale Negativa (Var = mu + alpha mu^2), alpha stimato sui dati.
 Pesi stimati ogni mese con le sole partite precedenti al mese (data/cards_model.json li conserva): le previsioni delle
 partite già giocate restano quelle che il modello avrebbe dato prima della partita; le partite da giocare usano i pesi
 stimati su tutte le partite già giocate. Variabili calcolate solo con le partite precedenti."""
 import math, collections, datetime
 import apif_extra as X
+from derby import is_derby
 
-VERSION = "cartellini-v2 (2026-10-05)"
+VERSION = "cartellini-v3 (2026-10-24)"
 COUNTRY = {'I1': 'ITA', 'I2': 'ITA', 'E0': 'ENG', 'E1': 'ENG', 'E2': 'ENG', 'E3': 'ENG', 'EC': 'ENG', 'SP1': 'ESP', 'SP2': 'ESP', 'F1': 'FRA', 'F2': 'FRA',
            'D1': 'GER', 'D2': 'GER', 'SC0': 'SCO', 'SC1': 'SCO', 'SC2': 'SCO', 'SC3': 'SCO'}
 CALENDAR_YEAR = {'ARG', 'BRA', 'CHN', 'FIN', 'IRL', 'JPN', 'NOR', 'SWE', 'USA', 'BLR'}   # stagione = anno solare
-FEATS = ["E", "R", "FF", "H", "nlo", "R10"]
+FEATS = ["E", "R", "FF", "H", "nlo", "R10", "DB"]
 K_TEAM, K_R, K_H, W, WL, MIN_LG = 3, 10, 12, 0.95, 0.995, 40
 
 def season_of(lg, d):
@@ -67,7 +69,8 @@ def features(matches):
                  "R10": ratio(sum(z[0] for z in R10), sum(z[1] for z in R10), K_R) if R10 else 0.0,
                  "FF": math.log(FF) if FF else 0.0,
                  "H": ratio(sum(z[0] for z in HH), sum(z[1] for z in HH), K_H) if HH else 0.0,
-                 "nlo": 1.0 if min(len(thS), len(taS)) < 5 else 0.0}
+                 "nlo": 1.0 if min(len(thS), len(taS)) < 5 else 0.0,
+                 "DB": 1.0 if is_derby(lg, r['h'], r['a']) else 0.0}
             feat = dict(lg=lg, x=[x[k] for k in FEATS], lm=lm, eh=eh, ea=ea, rH=(L['hc'] / L['ac']) if L['ac'] > 0 else 1.0, rN=len(R), nmin=min(len(thS), len(taS)), played=played, T=(r['hc'] + r['ac']) if played else None, d=r['d'][:10])
         res[i] = feat
         if not played: continue
@@ -118,7 +121,7 @@ def predict(f, b):
     r = f.get('rH') or 1.0
     if f['eh'] and f['ea']: mh = mu * f['eh'] * r / (f['eh'] * r + f['ea'])
     else: mh = mu * r / (1 + r)
-    return dict(mu=mu, mh=mh, ma=mu - mh, ref=ref, team=mult["E"], fouls=mult["FF"], h2h=mult["H"], early=mult["nlo"])
+    return dict(mu=mu, mh=mh, ma=mu - mh, ref=ref, team=mult["E"], fouls=mult["FF"], h2h=mult["H"], early=mult["nlo"], derby=mult["DB"])
 
 def run(matches, cache, today, since, fit_exclude=()):
     """Previsioni per le partite dal giorno `since` in poi. cache: {"version", "mesi": {YYYY-MM: [pesi, alpha]}} aggiornato qui.
