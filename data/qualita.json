@@ -1,0 +1,53 @@
+{
+ "stat_extra": {
+  "partite": 676,
+  "fuorigioco": 570,
+  "archivio": "2026-10-24 21:36"
+ },
+ "fuorigioco": {
+  "campionati": 40,
+  "partite": 40319,
+  "da_doppio_null": 2526
+ },
+ "partite_non_api": [],
+ "giocate_mancanti": [
+  "FIN 21/10 PK-35-FF Jaro (nomi non abbinati)"
+ ],
+ "squadre_non_riconosciute": [
+  "PK-35"
+ ],
+ "partite_scadute": [
+  "B1 23/10 Kortrijk - KV Mechelen"
+ ],
+ "statistiche_scartate": [
+  "SC0 11/10 Motherwell - Celtic: falli",
+  "BUL 10/10 Botev Vratsa - Spartak Varna: falli",
+  "BUL 10/10 Lokomotiv Sofia - Lokomotiv Plovdiv: falli",
+  "BUL 10/10 Botev Plovdiv - Slavia Sofia: falli",
+  "BUL 11/10 Septemvri Sofia - Dunav Ruse: falli",
+  "BUL 11/10 Cherno More Varna - Levski Sofia: falli",
+  "BUL 11/10 CSKA 1948 - CSKA Sofia: falli",
+  "BUL 12/10 Ludogorets - Arda Kardzhali: falli",
+  "BUL 23/10 CSKA 1948 - Botev Plovdiv: falli",
+  "BUL 24/10 Dunav Ruse - Spartak Varna: falli",
+  "BUL 24/10 Lokomotiv Sofia - Botev Vratsa: falli",
+  "SRB 18/10 FK Crvena Zvezda - Mladost Lucani: falli"
+ ],
+ "calendario_da_espn": [],
+ "quote": {
+  "aggiornate": "24/10/2026 22:03",
+  "abbinate": 395,
+  "non_abbinate": 1,
+  "esempi_non_abbinate": [
+   "FIN FF Jaro - PK-35"
+  ]
+ },
+ "api_aggiornata": "2026-10-24 21:36",
+ "avvisi": [
+  "1 squadre di API-Football non riconosciute",
+  "1 partite non giocate con data passata (rinviate o calendario non aggiornato)",
+  "12 partite con statistiche API impossibili (usato football-data o vuoto)"
+ ],
+ "stato": "da controllare",
+ "giro": "24/10/2026 22:03"
+}
