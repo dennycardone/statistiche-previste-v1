@@ -16,7 +16,8 @@ puntata fissa, log-loss, calibrazione per fasce, prima metà contro seconda met�
 Regola di decisione fissata il 25/10/2026 (prima di vedere i risultati): un metodo si può scegliere solo con almeno 100 giorni di
 archivio; scelta sui primi due terzi dei giorni, verifica sull'ultimo terzo; deve avere probabilità calibrata entro ±5 punti dalla
 frequenza reale nella verifica e ROI non peggiore di −margine medio di 1xBet. Prima di allora il rapporto dice solo "campione insufficiente"."""
-import json, math, itertools, collections, statistics, os
+import json, math, itertools, collections, statistics, os, sys, traceback
+sys.excepthook = lambda t, v, tb: print("::error title=Quota 2/3::" + " | ".join(traceback.format_exception(t, v, tb)).replace("\n", " ")[-1500:])
 C = json.load(open("q23_candidati.json"))
 GOL = {"1X2 gol", "Over/Under 1.5", "Over/Under 2.5", "Over/Under 3.5", "Gol/No gol"}
 TGT = {"Quota 2": (1.85, 2.20), "Quota 3": (2.75, 3.35)}
