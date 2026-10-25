@@ -1,7 +1,11 @@
 """Formazioni, statistiche dei giocatori e infortuni da API-Football, per il backtest (gol attesi e cartellini).
 Per ogni partita giocata: titolari delle due squadre e, per ogni giocatore sceso in campo, minuti, gol, assist, gialli, rossi,
 falli fatti e subiti, tiri e tiri in porta (fixtures?ids=, 20 partite per richiesta). Infortuni e squalifiche: injuries?league&season.
-Partite: ramo storico (2022-2025) + data/apif.json (stagione in corso). Riprende da formazioni/*.json; lascia 1500 richieste al giorno."""
+Partite: ramo storico (2022-2025) + data/apif.json (stagione in corso). Riprende da formazioni/*.json; usa solo le richieste che avanzano
+dopo la riserva dell'app (af_budget).
+25/10/2026 (Prevista 2.0, fase 1): per ogni giocatore anche fuorigioco, contrasti, intercetti, tiri respinti, duelli (totali e vinti),
+dribbling (tentati e riusciti), passaggi (totali e chiave), voto, ruolo e se è entrato dalla panchina (colonne 12-24). Le partite già
+scaricate col formato vecchio si riscaricano (elenco "v2")."""
 import json, os, time, urllib.request, urllib.parse, glob
 KEY = os.environ["APIFOOTBALL_KEY"].strip()
 AFL = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "EC": 43, "SP1": 140, "SP2": 141, "F1": 61, "F2": 62, "D1": 78, "D2": 79,
@@ -54,7 +58,8 @@ for lg, s in order:
                 inj.append([x["fixture"]["id"], x["team"]["id"], x["player"]["id"], x["player"].get("type"), x["player"].get("reason")])
             break   # l'endpoint injuries non è paginato
         D["infortuni"] = inj
-    todo = [i for i in D["ids"] if i not in D["partite"]]
+    v2 = set(D.get("v2", []))
+    todo = [i for i in D["ids"] if i not in D["partite"] or i not in v2]
     for k in range(0, len(todo), 20):
         if budget < 5: break
         R = get("fixtures", ids="-".join(todo[k:k + 20])); budget -= 1
@@ -69,9 +74,15 @@ for lg, s in order:
                     if not g.get("minutes"): continue
                     P.append([p["player"]["id"], side, num(g.get("minutes")), num((st.get("goals") or {}).get("total")), num((st.get("goals") or {}).get("assists")),
                               num((st.get("cards") or {}).get("yellow")), num((st.get("cards") or {}).get("red")), num((st.get("fouls") or {}).get("committed")),
-                              num((st.get("fouls") or {}).get("drawn")), num((st.get("shots") or {}).get("total")), num((st.get("shots") or {}).get("on")), g.get("position") or ""])
+                              num((st.get("fouls") or {}).get("drawn")), num((st.get("shots") or {}).get("total")), num((st.get("shots") or {}).get("on")), g.get("position") or "",
+                              num(st.get("offsides")), num((st.get("tackles") or {}).get("total")), num((st.get("tackles") or {}).get("interceptions")),
+                              num((st.get("tackles") or {}).get("blocks")), num((st.get("duels") or {}).get("total")), num((st.get("duels") or {}).get("won")),
+                              num((st.get("dribbles") or {}).get("attempts")), num((st.get("dribbles") or {}).get("success")), num((st.get("passes") or {}).get("total")),
+                              num((st.get("passes") or {}).get("key")), g.get("rating"), 1 if g.get("substitute") else 0, g.get("number")])
             D["partite"][str(f["fixture"]["id"])] = [f["fixture"]["date"][:16], hid, aid, f["teams"]["home"]["name"], f["teams"]["away"]["name"],
                                                      f["goals"]["home"], f["goals"]["away"], xi.get(hid, []), xi.get(aid, []), P]
+            if f.get("players"): v2.add(str(f["fixture"]["id"]))
+        D["v2"] = sorted(v2)
     json.dump(D, open(fn, "w"), ensure_ascii=False, separators=(",", ":"))
     print(lg, s, len(D["partite"]), "/", len(D["ids"]), "infortuni", len(D["infortuni"] or []), "budget", budget)
     if budget < 5: break

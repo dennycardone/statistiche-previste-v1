@@ -1,6 +1,8 @@
 name: Formazioni API-Football
 on:
-  workflow_dispatch: {}   # da lanciare a mano (scarico completato il 5/10/2026)
+  schedule:
+    - cron: "20 23 * * *"   # ogni sera dopo la riserva dell'app: completa il riscarico, poi aggiunge le partite nuove
+  workflow_dispatch: {}   # da lanciare a mano (scarico completato il 5/10/2026; 25/10/2026: riscarico con fuorigioco e statistiche estese)
 permissions:
   contents: write
 jobs:
@@ -36,6 +38,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cd formazioni
+          # 25/10/2026: mai salvare un archivio più piccolo del precedente (scarico parziale o ramo non letto)
+          n=$(ls *.json 2>/dev/null | wc -l); echo "file $n"; [ "$n" -ge 150 ] || { echo "::error::archivio formazioni incompleto ($n file), non salvato"; exit 1; }
           git init -q -b formazioni && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
           git add -A && git commit -q -m "Formazioni $(date -u '+%F %H:%M')"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" formazioni
