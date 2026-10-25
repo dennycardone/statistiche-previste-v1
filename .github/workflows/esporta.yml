@@ -1,6 +1,8 @@
 name: Analisi quote (solo numeri aggregati)
 on:
   workflow_dispatch: {}
+  schedule:
+    - cron: "13 6 * * 1"   # ogni lunedì: lo studio Quota 2 / Quota 3 si rifà con l'archivio cresciuto
   push:
     branches: [main]
     paths: [tools/mercati_nicchia.py, tools/analisi_quote.js, tools/analisi_1x2.js, tools/esiti_extra.py, tools/mercati_recenti.py, tools/quote_inventario.py, tools/quota23.js]   # riparte quando uno script cambia (nessuna richiesta API)
@@ -41,6 +43,9 @@ jobs:
         continue-on-error: true
       - name: Esiti reali in più (gialli per squadra, 1° tempo)
         run: python3 tools/esiti_extra.py
+        continue-on-error: true
+      - name: Quota 2 / Quota 3 (studio walk-forward, solo numeri aggregati)
+        run: node tools/quota23.js . && python3 tools/quota23.py
         continue-on-error: true
       - name: 1X2 delle statistiche contro 1xBet
         run: node tools/analisi_1x2.js .
