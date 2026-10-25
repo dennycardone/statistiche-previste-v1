@@ -546,7 +546,7 @@ select{pointer-events:none}
 .mhead .vtag{font-family:var(--display);font-stretch:75%;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:1px 6px}
 .mhead .bk-none,.mhead .bk-note{margin:0;padding:12px 14px;font-size:12px;line-height:1.45;color:var(--ink-3);text-align:center}.mhead .bk-none{font-size:14px;color:var(--ink-2);padding:22px 16px}.mhead .bk-note b{color:var(--gold)}
 #selBk .vtag{font-family:var(--display);font-stretch:75%;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:2px 7px;white-space:nowrap}
-.bklist{display:flex;flex-direction:column;gap:6px}
+.bklist{display:flex;flex-direction:column;gap:6px}.bksort{align-items:center;gap:6px}.qsm{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .bkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"m m" "p n";align-items:center;gap:6px 10px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;cursor:pointer}
 .bkrow:hover{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
 .bkm{grid-area:m}.bkp{grid-area:p}.bkn{grid-area:n;flex-direction:row!important;align-items:baseline!important;gap:8px}.bkm,.bkp,.bkn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.bkm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkm small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -596,7 +596,7 @@ select{pointer-events:none}
 .gitem[open] summary .gil b{color:var(--accent)}
 .rtabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--hot);min-height:20px}
 .gword.sm{font-size:16px}.gsay.sm{font-size:13.5px}
-.selp2{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:14px}.selp2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp2 .gin{font-size:12.5px;color:var(--ink-2);white-space:nowrap}.selp2 .gin b{font-size:15px;color:var(--ink)}
+.selp2{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center;font-size:14px}.selp2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp2 .gin{font-size:12.5px;color:var(--ink-2);white-space:nowrap}.selp2 .gin b{font-size:15px;color:var(--ink)}
 .mhead .hsw-n{max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;font-family:var(--body);font-stretch:88%;font-size:11px;font-weight:700;color:var(--gold-ink);background:var(--gold);border-radius:999px;padding:2px 8px;white-space:nowrap;animation:hswp 2.4s ease-in-out 3}
 @keyframes hswp{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .genrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -955,12 +955,12 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
         <option value="st">Tiri in porta</option><option value="f">Falli</option><option value="k">Cartellini</option>
       </select></label>
       <div class="seg" role="group" aria-label="Sede" id="ritVen">
-        <button type="button" class="segb" data-v="all" aria-pressed="false">Tutte</button>
-        <button type="button" class="segb" data-v="home" aria-pressed="true">Casa</button>
+        <button type="button" class="segb" data-v="all" aria-pressed="true">Tutte</button>
+        <button type="button" class="segb" data-v="home" aria-pressed="false">Casa</button>
         <button type="button" class="segb" data-v="away" aria-pressed="false">Trasferta</button>
       </div>
       <div class="rtf" role="group" aria-label="Quando giocano e Lettura">
-        <button type="button" class="chip" data-rw="all" aria-pressed="true">Sempre</button><button type="button" class="chip" data-rw="0" aria-pressed="false">Oggi</button><button type="button" class="chip" data-rw="1" aria-pressed="false">Domani</button>
+        <button type="button" class="chip" data-rw="all" aria-pressed="false">Sempre</button><button type="button" class="chip" data-rw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-rw="1" aria-pressed="false">Domani</button>
         <button type="button" class="chip" id="ritDot" aria-pressed="false"><i aria-hidden="true"></i>Lettura</button>
         <button type="button" class="chip" id="ritGrd" aria-pressed="false"><em class="ccls c-a" aria-hidden="true">A</em>Grado</button>
       </div>
@@ -971,14 +971,13 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
   <div class="view" id="viewSig" hidden>
     <section class="card" aria-label="Filtri segnali">
       <h2>Segnali</h2>
-      <p class="small muted" style="margin:0">Dalla probabilità più alta, con una soglia per mercato (Over 1,5 80%, Over 2,5 60%, Over 3,5 40%, Gol 60%, No gol 65%, corner e falli 70%, tiri e tiri in porta 80%, cartellini secondo la linea), solo squadre con almeno 3 partite in casa/trasferta. Partite con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
+      <p class="small muted" style="margin:0">Dalla probabilità più alta, con una soglia per mercato (Over 2,5 60%, Over 3,5 40%, Gol 60%, No gol 65%, corner e falli 70%, tiri e tiri in porta 80%, cartellini secondo la linea), solo squadre con almeno 3 partite in casa/trasferta. Partite con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri e tiri in porta (chi ne fa di più).</p>
       <div class="sigf">
         <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
         <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano">
           <button type="button" class="chip" data-sw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-sw="1" aria-pressed="true">Domani</button><button type="button" class="chip" data-sw="r" aria-pressed="false">Giornata</button>
         </div>
         <div class="row" id="sigStats" role="group" aria-label="Mercati">
-          <button type="button" class="chip sstat" data-k="g15" aria-pressed="true">Over 1,5</button>
           <button type="button" class="chip sstat" data-k="g25" aria-pressed="true">Over 2,5</button>
           <button type="button" class="chip sstat" data-k="g35" aria-pressed="true">Over 3,5</button>
           <button type="button" class="chip sstat" data-k="gg" aria-pressed="true">Gol/No gol</button>
@@ -3834,12 +3833,17 @@ function sigCardsHTML(rows, pref, withMatch = true, played = null) {
     return `<div class="sig">
       <button type="button" class="sigopen" data-lg="${r.lg.code}" data-h="${esc(r.f.home)}" data-a="${esc(r.f.away)}" data-d="${isoD(r.f.date)}"${withMatch ? "" : " disabled"}>
         ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}
-        <span class="p num">${pc(r.p)}</span>
+        <span class="p num">${pc(r.p)}${played ? "" : qSm(sigQuota(r))}</span>
         <span class="d"><span class="stag">${MK_TAG[r.mk]}</span><b>${esc(r.fav)}</b> · ${detail}</span>
         ${withMatch ? `<span class="w">${r.team ? `${r.team === r.f.home ? "In casa con" : "In trasferta con"} ${crest(r.lg.code, r.team === r.f.home ? r.f.away : r.f.home)}<b>${esc(r.team === r.f.home ? r.f.away : r.f.home)}</b> · ` : ""}${DAYS_SHORT[r.f.date.getUTCDay()]} ${dstr(r.f.date)}${r.f.time ? " " + esc(r.f.time) : ""} · ${esc(r.lg.name)}</span>` : ""}
       </button>
       ${played ? (() => { const o = sigOutcome(r, played); return o ? `<span class="esito ${o.ok ? "good" : "bad"}">${o.ok ? "✓ Preso" : "✗ Non preso"} · ${o.txt}</span>` : ""; })() : ""}
     </div>`; }).join("")}</div>`;
+}
+function sigQuota(r) {   // quota 1xBet del segnale (se c'è)
+  const e = { id: `${r.lg.code}|${isoD(r.f.date)}|${r.f.home}|${r.f.away}`, m: null };
+  const side = r.mk in GOAL_LINE ? (r.under ? "U" : "O") : r.mk === "gg" ? (r.sel === "No gol" ? "N" : "S") : r.mk === "k" ? (r.under ? "U" : "O") + r.line : r.sel;
+  return quotaFor(e, r.mk, side);
 }
 function bindSigCards(box, rows, pref) {
   box.querySelectorAll(".sigopen:not([disabled])").forEach(b => b.addEventListener("click", () => openMatch(b.dataset.lg, b.dataset.h, b.dataset.a, b.dataset.d)));
@@ -4745,7 +4749,7 @@ const RIT_EV = [
   // risultati esatti fino a 4 gol totali, dal punto di vista della squadra (gol fatti-subiti); solo nel filtro "Risultati esatti"
   ...[[1, 0], [2, 0], [2, 1], [3, 0], [3, 1], [4, 0], [0, 0], [1, 1], [2, 2], [0, 1], [0, 2], [1, 2], [0, 3], [1, 3], [0, 4]].map(([x, y]) =>
     ["r", "g", `${x > y ? "non vince" : x === y ? "non pareggia" : "non perde"} ${x}-${y}`, (f, a) => f === x && a === y])];
-const RIT = { ven: "home", min: 5, when: "all", dot: false, grd: false, sortP: true };   // ordine fisso: percentuale della Lettura
+const RIT = { ven: "all", min: 5, when: "0", dot: false, grd: false, sortP: true };   // ordine fisso: percentuale della Lettura
 const RIT_UNIT = { g: "", c: " corner", s: " tiri", st: " tiri in porta", f: " falli", k: " cartellini" };
 function ritRows(L, team, gr, ven) {
   const out = [];
@@ -4926,7 +4930,7 @@ document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("clic
 /* ===== Confidence Score: interfaccia (Radar, scheda partita) ===== */
 const CONF_C = new Map();   // previsioni con punteggio per partita e metodo (sessione)
 const CONF_STATUS = { aplus: `<svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnale A+`, watch: `<i class="sdot on"></i>Da seguire`, none: `<i class="sdot"></i>Nessun segnale` };
-const SEL = { f: "all", h: 24, days: new Set(["0"]) };   // Radar: Oggi e/o Domani (12/10/2026, al posto di 24/48/72 ore)
+const SEL = { f: "all", h: 24, days: new Set(["0"]), bkSort: lsGet("statPreviste.bkSort") === "p" ? "p" : "ev" };   // Radar: Oggi e/o Domani (12/10/2026, al posto di 24/48/72 ore)
 function entryOdds(e) {
   if (e.m) return e.m.odds || null;
   const f = S.fixtures.find(x => x.div === e.lg.code && x.home === e.home && x.away === e.away && isoD(x.date) === e.d);
@@ -4939,6 +4943,18 @@ function oddsFor(e, r) {
   const k = r.mk in GOAL_LINE ? `ou${GOAL_LINE[r.mk]}:${r.side === "U" ? "U" : "O"}` : r.mk === "gg" ? `gg:${r.side === "N" ? "N" : "S"}` : r.mk === "c" && (r.side === "1" || r.side === "2") ? `c1x2:${r.side}` : null;
   const v = k && P.q[k]; return v && v[0] > 1 ? { o: v[0], n: v[1] } : null;
 }
+/* 25/10/2026: quota 1xBet di una previsione (Grado, Radar, Segnali), solo se c'è: gol e Gol/No gol (odds.json), 1X2 di corner, tiri,
+   tiri in porta e falli (ultima quota vista, quote_mov.json), cartellini se la linea principale di 1xBet è la stessa (linee.json). */
+function quotaFor(e, mk, side) {
+  if (!e || e.m || !side) return null;
+  if (mk in GOAL_LINE || mk === "gg") { const q = oddsFor(e, { mk, side }); return q ? q.o : null; }
+  if (mk === "k") { const LB = bkLines(e), k = LB && LB.k, L = parseFloat(side.slice(1)); return k && Math.abs(k[0] - L) < 1e-6 ? (side[0] === "U" ? k[2] : k[1]) || null : null; }
+  const key = { c: "x.c1x2", s: "x.s1x2", st: "x.st1x2", f: "x.f1x2" }[mk]; if (!key || (side !== "1" && side !== "2")) return null;
+  const o = q1x2(e, key); if (o) return o[side === "1" ? 0 : 2];
+  if (mk === "c") { const q = oddsFor(e, { mk, side }); return q ? q.o : null; }
+  return null;
+}
+const qSm = q => q > 1 ? `<small class="qsm">@${f2(q)}</small>` : "";
 const oddsTxt = q => q ? `Quota 1xBet <b class="num">${q.o.toFixed(2).replace(".", ",")}</b>` : "";
 function confEntry(e, cfg, peek) {   // lista delle previsioni con punteggio; peek = non calcolare
   const key = e.id + "|" + cfg.key;
@@ -5151,16 +5167,20 @@ function renderSelBk(ents, cfg, when) {
   if (!withL.length) { SEL.bkN = 0; box.hidden = SEL.tab !== "bk"; box.innerHTML = `<div class="selhead"><h2><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato</h2></div><p class="apnone">NESSUNA LINEA DEI BOOKMAKER NEL PERIODO</p>`; radarTabs(); return; }
   const t0 = performance.now(), todo = [];
   for (const e of withL) { const k = e.id + "|" + cfg.key; if (!BK_C.has(k)) { if (performance.now() - t0 < 200) { try { bkEntry(e, cfg); } catch (x) { BK_C.set(k, []); } } else todo.push(e); } }
-  const L = withL.flatMap(e => (BK_C.get(e.id + "|" + cfg.key) || []).map(c => ({ e, c }))).sort((a, b) => b.c.ev - a.c.ev);
-  const lab = c => `${c.lab === "Calci d'angolo" ? "Corner" : c.lab}${c.who ? " " + esc(c.who) : " totali"}`;
+  // 25/10/2026: tutte le giocate (prima solo le prime 15, mentre il contatore della scheda le contava tutte), ordinate per guadagno atteso o per probabilità
+  const bySort = SEL.bkSort === "p" ? (a, b) => b.c.p - a.c.p || b.c.ev - a.c.ev : (a, b) => b.c.ev - a.c.ev || b.c.p - a.c.p;
+  const L = withL.flatMap(e => (BK_C.get(e.id + "|" + cfg.key) || []).map(c => ({ e, c }))).sort(bySort);
+  const lab = c => { const b = c.lab === "Calci d'angolo" ? "Corner" : c.lab; return `${b}${c.who ? " " + esc(c.who) : / totali$/.test(b) ? "" : " totali"}`; };
   SEL.bkN = L.length; box.hidden = SEL.tab !== "bk"; radarTabs();
   box.innerHTML = `<div class="selhead"><h2><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato</h2><span class="vtag">in verifica</span></div>
-    
-    ${L.length ? `<div class="bklist">${L.slice(0, 15).map(({ e, c }) => `<button type="button" class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
+    ${L.length ? `<div class="rtf bksort" role="group" aria-label="Ordina"><span class="small muted">Ordina per</span><button type="button" class="chip" data-bks="ev" aria-pressed="${SEL.bkSort !== "p"}">Guadagno</button><button type="button" class="chip" data-bks="p" aria-pressed="${SEL.bkSort === "p"}">Riuscita</button></div>
+    <p class="small muted" style="margin:0">${L.length} ${L.length === 1 ? "giocata" : "giocate"} con valore in ${new Set(L.map(x => x.e.id)).size} partite.</p>` : ""}
+    ${L.length ? `<div class="bklist">${L.map(({ e, c }) => `<button type="button" class="bkrow" data-id="${esc(e.id)}"><span class="bkm"><b>${esc(e.home)} – ${esc(e.away)}</b><small class="muted">${esc(lgName(e.lg))} · ${when(e)}</small></span>
       <span class="bkp"><span class="bkmk">${lab(c)}</span><b class="${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} ${th1(c.L)}</b></span>
-      <span class="bkn"><b class="num">${pc(c.p)}</b><small class="num">@${f2(c.odd)}</small><em class="num">+${Math.round(c.ev * 100)}%</em></span></button>`).join("")}</div>${L.length > 15 ? `<p class="small muted" style="margin:0">Le prime 15 su ${L.length}, per valore.</p>` : ""}` : `<p class="apnone">${todo.length ? "Calcolo in corso…" : "NESSUNA LINEA CON VALORE"}</p>`}`;
+      <span class="bkn"><b class="num">${pc(c.p)}</b><small class="num">@${f2(c.odd)}</small><em class="num">+${Math.round(c.ev * 100)}%</em></span></button>`).join("")}</div>${todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : ""}` : `<p class="apnone">${todo.length ? "Calcolo in corso…" : "NESSUNA LINEA CON VALORE"}</p>`}`;
   box.insertAdjacentHTML("beforeend", RG_LINE);
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
+  box.querySelectorAll("[data-bks]").forEach(b => b.addEventListener("click", () => { SEL.bkSort = b.dataset.bks; lsSet("statPreviste.bkSort", SEL.bkSort); renderSelBk(selEntries(), cfg, when); }));
   if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelBk(selEntries(), cfg, when); }, 30);
 }
 /* Radar a due schede: Grado · Mercato (11/10/2026: tolta "Segnali A+", gli A+ sono già nel Grado) */
@@ -5183,7 +5203,7 @@ function renderSel() {
   for (const e of ents) { const L = confEntry(e, cfg, true); if (L === undefined) todo.push(e); else got.push([e, L]); }
   const pass = r => SEL.f === "all" ? true : SEL.f === "aplus" ? r.cls === "A+" : SEL.f === "a" ? r.cls === "A" : SEL.f === "b" ? r.cls === "B" : SEL.f === "c" ? r.cls === "C" : SEL.f === "hp" ? r.q >= 0.7 : SEL.f === "c3" ? r.agreeN === C3_MODES.length : true;
   // A+ raggruppati per partita: le previsioni della stessa partita sono legate tra loro (es. tiri e tiri in porta), non sono occasioni indipendenti
-  const apm = got.map(([e, L]) => [e, L.filter(r => r.status === "aplus").map(r => ({ ...r, h: e.home, a: e.away, qt: oddsFor(e, r) })).sort((a, b) => b.q - a.q)]).filter(([, L]) => L.length)
+  const apm = got.map(([e, L]) => [e, L.filter(r => r.status === "aplus").map(r => ({ ...r, h: e.home, a: e.away, qt: quotaFor(e, r.mk, r.side) })).sort((a, b) => b.q - a.q)]).filter(([, L]) => L.length)
     .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
   try { renderSelBk(ents, cfg, when); } catch (x) { console.warn(x); }
@@ -5194,12 +5214,12 @@ function renderSel() {
       ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(plainLab(r))}</span><small class="muted">${esc(confLab(r))}</small>
         <span class="gline"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gword sm">${GRADE_WORD[r.cls]}</span>${gradeDots(gradeRate(r), r.cls)}</span>
         <span class="gsay sm">Previsioni come questa sono uscite <b>${Math.round(gradeRate(r) * 100)} volte su 100</b>.</span>
-        ${r.qt ? `<span class="small muted">${oddsTxt(r.qt)}</span>` : ""}</span>`).join("")}
+        ${r.qt ? `<span class="small muted">${oddsTxt({ o: r.qt })}</span>` : ""}</span>`).join("")}
       </button>`).join("")}</div>` : `<p class="apnone">NESSUN SEGNALE A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
   list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">${SEL.days.size ? `Nessuna partita ${selDaysTxt().toLowerCase()} ancora da giocare.` : "Scegli Oggi, Domani o entrambi."}</p>` :
     (rows.length ? rows.map(([e, L]) => `<button type="button" class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
-      ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}</span><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100</span></span>`).join("")}</button>`).join("")
+      ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}</span>${qSm(quotaFor(e, r.mk, r.side)) || "<small></small>"}<span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
   SEL.aN = todo.length ? null : apm.reduce((a, [, L]) => a + L.length, 0); SEL.cN = ents.length; radarTabs();
@@ -5392,7 +5412,7 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   if (!$("#viewSig").hidden) renderSignals();
   // movimento delle quote 1xBet: dopo l'avvio, senza rallentarlo
   if (online) getData("fuorigioco.json").then(j => { if (j && j.campionati) { OFFS = j; clearCache(); if (!$("#viewMatch").hidden && HEROCTX) { const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); } } }).catch(() => {});
-  if (online) getData("quote_mov.json").then(j => { QMOV = j || { partite: {} }; if (!$("#viewMatch").hidden) { renderQuote(); if (MV.hero === "bk" && HEROCTX) { const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); } } }).catch(() => { QMOV = { partite: {} }; });
+  if (online) getData("quote_mov.json").then(j => { QMOV = j || { partite: {} }; if (!$("#viewSel").hidden) renderSel(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewMatch").hidden) { renderQuote(); if (MV.hero === "bk" && HEROCTX) { const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); } } }).catch(() => { QMOV = { partite: {} }; });
   // Champions League: previsioni pronte (dopo l'avvio); link #u=… alla partita
   if (online) for (const C of CUPS) getData(C.file).then(j => { if (!j) return; CUPD[C.code] = j; if (typeof clearCache === "function") clearCache(); GEN_NEXT.clear();
     if (!$("#viewSig").hidden) renderSignals();
