@@ -1,0 +1,44 @@
+name: Quota 2 e Quota 3 (studio walk-forward, solo numeri aggregati)
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "13 6 * * 1"   # ogni lunedì: lo studio si rifà con l'archivio quote cresciuto
+  push:
+    branches: [main]
+    paths: [tools/quota23.js, tools/quota23.py, tools/esiti_extra.py]
+permissions:
+  contents: read
+jobs:
+  quota23:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivi dal magazzino privato
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Dati pubblicati (bundle ed extra)
+        run: |
+          mkdir -p pub && git fetch -q --depth 1 origin pages
+          for f in bundle extra tiri_area fuorigioco tempi; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+          git show FETCH_HEAD:data/bundle_storico.json > pub/bundle_storico.json 2>/dev/null || rm -f pub/bundle_storico.json
+      - name: Statistiche per tempo (ramo tempi)
+        run: |
+          mkdir -p tempi && git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: Esiti reali in più (gialli per squadra)
+        run: python3 tools/esiti_extra.py
+        continue-on-error: true
+      - name: Candidati (probabilità di Prevista con i soli dati precedenti e quote 1xBet)
+        run: node tools/quota23.js .
+      - name: Studio con la quota ultima prima del fischio
+        run: Q23_SCEN=q1 python3 tools/quota23.py
+        continue-on-error: true
+      - name: Studio con la quota prima vista
+        run: Q23_SCEN=q0 python3 tools/quota23.py
+        continue-on-error: true
