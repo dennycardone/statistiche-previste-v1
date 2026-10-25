@@ -33,7 +33,7 @@ jobs:
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
       - name: Valori dei giocatori per i falli con la formazione ufficiale (fase 1-B)
-        run: python tools/valori_giocatori.py formazioni
+        run: pip install -q numpy && python tools/valori_giocatori.py formazioni
         continue-on-error: true
       - name: Salva sul ramo formazioni
         if: always()
