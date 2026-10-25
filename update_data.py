@@ -1310,7 +1310,7 @@ if ODDS_FULL or ODDS_NEAR:
         # 2. Bundesliga dal 23/10) entra in pochi giorni, uno che toglie esce. "Giocabile" = almeno 5 delle ultime 10 (minimo 4 partite).
         # Radar, Segnali e pallini della home mostrano gli 1X2 di nicchia solo dove sono giocabili; la scheda partita li mostra sempre.
         try:
-            _MK = {"c": "x.c1x2", "s": "x.s1x2", "st": "x.st1x2", "f": "x.f1x2", "y": "x.y1x2", "c1": "x.h1.corners_1x2_1st_half", "y1": "x.h1.yellow_cards_1x2_1st_half"}
+            _MK = {"c": "x.c1x2", "s": "x.s1x2", "st": "x.st1x2", "f": "x.f1x2", "y": "x.y1x2", "c1": "x.h1.corners_1x2_1st_half", "y1": "x.h1.yellow_cards_1x2_1st_half", "o": "x.off.offsides_1x2"}
             _t0 = rome_now.strftime("%Y-%m-%d"); _byl = collections.defaultdict(list)
             for kk, x in OH.items():
                 lg_, d_ = kk.split("|")[:2]
