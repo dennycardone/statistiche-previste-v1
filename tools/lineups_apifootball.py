@@ -34,7 +34,9 @@ print("richieste oggi", rq, "disponibili per lo scarico", budget)
 # elenco partite per campionato e stagione
 todo_sets = {}
 for fn in glob.glob("storico/*.json"):
-    D = json.load(open(fn)); todo_sets[(D["lega"], D["stagione"])] = [str(i) for i in D.get("ids", [])]
+    D = json.load(open(fn))
+    if not isinstance(D, dict) or "lega" not in D: continue   # es. referees.json (arbitri), aggiunto al ramo storico dopo il 5/10
+    todo_sets[(D["lega"], D["stagione"])] = [str(i) for i in D.get("ids", [])]
 try:
     AP = json.load(open("data/apif.json"))["partite"]
     cur = {}
