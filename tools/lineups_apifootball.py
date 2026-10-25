@@ -6,7 +6,10 @@ dopo la riserva dell'app (af_budget).
 25/10/2026 (Prevista 2.0, fase 1): per ogni giocatore anche fuorigioco, contrasti, intercetti, tiri respinti, duelli (totali e vinti),
 dribbling (tentati e riusciti), passaggi (totali e chiave), voto, ruolo e se è entrato dalla panchina (colonne 12-24). Le partite già
 scaricate col formato vecchio si riscaricano (elenco "v2")."""
-import json, os, time, urllib.request, urllib.parse, glob
+import json, os, time, urllib.request, urllib.parse, glob, sys, traceback
+def _hook(t, v, tb):   # 25/10/2026: l'errore compare tra le annotazioni del giro (i log di Actions non sono leggibili da qui)
+    print("::error title=Formazioni::" + " | ".join(traceback.format_exception(t, v, tb)).replace("\n", " ")[-1500:]); sys.__excepthook__(t, v, tb)
+sys.excepthook = _hook
 KEY = os.environ["APIFOOTBALL_KEY"].strip()
 AFL = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "EC": 43, "SP1": 140, "SP2": 141, "F1": 61, "F2": 62, "D1": 78, "D2": 79,
        "N1": 88, "P1": 94, "SC0": 179, "SC1": 180, "SC2": 183, "SC3": 184, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71,
@@ -81,7 +84,7 @@ for lg, s in order:
                               num((st.get("passes") or {}).get("key")), g.get("rating"), 1 if g.get("substitute") else 0, g.get("number")])
             D["partite"][str(f["fixture"]["id"])] = [f["fixture"]["date"][:16], hid, aid, f["teams"]["home"]["name"], f["teams"]["away"]["name"],
                                                      f["goals"]["home"], f["goals"]["away"], xi.get(hid, []), xi.get(aid, []), P]
-            if f.get("players"): v2.add(str(f["fixture"]["id"]))
+            v2.add(str(f["fixture"]["id"]))   # scaricata col formato nuovo (anche se API-Football non ha i giocatori)
         D["v2"] = sorted(v2)
     json.dump(D, open(fn, "w"), ensure_ascii=False, separators=(",", ":"))
     print(lg, s, len(D["partite"]), "/", len(D["ids"]), "infortuni", len(D["infortuni"] or []), "budget", budget)
