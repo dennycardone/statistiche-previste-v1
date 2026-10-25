@@ -826,6 +826,53 @@ try:
         # già abbinate (es. esordienti in Champions: Sabah, Viking, Como…) restava senza nome → partita fuori dal calendario e senza quote
         if lg in API_ONLY:
             for v in L: MAPS[lg].setdefault(v[2], v[2]); MAPS[lg].setdefault(v[3], v[3])
+    # 25/10/2026 · Prevista 2.0, fase 1-B: formazioni ufficiali → correzione dei falli attesi. Test walk-forward (tools/p2/test1a.py,
+    # 44.000 partite dal 2023): 1X2 falli −0,0053 di log-loss nella verifica (lug 2024 – giu 2025) e −0,0057 nell'holdout (da lug 2025),
+    # migliori in 35/42 e 39/44 campionati. Per ogni squadra: falli attesi × e^(0,368·falli fatti dei suoi titolari + 0,377·falli subiti
+    # dei titolari avversari − 0,030·cartellini dei suoi titolari), ognuno come log(somma dei valori dei titolari di oggi / somma abituale
+    # della squadra). Valori dei giocatori: ramo valori (tools/valori_giocatori.py, ogni sera). Formazioni: fixtures/lineups di API-Football
+    # per le partite che iniziano entro 80 minuti (una richiesta a partita, ritentata al giro dopo se non sono ancora uscite).
+    try:
+        import math as _m
+        _VP = os.path.join(os.path.dirname(OUT), "valori", "valori.json"); _XP = os.path.join(OUT, "xi.json")
+        XI = json.load(open(_XP)) if os.path.exists(_XP) else {}
+        FORMZ, W_XI, _nxi = {}, (0.368, 0.377, -0.030), 0
+        _nowu = datetime.datetime.now(datetime.timezone.utc)
+        if os.path.exists(_VP):
+            _V = json.load(open(_VP)); _GP, _GS, _GR = _V["giocatori"], _V["squadre"], _V["ruoli"]
+            for fid, v in AP["partite"].items():
+                if v[1] not in AF_LEAGUES_X: continue
+                ko = datetime.datetime.fromisoformat(v[0] + ":00+00:00"); mins = (ko - _nowu).total_seconds() / 60
+                if fid not in XI and v[9] == "NS" and -10 < mins <= 80 and _key and _nxi < 80:
+                    try:
+                        R = _af("fixtures/lineups", fixture=fid).get("response") or []; _nxi += 1
+                        T = {}
+                        for t in R:
+                            xi_ = [[p["player"]["id"], p["player"].get("name") or "", p["player"].get("number"), p["player"].get("pos") or ""] for p in t.get("startXI") or [] if p.get("player")]
+                            T[t["team"]["name"]] = (t["team"]["id"], xi_)
+                        if len(T) == 2:
+                            nm = list(T); hk = v[2] if v[2] in T else nm[0]; ak = v[3] if v[3] in T else [x for x in nm if x != hk][0]
+                            if len(T[hk][1]) >= 10 and len(T[ak][1]) >= 10:
+                                XI[fid] = {"t": _nowu.strftime("%Y-%m-%d %H:%M"), "hid": T[hk][0], "aid": T[ak][0], "h": T[hk][1], "a": T[ak][1]}
+                    except Exception as e_: print("formazioni", fid, e_)
+                x = XI.get(fid)
+                if not x or mins < -180: continue
+                h, a = MAPS.get(v[1], {}).get(v[2]), MAPS.get(v[1], {}).get(v[3])
+                th, ta = _GS.get(str(x["hid"])), _GS.get(str(x["aid"]))
+                if not h or not a or not th or not ta: continue
+                rate = lambda p: (_GP.get(str(p[0])) or _GR.get((p[3] or "M")[:1], _GR["M"]))[:3]
+                sh = [sum(rate(p)[i] for p in x["h"]) for i in range(3)]; sa = [sum(rate(p)[i] for p in x["a"]) for i in range(3)]
+                lg_ = lambda s_, t_, i: _m.log(max(s_[i], 1e-6) / t_[i]) if t_[i] > 0 else 0.0
+                fh = _m.exp(max(-3, min(3, W_XI[0] * lg_(sh, th, 0) + W_XI[1] * lg_(sa, ta, 1) + W_XI[2] * lg_(sh, th, 2))))
+                fa = _m.exp(max(-3, min(3, W_XI[0] * lg_(sa, ta, 0) + W_XI[1] * lg_(sh, th, 1) + W_XI[2] * lg_(sa, ta, 2))))
+                d_ = ko.astimezone(ROME).date().isoformat()
+                FORMZ[f"{v[1]}|{d_}|{h}|{a}"] = {"fh": round(fh, 4), "fa": round(fa, 4), "ora": x["t"],
+                                                 "xi": {"h": [[p[1], p[2], p[3]] for p in x["h"]], "a": [[p[1], p[2], p[3]] for p in x["a"]]}}
+            for k_ in [k_ for k_, x in XI.items() if (_nowu - datetime.datetime.strptime(x["t"], "%Y-%m-%d %H:%M").replace(tzinfo=datetime.timezone.utc)).days > 3]: del XI[k_]
+        jdump(XI, _XP)
+        jdump({"pesi": W_XI, "partite": FORMZ}, os.path.join(OUT, "formazioni.json"))
+        print("::notice title=Formazioni ufficiali::" + f"{len(FORMZ)} partite con la correzione dei falli, {_nxi} richieste" + ("" if os.path.exists(_VP) else " (valori dei giocatori non disponibili)"))
+    except Exception as e_: print("::warning title=Formazioni ufficiali::" + str(e_))
     # 18/10/2026: fuorigioco per squadra (data/fuorigioco.json, per il modello fuorigioco dell'app). Fonti: ramo statextra (storico dal 2022,
     # recuperato da tools/extra_stats_apifootball.py) e archivio giornaliero (indice 13). API-Football registra lo 0-0 di fuorigioco come null per
     # entrambe le squadre: un doppio null diventa 0-0 SOLO se (a) nella partita ci sono tiri in area o possesso, (b) nelle ultime 20 partite del

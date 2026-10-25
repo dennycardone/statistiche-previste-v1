@@ -32,6 +32,9 @@ jobs:
       - run: python tools/lineups_apifootball.py
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Valori dei giocatori per i falli con la formazione ufficiale (fase 1-B)
+        run: python tools/valori_giocatori.py formazioni
+        continue-on-error: true
       - name: Salva sul ramo formazioni
         if: always()
         env:
@@ -43,3 +46,13 @@ jobs:
           git init -q -b formazioni && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
           git add -A && git commit -q -m "Formazioni $(date -u '+%F %H:%M')"
           git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" formazioni
+      - name: Valori dei giocatori sul ramo valori (piccolo, lo legge ogni aggiornamento)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -s formazioni/valori.json ] || { echo "::warning title=Valori giocatori::valori.json non calcolato"; exit 0; }
+          rm -rf _v && mkdir _v && cp formazioni/valori.json _v/ && cd _v
+          git init -q -b valori && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Valori giocatori $(date -u '+%F %H:%M')"
+          for t in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" valori && break; sleep 20; done

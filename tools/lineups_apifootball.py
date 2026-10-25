@@ -41,11 +41,14 @@ try:
     AP = json.load(open("data/apif.json"))["partite"]
     cur = {}
     for fid, v in AP.items():
-        if v[9] in ("FT", "AET", "PEN") and v[0] >= "2026-01-01": cur.setdefault(v[1], []).append(fid)
+        try:
+            if len(v) > 9 and v[9] in ("FT", "AET", "PEN") and v[0] >= "2026-01-01": cur.setdefault(v[1], []).append(fid)
+        except Exception: pass
     for lg, ids in cur.items():
         known = {i for (l, s), L in todo_sets.items() if l == lg for i in L}
         todo_sets[(lg, 2026)] = [i for i in ids if i not in known]
-except Exception as e: print("apif.json non disponibile", e)
+    print("::notice title=Formazioni::stagione in corso da apif.json: " + str(sum(len(v) for v in todo_sets.values() if v)) + " partite in elenco, nuove " + str(sum(len(todo_sets.get((lg, 2026), [])) for lg in cur)))
+except Exception as e: print("::warning title=Formazioni::apif.json non disponibile: " + str(e))
 def num(x):
     try: return int(x) if x is not None else 0
     except Exception: return 0
