@@ -838,51 +838,52 @@ try:
     # della squadra). Valori dei giocatori: ramo valori (tools/valori_giocatori.py, ogni sera). Formazioni: fixtures/lineups di API-Football
     # per le partite che iniziano entro 80 minuti (una richiesta a partita, ritentata al giro dopo se non sono ancora uscite).
     try:
-        import math as _m
+        import xi_corr
         _VP = os.path.join(os.path.dirname(OUT), "valori", "valori.json"); _XP = os.path.join(OUT, "xi.json")
         XI = json.load(open(_XP)) if os.path.exists(_XP) else {}
-        FORMZ, W_XI, _nxi, _DX = {}, (0.368, 0.377, -0.030), 0, []   # _DX: esito di ogni tentativo (diagnosi nell'avviso)
+        # 26/10/2026: formazioni prese dal micro-processo (formazioni_live.yml, ogni 10 minuti, ramo xi): si uniscono a quelle di questo giro
+        _XL = os.path.join(os.path.dirname(OUT), "xi_live", "xi.json")
+        if os.path.exists(_XL):
+            try:
+                for fid, x in json.load(open(_XL)).get("xi", {}).items(): XI.setdefault(fid, {k: x[k] for k in ("t", "hid", "aid", "h", "a")})
+            except Exception as e_: print("::warning title=Formazioni ufficiali::ramo xi non letto: " + str(e_)[:120])
+        FORMZ, W_XI, _nxi, _DX, _KO, _NEXT = {}, xi_corr.W_XI, 0, [], {}, []   # _DX: esito di ogni tentativo (diagnosi nell'avviso)
         _nowu = datetime.datetime.now(datetime.timezone.utc)
         if os.path.exists(_VP):
-            _V = json.load(open(_VP)); _GP, _GS, _GR = _V["giocatori"], _V["squadre"], _V["ruoli"]
+            _V = json.load(open(_VP))
             for fid, v in AP["partite"].items():
                 if v[1] not in AF_LEAGUES_X: continue
                 ko = datetime.datetime.fromisoformat(v[0] + ":00+00:00"); mins = (ko - _nowu).total_seconds() / 60
-                if fid not in XI and v[9] == "NS" and -10 < mins <= 80 and _key and _nxi < 80:
+                h, a = MAPS.get(v[1], {}).get(v[2]), MAPS.get(v[1], {}).get(v[3])
+                d_ = ko.astimezone(ROME).date().isoformat()
+                # elenco per il micro-processo: partite non iniziate delle prossime 36 ore con i nostri nomi (id API-Football, nessuna quota)
+                if v[9] == "NS" and -10 < mins <= 36 * 60 and h and a:
+                    _NEXT.append({"fid": fid, "lg": v[1], "ko": ko.strftime("%Y-%m-%dT%H:%M"), "d": d_, "h": h, "a": a, "ha": v[2], "aa": v[3]})
+                # riserva: il micro-processo di solito le prende prima; qui solo da 50 minuti prima del fischio
+                if fid not in XI and v[9] == "NS" and -10 < mins <= 50 and _key and _nxi < 80:
                     try:
                         R = _af("fixtures/lineups", fixture=fid).get("response") or []; _nxi += 1
-                        T = {}
-                        for t in R:
-                            xi_ = [[p["player"]["id"], p["player"].get("name") or "", p["player"].get("number"), p["player"].get("pos") or ""] for p in t.get("startXI") or [] if p.get("player")]
-                            T[t["team"]["name"]] = (t["team"]["id"], xi_)
-                        if len(T) == 2:
-                            nm = list(T); hk = v[2] if v[2] in T else nm[0]; ak = v[3] if v[3] in T else [x for x in nm if x != hk][0]
-                            if len(T[hk][1]) >= 10 and len(T[ak][1]) >= 10:
-                                XI[fid] = {"t": _nowu.strftime("%Y-%m-%d %H:%M"), "hid": T[hk][0], "aid": T[ak][0], "h": T[hk][1], "a": T[ak][1]}
-                                _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): presa")
-                            else: _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): titolari {len(T[hk][1])}/{len(T[ak][1])}")
-                        else: _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): " + ("non ancora uscita" if not T else f"{len(T)} squadre nella risposta"))
+                        got, why = xi_corr.parse_lineups(R, v[2], v[3])
+                        if got:
+                            XI[fid] = {"t": _nowu.strftime("%Y-%m-%d %H:%M"), "hid": got[0], "aid": got[1], "h": got[2], "a": got[3]}
+                            _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): presa")
+                        else: _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): {why}")
                     except Exception as e_: _DX.append(f"{v[2]}–{v[3]}: errore {str(e_)[:80]}")
                 x = XI.get(fid)
                 if not x or mins < -180: continue
-                h, a = MAPS.get(v[1], {}).get(v[2]), MAPS.get(v[1], {}).get(v[3])
-                th, ta = _GS.get(str(x["hid"])), _GS.get(str(x["aid"]))
-                if not h or not a or not th or not ta:
-                    _DX.append(f"{v[2]}–{v[3]}: " + ("nomi non abbinati ai nostri" if not h or not a else "squadra senza valori dei giocatori")); continue
-                rate = lambda p: (_GP.get(str(p[0])) or _GR.get((p[3] or "M")[:1], _GR["M"]))[:3]
-                sh = [sum(rate(p)[i] for p in x["h"]) for i in range(3)]; sa = [sum(rate(p)[i] for p in x["a"]) for i in range(3)]
-                lg_ = lambda s_, t_, i: _m.log(max(s_[i], 1e-6) / t_[i]) if t_[i] > 0 else 0.0
-                fh = _m.exp(max(-3, min(3, W_XI[0] * lg_(sh, th, 0) + W_XI[1] * lg_(sa, ta, 1) + W_XI[2] * lg_(sh, th, 2))))
-                fa = _m.exp(max(-3, min(3, W_XI[0] * lg_(sa, ta, 0) + W_XI[1] * lg_(sh, th, 1) + W_XI[2] * lg_(sa, ta, 2))))
-                d_ = ko.astimezone(ROME).date().isoformat()
-                FORMZ[f"{v[1]}|{d_}|{h}|{a}"] = {"fh": round(fh, 4), "fa": round(fa, 4), "ora": x["t"],
-                                                 "xi": {"h": [[p[1], p[2], p[3]] for p in x["h"]], "a": [[p[1], p[2], p[3]] for p in x["a"]]}}
+                if not h or not a: _DX.append(f"{v[2]}–{v[3]}: nomi non abbinati ai nostri"); continue
+                c_, why = xi_corr.corr(x, _V)
+                if not c_: _DX.append(f"{v[2]}–{v[3]}: {why}"); continue
+                k_ = f"{v[1]}|{d_}|{h}|{a}"; _KO[k_] = ko.strftime("%Y-%m-%d %H:%M")
+                FORMZ[k_] = {"fh": c_[0], "fa": c_[1], "ora": x["t"], "xi": xi_corr.entry(x)}
             for k_ in [k_ for k_, x in XI.items() if (_nowu - datetime.datetime.strptime(x["t"], "%Y-%m-%d %H:%M").replace(tzinfo=datetime.timezone.utc)).days > 3]: del XI[k_]
+        jdump(sorted(_NEXT, key=lambda r: r["ko"]), os.path.join(OUT, "prossime.json"))
         jdump(XI, _XP)
         jdump({"pesi": W_XI, "partite": FORMZ}, os.path.join(OUT, "formazioni.json"))
         # archivio privato delle correzioni (mai pubblicato, mai sfoltito): serve allo studio Quota 2 / Quota 3 "statistiche + formazioni"
         _HP = os.path.join(OUT, "formazioni_hist.json"); _FH = json.load(open(_HP)) if os.path.exists(_HP) else {}
-        for k_, x in FORMZ.items(): _FH[k_] = {"fh": x["fh"], "fa": x["fa"], "ora": x["ora"]}
+        for k_, x in FORMZ.items():   # solo formazioni prese prima del fischio (dati noti prima della partita)
+            if x["ora"] < _KO.get(k_, ""): _FH[k_] = {"fh": x["fh"], "fa": x["fa"], "ora": x["ora"]}
         jdump(_FH, _HP)
         print("::notice title=Formazioni ufficiali::" + f"{len(FORMZ)} partite con la correzione dei falli, {_nxi} richieste" + ("" if os.path.exists(_VP) else " (valori dei giocatori non disponibili)")
               + (" · " + " · ".join(_DX[:12]) if _DX else ""))
