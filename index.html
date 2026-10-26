@@ -546,7 +546,7 @@ select{pointer-events:none}
 .mhead .vtag{font-family:var(--display);font-stretch:75%;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:1px 6px}
 .mhead .bk-none,.mhead .bk-note{margin:0;padding:12px 14px;font-size:12px;line-height:1.45;color:var(--ink-3);text-align:center}.mhead .bk-none{font-size:14px;color:var(--ink-2);padding:22px 16px}.mhead .bk-note b{color:var(--gold)}
 #selBk .vtag{font-family:var(--display);font-stretch:75%;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:2px 7px;white-space:nowrap}
-.xibox{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface-2)}.xicols{display:grid;grid-template-columns:1fr 1fr;gap:8px}.xicols ul{list-style:none;margin:2px 0 0;padding:0;font-size:12.5px}.xitag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 5px;border-radius:5px;background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--ink);margin-left:6px;vertical-align:middle}.bklist{display:flex;flex-direction:column;gap:6px}.bksort{align-items:center;gap:6px}.qsm{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bklist{display:flex;flex-direction:column;gap:6px}.bksort{align-items:center;gap:6px}.qsm{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .bkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"m m" "p n";align-items:center;gap:6px 10px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;cursor:pointer}
 .bkrow:hover{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
 .bkm{grid-area:m}.bkp{grid-area:p}.bkn{grid-area:n;flex-direction:row!important;align-items:baseline!important;gap:8px}.bkm,.bkp,.bkn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.bkm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkm small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1019,7 +1019,6 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </div>
     <div class="mpane" data-mp="prev">
       <section class="mhead" id="mhead" aria-label="Lettura della partita"></section>
-      <section class="card" id="mxi" aria-label="Formazioni ufficiali" hidden></section>
       <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
       <section class="card" id="mcmp" aria-label="Confronto con la partita giocata" hidden></section>
       <main id="out" class="wrap" style="padding:0;margin:0;width:100%"></main>
@@ -1102,7 +1101,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <p><b>Probabilità.</b> Il totale segue una Binomiale Negativa (gol: Poisson), con la variabilità misurata sugli errori reali: ogni partita già giocata viene prevista senza usarla e confrontata con il risultato vero. <b>1X2 delle statistiche</b> (chi ne fa di più): ogni squadra ha la sua Binomiale Negativa; per corner e tiri si tiene conto che i numeri delle due squadre sono correlati negativamente (copula gaussiana, −0,20 corner, −0,24 tiri: i corner e i tiri di una squadra tolgono spazio a quelli dell'altra, quindi il pari è un po' meno probabile che con squadre indipendenti). Tiri in porta, falli, cartellini e fuorigioco: squadre indipendenti, perché nel test la correlazione non migliorava le previsioni.</p>
       <p><b>Media dinamica.</b> Previsto casa = normale in casa del campionato × attacco della squadra di casa × difesa dell'ospite (e viceversa). Attacco e difesa sono voti (1,00 = normale) calcolati su tutte le partite, casa e trasferta, tenendo conto degli avversari. Ogni voto parte da 1,00 e si sposta verso i dati della squadra con peso partite ÷ (partite + P). P la sceglie l'app da sola per ogni statistica: prova 2, 3, 5, 8, 12 e 20 prevedendo ogni partita giocata solo con i giorni precedenti, e usa quella con l'errore più basso (tra le partite giocate prima della data della previsione, così le previsioni passate non cambiano). Falli: difesa = falli subiti.</p>
       <p><b>Media dinamica – corner.</b> Anche per i corner la Media dinamica usa un modello verificato: regressione di Poisson con corner medi del campionato per sede (365 giorni), fattore campo, un rating attacco × difesa dei corner sugli ultimi 4 anni (una partita di 2 anni fa pesa il 37%, prudenza P = 20), differenza di Elo calcolato dall'app e corner delle ultime 5 partite (fatti dalla squadra, concessi dall'avversario). Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in ogni stagione. Il totale segue una Binomiale Negativa con r = 60 (i corner di casa e ospite sono correlati negativamente, quindi il totale varia meno della somma); per il 1X2 corner ogni squadra ha la sua Binomiale Negativa con r = 12. Dal 15/10/2026 i corner attesi di ogni squadra tengono conto anche dei tiri non in porta (tiri − tiri in porta: respinti e fuori) fatti dalla squadra e concessi dall'avversario negli ultimi 365 giorni, e il 1X2 corner e il 1X2 tiri usano la correlazione negativa tra casa e ospite (copula gaussiana, −0,20 corner, −0,24 tiri): nel test walk-forward su circa 16.000 partite (luglio 2025 – ottobre 2026, parametri stimati sulle partite precedenti) le previsioni sono migliorate in ogni stagione.</p>
-      <p><b>Media dinamica – falli.</b> Anche per i falli la Media dinamica usa un modello verificato: due regressioni di Poisson, una per la squadra di casa e una per l'ospite, con falli medi del campionato per sede (365 giorni), un rating falli commessi × subiti sugli ultimi 2 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4), falli delle ultime 5 partite (commessi dalla squadra, subiti dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 (chi va spesso in vantaggio fa meno falli) e tiri delle ultime 15. Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in 67 stagioni su 73 (nelle altre 6 peggiore di pochi centesimi). Il totale segue una Binomiale Negativa con r = 150, ogni squadra con r = 200 (i falli sono quasi Poisson). Sopra il modello si applica il <b>fattore arbitro</b>: falli reali ÷ previsti nelle sue partite precedenti (dati API-Football), ristretto verso 1 quando ha poche partite e con un tetto di +4% (nel test del 7/10/2026 gli arbitri "severi" non portavano davvero tanti falli in più quanti ne indicava il loro storico; il tetto è stato scelto sulle partite fino al 30/6/2026 e verificato su quelle dopo). Nel test su 12.584 partite migliora la precisione sugli Over falli dell'1,3% circa e l'errore medio dell'1,1%. Nella scheda Disciplina si vede quanto pesa, partita per partita. <b>Formazioni ufficiali</b> (dal 25/10/2026): circa un'ora prima della partita, quando escono gli undici titolari, i falli attesi di ogni squadra si correggono con i giocatori in campo: falli fatti dai suoi titolari e falli subiti dai titolari avversari, ognuno rispetto ai titolari abituali della squadra (valori dei giocatori ogni 90 minuti dalle sole partite precedenti, API-Football dal 2022). Nel test walk-forward su 44.000 partite dal 2023 il 1X2 falli è migliorato sia da luglio 2024 a giugno 2025 sia da luglio 2025 (log-loss −0,0053 e −0,0057, in 35 campionati su 42 e 39 su 44); con la formazione probabile, invece, nessun miglioramento. Le partite corrette hanno l'etichetta XI.</p>
+      <p><b>Media dinamica – falli.</b> Anche per i falli la Media dinamica usa un modello verificato: due regressioni di Poisson, una per la squadra di casa e una per l'ospite, con falli medi del campionato per sede (365 giorni), un rating falli commessi × subiti sugli ultimi 2 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4), falli delle ultime 5 partite (commessi dalla squadra, subiti dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 (chi va spesso in vantaggio fa meno falli) e tiri delle ultime 15. Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in 67 stagioni su 73 (nelle altre 6 peggiore di pochi centesimi). Il totale segue una Binomiale Negativa con r = 150, ogni squadra con r = 200 (i falli sono quasi Poisson). Sopra il modello si applica il <b>fattore arbitro</b>: falli reali ÷ previsti nelle sue partite precedenti (dati API-Football), ristretto verso 1 quando ha poche partite e con un tetto di +4% (nel test del 7/10/2026 gli arbitri "severi" non portavano davvero tanti falli in più quanti ne indicava il loro storico; il tetto è stato scelto sulle partite fino al 30/6/2026 e verificato su quelle dopo). Nel test su 12.584 partite migliora la precisione sugli Over falli dell'1,3% circa e l'errore medio dell'1,1%. Nella scheda Disciplina si vede quanto pesa, partita per partita.</p>
       <p><b>Media dinamica – cartellini.</b> Modello cartellini v2 (gialli + rossi), scelto con un test walk-forward su 47.955 partite API-Football 2022-2026: regressione con media del campionato, cartellini presi e provocati dalle due squadre (media mobile), <b>arbitro</b> (cartellini reali ÷ attesi in tutte le sue partite precedenti e nelle ultime 10, ristretto verso 1), falli fatti e subiti in stagione, scontri diretti degli ultimi 3 anni, avvio di stagione e, dal 24/10/2026, <b>derby</b> (stracittadine e rivalità storiche note, circa 250 coppie in 29 campionati: circa +20% di cartellini; nel test walk-forward su circa 60.000 partite i derby erano sottostimati di circa un cartellino, con il derby le previsioni sono migliorate sia nel 2024-25 sia da luglio 2025, mentre dare più peso agli scontri diretti le peggiorava). Pesi ristimati ogni mese con le sole partite precedenti. Il totale segue una Binomiale Negativa. Se l'arbitro non è ancora stato designato la previsione è senza il suo effetto, e la scheda lo dice. Dal 19/10/2026 la divisione dei cartellini tra le due squadre tiene conto del possesso palla atteso (media del possesso della squadra e di quello concesso dall'avversario, 365 giorni): chi tiene più palla ne prende meno, chi rincorre di più; il totale della partita, e quindi l'Over/Under, non cambia (test walk-forward su 47.336 partite 2022-2026: previsioni per squadra e 1X2 cartellini migliori sia nel 2024-25 sia da luglio 2025).</p>
       <p><b>Fuorigioco.</b> Fuorigioco attesi di ogni squadra = regressione di Poisson con fuorigioco medi del campionato per sede (365 giorni), rating dei fuorigioco commessi dalla squadra (365 giorni, prudenza P = 20) e rating dei fuorigioco provocati dalla difesa avversaria (90 giorni, prudenza P = 5); Binomiale Negativa per squadra (r = 10,68) e sul totale (r = 21,56), 1X2 a squadre indipendenti. Dati API-Football dalla stagione 2023-24: API-Football scrive lo 0-0 di fuorigioco come dato vuoto per entrambe le squadre; un doppio vuoto diventa 0-0 solo se la partita ha le altre statistiche avanzate e il campionato, nelle partite dei giorni precedenti, ha i fuorigioco con regolarità e quasi mai uno 0-0 scritto in chiaro (altrimenti resta un dato mancante). N/D nelle coppe e nei campionati dove nelle ultime 20 partite meno di 15 hanno i fuorigioco. Nel test walk-forward (luglio 2025 – ottobre 2026, 16.629 partite) prevede meglio delle medie delle squadre; Elo e tiri non aggiungono nulla. Il confronto con le quote 1xBet è mostrato senza bollino "valore" finché non è verificato. Dal 25/10/2026 il 1X2 fuorigioco è anche in Precedenti, Rendimento, Tendenze, Digiuni, Grado e Segnali, con le stesse regole degli altri mercati (solo nei campionati dove 1xBet lo quota): nel test walk-forward su 38.168 partite dal 2023-24 le probabilità del lato favorito escono come dichiarate (es. 65-70%: presi 69%; 70-75%: 76%); soglia dei Segnali 65% (da luglio 2025: presi 73% su 903 segnalazioni); Grado stimato sulle stagioni precedenti (A+ preso 90% su 31, A 91% su 82, B 78%, C 74%).</p>
       <p><b>Valori per tempo.</b> Sotto tiri, tiri in porta e corner la Lettura mostra i valori attesi del 1° e del 2° tempo: valore atteso della partita × quota del 1° tempo del campionato per sede, calcolata dai soli dati reali per tempo di API-Football (dalla stagione 2024-25, solo partite in cui i due tempi sommati coincidono con il totale; campionati con almeno 200 partite). Falli: API-Football non dà i dati per tempo.</p>
@@ -2612,31 +2611,7 @@ const CARD_LINES = [2.5, 3.5, 4.5, 5.5];   // cartellini: probabilità di Poisso
 function cardProbs(mu) {   // modello cartellini v2: Binomiale Negativa con alpha stimato sui dati (extra.json); senza alpha, Poisson
   const a = EXTRA && EXTRA.alpha, pmf = pmfTotal(mu, a > 2e-4 ? 1 / a : Infinity, 25); return CARD_LINES.map(t => pOver(pmf, t)); }
 const REF_F_CAP = 1.04;
-function xiBoxHTML(home, away, MFx) {
-  const F = MFx.xiF, pcs = v => `${v >= 1 ? "+" : "−"}${Math.round(Math.abs(v - 1) * 100)}%`, li = L => L.map(p => `<li><span class="num">${p[1] != null ? p[1] : ""}</span> ${esc(p[0])} <small class="muted">${esc(p[2] || "")}</small></li>`).join("");
-  return `<h2>Formazioni ufficiali <span class="xitag">XI</span></h2>
-    <p class="small" style="margin:0">Falli attesi con i titolari di oggi: ${esc(home)} <b class="num">${f1(MFx.preXi.lh)} → ${f1(MFx.lh)}</b> (${pcs(F.fh)}) · ${esc(away)} <b class="num">${f1(MFx.preXi.la)} → ${f1(MFx.la)}</b> (${pcs(F.fa)}). Già applicato a 1X2 falli, Segnali, Grado e Radar.</p>
-    <details><summary class="small">Gli undici titolari</summary><div class="xicols"><div><small>${esc(home)}</small><ul>${li(F.xi.h)}</ul></div><div><small>${esc(away)}</small><ul>${li(F.xi.a)}</ul></div></div></details>`;
-}
-/* 25/10/2026 · Prevista 2.0, fase 1-B: formazioni ufficiali (data/formazioni.json, circa un'ora prima della partita). Falli attesi di ogni
-   squadra × e^(0,368·falli fatti dei suoi titolari + 0,377·falli subiti dei titolari avversari − 0,030·cartellini dei suoi titolari), ognuno
-   come log(titolari di oggi / titolari abituali). Test walk-forward su 44.000 partite dal 2023 (tools/p2/test1a.py): 1X2 falli −0,0053 di
-   log-loss nella verifica e −0,0057 nell'holdout, migliori in 35/42 e 39/44 campionati; segnali al 70%: 1.521 invece di 1.244, presi
-   77,6% invece di 76,8% (holdout). Solo partite da giocare. */
-let FORMAZ = null;
-function formazFor(home, away) {
-  if (!FORMAZ || !FORMAZ.partite || S.cutoff) return null;
-  const t = goalDate(home, away); if (!t) return null;
-  return FORMAZ.partite[`${S.league}|${isoD(new Date(t))}|${home}|${away}`] || null;
-}
 function model(home, away, cfg, k = "c") {
-  const M = modelRef(home, away, cfg, k);
-  if (k !== "f" || !M || M.ucl) return M;
-  const F = formazFor(home, away); if (!F || !(F.fh > 0) || !(F.fa > 0)) return M;
-  const lh = M.lh * F.fh, la = M.la * F.fa;
-  return { ...M, lh, la, tot: lh + la, xiF: F, preXi: { lh: M.lh, la: M.la }, pmf: pmfTotal(lh + la, M.r, 90) };
-}
-function modelRef(home, away, cfg, k = "c") {
   const M = modelBase(home, away, cfg, k);
   if (k !== "f" || !M || M.ucl) return M;
   const x = extraFor(home, away), f0 = x && x[2];
@@ -3786,7 +3761,7 @@ async function tryHosted(ST0) {
     }).catch(() => null);
     const P = { bundle: getBundle("bundle.json"), storico: ST && ST.v && ST.v.bundle_storico ? getBundle("bundle_storico.json") : Promise.resolve(null),
                 crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
-                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json"), fz: get("formazioni.json") };
+                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json") };
     let man = null, texts = null;
     const [b, bs] = await Promise.all([P.bundle, P.storico]);
     if (ST && ST.v && ST.v.bundle_storico && !(bs && bs.files)) return false;   // stagioni chiuse non arrivate: meglio non mostrare dati a metà
@@ -3798,9 +3773,8 @@ async function tryHosted(ST0) {
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
-    const [cr, lo, od, li, ex, qu, pr, hf, qa, me, fz] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer, P.fz]);
+    const [cr, lo, od, li, ex, qu, pr, hf, qa, me] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer]);
     if (me && me.giocabili) MERCATI = me;
-    if (fz && fz.partite) { FORMAZ = fz; clearCache(); }
     if (qa && qa.campionati) { TAREA = qa; clearCache(); }
     if (hf && hf.campionati) HALF = hf;
     if (cr) CRESTS = cr.colors || {};
@@ -3871,7 +3845,7 @@ function sigCardsHTML(rows, pref, withMatch = true, played = null) {
       <button type="button" class="sigopen" data-lg="${r.lg.code}" data-h="${esc(r.f.home)}" data-a="${esc(r.f.away)}" data-d="${isoD(r.f.date)}"${withMatch ? "" : " disabled"}>
         ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}
         <span class="p num">${pc(r.p)}${played ? "" : qSm(sigQuota(r))}</span>
-        <span class="d"><span class="stag">${MK_TAG[r.mk]}</span>${r.mk === "f" && FORMAZ && FORMAZ.partite && FORMAZ.partite[`${r.lg.code}|${isoD(r.f.date)}|${r.f.home}|${r.f.away}`] ? `<span class="xitag" title="Falli corretti con le formazioni ufficiali">XI</span>` : ""}<b>${esc(r.fav)}</b> · ${detail}</span>
+        <span class="d"><span class="stag">${MK_TAG[r.mk]}</span><b>${esc(r.fav)}</b> · ${detail}</span>
         ${withMatch ? `<span class="w">${r.team ? `${r.team === r.f.home ? "In casa con" : "In trasferta con"} ${crest(r.lg.code, r.team === r.f.home ? r.f.away : r.f.home)}<b>${esc(r.team === r.f.home ? r.f.away : r.f.home)}</b> · ` : ""}${DAYS_SHORT[r.f.date.getUTCDay()]} ${dstr(r.f.date)}${r.f.time ? " " + esc(r.f.time) : ""} · ${esc(r.lg.name)}</span>` : ""}
       </button>
       ${played ? (() => { const o = sigOutcome(r, played); return o ? `<span class="esito ${o.ok ? "good" : "bad"}">${o.ok ? "✓ Preso" : "✗ Non preso"} · ${o.txt}</span>` : ""; })() : ""}
@@ -4473,9 +4447,7 @@ function renderMatchExtras(home, away) {
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}` : "Confronto libero";
   $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G); HEROCTX = { home, away, e, cfg, G };
   if (!isCup(S.league)) renderMatchConf(home, away, e, cfg);
-  $("#mref").hidden = true; REFCTX = { home, away, e };
-  { const bx = $("#mxi"); let MFx = null; try { MFx = !m && home && away && home !== away ? model(home, away, cfg, "f") : null; } catch (x) {}   // formazioni ufficiali (fase 1-B)
-    bx.hidden = !(MFx && MFx.xiF); bx.innerHTML = MFx && MFx.xiF ? xiBoxHTML(home, away, MFx) : ""; }   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
+  $("#mref").hidden = true; REFCTX = { home, away, e };   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
   // confronto previsione / partita giocata
   const cmp = $("#mcmp");
   if (m && G) {
@@ -5106,13 +5078,7 @@ function refSheetHTML() {
   const RS = ref ? refStats(ref, e && e.date) : null;
   const rsTxt = RS ? `<div class="kgrid"><span><small>Partite</small><b class="num">${RS.n}</b></span><span><small>Cartellini</small><b class="num">${f1(RS.c)}</b></span><span><small>Over 3,5</small><b class="num">${pc(RS.o35)}</b></span><span><small>Over 4,5</small><b class="num">${pc(RS.o45)}</b></span>${RS.f != null ? `<span><small>Falli</small><b class="num">${f1(RS.f)}</b></span>` : ""}</div>
     <p class="small muted" style="margin:0">Medie reali nelle sue partite dei nostri campionati negli ultimi 12 mesi circa, prima di questa${RS.f != null && RS.nf < RS.n ? ` (falli su ${RS.nf} partite)` : ""}.</p>` : (ref ? `<p class="muted" style="margin:0">Nessuna sua partita precedente nei nostri dati.</p>` : "");
-  let fT = null, MFx = null; try { const MF = model(home, away, MODES[$("#decay").value] || MODES.dyn, "f"); fT = MF && MF.tot; MFx = MF; } catch (x) {}
-  // 25/10/2026 (fase 1-B): formazioni ufficiali e quanto cambiano i falli attesi
-  const xiHTML = "";   // le formazioni ufficiali sono nella Lettura (riquadro #mxi)
-  const _unused = MFx && MFx.xiF ? (() => { const F = MFx.xiF, pcs = v => `${v >= 1 ? "+" : "−"}${Math.round(Math.abs(v - 1) * 100)}%`, li = L => L.map(p => `<li><span class="num">${p[1] != null ? p[1] : ""}</span> ${esc(p[0])} <small class="muted">${esc(p[2] || "")}</small></li>`).join("");
-    return `<div class="xibox"><b>Formazioni ufficiali</b> <small class="muted">(uscite alle ${esc(String(F.ora).slice(11, 16))} UTC)</small>
-      <p class="small" style="margin:4px 0">Falli attesi con i titolari di oggi: ${esc(home)} <b class="num">${f1(MFx.preXi.lh)} → ${f1(MFx.lh)}</b> (${pcs(F.fh)}) · ${esc(away)} <b class="num">${f1(MFx.preXi.la)} → ${f1(MFx.la)}</b> (${pcs(F.fa)}). Già applicato a 1X2 falli, Segnali, Grado e Radar.</p>
-      <details><summary class="small">Gli undici titolari</summary><div class="xicols"><div><small>${esc(home)}</small><ul>${li(F.xi.h)}</ul></div><div><small>${esc(away)}</small><ul>${li(F.xi.a)}</ul></div></div></details></div>`; })() : "";
+  let fT = null; try { const MF = model(home, away, MODES[$("#decay").value] || MODES.dyn, "f"); fT = MF && MF.tot; } catch (x) {}
   const infl = !ref ? `<p class="refinf"><svg class="ic ic-arbitro" aria-hidden="true"><use href="#i-arbitro"/></svg>Arbitro non ancora indicato: nei cartellini e nei falli previsti la sua influenza <b>non è applicata</b>.</p>`
     : `<div class="refinf"><b><svg class="ic ic-arbitro" aria-hidden="true"><use href="#i-arbitro"/></svg>Influenza dell'arbitro nelle previsioni della Lettura</b>
       <span>Cartellini: ${v2 && fc ? `<b>${pct(fc)}</b> già applicato${mu ? ` nei <b>${f1(mu)}</b> previsti` : ""}` : "non applicata (modello senza arbitro per questo campionato)"}</span>
@@ -5120,7 +5086,7 @@ function refSheetHTML() {
   return `<h3 style="margin:0">Arbitro</h3>
     <p style="margin:0">${refTxt}${v2 && ref && fc ? ` · effetto stimato sui cartellini <b>${pct(fc)}</b>` : ""}${ff && Math.abs(ff - 1) >= 0.005 ? ` · sui falli <b>${pct(ff)}</b>` : ""}</p>
     ${rsTxt}
-    ${infl}${xiHTML}
+    ${infl}
     <h3 style="margin:6px 0 0"><svg class="ic ic-card" aria-hidden="true"><use href="#i-card"/></svg>Cartellini della partita</h3>
     ${mu ? `<div class="kgrid"><span><small>Previsione</small><b class="num">${f1(mu)}</b></span><span><small>${esc(home)}</small><b class="num">${mh != null ? f1(mh) : "—"}</b></span><span><small>${esc(away)}</small><b class="num">${ma != null ? f1(ma) : "—"}</b></span>${played ? `<span><small>In partita</small><b class="num">${real}</b></span>` : ""}</div>
       <div class="kp" style="display:flex;flex-wrap:wrap;gap:6px 14px">${CARD_LINES.map((t, i) => `<span>Over ${th1(t)} <b class="num${played ? (real > t) === (P[i] >= 0.5) ? " good" : " bad" : ""}">${pc(P[i])}</b></span>`).join("")}</div>` : `<p class="muted" style="margin:0">Previsione cartellini non disponibile per questo campionato (servono i cartellini delle partite precedenti).</p>`}
@@ -5272,7 +5238,7 @@ function renderSel() {
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
   list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">${SEL.days.size ? `Nessuna partita ${selDaysTxt().toLowerCase()} ancora da giocare.` : "Scegli Oggi, Domani o entrambi."}</p>` :
     (rows.length ? rows.map(([e, L]) => `<button type="button" class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
-      ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}${r.mk === "f" && FORMAZ && FORMAZ.partite && FORMAZ.partite[e.id] ? `<span class="xitag" title="Falli corretti con le formazioni ufficiali">XI</span>` : ""}</span>${qSm(quotaFor(e, r.mk, r.side)) || "<small></small>"}<span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100</span></span>`).join("")}</button>`).join("")
+      ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}</span>${qSm(quotaFor(e, r.mk, r.side)) || "<small></small>"}<span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
   SEL.aN = todo.length ? null : apm.reduce((a, [, L]) => a + L.length, 0); SEL.cN = ents.length; radarTabs();
@@ -5493,8 +5459,8 @@ async function reloadIfNew() {
       if (!(await tryHosted(ST))) return;
       const of = await getData("fuorigioco.json", "json", ST); if (of && of.campionati) { OFFS = of; attachOffs(); }
     } else {
-      const [od, li, pr, qu, me, fz] = await Promise.all(["odds.json", "linee.json", "precalc.json", "qualita.json", "mercati.json", "formazioni.json"].map(f => ch(f.slice(0, -5)) ? getData(f, "json", ST) : Promise.resolve(undefined)));
-      if (od) ODDS = od; if (li) LINEE = li; if (qu) QUALITA = qu; if (me && me.giocabili) MERCATI = me; if (fz && fz.partite) FORMAZ = fz;
+      const [od, li, pr, qu, me] = await Promise.all(["odds.json", "linee.json", "precalc.json", "qualita.json", "mercati.json"].map(f => ch(f.slice(0, -5)) ? getData(f, "json", ST) : Promise.resolve(undefined)));
+      if (od) ODDS = od; if (li) LINEE = li; if (qu) QUALITA = qu; if (me && me.giocabili) MERCATI = me;
       S.meta = { ...S.meta, fetched: ST.updated };
       const P2 = pr !== undefined ? pr : PRECALC; PRECALC = P2 && P2.updated === ST.updated ? P2 : null;
       STATO = ST;
