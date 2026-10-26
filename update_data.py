@@ -883,7 +883,7 @@ try:
     except Exception as e_: print("::warning title=Formazioni ufficiali::" + str(e_))
     try:   # 26/10/2026 (fase 0): fiducia degli abbinamenti dei nomi API-Football → nostri
         _low = [f"{lg_} {k}→{x['nostro']} ({x['voti']} voti)" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["abbinati"].items() if x["fiducia"] == "bassa"]
-        _un = [f"{lg_} {k} ({x['partite']} partite): {x['diagnosi']}" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["non_abbinati"].items()]
+        _un = [f"{lg_} {k} ({x['partite']} partite): {x['diagnosi']}" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["non_abbinati"].items() if x.get("recenti")]   # solo squadre con partite negli ultimi 200 giorni
         QUAL["nomi"] = {"fiducia_bassa": _low[:40], "non_abbinati": _un[:40],
                         "abbinati": sum(len(D_["abbinati"]) for D_ in apif_extra.CONF.values())}
         print("::notice title=Abbinamento nomi::" + f"{QUAL['nomi']['abbinati']} nomi abbinati · fiducia bassa {len(_low)} · non abbinati {len(_un)}" + (": " + "; ".join(_un[:12]) if _un else ""))

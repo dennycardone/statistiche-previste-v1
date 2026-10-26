@@ -54,8 +54,11 @@ def learn_map(api, ours, lg=None):
     # 26/10/2026 (fase 0): punteggio di fiducia di ogni abbinamento (voti delle partite in comune, quota dei voti, somiglianza dei nomi) e,
     # per i nomi non abbinati, una diagnosi: squadra di passaggio (poche partite: playoff/spareggi con squadre di un'altra serie),
     # oppure il nome nostro più simile ancora libero (da controllare)
-    cnt = collections.Counter()
-    for d, h, a, hg, ag in api: cnt[h] += 1; cnt[a] += 1
+    cnt, rec = collections.Counter(), collections.Counter()
+    dmax = max((x[0] for x in api), default=None)
+    for d, h, a, hg, ag in api:
+        cnt[h] += 1; cnt[a] += 1
+        if dmax and (dmax - d).days <= 200: rec[h] += 1; rec[a] += 1
     ours_t = {o[1] for o in ours} | {o[2] for o in ours}; used = set(out.values())
     C = {}
     for k, v in out.items():
@@ -66,7 +69,7 @@ def learn_map(api, ours, lg=None):
     for k in cnt:
         if k in out: continue
         free = sorted(((_sim(k, t), t) for t in ours_t - used), reverse=True)
-        U[k] = {"partite": cnt[k], "diagnosi": "squadra di passaggio (playoff o spareggio con un'altra serie)" if cnt[k] <= 3 else
+        U[k] = {"partite": cnt[k], "recenti": rec[k], "diagnosi": "squadra di passaggio (playoff o spareggio con un'altra serie)" if cnt[k] <= 3 else
                 ("da controllare: forse " + free[0][1] if free and free[0][0] >= 0.5 else "senza corrispondenza nei nostri dati"),
                 "simile": free[0][1] if free else None}
     CONF[lg] = {"abbinati": C, "non_abbinati": U}
