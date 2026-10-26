@@ -731,6 +731,9 @@ try:
                 base = [f["fixture"]["date"][:16], lg, f["teams"]["home"]["name"], f["teams"]["away"]["name"], f["goals"]["home"], f["goals"]["away"],
                         f["fixture"].get("referee") or (old[6] if old else None), old[7] if old else [None] * 7, old[8] if old else [None] * 7, stt]
                 AP["partite"][fid] = base
+                # 26/10/2026 (fase 0, dati "as-of"): quando abbiamo visto per la prima volta l'arbitro (prima della partita o dopo)
+                if base[6] and not AP.setdefault("visto", {}).setdefault(fid, {}).get("ref"):
+                    AP["visto"][fid]["ref"] = _utc.strftime("%Y-%m-%dT%H:%M"); AP["visto"][fid]["ko"] = base[0]
                 for side_ in ("home", "away"):   # loghi delle squadre (immagini gratuite di API-Football, non consumano richieste)
                     if f["teams"][side_].get("logo"): AP.setdefault("loghi", {}).setdefault(lg, {})[f["teams"][side_]["name"]] = f["teams"][side_]["logo"]
                 if stt not in ("FT", "AET", "PEN"): return
@@ -776,6 +779,7 @@ try:
                     if x and H and A:   # risposta senza statistiche: restano quelle che c'erano (non si cancellano)
                         x[7] = [_stat(H, k) for k in KS_]; x[8] = [_stat(A, k) for k in KS_]; n_new += 1
                         AP["stats_at"][fid] = _utc.strftime("%Y-%m-%dT%H:%M")
+                        AP.setdefault("visto", {}).setdefault(fid, {}).setdefault("st", _utc.strftime("%Y-%m-%dT%H:%M"))
             _old = (_utc - datetime.timedelta(days=10)).strftime("%Y-%m-%dT%H:%M")
             AP["stats_at"] = {k: v for k, v in AP.get("stats_at", {}).items() if v >= _old}
             print(f"::notice title=API-Football · aggiornamento partite::{'calendario completo' if full else 'partite per data'}: {n_req0} richieste · statistiche: {len(need)} partite, {n_req1} richieste")

@@ -1,11 +1,11 @@
-name: Controlli settimanali (calibrazione, solo numeri aggregati)
+name: Controlli settimanali (calibrazione e qualità dei dati, solo numeri aggregati)
 on:
   workflow_dispatch: {}
   schedule:
     - cron: "41 6 * * 1"   # ogni lunedì
   push:
     branches: [main]
-    paths: [tools/calibrazione.js, tools/calibrazione.py]
+    paths: [tools/calibrazione.js, tools/calibrazione.py, tools/qualita_dati.py]
 permissions:
   contents: read
 jobs:
@@ -22,6 +22,9 @@ jobs:
         with: { node-version: "22" }
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
+      - name: Qualità dei dati (mancanti, zeri sospetti, valori impossibili o anomali)
+        run: python3 tools/qualita_dati.py pub
+        continue-on-error: true
       - name: Previsioni degli ultimi 120 giorni con i soli dati precedenti
         run: node tools/calibrazione.js . 120
       - name: Calibrazione per mercato e campionato
