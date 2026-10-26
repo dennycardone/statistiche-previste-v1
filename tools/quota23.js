@@ -20,6 +20,8 @@ A.resetState();
 for (const bf of ["bundle_storico.json", "bundle.json"]) { const t = rd(PUB, bf); if (t) for (const f of JSON.parse(t).files) A.addParsed(A.parseCSV(f.text)); }
 A.attachOffs();
 const OH = JSON.parse(fs.readFileSync(path.join(DATA, "odds_hist.json"), "utf8"));
+// 26/10/2026: correzioni dei falli con le formazioni ufficiali registrate prima della partita (archivio privato di update_data.py)
+const XIH = JSON.parse(rd(DATA, "formazioni_hist.json") || "{}");
 const RT = vm.runInContext("OFF_R_TEAM", ctx);
 const q = (v, part, k) => { const x = v[part] && v[part].q && v[part].q[k]; const o = Array.isArray(x) ? x[0] : x; return o > 1 ? o : null; };
 const out = []; let nPl = 0;
@@ -27,8 +29,8 @@ for (const [key, v] of Object.entries(OH)) {
   const m = A.S.matches.get(key); if (!m || m.hg == null) continue;
   nPl++;
   const [lg, d, h, a] = key.split("|"), es = ES[key] || {};
-  const add = (mk, side, p, hit, k) => { if (p == null || !isFinite(p) || hit == null) return; const q0 = q(v, "prima", k), q1 = q(v, "ultima", k); if (!q0 && !q1) return;
-    out.push({ key, d, lg, t: m.time || "", mk, side, p: Math.round(p * 1e4) / 1e4, y: hit ? 1 : 0, q0, q1 }); };
+  const add = (mk, side, p, hit, k, pxi) => { if (p == null || !isFinite(p) || hit == null) return; const q0 = q(v, "prima", k), q1 = q(v, "ultima", k); if (!q0 && !q1) return;
+    out.push({ key, d, lg, t: m.time || "", mk, side, p: Math.round(p * 1e4) / 1e4, pxi: pxi != null && isFinite(pxi) ? Math.round(pxi * 1e4) / 1e4 : null, y: hit ? 1 : 0, q0, q1 }); };
   const c0 = A.S.cutoff; A.S.cutoff = m.date;
   try {
     A.withLeague(lg, () => {
@@ -42,7 +44,8 @@ for (const [key, v] of Object.entries(OH)) {
       const st = (name, R, xh, xa, k, indep) => {
         if (!R || !isFinite(R.lh) || xh == null || xa == null) return;
         const P = indep ? A.headToHeadProb(R.lh, R.la, Infinity, indep) : A.headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop);
-        add(name, "1", P.home, xh > xa, k + ":Home"); add(name, "X", P.draw, xh === xa, k + ":Draw"); add(name, "2", P.away, xa > xh, k + ":Away");
+        const X = k === "x.f1x2" && XIH[key] ? A.headToHeadProb(R.lh * XIH[key].fh, R.la * XIH[key].fa, R.r, R.rTeam, R.cop) : null;
+        add(name, "1", P.home, xh > xa, k + ":Home", X && X.home); add(name, "X", P.draw, xh === xa, k + ":Draw", X && X.draw); add(name, "2", P.away, xa > xh, k + ":Away", X && X.away);
       };
       st("1X2 corner", A.model(h, a, A.MODES.dyn, "c"), m.hc, m.ac, "x.c1x2");
       const TS = A.modelShots(h, a, A.MODES.dyn);

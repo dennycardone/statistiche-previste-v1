@@ -871,6 +871,10 @@ try:
             for k_ in [k_ for k_, x in XI.items() if (_nowu - datetime.datetime.strptime(x["t"], "%Y-%m-%d %H:%M").replace(tzinfo=datetime.timezone.utc)).days > 3]: del XI[k_]
         jdump(XI, _XP)
         jdump({"pesi": W_XI, "partite": FORMZ}, os.path.join(OUT, "formazioni.json"))
+        # archivio privato delle correzioni (mai pubblicato, mai sfoltito): serve allo studio Quota 2 / Quota 3 "statistiche + formazioni"
+        _HP = os.path.join(OUT, "formazioni_hist.json"); _FH = json.load(open(_HP)) if os.path.exists(_HP) else {}
+        for k_, x in FORMZ.items(): _FH[k_] = {"fh": x["fh"], "fa": x["fa"], "ora": x["ora"]}
+        jdump(_FH, _HP)
         print("::notice title=Formazioni ufficiali::" + f"{len(FORMZ)} partite con la correzione dei falli, {_nxi} richieste" + ("" if os.path.exists(_VP) else " (valori dei giocatori non disponibili)"))
     except Exception as e_: print("::warning title=Formazioni ufficiali::" + str(e_))
     # 18/10/2026: fuorigioco per squadra (data/fuorigioco.json, per il modello fuorigioco dell'app). Fonti: ramo statextra (storico dal 2022,

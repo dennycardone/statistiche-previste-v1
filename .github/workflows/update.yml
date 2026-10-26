@@ -123,7 +123,7 @@ jobs:
             rm -rf _bk && mkdir _bk && git fetch -q --depth 1 origin backup && git archive FETCH_HEAD | tar -x -C _bk && last=$(git log -1 --format=%ct FETCH_HEAD)
           fi
           if [ $(( $(date +%s) - last )) -lt 72000 ]; then echo "copia di oggi già fatta"; exit 0; fi
-          F=""; for f in odds_hist.json apif.json odds.json; do [ -f data/$f ] && F="$F $f"; done
+          F=""; for f in odds_hist.json apif.json odds.json formazioni_hist.json; do [ -f data/$f ] && F="$F $f"; done
           [ -n "$F" ] || exit 0
           mkdir -p _bk2 && tar -czf - -C data $F | openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -pass env:BK | split -b 90m - _bk2/archivio.enc.
           if ls _bk/archivio.enc.* >/dev/null 2>&1; then mkdir -p _bk2/precedente && cp _bk/archivio.enc.* _bk/data.txt _bk2/precedente/ 2>/dev/null || true; fi

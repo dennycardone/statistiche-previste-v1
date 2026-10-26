@@ -15,7 +15,11 @@ Metriche: giorni con proposta, quota media, probabilità dichiarata media (grezz
 puntata fissa, log-loss, calibrazione per fasce, prima metà contro seconda metà del periodo.
 Regola di decisione fissata il 25/10/2026 (prima di vedere i risultati): un metodo si può scegliere solo con almeno 100 giorni di
 archivio; scelta sui primi due terzi dei giorni, verifica sull'ultimo terzo; deve avere probabilità calibrata entro ±5 punti dalla
-frequenza reale nella verifica e ROI non peggiore di −margine medio di 1xBet. Prima di allora il rapporto dice solo "campione insufficiente"."""
+frequenza reale nella verifica e ROI non peggiore di −margine medio di 1xBet. Prima di allora il rapporto dice solo "campione insufficiente".
+26/10/2026 (decisioni di Denny): solo l'archivio reale 1xBet (niente quote storiche di altri bookmaker); la probabilità CORRETTA per esito
+(Prevista + 1xBet senza margine, walk-forward) è lo standard; la grezza resta solo come riferimento. Focus settimanale su "solo statistiche"
+e "statistiche + formazioni ufficiali sui falli", singola contro doppia; checkpoint intermedio di sola lettura a 60 giorni, decisione a 100:
+la doppia sulle statistiche deve restare calibrata entro ±5 punti e battere le combinazioni che contengono i gol."""
 import json, math, itertools, collections, statistics, os, sys, traceback
 sys.excepthook = lambda t, v, tb: print("::error title=Quota 2/3::" + " | ".join(traceback.format_exception(t, v, tb)).replace("\n", " ")[-1500:])
 C = json.load(open("q23_candidati.json"))
@@ -25,6 +29,7 @@ MIN_DAYS = 100
 import numpy as np
 SCEN = os.environ.get("Q23_SCEN", "q1")   # quale quota usare in questo passaggio (q1 = ultima prima del fischio, q0 = prima vista)
 # probabilità di 1xBet senza margine per ogni esito (stesso mercato della stessa partita)
+for c in C: c["pX"] = c.get("pxi") if c.get("pxi") is not None else c["p"]
 grp = collections.defaultdict(list)
 for c in C: grp[(c["key"], c["mk"])].append(c)
 for L in grp.values():
@@ -44,25 +49,30 @@ def fit_lr(X, y, l2=1.0):
     return b
 days_all = sorted({c["d"] for c in C})
 calrep = {}
-for grp_name, test in (("gol", lambda c: c["mk"] in GOL), ("statistiche", lambda c: c["mk"] not in GOL)):
+for base in ("p", "pX"):
+  for grp_name, test in (("gol", lambda c: c["mk"] in GOL), ("statistiche", lambda c: c["mk"] not in GOL)):
+    if base == "pX" and grp_name == "gol": continue
     E = [c for c in C if test(c) and c.get("m" + SCEN)]
     ev = collections.defaultdict(list)
     for c in E: ev[c["d"]].append(c)
     out_m, out_b, out_p, ys = [], [], [], []
+    tag = ("pc_" if base == "p" else "pcX_") + SCEN
     for i, d in enumerate(days_all):
         tr = [c for dd in days_all[:i] for c in ev.get(dd, [])]
         te = ev.get(d, [])
         if i < 7 or len(tr) < 300:
-            for c in te: c["pc_" + SCEN] = None
+            for c in te: c[tag] = None
             continue
-        b = fit_lr([[lg_(c["p"]), lg_(c["m" + SCEN])] for c in tr], [c["y"] for c in tr])
+        b = fit_lr([[lg_(c[base]), lg_(c["m" + SCEN])] for c in tr], [c["y"] for c in tr])
         for c in te:
-            z = b[0] + b[1] * lg_(c["p"]) + b[2] * lg_(c["m" + SCEN]); c["pc_" + SCEN] = 1 / (1 + math.exp(-z))
-            out_m.append(c["p"]); out_b.append(c["m" + SCEN]); out_p.append(c["pc_" + SCEN]); ys.append(c["y"])
+            z = b[0] + b[1] * lg_(c[base]) + b[2] * lg_(c["m" + SCEN]); c[tag] = 1 / (1 + math.exp(-z))
+            out_m.append(c[base]); out_b.append(c["m" + SCEN]); out_p.append(c[tag]); ys.append(c["y"])
     if ys:
         L_ = lambda P: -statistics.mean(math.log(max(1e-6, p if y else 1 - p)) for p, y in zip(P, ys))
-        bfull = fit_lr([[lg_(c["p"]), lg_(c["m" + SCEN])] for c in E], [c["y"] for c in E])
-        calrep[grp_name] = f"{grp_name}: {len(ys)} esiti fuori campione · log-loss Prevista {L_(out_m):.4f} · 1xBet senza margine {L_(out_b):.4f} · corretta {L_(out_p):.4f} · pesi oggi Prevista {bfull[1]:.2f}, 1xBet {bfull[2]:.2f}"
+        bfull = fit_lr([[lg_(c[base]), lg_(c["m" + SCEN])] for c in E], [c["y"] for c in E])
+        nm = grp_name + (" con formazioni sui falli" if base == "pX" else "")
+        calrep[nm] = f"{nm}: {len(ys)} esiti fuori campione · log-loss Prevista {L_(out_m):.4f} · 1xBet senza margine {L_(out_b):.4f} · corretta {L_(out_p):.4f} · pesi oggi Prevista {bfull[1]:.2f}, 1xBet {bfull[2]:.2f}"
+nxi = sum(1 for c in C if c.get("pxi") is not None)
 byday = collections.defaultdict(list)
 for c in C: byday[c["d"]].append(c)
 days = sorted(byday)
@@ -112,18 +122,32 @@ def stats(R):
                 ci=1.96 * math.sqrt(h * (1 - h) / n), roi=roi, ll=ll, a=f(A), b=f(B))
 
 qk = SCEN; qlab = "quota ultima prima del fischio" if qk == "q1" else "quota prima vista"
-if calrep: note(f"Quota 2/3 · correzione per esito ({qlab})", " ‖ ".join(calrep.values()))
+stage = "DECISIONE (100 giorni raggiunti)" if len(days) >= MIN_DAYS else "CHECKPOINT INTERMEDIO di sola lettura (60 giorni)" if len(days) >= 60 else f"in raccolta: checkpoint a 60 giorni, decisione a {MIN_DAYS}"
+if calrep: note(f"Quota 2/3 · correzione per esito ({qlab})", " ‖ ".join(calrep.values()) + f" ‖ esiti di falli con formazione ufficiale: {nxi}")
+PC = "pc_" + qk
 for tgt in TGT:
     for n in (1, 2, 3):
         lines = []
-        for pk, plab in (("p", "Prevista"), ("pc_" + qk, "corretta")):
-            for mset in ("tutti", "gol", "statistiche"):
-                for order in ("P", "EV", "P70"):
-                    for abst in ("sempre", "EV≥0"):
-                        st_ = stats(run(qk, tgt, n, mset, order, abst, pk=pk))
-                        if not st_: continue
-                        lines.append(f"{plab}/{mset}/{order}/{abst}: {st_['n']} g · q {st_['q']:.2f} · dich {st_['p']*100:.0f}% · presa {st_['h']*100:.0f}% ±{st_['ci']*100:.0f} · ROI {st_['roi']*100:+.0f}% · LL {st_['ll']:.3f} · {st_['a']} | {st_['b']}")
+        st_ = stats(run(qk, tgt, n, "tutti", "P", "sempre", pk="p"))
+        if st_: lines.append(f"riferimento, probabilità grezza/tutti/P/sempre: {st_['n']} g · dich {st_['p']*100:.0f}% · presa {st_['h']*100:.0f}% ±{st_['ci']*100:.0f} · ROI {st_['roi']*100:+.0f}%")
+        for mset in ("tutti", "gol", "statistiche"):
+            for order in ("P", "EV", "P70"):
+                for abst in ("sempre", "EV≥0"):
+                    st_ = stats(run(qk, tgt, n, mset, order, abst, pk=PC))
+                    if not st_: continue
+                    lines.append(f"{mset}/{order}/{abst}: {st_['n']} g · q {st_['q']:.2f} · dich {st_['p']*100:.0f}% · presa {st_['h']*100:.0f}% ±{st_['ci']*100:.0f} · ROI {st_['roi']*100:+.0f}% · LL {st_['ll']:.3f} · {st_['a']} | {st_['b']}")
         if n > 1:
-            st_ = stats(run(qk, tgt, n, "tutti", "P", "sempre", diff_lg=True, pk="pc_" + qk))
-            if st_: lines.append(f"corretta/tutti/P/sempre/CAMPIONATI DIVERSI: {st_['n']} g · q {st_['q']:.2f} · dich {st_['p']*100:.0f}% · presa {st_['h']*100:.0f}% ±{st_['ci']*100:.0f} · ROI {st_['roi']*100:+.0f}%")
-        note(f"{tgt} {['', 'singola', 'doppia', 'tripla'][n]} · {qlab}", " ‖ ".join(lines) if lines else "nessuna proposta possibile")
+            st_ = stats(run(qk, tgt, n, "tutti", "P", "sempre", diff_lg=True, pk=PC))
+            if st_: lines.append(f"tutti/P/sempre/CAMPIONATI DIVERSI: {st_['n']} g · q {st_['q']:.2f} · dich {st_['p']*100:.0f}% · presa {st_['h']*100:.0f}% ±{st_['ci']*100:.0f} · ROI {st_['roi']*100:+.0f}%")
+        note(f"{tgt} {['', 'singola', 'doppia', 'tripla'][n]} · {qlab} · probabilità corretta", " ‖ ".join(lines) if lines else "nessuna proposta possibile")
+# focus: solo statistiche (e statistiche + formazioni sui falli), singola contro doppia, contro le combinazioni che contengono i gol
+foc = [f"fase: {stage} · giorni {len(days)}"]
+for tgt in TGT:
+    for n in (1, 2):
+        for lab, mset, pk in (("statistiche", "statistiche", PC), ("statistiche + formazioni falli", "statistiche", "pcX_" + qk), ("tutti (con gol)", "tutti", PC), ("solo gol", "gol", PC)):
+            for order in ("P", "EV"):
+                R = run(qk, tgt, n, mset, order, "sempre", pk=pk); st_ = stats(R)
+                if not st_: continue
+                X = [r for r in R if r]; gap = (st_["h"] - st_["p"]) * 100
+                foc.append(f"{tgt} {['', 'singola', 'doppia'][n]} · {lab} · {order}: {st_['n']} g · dich {st_['p']*100:.0f}% · presa {st_['h']*100:.0f}% ±{st_['ci']*100:.0f} (scarto {gap:+.0f} punti, {'entro' if abs(gap) <= 5 else 'FUORI'} ±5) · ROI {st_['roi']*100:+.0f}%")
+note(f"Quota 2/3 · FOCUS statistiche · {qlab}", " ‖ ".join(foc))
