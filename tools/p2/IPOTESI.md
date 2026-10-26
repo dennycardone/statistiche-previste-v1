@@ -18,6 +18,15 @@ Regola: entra nell'app solo se migliora in modo significativo nella verifica, ne
 | 26/10 | Titolari sui cartellini: falli commessi dei titolari (XF) | cartellini | piccolo ma stabile | −0,0002 ±0,0001 / −0,0004 ±0,0002 |
 | 26/10 | Titolari sui cartellini: cartellini dei titolari (XC) | cartellini | no (prima stagione non significativa) | −0,0003 ±0,0004 / −0,0004 ±0,0003 |
 
+## Studi sull'archivio reale delle quote 1xBet (regola dei 100 giorni)
+Stessa regola per tutti: si decide solo con almeno 100 giorni di archivio (primi due terzi solo da guardare, ultimo terzo verifica);
+checkpoint di sola lettura il 7/12/2026 (~60 giorni), decisione il 18/1/2027 (~100 giorni). Sempre la probabilità corretta per esito.
+
+| Data | Ipotesi | Strumento | Stato |
+|---|---|---|---|
+| 25/10 | Quota 2 / Quota 3: metodo di scelta della combinazione del giorno | `tools/quota23.py` | in raccolta |
+| 26/10 | Gestione del capitale: Kelly 1/8 e 1/4 (tetto 3% per giocata) e fasce di Grado/valore contro puntata fissa 1%/2%, su singole e migliore Quota 2 / Quota 3 del giorno, per perimetro (solo statistiche, statistiche + formazioni falli, tutti, solo gol), tetto giornaliero 10% della cassa, astensione senza valore atteso positivo. Entra nell'app (Gioco responsabile / Diario, cassa solo nel localStorage) solo se nella verifica ha rendimento corretto per il rischio più alto della fissa 1% (IC 95% bootstrap settimanale sopra zero) o calo massimo più basso a rendimento non inferiore, con yield non peggiore del −margine 1xBet | `tools/bankroll.py` | in raccolta |
+
 ## In coda
 - Arbitro designato / formazione nota come fattori del Grado (si registrano da oggi: provabili tra qualche mese).
 - Formazioni su tiri e fuorigioco: da riprovare con più partite.

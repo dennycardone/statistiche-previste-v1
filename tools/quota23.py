@@ -72,6 +72,9 @@ for base in ("p", "pX"):
         bfull = fit_lr([[lg_(c[base]), lg_(c["m" + SCEN])] for c in E], [c["y"] for c in E])
         nm = grp_name + (" con formazioni sui falli" if base == "pX" else "")
         calrep[nm] = f"{nm}: {len(ys)} esiti fuori campione · log-loss Prevista {L_(out_m):.4f} · 1xBet senza margine {L_(out_b):.4f} · corretta {L_(out_p):.4f} · pesi oggi Prevista {bfull[1]:.2f}, 1xBet {bfull[2]:.2f}"
+# 26/10/2026: le probabilità corrette (walk-forward) passano al simulatore di capitale (tools/bankroll.py). File SOLO nel runner, mai pubblicato.
+json.dump([{k: c.get(k) for k in ("key", "d", "lg", "t", "mk", "side", "y", "q0", "q1", "pc_" + SCEN, "pcX_" + SCEN)} for c in C],
+          open(f"q23_corrette_{SCEN}.json", "w"))
 nxi = sum(1 for c in C if c.get("pxi") is not None)
 byday = collections.defaultdict(list)
 for c in C: byday[c["d"]].append(c)
