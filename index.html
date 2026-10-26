@@ -2627,10 +2627,10 @@ const WPC = v => { const p = Math.round((v - 1) * 100); return p === 0 ? "nella 
 const WPP = (a, b) => `${pc(a)} → <b>${pc(b)}</b>`;
 function whyStat(lab, home, away, M, muH, muA, drv) {
   if (!M || !isFinite(M.lh) || !isFinite(M.la)) return "";
-  const vs = (v, mu, sede) => mu > 0 ? ` (${WPC(v / mu)} sulla media ${sede} del campionato, ${f1(mu)})` : "";
+  const vs = (v, mu, sede) => mu > 0 ? ` (media ${sede} del campionato ${f1(mu)}, ${WPC(v / mu)})` : "";
   let s = `<b>${lab}</b> · ${esc(home)} <b class="num">${f1(M.lh)}</b>${vs(M.lh, muH, "in casa")}, ${esc(away)} <b class="num">${f1(M.la)}</b>${vs(M.la, muA, "in trasferta")}.`;
   const top = (drv || []).filter(d => d[1] > 0 && isFinite(d[1]) && Math.abs(Math.log(d[1])) >= 0.04).sort((a, b) => Math.abs(Math.log(b[1])) - Math.abs(Math.log(a[1]))).slice(0, 2);
-  if (top.length) s += ` Pesa soprattutto ${top.map(d => `${d[0]} (${WPC(d[1])} sulla media)`).join(" e ")}.`;
+  if (top.length) s += ` Contano di più: ${top.map(d => `${d[0]} (${WPC(d[1])}${d[2] || ""})`).join(" e ")}.`;
   return `<li>${s}</li>`;
 }
 function whyHTML(home, away, cfg) {
@@ -2648,13 +2648,13 @@ function whyHTML(home, away, cfg) {
     const M = model(home, away, cfg, "f"), R = modelRef(home, away, cfg, "f"), B = modelBase(home, away, cfg, "f"), rt = M && M.Bp && M.Bp.rt;
     if (M) {
       const drv = rt ? [[`quanti falli commette ${esc(home)}`, rt.aH], [`quanti ne subisce ${esc(away)}`, rt.dA], [`quanti falli commette ${esc(away)}`, rt.aA], [`quanti ne subisce ${esc(home)}`, rt.dH]] : [];
-      if (M.xiF) { drv.push([`la formazione di ${esc(home)}`, M.xiF.fh], [`la formazione di ${esc(away)}`, M.xiF.fa]); }
+      if (M.xiF) { drv.push([`i titolari di oggi di ${esc(home)}`, M.xiF.fh], [`i titolari di oggi di ${esc(away)}`, M.xiF.fa]); }
       if (R && R.refF) drv.push(["l'arbitro", R.refF]);
       L.push(whyStat("Falli", home, away, M, ...lgMu(M), drv));
       const p = X => headToHeadProb(X.lh, X.la, X.r, X.rTeam != null ? X.rTeam : X.r, X.cop || 0);
       const P = p(M);
       if (M.xiF && R) { const Q = p(R); W.push(`Senza le formazioni ufficiali: falli attesi ${f1(R.tot)} invece di ${f1(M.tot)}; 1X2 falli ${esc(home)} ${WPP(P.home, Q.home)}, ${esc(away)} ${WPP(P.away, Q.away)}.`); }
-      if (R && R.refF && B) {
+      if (R && R.refF && B && Math.abs(Math.log(R.refF)) >= 0.04) {
         const Bx = M.xiF ? { ...B, lh: B.lh * M.xiF.fh, la: B.la * M.xiF.fa } : B, Q = p(Bx);
         W.push(`Senza l'effetto dell'arbitro sui falli (${WPC(R.refF)}): falli attesi ${f1(Bx.lh + Bx.la)} invece di ${f1(M.tot)}; 1X2 falli ${esc(home)} ${WPP(P.home, Q.home)}, ${esc(away)} ${WPP(P.away, Q.away)}.`);
       }
@@ -2678,7 +2678,7 @@ function whyHTML(home, away, cfg) {
     if (mu > 0 && F) {
       const [mT, mR, mF, mH, mE, mD] = F, names = [["le due squadre", mT], ["l'arbitro", x[0] ? mR : 1], ["i falli fatti e subiti", mF], ["gli scontri diretti", mH], ["il derby", mD]];
       const top = names.filter(d => d[1] > 0 && Math.abs(Math.log(d[1])) >= 0.04).sort((a, b) => Math.abs(Math.log(b[1])) - Math.abs(Math.log(a[1]))).slice(0, 2);
-      L.push(`<li><b>Cartellini</b> · attesi <b class="num">${f1(mu)}</b> in totale.${top.length ? ` Pesa soprattutto ${top.map(d => `${d[0]} (${WPC(d[1])})`).join(" e ")}.` : " Nessun fattore si stacca dalla media."}</li>`);
+      L.push(`<li><b>Cartellini</b> · attesi <b class="num">${f1(mu)}</b> in totale.${top.length ? ` Contano di più: ${top.map(d => `${d[0]} (${WPC(d[1])})`).join(" e ")}.` : " Nessun fattore si stacca dalla media."}</li>`);
       const P0 = cardProbs(mu), i45 = CARD_LINES.indexOf(4.5), i35 = CARD_LINES.indexOf(3.5);
       const wi = (lab, m) => { if (!(m > 0) || Math.abs(Math.log(m)) < 0.04) return; const P1 = cardProbs(mu / m);
         W.push(`Senza ${lab} (${WPC(m)}): cartellini attesi ${f1(mu / m)} invece di ${f1(mu)}; Over 3,5 ${WPP(P0[i35], P1[i35])}, Over 4,5 ${WPP(P0[i45], P1[i45])}.`); };
