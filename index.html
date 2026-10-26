@@ -1643,6 +1643,7 @@ function parseDate(s) {
 const seasonOf = dt => dt.getUTCMonth() + 1 >= 7 ? dt.getUTCFullYear() : dt.getUTCFullYear() - 1;
 /* Campionati: codice football-data.co.uk. cal = stagione per anno solare (file "new", solo risultati) */
 // 26/10/2026: Bulgaria e Ungheria tolte su richiesta di Denny (dati statistici mancanti), fino a nuovo avviso
+// 26/10/2026 sera: tolti anche Israele, Scozia Championship e League One, Finlandia, Polonia, Romania, Serbia, Cina, Croazia (richiesta di Denny)
 const LEAGUES = [
   { code: "I1",  name: "Serie A",               country: "Italia",      file: "mmz4281/2627/I1.csv" },
   { code: "I2",  name: "Serie B",               country: "Italia",      file: "mmz4281/2627/I2.csv" },
@@ -1657,8 +1658,6 @@ const LEAGUES = [
   { code: "E3", name: "League Two", country: "Inghilterra", file: "mmz4281/2627/E3.csv" },
   { code: "EC", name: "National League", country: "Inghilterra", file: "mmz4281/2627/EC.csv", noStats: true },
   { code: "SC0", name: "Premiership", country: "Scozia", file: "mmz4281/2627/SC0.csv" },
-  { code: "SC1", name: "Championship", country: "Scozia", file: "mmz4281/2627/SC1.csv" },
-  { code: "SC2", name: "League One", country: "Scozia", file: "mmz4281/2627/SC2.csv" },
   { code: "SC3", name: "League Two", country: "Scozia", file: "mmz4281/2627/SC3.csv" },
   { code: "D2", name: "2. Bundesliga", country: "Germania", file: "mmz4281/2627/D2.csv" },
   { code: "F2", name: "Ligue 2", country: "Francia", file: "mmz4281/2627/F2.csv" },
@@ -1669,24 +1668,17 @@ const LEAGUES = [
   { code: "ARG", name: "Liga Profesional", country: "Argentina", file: "new/ARG.csv", newCountry: "Argentina", cal: true },
   { code: "AUT", name: "Bundesliga", country: "Austria", file: "new/AUT.csv", newCountry: "Austria" },
   { code: "BRA", name: "Série A", country: "Brasile", file: "new/BRA.csv", newCountry: "Brazil", cal: true },
-  { code: "CHN", name: "Super League", country: "Cina", file: "new/CHN.csv", newCountry: "China", cal: true },
   { code: "DNK", name: "Superliga", country: "Danimarca", file: "new/DNK.csv", newCountry: "Denmark" },
-  { code: "FIN", name: "Veikkausliiga", country: "Finlandia", file: "new/FIN.csv", newCountry: "Finland", cal: true },
   { code: "IRL", name: "Premier Division", country: "Irlanda", file: "new/IRL.csv", newCountry: "Ireland", cal: true },
   { code: "JPN", name: "J1 League", country: "Giappone", file: "new/JPN.csv", newCountry: "Japan", cal: true },
   { code: "MEX", name: "Liga MX", country: "Messico", file: "new/MEX.csv", newCountry: "Mexico" },
   { code: "NOR", name: "Eliteserien", country: "Norvegia", file: "new/NOR.csv", newCountry: "Norway", cal: true },
-  { code: "POL", name: "Ekstraklasa", country: "Polonia", file: "new/POL.csv", newCountry: "Poland" },
-  { code: "ROU", name: "Liga I", country: "Romania", file: "new/ROU.csv", newCountry: "Romania" },
   { code: "RUS", name: "Premier League", country: "Russia", file: "new/RUS.csv", newCountry: "Russia" },
   { code: "SWE", name: "Allsvenskan", country: "Svezia", file: "new/SWE.csv", newCountry: "Sweden", cal: true },
   { code: "SWZ", name: "Super League", country: "Svizzera", file: "new/SWZ.csv", newCountry: "Switzerland" },
   { code: "USA", name: "MLS", country: "USA", file: "new/USA.csv", newCountry: "USA", cal: true },
   // ottobre 2026: campionati solo su API-Football (squadre delle coppe europee); avviso automatico se le statistiche coprono meno del 90% delle partite
-  { code: "SRB", name: "SuperLiga", country: "Serbia", file: "api/SRB.csv", newCountry: "SRB", api: true },
-  { code: "CRO", name: "HNL", country: "Croazia", file: "api/CRO.csv", newCountry: "CRO", api: true },
   { code: "CZE", name: "Chance Liga", country: "Repubblica Ceca", file: "api/CZE.csv", newCountry: "CZE", api: true },
-  { code: "ISR", name: "Ligat ha'Al", country: "Israele", file: "api/ISR.csv", newCountry: "ISR", api: true },
 ];
 const LG = Object.fromEntries(LEAGUES.map(l => [l.code, l]));
 // Champions League (13/10/2026): solo per la scheda partita e il blocco "Coppe europee" di Partite; non è in LEAGUES, quindi resta fuori da Radar, Segnali, Tendenze e Digiuni

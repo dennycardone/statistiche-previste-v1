@@ -18,9 +18,17 @@ API_ONLY = {"SRB": (286, "Super Liga", False), "CRO": (210, "HNL", False), "CZE"
 # esclusi (verifica 6/10/2026 sullo storico): Cipro (statistiche solo sul 22-35% delle partite 2024-2026), Bielorussia (nessuna statistica);
 # Slovacchia e Ucraina tolte su richiesta (stagione 2026/27 quasi senza statistiche): i loro file vengono cancellati
 # 26/10/2026: tolte anche Bulgaria (falli mancanti su tutte le partite lug-ott 2026, fuorigioco 0-0 sospetti) e Ungheria, su richiesta
-for _f in ("SVK.csv", "UKR.csv", "BUL.csv", "HUN.csv"):
-    try: os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", _f))
-    except OSError: pass
+# 26/10/2026 sera (Denny): tolti anche Israele, Scozia Championship e League One, Finlandia, Polonia, Romania, Serbia, Cina, Croazia.
+# Un solo elenco: niente download, niente richieste API, niente quote; i loro file e le loro partite vengono cancellati.
+REMOVED = {"SVK", "UKR", "BUL", "HUN", "ISR", "SC1", "SC2", "FIN", "POL", "ROU", "SRB", "CHN", "CRO"}
+LEAGUES = [l for l in LEAGUES if l not in REMOVED]
+NEW_LEAGUES = [l for l in NEW_LEAGUES if l not in REMOVED]
+API_ONLY = {k: v for k, v in API_ONLY.items() if k not in REMOVED}
+import glob as _g0
+for _c in REMOVED:
+    for _f in _g0.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", _c + ".csv")) + _g0.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", _c + "_*.csv")):
+        try: os.remove(_f)
+        except OSError: pass
 BASE = "https://www.football-data.co.uk/mmz4281/{code}/{lg}.csv"
 NEW = "https://www.football-data.co.uk/new/{lg}.csv"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -287,6 +295,7 @@ def espn_match(lg, names, pool):
         if m: return byn[m[0]]
     return None
 espn_path = os.path.join(OUT, "espn_fixtures.csv")
+ESPN = {k: v for k, v in ESPN.items() if k not in REMOVED}
 espn_old = os.path.exists(espn_path)
 if not espn_old or datetime.datetime.utcnow().hour % 3 == 2 or os.environ.get("ESPN_FORCE"):
     erows, check = ["Div,Date,Time,HomeTeam,AwayTeam,Round"], {}
@@ -340,6 +349,7 @@ except Exception: SC = {}
 SC.setdefault("v", 1); SC.setdefault("months", {}); SC.setdefault("ev", {}); SC.setdefault("teams", {})
 budget = ESPN_BUDGET
 def _tn(t): return [t.get("displayName"), t.get("shortDisplayName"), t.get("name"), t.get("abbreviation"), t.get("location")]
+ESPN_STATS = {k: v for k, v in ESPN_STATS.items() if k not in REMOVED}
 for lg, code_ in ESPN_STATS.items():
     done = set(SC["months"].setdefault(lg, [])); EV = SC["ev"].setdefault(lg, {}); TM = SC["teams"].setdefault(lg, {})
     months, y, m = [], today.year - 5, 1
@@ -474,6 +484,7 @@ if RC.get("v") != 1: RC = {"v": 1, "days": {}, "ev": {}}
 try: UKZ = ZoneInfo("Europe/London")
 except Exception: UKZ = datetime.timezone.utc
 res_check = {}
+ESPN_RES = {k: v for k, v in ESPN_RES.items() if k not in REMOVED}
 for lg, code_ in ESPN_RES.items():
     name = f"{lg}_{code(cur)}.csv"; path = os.path.join(OUT, name)
     if not os.path.exists(path): continue
@@ -677,6 +688,7 @@ AF_LEAGUES_X = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "E
                 "CHN": 169, "DNK": 119, "FIN": 244, "IRL": 357, "JPN": 98, "MEX": 262, "NOR": 103, "POL": 106, "ROU": 283, "RUS": 235, "SWE": 113,
                 "SWZ": 207, "USA": 253}
 AF_LEAGUES_X.update({k: v[0] for k, v in API_ONLY.items()})
+AF_LEAGUES_X = {k: v for k, v in AF_LEAGUES_X.items() if k not in REMOVED}
 try:
     import apif_extra, glob as _glob, urllib.parse as _up
     _key = os.environ.get("APIFOOTBALL_KEY", "").strip()
@@ -788,7 +800,7 @@ try:
             print("arbitri: aggiornate", n_new, "statistiche,", len(AP["partite"]), "partite in archivio")
             _nx = sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None)
             print(f"::notice title=Statistiche in più (tiri in area, bloccati, possesso)::{_nx} partite in archivio")
-        for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR", "BUL", "HUN")]: del AP["partite"][_k]   # campionati tolti
+        for _k in [k for k, v in AP["partite"].items() if v[1] in REMOVED]: del AP["partite"][_k]   # campionati tolti
         jdump(AP, ap_path)
     # conteggio delle partite con le statistiche in più (tiri in area, bloccati, possesso, parate) a ogni giro: solo il numero, per verificare i nomi dei campi
     QUAL["stat_extra"] = {"partite": sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None),
@@ -819,7 +831,7 @@ try:
             pairs[(lg, h, a)].append(d)
             if g1.isdigit() and g2.isdigit(): ours[lg].append((d, h, a, int(g1), int(g2)))
     # campionati tolti (Slovacchia, Ucraina): fuori dall'archivio, così non tornano nel calendario e nel controllo qualità
-    for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR", "BUL", "HUN")]: del AP["partite"][_k]
+    for _k in [k for k, v in AP["partite"].items() if v[1] in REMOVED]: del AP["partite"][_k]
     by_lg = collections.defaultdict(list)
     for v in AP["partite"].values():
         if v[1] in AF_LEAGUES_X: by_lg[v[1]].append(v)   # solo i campionati dell'app
@@ -1070,7 +1082,7 @@ try:
                 try: d_ = datetime.datetime.strptime(r[1], "%d/%m/%Y").date()
                 except Exception: continue
                 ren_ = FD_RENAME.get(r[0], {}); r = list(r); r[3] = ren_.get(r[3], r[3]); r[4] = ren_.get(r[4], r[4])   # squadra rinominata (19/10/2026)
-                if d_ < _now.date() or (r[0], r[3], r[4]) in _now_k or r[0] in ("SVK", "UKR", "BUL", "HUN"): continue   # campionati tolti
+                if d_ < _now.date() or (r[0], r[3], r[4]) in _now_k or r[0] in REMOVED: continue   # campionati tolti
                 _cur_t = set(MAPS.get(r[0], {}).values())
                 if _cur_t and (r[3] not in _cur_t or r[4] not in _cur_t): continue   # nome che il campionato non usa più: non rimetterla
                 if any(g[:3] == (r[0], r[3], r[4]) and abs((datetime.date.fromisoformat(g[3]) - d_).days) <= 2 for g in _gone): continue
@@ -1204,6 +1216,7 @@ AF_LEAGUES = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "EC"
               "CHN": 169, "DNK": 119, "FIN": 244, "IRL": 357, "JPN": 98, "MEX": 262, "NOR": 103, "POL": 106, "ROU": 283, "RUS": 235, "SWE": 113,
               "SWZ": 207, "USA": 253}
 AF_LEAGUES.update({k: v[0] for k, v in API_ONLY.items()})
+AF_LEAGUES = {k: v for k, v in AF_LEAGUES.items() if k not in REMOVED}
 AF_KEY = os.environ.get("APIFOOTBALL_KEY", "").strip()
 odds_path = os.path.join(OUT, "odds.json")
 try: OD = json.load(open(odds_path))
