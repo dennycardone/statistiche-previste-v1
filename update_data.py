@@ -10,14 +10,15 @@ NEW_LEAGUES = ["ARG", "AUT", "BRA", "CHN", "DNK", "FIN", "IRL", "JPN", "MEX", "N
 # campionati solo su API-Football (ottobre 2026, squadre delle coppe europee): codice → (id API-Football, nome, stagione per anno solare).
 # Statistiche partita nello storico 2024-2026: Serbia, Croazia, Cechia oltre il 95% delle partite; Ungheria,
 # Israele, Bulgaria circa la metà (le partite senza statistiche restano vuote: niente stime).
-API_ONLY = {"SRB": (286, "Super Liga", False), "CRO": (210, "HNL", False), "HUN": (271, "NB I", False), "CZE": (345, "Czech Liga", False),
-            "ISR": (383, "Ligat Ha'al", False), "BUL": (172, "First League", False),
+API_ONLY = {"SRB": (286, "Super Liga", False), "CRO": (210, "HNL", False), "CZE": (345, "Czech Liga", False),
+            "ISR": (383, "Ligat Ha'al", False),
             # 13/10/2026: Champions League come un campionato per la scheda partita (precedenti, classifica, rendimento, quote 1xBet);
             # solo fase principale (le qualificazioni di giugno-agosto restano fuori). Le previsioni vengono da data/ucl.json (tools/ucl_model.py).
             "UCL": (2, "Champions League", False), "UEL": (3, "Europa League", False)}   # 13/10/2026: anche l'Europa League
 # esclusi (verifica 6/10/2026 sullo storico): Cipro (statistiche solo sul 22-35% delle partite 2024-2026), Bielorussia (nessuna statistica);
 # Slovacchia e Ucraina tolte su richiesta (stagione 2026/27 quasi senza statistiche): i loro file vengono cancellati
-for _f in ("SVK.csv", "UKR.csv"):
+# 26/10/2026: tolte anche Bulgaria (falli mancanti su tutte le partite lug-ott 2026, fuorigioco 0-0 sospetti) e Ungheria, su richiesta
+for _f in ("SVK.csv", "UKR.csv", "BUL.csv", "HUN.csv"):
     try: os.remove(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", _f))
     except OSError: pass
 BASE = "https://www.football-data.co.uk/mmz4281/{code}/{lg}.csv"
@@ -787,7 +788,7 @@ try:
             print("arbitri: aggiornate", n_new, "statistiche,", len(AP["partite"]), "partite in archivio")
             _nx = sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None)
             print(f"::notice title=Statistiche in più (tiri in area, bloccati, possesso)::{_nx} partite in archivio")
-        for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR")]: del AP["partite"][_k]   # campionati tolti
+        for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR", "BUL", "HUN")]: del AP["partite"][_k]   # campionati tolti
         jdump(AP, ap_path)
     # conteggio delle partite con le statistiche in più (tiri in area, bloccati, possesso, parate) a ogni giro: solo il numero, per verificare i nomi dei campi
     QUAL["stat_extra"] = {"partite": sum(1 for v in AP["partite"].values() if v[7] and len(v[7]) > 7 and v[7][7] is not None),
@@ -818,7 +819,7 @@ try:
             pairs[(lg, h, a)].append(d)
             if g1.isdigit() and g2.isdigit(): ours[lg].append((d, h, a, int(g1), int(g2)))
     # campionati tolti (Slovacchia, Ucraina): fuori dall'archivio, così non tornano nel calendario e nel controllo qualità
-    for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR")]: del AP["partite"][_k]
+    for _k in [k for k, v in AP["partite"].items() if v[1] in ("SVK", "UKR", "BUL", "HUN")]: del AP["partite"][_k]
     by_lg = collections.defaultdict(list)
     for v in AP["partite"].values():
         if v[1] in AF_LEAGUES_X: by_lg[v[1]].append(v)   # solo i campionati dell'app
