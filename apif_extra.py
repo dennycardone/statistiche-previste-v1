@@ -19,6 +19,7 @@ def _sim(a, b):
 # 19/10/2026: grafie API-Football della stagione speciale giapponese (febbraio–giugno 2026) che l'abbinamento non impara (poche partite)
 ALSO = {"JPN": {"V-varen Nagasaki": "V-Varen Nagasaki", "Mito Hollyhock": "Mito", "JEF United Chiba": "Chiba"}}
 MANUAL = {"NOR": {"Ham-Kam": "HamKam"}, "AUT": {"WSG Wattens": "Tirol"}, "ROU": {"Dinamo Bucuresti": "Dinamo Bucuresti"}}   # nomi che l'abbinamento automatico non riconosce
+CONF = {}   # fiducia degli abbinamenti dell'ultimo giro, per campionato (fase 0)
 def learn_map(api, ours, lg=None):
     """api: [(date, home, away, hg, ag)], ours: [(date, home, away, hg, ag)] di un campionato -> {nome API: nostro nome}"""
     byd = collections.defaultdict(list)
@@ -50,6 +51,25 @@ def learn_map(api, ours, lg=None):
     for k, v in MANUAL.get(lg, {}).items():
         out = {x: y for x, y in out.items() if y != v}; out[k] = v
     for k, v in ALSO.get(lg, {}).items(): out.setdefault(k, v)   # grafie in più, senza togliere quelle imparate
+    # 26/10/2026 (fase 0): punteggio di fiducia di ogni abbinamento (voti delle partite in comune, quota dei voti, somiglianza dei nomi) e,
+    # per i nomi non abbinati, una diagnosi: squadra di passaggio (poche partite: playoff/spareggi con squadre di un'altra serie),
+    # oppure il nome nostro più simile ancora libero (da controllare)
+    cnt = collections.Counter()
+    for d, h, a, hg, ag in api: cnt[h] += 1; cnt[a] += 1
+    ours_t = {o[1] for o in ours} | {o[2] for o in ours}; used = set(out.values())
+    C = {}
+    for k, v in out.items():
+        c = votes.get(k, collections.Counter()); n = c.get(v, 0); tot = sum(c.values()) or 1
+        fid = "manuale" if k in MANUAL.get(lg, {}) or k in ALSO.get(lg, {}) else "alta" if n >= 5 and n / tot >= 0.95 else "media" if n >= 2 else "bassa"
+        C[k] = {"nostro": v, "voti": n, "quota": round(n / tot, 2), "somiglianza": round(_sim(k, v), 2), "fiducia": fid}
+    U = {}
+    for k in cnt:
+        if k in out: continue
+        free = sorted(((_sim(k, t), t) for t in ours_t - used), reverse=True)
+        U[k] = {"partite": cnt[k], "diagnosi": "squadra di passaggio (playoff o spareggio con un'altra serie)" if cnt[k] <= 3 else
+                ("da controllare: forse " + free[0][1] if free and free[0][0] >= 0.5 else "senza corrispondenza nei nostri dati"),
+                "simile": free[0][1] if free else None}
+    CONF[lg] = {"abbinati": C, "non_abbinati": U}
     return out
 def refkey(name):   # "Daniele Doveri", "D. Doveri", "Doveri, Italy" → "d doveri" (API-Football non scrive sempre allo stesso modo)
     if not name: return None

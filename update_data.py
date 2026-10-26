@@ -881,6 +881,13 @@ try:
         jdump(_FH, _HP)
         print("::notice title=Formazioni ufficiali::" + f"{len(FORMZ)} partite con la correzione dei falli, {_nxi} richieste" + ("" if os.path.exists(_VP) else " (valori dei giocatori non disponibili)"))
     except Exception as e_: print("::warning title=Formazioni ufficiali::" + str(e_))
+    try:   # 26/10/2026 (fase 0): fiducia degli abbinamenti dei nomi API-Football → nostri
+        _low = [f"{lg_} {k}→{x['nostro']} ({x['voti']} voti)" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["abbinati"].items() if x["fiducia"] == "bassa"]
+        _un = [f"{lg_} {k} ({x['partite']} partite): {x['diagnosi']}" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["non_abbinati"].items()]
+        QUAL["nomi"] = {"fiducia_bassa": _low[:40], "non_abbinati": _un[:40],
+                        "abbinati": sum(len(D_["abbinati"]) for D_ in apif_extra.CONF.values())}
+        print("::notice title=Abbinamento nomi::" + f"{QUAL['nomi']['abbinati']} nomi abbinati · fiducia bassa {len(_low)} · non abbinati {len(_un)}" + (": " + "; ".join(_un[:12]) if _un else ""))
+    except Exception as e_: print("::warning title=Abbinamento nomi::" + str(e_))
     # 18/10/2026: fuorigioco per squadra (data/fuorigioco.json, per il modello fuorigioco dell'app). Fonti: ramo statextra (storico dal 2022,
     # recuperato da tools/extra_stats_apifootball.py) e archivio giornaliero (indice 13). API-Football registra lo 0-0 di fuorigioco come null per
     # entrambe le squadre: un doppio null diventa 0-0 SOLO se (a) nella partita ci sono tiri in area o possesso, (b) nelle ultime 20 partite del
@@ -1020,7 +1027,10 @@ try:
                     d = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(ROME).date()
                     if not (_now.date() - datetime.timedelta(days=14) <= d <= _now.date()): continue
                     h, a = MAPS[lg].get(v[2]), MAPS[lg].get(v[3])
-                    if not h or not a: _miss.append(f"{lg} {d:%d/%m} {v[2]}-{v[3]} (nomi non abbinati)"); continue
+                    if not h or not a:
+                        _U = apif_extra.CONF.get(lg, {}).get("non_abbinati", {})
+                        if any(str((_U.get(x) or {}).get("diagnosi", "")).startswith("squadra di passaggio") for x in (v[2], v[3]) if not MAPS[lg].get(x)): continue   # 26/10/2026: spareggi con squadre di un'altra serie (es. PK-35): non sono partite del campionato
+                        _miss.append(f"{lg} {d:%d/%m} {v[2]}-{v[3]} (nomi non abbinati)"); continue
                     if not any(abs((x - d).days) <= 3 for x in _pl.get((lg, h, a), [])): _miss.append(f"{lg} {d:%d/%m} {h}-{a}")
             QUAL["giocate_mancanti"] = _miss
             print("::" + ("warning" if _miss else "notice") + " title=Partite giocate mancanti::" + (str(len(_miss)) + ": " + "; ".join(_miss[:25]) if _miss else "nessuna"))
