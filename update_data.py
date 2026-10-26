@@ -840,7 +840,7 @@ try:
         import math as _m
         _VP = os.path.join(os.path.dirname(OUT), "valori", "valori.json"); _XP = os.path.join(OUT, "xi.json")
         XI = json.load(open(_XP)) if os.path.exists(_XP) else {}
-        FORMZ, W_XI, _nxi = {}, (0.368, 0.377, -0.030), 0
+        FORMZ, W_XI, _nxi, _DX = {}, (0.368, 0.377, -0.030), 0, []   # _DX: esito di ogni tentativo (diagnosi nell'avviso)
         _nowu = datetime.datetime.now(datetime.timezone.utc)
         if os.path.exists(_VP):
             _V = json.load(open(_VP)); _GP, _GS, _GR = _V["giocatori"], _V["squadre"], _V["ruoli"]
@@ -858,12 +858,16 @@ try:
                             nm = list(T); hk = v[2] if v[2] in T else nm[0]; ak = v[3] if v[3] in T else [x for x in nm if x != hk][0]
                             if len(T[hk][1]) >= 10 and len(T[ak][1]) >= 10:
                                 XI[fid] = {"t": _nowu.strftime("%Y-%m-%d %H:%M"), "hid": T[hk][0], "aid": T[ak][0], "h": T[hk][1], "a": T[ak][1]}
-                    except Exception as e_: print("formazioni", fid, e_)
+                                _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): presa")
+                            else: _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): titolari {len(T[hk][1])}/{len(T[ak][1])}")
+                        else: _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): " + ("non ancora uscita" if not T else f"{len(T)} squadre nella risposta"))
+                    except Exception as e_: _DX.append(f"{v[2]}–{v[3]}: errore {str(e_)[:80]}")
                 x = XI.get(fid)
                 if not x or mins < -180: continue
                 h, a = MAPS.get(v[1], {}).get(v[2]), MAPS.get(v[1], {}).get(v[3])
                 th, ta = _GS.get(str(x["hid"])), _GS.get(str(x["aid"]))
-                if not h or not a or not th or not ta: continue
+                if not h or not a or not th or not ta:
+                    _DX.append(f"{v[2]}–{v[3]}: " + ("nomi non abbinati ai nostri" if not h or not a else "squadra senza valori dei giocatori")); continue
                 rate = lambda p: (_GP.get(str(p[0])) or _GR.get((p[3] or "M")[:1], _GR["M"]))[:3]
                 sh = [sum(rate(p)[i] for p in x["h"]) for i in range(3)]; sa = [sum(rate(p)[i] for p in x["a"]) for i in range(3)]
                 lg_ = lambda s_, t_, i: _m.log(max(s_[i], 1e-6) / t_[i]) if t_[i] > 0 else 0.0
@@ -879,7 +883,8 @@ try:
         _HP = os.path.join(OUT, "formazioni_hist.json"); _FH = json.load(open(_HP)) if os.path.exists(_HP) else {}
         for k_, x in FORMZ.items(): _FH[k_] = {"fh": x["fh"], "fa": x["fa"], "ora": x["ora"]}
         jdump(_FH, _HP)
-        print("::notice title=Formazioni ufficiali::" + f"{len(FORMZ)} partite con la correzione dei falli, {_nxi} richieste" + ("" if os.path.exists(_VP) else " (valori dei giocatori non disponibili)"))
+        print("::notice title=Formazioni ufficiali::" + f"{len(FORMZ)} partite con la correzione dei falli, {_nxi} richieste" + ("" if os.path.exists(_VP) else " (valori dei giocatori non disponibili)")
+              + (" · " + " · ".join(_DX[:12]) if _DX else ""))
     except Exception as e_: print("::warning title=Formazioni ufficiali::" + str(e_))
     try:   # 26/10/2026 (fase 0): fiducia degli abbinamenti dei nomi API-Football → nostri
         _low = [f"{lg_} {k}→{x['nostro']} ({x['voti']} voti)" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["abbinati"].items() if x["fiducia"] == "bassa"]
