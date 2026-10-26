@@ -52,6 +52,9 @@ jobs:
       - name: "Gestione del capitale · solo gol"
         run: BK_PER=3 Q23_SCEN=q1 python3 tools/bankroll.py
         continue-on-error: true
+      - name: "Gestione del capitale · solo 1X2 statistiche"
+        run: BK_PER=4 Q23_SCEN=q1 python3 tools/bankroll.py
+        continue-on-error: true
       - name: Studio con la quota prima vista
         run: Q23_SCEN=q0 python3 tools/quota23.py
         continue-on-error: true

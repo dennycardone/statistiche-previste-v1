@@ -8,7 +8,7 @@ Mai la probabilità grezza: con la grezza il dimensionamento della puntata esplo
 Regole fissate il 26/10/2026, PRIMA di vedere i risultati:
   cassa iniziale 100, simulazione giorno per giorno; le puntate di un giorno si decidono con la cassa di inizio giornata e si
   saldano a fine giornata (le vincite non si rigiocano lo stesso giorno, prudente).
-  perimetri: solo statistiche · statistiche + formazioni sui falli · tutti i mercati · solo gol
+  perimetri: solo statistiche · statistiche + formazioni sui falli · tutti i mercati · solo gol · solo 1X2 statistiche (dal 26/10)
   flussi:   singole  = ogni esito con valore atteso positivo sulla probabilità corretta (P·Q − 1 > 0), al massimo uno per partita
                        (quello con valore atteso più alto: niente esiti correlati della stessa partita)
             Quota 2  = la combinazione (singola, doppia o tripla, partite diverse) con quota 1xBet 1,85–2,20 e valore atteso più alto
@@ -38,7 +38,10 @@ GOL = {"1X2 gol", "Over/Under 1.5", "Over/Under 2.5", "Over/Under 3.5", "Gol/No 
 TGT = {"Quota 2": (1.85, 2.20), "Quota 3": (2.75, 3.35)}
 START, CAP, KCAP, MIN_DAYS = 100.0, 0.10, 0.03, 100
 PER = [("solo statistiche", lambda c: c["mk"] not in GOL, "pc_"), ("statistiche + formazioni falli", lambda c: c["mk"] not in GOL, "pcX_"),
-       ("tutti i mercati", lambda c: True, "pc_"), ("solo gol", lambda c: c["mk"] in GOL, "pc_")]
+       ("tutti i mercati", lambda c: True, "pc_"), ("solo gol", lambda c: c["mk"] in GOL, "pc_"),
+       # 26/10/2026 (Denny): solo testa a testa sulle statistiche (1X2 corner, tiri, tiri in porta, falli, gialli, fuorigioco), senza
+       # Over/Under cartellini; stesse regole di decisione. La correzione per esito resta quella stimata su tutte le statistiche.
+       ("solo 1X2 statistiche", lambda c: c["mk"] not in GOL and c["mk"].startswith("1X2"), "pc_")]
 METH = ["fissa 1%", "fissa 2%", "Kelly 1/8", "Kelly 1/4", "fasce"]
 note = lambda t, m: print(f"::notice title={t}::" + m.replace("%", "%25").replace("\n", " "))
 days = sorted({c["d"] for c in C})
