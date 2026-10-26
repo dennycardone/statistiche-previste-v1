@@ -4,7 +4,7 @@ dall'aggiornamento principale (che GitHub fa partire anche con un'ora di ritardo
   python tools/formazioni_live.py check   → 1 secondo, 0 richieste: c'è lavoro? (partite che iniziano entro 65 minuti senza formazione,
                                             oppure formazioni prese ma non ancora sul sito). Scrive need=0/1 in $GITHUB_OUTPUT.
   python tools/formazioni_live.py run     → chiede fixtures/lineups a API-Football per quelle partite (una richiesta a partita, al massimo
-                                            40 per giro); se a 12–50 minuti dal fischio qualche formazione non è ancora uscita, riprova una
+                                            40 per giro); se a 12–65 minuti dal fischio qualche formazione non è ancora uscita, riprova una
                                             volta dopo 9 minuti nello stesso giro (finestra tra −45 e −15 minuti mai persa). Poi calcola la
                                             correzione dei falli (xi_corr.py, la stessa dell'aggiornamento principale) e scrive
                                             out/formazioni.json se il sito va aggiornato.
@@ -13,7 +13,7 @@ valori/valori.json (ramo valori). Solo formazioni prese PRIMA del fischio (nessu
 import json, os, sys, time, datetime, urllib.request, urllib.parse, traceback
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.excepthook = lambda t, v, tb: print("::error title=Formazioni (micro)::" + " | ".join(traceback.format_exception(t, v, tb)).replace("\n", " ")[-1500:])
-WIN, RETRY_LO, RETRY_HI, WAIT, MAXREQ = 65, 12, 50, 9 * 60, 40
+WIN, RETRY_LO, RETRY_HI, WAIT, MAXREQ = 65, 12, 65, 9 * 60, 40
 rd = lambda p, d: json.load(open(p)) if os.path.exists(p) and os.path.getsize(p) > 0 else d
 NEXT = rd("pub/prossime.json", [])
 PUB = rd("pub/formazioni.json", {"partite": {}})
