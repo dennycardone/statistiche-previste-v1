@@ -546,7 +546,7 @@ select{pointer-events:none}
 .mhead .vtag{font-family:var(--display);font-stretch:75%;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:1px 6px}
 .mhead .bk-none,.mhead .bk-note{margin:0;padding:12px 14px;font-size:12px;line-height:1.45;color:var(--ink-3);text-align:center}.mhead .bk-none{font-size:14px;color:var(--ink-2);padding:22px 16px}.mhead .bk-note b{color:var(--gold)}
 #selBk .vtag{font-family:var(--display);font-stretch:75%;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:2px 7px;white-space:nowrap}
-.xibox{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface-2)}.xicols{display:grid;grid-template-columns:1fr 1fr;gap:8px}.xicols ul{list-style:none;margin:2px 0 0;padding:0;font-size:12.5px}.xitag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 5px;border-radius:5px;background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--ink);margin-left:6px;vertical-align:middle}.bklist{display:flex;flex-direction:column;gap:6px}.bksort{align-items:center;gap:6px}.qsm{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.whyl{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45}.whyh{font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin:12px 0 0;color:var(--ink-2)}.xibox{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface-2)}.xicols{display:grid;grid-template-columns:1fr 1fr;gap:8px}.xicols ul{list-style:none;margin:2px 0 0;padding:0;font-size:12.5px}.xitag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 5px;border-radius:5px;background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--ink);margin-left:6px;vertical-align:middle}.bklist{display:flex;flex-direction:column;gap:6px}.bksort{align-items:center;gap:6px}.qsm{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .bkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"m m" "p n";align-items:center;gap:6px 10px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;cursor:pointer}
 .bkrow:hover{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
 .bkm{grid-area:m}.bkp{grid-area:p}.bkn{grid-area:n;flex-direction:row!important;align-items:baseline!important;gap:8px}.bkm,.bkp,.bkn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.bkm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkm small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1020,6 +1020,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <div class="mpane" data-mp="prev">
       <section class="mhead" id="mhead" aria-label="Lettura della partita"></section>
       <section class="card" id="mxi" aria-label="Formazioni ufficiali" hidden></section>
+      <section class="card" id="mwhy" aria-label="Perché questi numeri" hidden></section>
       <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
       <section class="card" id="mcmp" aria-label="Confronto con la partita giocata" hidden></section>
       <main id="out" class="wrap" style="padding:0;margin:0;width:100%"></main>
@@ -1105,6 +1106,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <p><b>Media dinamica – falli.</b> Anche per i falli la Media dinamica usa un modello verificato: due regressioni di Poisson, una per la squadra di casa e una per l'ospite, con falli medi del campionato per sede (365 giorni), un rating falli commessi × subiti sugli ultimi 2 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4), falli delle ultime 5 partite (commessi dalla squadra, subiti dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 (chi va spesso in vantaggio fa meno falli) e tiri delle ultime 15. Coefficienti stimati su 8 campionati, stagioni complete 2007/08–2024/25; nel test walk-forward migliore della versione precedente in tutti gli 8 campionati e in 67 stagioni su 73 (nelle altre 6 peggiore di pochi centesimi). Il totale segue una Binomiale Negativa con r = 150, ogni squadra con r = 200 (i falli sono quasi Poisson). Sopra il modello si applica il <b>fattore arbitro</b>: falli reali ÷ previsti nelle sue partite precedenti (dati API-Football), ristretto verso 1 quando ha poche partite e con un tetto di +4% (nel test del 7/10/2026 gli arbitri "severi" non portavano davvero tanti falli in più quanti ne indicava il loro storico; il tetto è stato scelto sulle partite fino al 30/6/2026 e verificato su quelle dopo). Nel test su 12.584 partite migliora la precisione sugli Over falli dell'1,3% circa e l'errore medio dell'1,1%. Nella scheda Disciplina si vede quanto pesa, partita per partita. <b>Formazioni ufficiali</b> (dal 25/10/2026): circa un'ora prima della partita, quando escono gli undici titolari, i falli attesi di ogni squadra si correggono con i giocatori in campo: falli fatti dai suoi titolari e falli subiti dai titolari avversari, ognuno rispetto ai titolari abituali della squadra (valori dei giocatori ogni 90 minuti dalle sole partite precedenti, API-Football dal 2022). Nel test walk-forward su 44.000 partite dal 2023 il 1X2 falli è migliorato sia da luglio 2024 a giugno 2025 sia da luglio 2025 (log-loss −0,0053 e −0,0057, in 35 campionati su 42 e 39 su 44); con la formazione probabile, invece, nessun miglioramento. Le partite corrette hanno l'etichetta XI.</p>
       <p><b>Media dinamica – cartellini.</b> Modello cartellini v2 (gialli + rossi), scelto con un test walk-forward su 47.955 partite API-Football 2022-2026: regressione con media del campionato, cartellini presi e provocati dalle due squadre (media mobile), <b>arbitro</b> (cartellini reali ÷ attesi in tutte le sue partite precedenti e nelle ultime 10, ristretto verso 1), falli fatti e subiti in stagione, scontri diretti degli ultimi 3 anni, avvio di stagione e, dal 24/10/2026, <b>derby</b> (stracittadine e rivalità storiche note, circa 250 coppie in 29 campionati: circa +20% di cartellini; nel test walk-forward su circa 60.000 partite i derby erano sottostimati di circa un cartellino, con il derby le previsioni sono migliorate sia nel 2024-25 sia da luglio 2025, mentre dare più peso agli scontri diretti le peggiorava). Pesi ristimati ogni mese con le sole partite precedenti. Il totale segue una Binomiale Negativa. Se l'arbitro non è ancora stato designato la previsione è senza il suo effetto, e la scheda lo dice. Dal 19/10/2026 la divisione dei cartellini tra le due squadre tiene conto del possesso palla atteso (media del possesso della squadra e di quello concesso dall'avversario, 365 giorni): chi tiene più palla ne prende meno, chi rincorre di più; il totale della partita, e quindi l'Over/Under, non cambia (test walk-forward su 47.336 partite 2022-2026: previsioni per squadra e 1X2 cartellini migliori sia nel 2024-25 sia da luglio 2025).</p>
       <p><b>Fuorigioco.</b> Fuorigioco attesi di ogni squadra = regressione di Poisson con fuorigioco medi del campionato per sede (365 giorni), rating dei fuorigioco commessi dalla squadra (365 giorni, prudenza P = 20) e rating dei fuorigioco provocati dalla difesa avversaria (90 giorni, prudenza P = 5); Binomiale Negativa per squadra (r = 10,68) e sul totale (r = 21,56), 1X2 a squadre indipendenti. Dati API-Football dalla stagione 2023-24: API-Football scrive lo 0-0 di fuorigioco come dato vuoto per entrambe le squadre; un doppio vuoto diventa 0-0 solo se la partita ha le altre statistiche avanzate e il campionato, nelle partite dei giorni precedenti, ha i fuorigioco con regolarità e quasi mai uno 0-0 scritto in chiaro (altrimenti resta un dato mancante). N/D nelle coppe e nei campionati dove nelle ultime 20 partite meno di 15 hanno i fuorigioco. Nel test walk-forward (luglio 2025 – ottobre 2026, 16.629 partite) prevede meglio delle medie delle squadre; Elo e tiri non aggiungono nulla. Il confronto con le quote 1xBet è mostrato senza bollino "valore" finché non è verificato. Dal 25/10/2026 il 1X2 fuorigioco è anche in Precedenti, Rendimento, Tendenze, Digiuni, Grado e Segnali, con le stesse regole degli altri mercati (solo nei campionati dove 1xBet lo quota): nel test walk-forward su 38.168 partite dal 2023-24 le probabilità del lato favorito escono come dichiarate (es. 65-70%: presi 69%; 70-75%: 76%); soglia dei Segnali 65% (da luglio 2025: presi 73% su 903 segnalazioni); Grado stimato sulle stagioni precedenti (A+ preso 90% su 31, A 91% su 82, B 78%, C 74%).</p>
+      <p><b>Perché questi numeri ed "E se…".</b> Nella Lettura di ogni partita da giocare, una frase per statistica spiega i numeri: attesi di ogni squadra contro la media del campionato nella stessa sede (casa o trasferta) e i due fattori che pesano di più in quella partita, presi dai modelli verificati (per i corner e i falli i rating di attacco e difesa delle due squadre; per i falli anche la formazione ufficiale e l'arbitro; per i fuorigioco i fuorigioco commessi e quelli provocati dalla linea difensiva avversaria; per i cartellini i fattori del modello v3: squadre, arbitro, falli, scontri diretti, derby). "E se…" ricalcola nel telefono la stessa previsione togliendo un fattore alla volta (formazioni ufficiali, arbitro, derby, linea difensiva nella media del campionato) e mostra quanto cambiano gli attesi e le probabilità; gli altri fattori restano uguali. Non sono numeri nuovi né consigli di gioco: è lo stesso modello, letto pezzo per pezzo. Sono indicati solo i fattori che spostano la previsione di almeno il 4%.</p>
       <p><b>Valori per tempo.</b> Sotto tiri, tiri in porta e corner la Lettura mostra i valori attesi del 1° e del 2° tempo: valore atteso della partita × quota del 1° tempo del campionato per sede, calcolata dai soli dati reali per tempo di API-Football (dalla stagione 2024-25, solo partite in cui i due tempi sommati coincidono con il totale; campionati con almeno 200 partite). Falli: API-Football non dà i dati per tempo.</p>
       <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote di 1xBet, unico bookmaker di riferimento): quote controllate circa ogni 30 minuti, risultati e statistiche circa ogni ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football. In Radar, Segnali e pallini della home gli 1X2 di corner, tiri, tiri in porta e falli compaiono solo nei campionati dove 1xBet li quota (almeno 1 partita su 2, calcolato a ogni aggiornamento sull'archivio delle quote); nella scheda partita ci sono sempre.</p>
       <p><b>Media dinamica – tiri e tiri in porta.</b> Anche tiri e tiri in porta usano modelli verificati: regressioni di Poisson che partono dalla media di lega per sede (365 giorni). Tiri: rating tiri fatti × concessi degli ultimi 4 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4) con una parte casa/trasferta, tiri delle ultime 10 (fatti dalla squadra, concessi dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 ed Elo. Tiri in porta: rating tiri in porta (una partita di un anno fa pesa il 37%, prudenza P = 8), rating dei tiri totali (chi tira molto finisce per avere più tiri in porta), tiri delle ultime 8 ed Elo. Coefficienti stimati su 8 campionati, solo stagioni in cui football-data misura i tiri nello stesso modo (quota in porta fino al 40%); nel test walk-forward migliori della versione precedente in tutti gli 8 campionati e, per squadra, in ogni stagione. Totale: Binomiale Negativa r = 150 per i tiri e r = 100 per i tiri in porta; per squadra r = 25 e r = 40.</p>
@@ -2333,7 +2335,7 @@ ${esc(away)} = e^(${sd(C.b0)}${sg(C.lmu)}·ln ${f2(F.muA)}${sg(C.lrc)}·ln ${f2(
 tiri non in porta (tiri − tiri in porta, 365 giorni): ${NS ? `${esc(home)} attacco ${f2(NS.aH)} · difesa ${f2(NS.dH)} — ${esc(away)} attacco ${f2(NS.aA)} · difesa ${f2(NS.dA)}
 corner attesi: ${esc(home)} ${f2(lh0)} × e^(${c3(CNS_B)}·${sd(NS.xh)}) = ${f2(lh)} · ${esc(away)} ${f2(la0)} × e^(${c3(CNS_B)}·${sd(NS.xa)}) = ${f2(la)}` : "dati insufficienti, nessuna correzione"}
 distribuzione: Binomiale Negativa sul totale r = ${CD_R_TOT}; per squadra r = ${CD_R_TEAM}; 1X2 con correlazione casa-ospite ${String(COP_C).replace(".", ",").replace("-", "−")}`;
-  return { lh, la, dynText: text, cdyn: true, withElo, r: CD_R_TOT, rTeam: CD_R_TEAM, cop: COP_C, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
+  return { lh, la, dynText: text, cdyn: true, withElo, rt: { aH, dH, aA, dA }, r: CD_R_TOT, rTeam: CD_R_TEAM, cop: COP_C, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
     muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
 }
 
@@ -2412,7 +2414,7 @@ intervallo, ultime 38: ${esc(home)} ${gst(fH)} — ${esc(away)} ${gst(fA)}
 tiri, ultime 15: ${esc(home)} ${s15t(fH)} — ${esc(away)} ${s15t(fA)}
 falli attesi: ${esc(home)} ${f2(lh)} · ${esc(away)} ${f2(la)} · totale ${f2(lh + la)}
 distribuzione: Binomiale Negativa sul totale r = ${FD_R_TOT}; per squadra r = ${FD_R_TEAM}`;
-  return { lh, la, dynText: text, fdyn: true, r: FD_R_TOT, rTeam: FD_R_TEAM, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
+  return { lh, la, dynText: text, fdyn: true, rt: { aH, dH, aA, dA }, r: FD_R_TOT, rTeam: FD_R_TEAM, W: { cl: 0 }, cl: { lh, la }, lg: { lh: F.muH, la: F.muA }, av: { lh, la }, tt: { lh, la },
     muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
 }
 
@@ -2616,6 +2618,80 @@ function xiBoxHTML(home, away, MFx) {
   return `<h2>Formazioni ufficiali <span class="xitag">XI</span></h2>
     <p class="small" style="margin:0">Falli attesi con i titolari di oggi: ${esc(home)} <b class="num">${f1(MFx.preXi.lh)} → ${f1(MFx.lh)}</b> (${pcs(F.fh)}) · ${esc(away)} <b class="num">${f1(MFx.preXi.la)} → ${f1(MFx.la)}</b> (${pcs(F.fa)}). Già applicato a 1X2 falli, Segnali, Grado e Radar.</p>
     <details><summary class="small">Gli undici titolari</summary><div class="xicols"><div><small>${esc(home)}</small><ul>${li(F.xi.h)}</ul></div><div><small>${esc(away)}</small><ul>${li(F.xi.a)}</ul></div></div></details>`;
+}
+/* 26/10/2026 · Prevista 2.0, fase 3: "Perché questi numeri" ed "E se…". Una frase per statistica con i numeri veri di questa partita
+   (attesi di ogni squadra contro la media del campionato nella stessa sede e i due fattori che pesano di più nel modello), poi il what-if
+   calcolato nel browser togliendo un fattore alla volta: formazioni ufficiali, arbitro, derby, linea difensiva (fuorigioco provocati).
+   Solo spiegazione: nessun numero nuovo, gli stessi modelli della Lettura. */
+const WPC = v => { const p = Math.round((v - 1) * 100); return p === 0 ? "nella media" : `${p > 0 ? "+" : "−"}${Math.abs(p)}%`; };
+const WPP = (a, b) => `${pc(a)} → <b>${pc(b)}</b>`;
+function whyStat(lab, home, away, M, muH, muA, drv) {
+  if (!M || !isFinite(M.lh) || !isFinite(M.la)) return "";
+  const vs = (v, mu, sede) => mu > 0 ? ` (${WPC(v / mu)} sulla media ${sede} del campionato, ${f1(mu)})` : "";
+  let s = `<b>${lab}</b> · ${esc(home)} <b class="num">${f1(M.lh)}</b>${vs(M.lh, muH, "in casa")}, ${esc(away)} <b class="num">${f1(M.la)}</b>${vs(M.la, muA, "in trasferta")}.`;
+  const top = (drv || []).filter(d => d[1] > 0 && isFinite(d[1]) && Math.abs(Math.log(d[1])) >= 0.04).sort((a, b) => Math.abs(Math.log(b[1])) - Math.abs(Math.log(a[1]))).slice(0, 2);
+  if (top.length) s += ` Pesa soprattutto ${top.map(d => `${d[0]} (${WPC(d[1])} sulla media)`).join(" e ")}.`;
+  return `<li>${s}</li>`;
+}
+function whyHTML(home, away, cfg) {
+  const L = [], W = [];
+  const lgMu = M => { const B = M && (M.Bp || M); return [B && B.muH, B && B.muA]; };
+  try {   // corner
+    const M = model(home, away, cfg, "c"), rt = M && M.Bp && M.Bp.rt;
+    L.push(whyStat("Corner", home, away, M, ...lgMu(M), rt ? [[`quanti corner batte ${esc(home)}`, rt.aH], [`quanti ne concede ${esc(away)}`, rt.dA], [`quanti corner batte ${esc(away)}`, rt.aA], [`quanti ne concede ${esc(home)}`, rt.dH]] : null));
+  } catch (x) {}
+  try {   // tiri e tiri in porta
+    const S1 = model(home, away, cfg, "s"), S2 = model(home, away, cfg, "st");
+    L.push(whyStat("Tiri", home, away, S1, ...lgMu(S1))); L.push(whyStat("Tiri in porta", home, away, S2, ...lgMu(S2)));
+  } catch (x) {}
+  try {   // falli: rating, arbitro, formazioni
+    const M = model(home, away, cfg, "f"), R = modelRef(home, away, cfg, "f"), B = modelBase(home, away, cfg, "f"), rt = M && M.Bp && M.Bp.rt;
+    if (M) {
+      const drv = rt ? [[`quanti falli commette ${esc(home)}`, rt.aH], [`quanti ne subisce ${esc(away)}`, rt.dA], [`quanti falli commette ${esc(away)}`, rt.aA], [`quanti ne subisce ${esc(home)}`, rt.dH]] : [];
+      if (M.xiF) { drv.push([`la formazione di ${esc(home)}`, M.xiF.fh], [`la formazione di ${esc(away)}`, M.xiF.fa]); }
+      if (R && R.refF) drv.push(["l'arbitro", R.refF]);
+      L.push(whyStat("Falli", home, away, M, ...lgMu(M), drv));
+      const p = X => headToHeadProb(X.lh, X.la, X.r, X.rTeam != null ? X.rTeam : X.r, X.cop || 0);
+      const P = p(M);
+      if (M.xiF && R) { const Q = p(R); W.push(`Senza le formazioni ufficiali: falli attesi ${f1(R.tot)} invece di ${f1(M.tot)}; 1X2 falli ${esc(home)} ${WPP(P.home, Q.home)}, ${esc(away)} ${WPP(P.away, Q.away)}.`); }
+      if (R && R.refF && B) {
+        const Bx = M.xiF ? { ...B, lh: B.lh * M.xiF.fh, la: B.la * M.xiF.fa } : B, Q = p(Bx);
+        W.push(`Senza l'effetto dell'arbitro sui falli (${WPC(R.refF)}): falli attesi ${f1(Bx.lh + Bx.la)} invece di ${f1(M.tot)}; 1X2 falli ${esc(home)} ${WPP(P.home, Q.home)}, ${esc(away)} ${WPP(P.away, Q.away)}.`);
+      }
+    }
+  } catch (x) {}
+  try {   // fuorigioco: attacco e linea difensiva avversaria
+    const O = offModel(home, away);
+    if (O && !O.nd && isFinite(O.lh)) {
+      L.push(whyStat("Fuorigioco", home, away, O, O.muH, O.muA, [[`quanti fuorigioco commette ${esc(home)}`, O.aH], [`quanti ne provoca la linea difensiva di ${esc(away)}`, O.dA], [`quanti fuorigioco commette ${esc(away)}`, O.aA], [`quanti ne provoca la linea difensiva di ${esc(home)}`, O.dH]]));
+      // E se: la linea difensiva più lontana dalla media torna nella media del campionato
+      const side = Math.abs(Math.log(O.dA)) >= Math.abs(Math.log(O.dH)) ? "A" : "H", d = side === "A" ? O.dA : O.dH;
+      if (Math.abs(Math.log(d)) >= 0.04) {
+        const k = Math.pow(d, -OFFC.def), lh = side === "A" ? O.lh * k : O.lh, la = side === "H" ? O.la * k : O.la, RT = OFF_R_TEAM;
+        const P = headToHeadProb(O.lh, O.la, Infinity, RT), Q = headToHeadProb(lh, la, Infinity, RT), who = side === "A" ? away : home, vic = side === "A" ? home : away;
+        W.push(`Con la linea difensiva di ${esc(who)} nella media del campionato (oggi ${WPC(d)}): fuorigioco attesi di ${esc(vic)} ${f1(side === "A" ? lh : la)} invece di ${f1(side === "A" ? O.lh : O.la)}; 1X2 fuorigioco ${esc(home)} ${WPP(P.home, Q.home)}, ${esc(away)} ${WPP(P.away, Q.away)}.`);
+      }
+    }
+  } catch (x) {}
+  try {   // cartellini: fattori del modello v3 (squadre, arbitro, falli, scontri diretti, derby)
+    const x = extraFor(home, away), mu = x && x[4], F = x && Array.isArray(x[8]) && typeof x[8][0] === "number" ? x[8] : null;
+    if (mu > 0 && F) {
+      const [mT, mR, mF, mH, mE, mD] = F, names = [["le due squadre", mT], ["l'arbitro", x[0] ? mR : 1], ["i falli fatti e subiti", mF], ["gli scontri diretti", mH], ["il derby", mD]];
+      const top = names.filter(d => d[1] > 0 && Math.abs(Math.log(d[1])) >= 0.04).sort((a, b) => Math.abs(Math.log(b[1])) - Math.abs(Math.log(a[1]))).slice(0, 2);
+      L.push(`<li><b>Cartellini</b> · attesi <b class="num">${f1(mu)}</b> in totale.${top.length ? ` Pesa soprattutto ${top.map(d => `${d[0]} (${WPC(d[1])})`).join(" e ")}.` : " Nessun fattore si stacca dalla media."}</li>`);
+      const P0 = cardProbs(mu), i45 = CARD_LINES.indexOf(4.5), i35 = CARD_LINES.indexOf(3.5);
+      const wi = (lab, m) => { if (!(m > 0) || Math.abs(Math.log(m)) < 0.04) return; const P1 = cardProbs(mu / m);
+        W.push(`Senza ${lab} (${WPC(m)}): cartellini attesi ${f1(mu / m)} invece di ${f1(mu)}; Over 3,5 ${WPP(P0[i35], P1[i35])}, Over 4,5 ${WPP(P0[i45], P1[i45])}.`); };
+      if (x[0]) wi("l'effetto dell'arbitro sui cartellini", mR);
+      wi("l'effetto derby", mD);
+    }
+  } catch (x) {}
+  const li = L.filter(Boolean);
+  if (!li.length) return "";
+  return `<h2>Perché questi numeri</h2>
+    <ul class="whyl">${li.join("")}</ul>
+    ${W.length ? `<h3 class="whyh">E se…</h3><ul class="whyl">${W.map(w => `<li>${w}</li>`).join("")}</ul>` : ""}
+    <p class="small muted" style="margin:6px 0 0">Stessi modelli della Lettura: "E se…" ricalcola togliendo un fattore alla volta, gli altri restano uguali. Spiegazione, non un consiglio di gioco.</p>`;
 }
 /* 25/10/2026 · Prevista 2.0, fase 1-B: formazioni ufficiali (data/formazioni.json, circa un'ora prima della partita). Falli attesi di ogni
    squadra × e^(0,368·falli fatti dei suoi titolari + 0,377·falli subiti dei titolari avversari − 0,030·cartellini dei suoi titolari), ognuno
@@ -4475,6 +4551,8 @@ function renderMatchExtras(home, away) {
   $("#mref").hidden = true; REFCTX = { home, away, e };
   { const bx = $("#mxi"); let MFx = null; try { MFx = !m && home && away && home !== away ? model(home, away, cfg, "f") : null; } catch (x) {}   // formazioni ufficiali (fase 1-B)
     bx.hidden = !(MFx && MFx.xiF); bx.innerHTML = MFx && MFx.xiF ? xiBoxHTML(home, away, MFx) : ""; }   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
+  { const bw = $("#mwhy"); let h = ""; try { h = !m && home && away && home !== away && !isCup(S.league) ? whyHTML(home, away, cfg) : ""; } catch (x) {}   // fase 3: Perché questi numeri / E se…
+    bw.hidden = !h; bw.innerHTML = h; }
   // confronto previsione / partita giocata
   const cmp = $("#mcmp");
   if (m && G) {
