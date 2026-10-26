@@ -51,7 +51,12 @@ try:
         L = [x for x in L if x[0] >= "2025-01-01" and x[3] is not None and x[4] is not None]
         if not L: continue
         z = sum(1 for x in L if x[3] == 0 and x[4] == 0)
-        if z / len(L) > 0.08: out.append(f"{lg} fuorigioco: 0-0 in {z}/{len(L)} partite (sopra l'8%: controllare la regola dei doppi null)")
+        # 26/10/2026: 0-0 confrontato con quello atteso dai valori scritti (P(casa 0 | ospite >0) × P(ospite 0 | casa >0)): alcuni campionati
+        # hanno pochi fuorigioco e quindi molti 0-0 veri (es. Eredivisie 9%, atteso 8,7%); l'avviso scatta solo se lo 0-0 supera l'atteso di 2 punti
+        ap = [x for x in L if x[4] > 0]; hp = [x for x in L if x[3] > 0]
+        if len(ap) >= 50 and len(hp) >= 50:
+            exp = (sum(1 for x in ap if x[3] == 0) / len(ap)) * (sum(1 for x in hp if x[4] == 0) / len(hp))
+            if z / len(L) - exp > 0.02: out.append(f"{lg} fuorigioco: 0-0 in {z}/{len(L)} partite ({z/len(L)*100:.1f}%, atteso {exp*100:.1f}%): probabili dati mancanti scritti come 0-0")
 except Exception as e: out.append(f"fuorigioco non letto: {e}")
 print("::notice title=Qualità dati · riepilogo::" + f"{len(rows)} partite dal 2025 · " + (", ".join(f"{k} {v}" for k, v in issues.items()) or "nessun problema"))
 for i in range(0, len(out), 25): print("::notice title=Qualità dati · campionati::" + " ‖ ".join(out[i:i + 25]))
