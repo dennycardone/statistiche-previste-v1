@@ -2638,7 +2638,7 @@ function whyHTML(home, away, cfg) {
   const lgMu = M => { const B = M && (M.Bp || M); return [B && B.muH, B && B.muA]; };
   try {   // corner
     const M = model(home, away, cfg, "c"), rt = M && M.Bp && M.Bp.rt;
-    L.push(whyStat("Corner", home, away, M, ...lgMu(M), rt ? [[`quanti corner batte ${esc(home)}`, rt.aH], [`quanti ne concede ${esc(away)}`, rt.dA], [`quanti corner batte ${esc(away)}`, rt.aA], [`quanti ne concede ${esc(home)}`, rt.dH]] : null));
+    L.push(whyStat("Corner", home, away, M, ...lgMu(M), rt ? [[`quanti corner batte ${esc(home)}`, rt.aH], [`quanti corner concede ${esc(away)} agli avversari`, rt.dA], [`quanti corner batte ${esc(away)}`, rt.aA], [`quanti corner concede ${esc(home)} agli avversari`, rt.dH]] : null));
   } catch (x) {}
   try {   // tiri e tiri in porta
     const S1 = model(home, away, cfg, "s"), S2 = model(home, away, cfg, "st");
@@ -2647,7 +2647,7 @@ function whyHTML(home, away, cfg) {
   try {   // falli: rating, arbitro, formazioni
     const M = model(home, away, cfg, "f"), R = modelRef(home, away, cfg, "f"), B = modelBase(home, away, cfg, "f"), rt = M && M.Bp && M.Bp.rt;
     if (M) {
-      const drv = rt ? [[`quanti falli commette ${esc(home)}`, rt.aH], [`quanti ne subisce ${esc(away)}`, rt.dA], [`quanti falli commette ${esc(away)}`, rt.aA], [`quanti ne subisce ${esc(home)}`, rt.dH]] : [];
+      const drv = rt ? [[`quanti falli commette ${esc(home)}`, rt.aH], [`quanti falli subisce ${esc(away)} dagli avversari`, rt.dA], [`quanti falli commette ${esc(away)}`, rt.aA], [`quanti falli subisce ${esc(home)} dagli avversari`, rt.dH]] : [];
       if (M.xiF) { drv.push([`i titolari di oggi di ${esc(home)}`, M.xiF.fh], [`i titolari di oggi di ${esc(away)}`, M.xiF.fa]); }
       if (R && R.refF) drv.push(["l'arbitro", R.refF]);
       L.push(whyStat("Falli", home, away, M, ...lgMu(M), drv));
@@ -2663,7 +2663,7 @@ function whyHTML(home, away, cfg) {
   try {   // fuorigioco: attacco e linea difensiva avversaria
     const O = offModel(home, away);
     if (O && !O.nd && isFinite(O.lh)) {
-      L.push(whyStat("Fuorigioco", home, away, O, O.muH, O.muA, [[`quanti fuorigioco commette ${esc(home)}`, O.aH], [`quanti ne provoca la linea difensiva di ${esc(away)}`, O.dA], [`quanti fuorigioco commette ${esc(away)}`, O.aA], [`quanti ne provoca la linea difensiva di ${esc(home)}`, O.dH]]));
+      L.push(whyStat("Fuorigioco", home, away, O, O.muH, O.muA, [[`quanti fuorigioco commette ${esc(home)}`, O.aH], [`quanti fuorigioco la linea difensiva di ${esc(away)} fa fare agli avversari`, O.dA], [`quanti fuorigioco commette ${esc(away)}`, O.aA], [`quanti fuorigioco la linea difensiva di ${esc(home)} fa fare agli avversari`, O.dH]]));
       // E se: la linea difensiva più lontana dalla media torna nella media del campionato
       const side = Math.abs(Math.log(O.dA)) >= Math.abs(Math.log(O.dH)) ? "A" : "H", d = side === "A" ? O.dA : O.dH;
       if (Math.abs(Math.log(d)) >= 0.04) {
