@@ -87,6 +87,19 @@ jobs:
           # sul sito solo i file che l'app usa (più prossime.json: id API-Football delle prossime partite per il micro-processo delle formazioni): gli archivi grezzi (API-Football, quote storiche, ESPN, CSV) restano nel magazzino privato
           APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
           DATA="formazioni.json prossime.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
+          # 26/10/2026: il micro-processo delle formazioni (formazioni_live.yml) può aver pubblicato formazioni durante questo giro: si tengono
+          # (unione con quelle già sul sito, quelle di questo giro hanno la precedenza; via dopo 3 ore dal fischio come in update_data.py)
+          git fetch -q --depth 1 origin pages 2>/dev/null && git show FETCH_HEAD:data/formazioni.json > /tmp/fz_sito.json 2>/dev/null || true
+          python3 - <<'PY' || echo "::warning title=Formazioni ufficiali::unione con il sito non riuscita"
+          import json, os, datetime
+          if os.path.exists("/tmp/fz_sito.json") and os.path.getsize("/tmp/fz_sito.json") > 0 and os.path.exists("data/formazioni.json"):
+              s, o = json.load(open("/tmp/fz_sito.json")), json.load(open("data/formazioni.json"))
+              oggi = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+              n = 0
+              for k, v in s.get("partite", {}).items():
+                  if k not in o["partite"] and k.split("|")[1] >= oggi: o["partite"][k] = v; n += 1
+              if n: json.dump(o, open("data/formazioni.json", "w"), ensure_ascii=False, separators=(",", ":")); print("formazioni tenute dal sito:", n)
+          PY
           # 19/10/2026: data/stato.json = ora del giro + impronta (sha1) di ogni file. L'app chiede i file come data/x.json?v=impronta:
           # un file uguale al giro prima ha la stessa impronta e il telefono lo riprende dalla sua copia, senza riscaricarlo
           python3 - $DATA <<'PY'
