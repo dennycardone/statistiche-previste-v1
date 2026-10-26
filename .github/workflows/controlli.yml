@@ -1,0 +1,28 @@
+name: Controlli settimanali (calibrazione, solo numeri aggregati)
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "41 6 * * 1"   # ogni lunedì
+  push:
+    branches: [main]
+    paths: [tools/calibrazione.js, tools/calibrazione.py]
+permissions:
+  contents: read
+jobs:
+  calibrazione:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dati pubblicati
+        run: |
+          mkdir -p pub && git fetch -q --depth 1 origin pages
+          for f in bundle bundle_storico extra tiri_area fuorigioco; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Previsioni degli ultimi 120 giorni con i soli dati precedenti
+        run: node tools/calibrazione.js . 120
+      - name: Calibrazione per mercato e campionato
+        run: python3 tools/calibrazione.py
