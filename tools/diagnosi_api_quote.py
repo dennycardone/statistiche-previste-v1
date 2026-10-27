@@ -30,5 +30,7 @@ for f in picked[:4]:
     xb = books.get("1xBet", [])
     stat = [n for n in xb if n and any(w in n.lower() for w in ("foul", "offside", "yellow", "shot", "corner", "card"))]
     others = sorted({b for b, L in books.items() if any("foul" in (n or "").lower() for n in L)})
+    b365 = [n for n in books.get("Bet365", []) if n and any(w in n.lower() for w in ("foul", "offside", "yellow", "shot", "corner", "card", "booking"))]
+    note("Diagnosi API · Bet365 · " + nm, f"mercati Bet365 {len(books.get('Bet365', []))} · statistiche: {', '.join(b365) or 'nessuno'}")
     note("Diagnosi API · " + nm, f"aggiornate {e.get('update', '')[:16]} · bookmaker {len(books)} · mercati 1xBet {len(xb)} · statistiche 1xBet: {', '.join(stat) or 'nessuno'} · "
          f"altri bookmaker con falli: {', '.join(others) or 'nessuno'}")
