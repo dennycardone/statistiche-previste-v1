@@ -57,3 +57,21 @@ if PAT:
     note("Diagnosi quote · calendario API-Football", " ‖ ".join(miss[:12]) or "nessuna")
 rows = [f"{lg}: {ntot[lg]} partite · " + ", ".join(f"{MK[m]} {cov[lg][m]}" for m in MK if cov[lg][m]) for lg in sorted(ntot)]
 note("Diagnosi quote · copertura per campionato", f"giorni {DATES or 'tutti'} ‖ " + " ‖ ".join(rows))
+# per giorno: partite con quote e quante avevano i mercati delle statistiche (tutti i campionati insieme), per vedere quando cambia qualcosa
+byd = collections.defaultdict(collections.Counter)
+for k, x in OH.items():
+    lg, d = k.split("|")[:2]
+    if DATES and d not in DATES: continue
+    q = {**(x.get("prima") or {}).get("q", {}), **(x.get("ultima") or {}).get("q", {})}; ks = {qk.split(":")[0] for qk in q}
+    byd[d]["partite"] += 1
+    for m in MK:
+        if m in ks: byd[d][MK[m]] += 1
+    # nomi dei mercati 1xBet "grezzi" archiviati (x.h1., x.off.): servono a capire se API-Football ha cambiato nome a un mercato
+    for qk in ks:
+        if qk.startswith("x.") and qk not in MK and not qk.startswith("x.h1."): byd[d]["altri:" + qk] += 1
+note("Diagnosi quote · per giorno", " ‖ ".join(f"{d}: " + ", ".join(f"{k} {v}" for k, v in c.most_common() if not k.startswith("altri:")) for d, c in sorted(byd.items())))
+oth = collections.Counter()
+for d, c in byd.items():
+    for k, v in c.items():
+        if k.startswith("altri:"): oth[k[6:]] += v
+note("Diagnosi quote · altri mercati 1xBet archiviati", ", ".join(f"{k} {v}" for k, v in oth.most_common(40)))
