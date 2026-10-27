@@ -1,11 +1,12 @@
 name: Formazioni ufficiali (micro-processo)
-# 26/10/2026 (approvato da Denny): l'aggiornamento principale parte anche con un'ora di ritardo e le formazioni escono 30-60 minuti prima
-# del fischio. Questo giro leggero, ogni 10 minuti, prende solo le formazioni delle partite che iniziano entro 65 minuti; se non c'è niente
-# da fare esce subito (0 richieste API). Se una formazione a 12-50 minuti dal fischio non è ancora uscita riprova dopo 9 minuti nello
-# stesso giro. Pubblica subito la correzione dei falli sul sito (data/formazioni.json), senza aspettare l'aggiornamento principale.
+# 26/10/2026 (approvato da Denny): prende solo le formazioni delle partite che iniziano entro 65 minuti; se non c'è niente da fare non fa
+# richieste API. Pubblica subito la correzione dei falli sul sito (data/formazioni.json), senza aspettare l'aggiornamento principale.
+# 27/10/2026: GitHub fa partire i giri programmati con 30-40 minuti di ritardo e a volte per ore nessuno (27/10: nessun giro dalle 6:00
+# alle 8:36). Ora un giro resta attivo fino a ~5 ore e 45 minuti e controlla ogni 5 minuti (tools/formazioni_loop.sh); i giri
+# programmati ogni 30 minuti servono solo a farne ripartire uno nuovo quando il precedente finisce (mai due insieme).
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch: {}
 concurrency:
   group: formazioni-live
@@ -15,55 +16,12 @@ permissions:
 jobs:
   xi:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
-        with: { ref: main, fetch-depth: 1, sparse-checkout: "xi_corr.py\ntools/formazioni_live.py", sparse-checkout-cone-mode: false }
-      - name: Elenco delle prossime partite e formazioni già prese
-        run: |
-          mkdir -p pub xi_live
-          git fetch -q --depth 1 origin pages && git show FETCH_HEAD:data/prossime.json > pub/prossime.json 2>/dev/null || true
-          git show FETCH_HEAD:data/formazioni.json > pub/formazioni.json 2>/dev/null || true
-          if git ls-remote --exit-code origin xi >/dev/null 2>&1; then git fetch -q --depth 1 origin xi && git show FETCH_HEAD:xi.json > xi_live/xi.json; fi
-      - name: C'è lavoro? (0 richieste)
-        id: chk
-        run: python3 tools/formazioni_live.py check
-      - name: Valori dei giocatori
-        if: steps.chk.outputs.need == '1'
-        run: |
-          mkdir -p valori
-          git fetch -q --depth 1 origin valori && git show FETCH_HEAD:valori.json > valori/valori.json || echo "::warning title=Formazioni (micro)::ramo valori non letto"
-      - name: Formazioni da API-Football e correzione dei falli
-        if: steps.chk.outputs.need == '1'
-        run: python3 tools/formazioni_live.py run
+        with: { ref: main, fetch-depth: 1, sparse-checkout: "xi_corr.py\ntools/formazioni_live.py\ntools/formazioni_loop.sh", sparse-checkout-cone-mode: false }
+      - name: Controllo ogni 5 minuti per quasi 6 ore
+        run: bash tools/formazioni_loop.sh
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
-      - name: Salva le formazioni prese (ramo xi)
-        if: steps.chk.outputs.need == '1'
-        env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          rm -rf _x && mkdir _x && cp xi_live/xi.json _x/ && cd _x
-          git init -q -b xi && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
-          git add -A && git commit -q -m "Formazioni $(date -u '+%F %H:%M')"
-          for t in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" xi && break; sleep 10; done
-      - name: Pubblica la correzione sul sito (solo data/formazioni.json e la sua impronta)
-        if: steps.chk.outputs.need == '1' && hashFiles('out/formazioni.json') != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          for t in 1 2 3 4; do
-            rm -rf _p && git init -q _p && cd _p
-            git fetch -q --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages && git checkout -q -b pages FETCH_HEAD
-            v=$(sha1sum ../out/formazioni.json | cut -c1-12)
-            for d in data docs/data; do
-              [ -d $d ] || continue
-              cp ../out/formazioni.json $d/formazioni.json
-              python3 -c "import json,sys; p=sys.argv[1]; s=json.load(open(p)); s['v']['formazioni']=sys.argv[2]; json.dump(s,open(p,'w'),separators=(',',':'))" $d/stato.json $v
-            done
-            git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
-            git add -A && git commit -q -m "Formazioni ufficiali $(date -u '+%F %H:%M')" || { echo "niente da pubblicare"; exit 0; }
-            git push -q "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages && { echo "pubblicato"; exit 0; }
-            cd .. && sleep 15
-          done
-          echo "::warning title=Formazioni (micro)::pubblicazione sul sito non riuscita (la farà l'aggiornamento principale)"

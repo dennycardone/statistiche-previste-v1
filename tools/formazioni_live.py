@@ -63,7 +63,7 @@ def fetch(ms):
     return left
 
 left = fetch(todo())
-again = [m for m in left if RETRY_LO < mins(m) <= RETRY_HI] if KEY and nreq < MAXREQ else []
+again = [m for m in left if RETRY_LO < mins(m) <= RETRY_HI] if KEY and nreq < MAXREQ and not os.environ.get("FL_LOOP") else []   # nel giro lungo (FL_LOOP) si riprova al controllo dopo, 5 minuti
 if again:   # secondo tentativo nello stesso giro: GitHub può ritardare il giro dopo anche di 20-30 minuti
     time.sleep(WAIT)
     fetch([m for m in again if m["fid"] not in XL["xi"]])

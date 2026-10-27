@@ -888,6 +888,20 @@ try:
                 if not c_: _DX.append(f"{v[2]}–{v[3]}: {why}"); continue
                 k_ = f"{v[1]}|{d_}|{h}|{a}"; _KO[k_] = ko.strftime("%Y-%m-%d %H:%M")
                 FORMZ[k_] = {"fh": c_[0], "fa": c_[1], "ora": x["t"], "xi": xi_corr.entry(x)}
+            # 27/10/2026: rapporto delle ultime 24 ore. Per ogni partita iniziata dei nostri campionati: formazione presa prima del fischio
+            # (con quanti minuti di anticipo) o mancata. Avviso se ne manca più di 1 su 10.
+            _pres, _mis = [], []
+            for fid, v in AP["partite"].items():
+                if v[1] not in AF_LEAGUES_X or v[1] in ("UCL", "UEL"): continue
+                ko = datetime.datetime.fromisoformat(v[0] + ":00+00:00"); ago = (_nowu - ko).total_seconds() / 60
+                if not (10 <= ago <= 24 * 60) or v[9] in ("NS", "TBD", "PST", "CANC", "ABD", "AWD", "WO"): continue
+                x = XI.get(fid); nm_ = f"{v[1]} {v[2]}–{v[3]}"
+                if x and x["t"] < ko.strftime("%Y-%m-%d %H:%M"): _pres.append((ko - datetime.datetime.strptime(x["t"], "%Y-%m-%d %H:%M").replace(tzinfo=datetime.timezone.utc)).total_seconds() / 60)
+                else: _mis.append(nm_ + (" (presa dopo il fischio)" if x else ""))
+            _nt = len(_pres) + len(_mis)
+            QUAL["formazioni"] = {"partite_24h": _nt, "prese_prima": len(_pres), "anticipo_medio_min": round(sum(_pres) / len(_pres)) if _pres else None, "mancate": _mis[:30]}
+            if _nt: print(f"::{'warning' if len(_mis) > 0.1 * _nt else 'notice'} title=Formazioni · ultime 24 ore::prese prima del fischio {len(_pres)} su {_nt}"
+                          + (f" (in media {round(sum(_pres) / len(_pres))} minuti prima)" if _pres else "") + (" · mancate: " + "; ".join(_mis[:12]) if _mis else ""))
             for k_ in [k_ for k_, x in XI.items() if (_nowu - datetime.datetime.strptime(x["t"], "%Y-%m-%d %H:%M").replace(tzinfo=datetime.timezone.utc)).days > 3]: del XI[k_]
         jdump(sorted(_NEXT, key=lambda r: r["ko"]), os.path.join(OUT, "prossime.json"))
         jdump(XI, _XP)
@@ -1375,6 +1389,38 @@ if ODDS_FULL or ODDS_NEAR:
         hp = os.path.join(OUT, "odds_hist.json")
         OH = jload_archive(hp)
         ts = rome_now.strftime("%Y-%m-%d %H:%M")
+        # 27/10/2026: partita spostata di data (es. PSG–Lyon dal 25 al 26/10): la stessa sfida dello stesso campionato entro 4 giorni è UNA
+        # partita; l'archivio della data vecchia si unisce a quello nuovo (prima quota vista, mercati, serie dei movimenti), così la storia
+        # non si spezza in due e i mercati visti prima dello spostamento restano registrati con la loro ora.
+        def _merge_old(new_k, old_k):
+            o_, n_ = OH.pop(old_k), OH.get(new_k, {})
+            m_ = {"prima": o_.get("prima") or n_.get("prima")}
+            if n_.get("prima"):
+                for qk, qv in n_["prima"].get("q", {}).items():
+                    if qk not in m_["prima"]["q"]: m_["prima"]["q"][qk] = qv; m_["prima"].setdefault("ore", {})[qk] = n_["prima"].get("ore", {}).get(qk, n_["prima"]["ora"])
+            if o_.get("ultima") or n_.get("ultima"):
+                m_["ultima"] = {"ora": (n_.get("ultima") or o_.get("ultima"))["ora"], "q": {**(o_.get("ultima") or {}).get("q", {}), **(n_.get("ultima") or {}).get("q", {})}}
+            m_["serie"] = ((o_.get("serie") or []) + (n_.get("serie") or []))[-60:]
+            m_["spostata_da"] = old_k.split("|")[1]
+            m_ = {k_: v_ for k_, v_ in m_.items() if v_}
+            OH[new_k] = m_; _moved.append(f"{old_k} → {new_k.split('|')[1]}")
+        _moved, _byp = [], collections.defaultdict(list)
+        for kk in list(OH): _l, _d, _h, _a = kk.split("|"); _byp[(_l, _h, _a)].append(_d)
+        for kk in allq:   # sfida vista oggi con una data che l'archivio non ha: c'è la stessa sfida pochi giorni prima o dopo?
+            _l, _d, _h, _a = kk.split("|")
+            if kk in OH: continue
+            for _od in _byp.get((_l, _h, _a), []):
+                ok_ = f"{_l}|{_od}|{_h}|{_a}"
+                if ok_ in OH and ok_ not in allq and abs((datetime.date.fromisoformat(_od) - datetime.date.fromisoformat(_d)).days) <= 4: _merge_old(kk, ok_); break
+        for (_l, _h, _a), L_ in _byp.items():   # coppie già spezzate (prima di oggi): la data vecchia smette di essere vista prima della nuova
+            if len(L_) < 2: continue
+            L_ = sorted(L_)
+            for i_ in range(len(L_) - 1):
+                k0, k1 = f"{_l}|{L_[i_]}|{_h}|{_a}", f"{_l}|{L_[i_ + 1]}|{_h}|{_a}"
+                if k0 in OH and k1 in OH and (datetime.date.fromisoformat(L_[i_ + 1]) - datetime.date.fromisoformat(L_[i_])).days <= 4 \
+                        and (OH[k0].get("ultima") or {}).get("ora", "") <= (OH[k1].get("prima") or {}).get("ora", "~"):
+                    _merge_old(k1, k0)
+        if _moved: print("::notice title=Quote · partite spostate::archivio unito per " + str(len(_moved)) + ": " + "; ".join(_moved[:10]))
         for kk, q in allq.items():
             x = OH.setdefault(kk, {})
             if "prima" not in x: x["prima"] = {"ora": ts, "q": dict(q)}
@@ -1402,13 +1448,37 @@ if ODDS_FULL or ODDS_NEAR:
                 if d_ > _t0: continue
                 ks = {q.split(":")[0] for part in ("prima", "ultima") for q in (x.get(part) or {}).get("q", {}) if q.startswith("x.")}
                 if ks: _byl[lg_].append((d_, ks))
-            _tot, _has = collections.Counter(), collections.defaultdict(collections.Counter)
-            for lg_, L_ in _byl.items():
-                L_.sort(key=lambda z: z[0])
-                for m_, key_ in _MK.items():
-                    win = [ks for d_, ks in L_ if d_ < _t0 or key_ in ks][-10:]   # oggi: solo le partite che hanno già quella quota
-                    if len(win) >= 4: _tot[(lg_, m_)] = len(win); _has[m_][lg_] = sum(1 for ks in win if key_ in ks)
-            _mer = {m_: sorted(lg_ for lg_, n_ in _has[m_].items() if n_ / _tot[(lg_, m_)] >= 0.5) for m_ in _MK}
+            # 27/10/2026: regola delle ultime 10 valutata su ognuno degli ultimi 21 giorni: un campionato resta giocabile per 21 giorni
+            # dall'ultima volta che la superava. Motivo: dal 24/10 API-Football ha smesso di passare quasi tutti i mercati 1xBet di falli,
+            # gialli e fuorigioco (e in parte i tiri) anche dove 1xBet li offre: senza margine, Radar e Segnali avrebbero tolto quei mercati
+            # da campionati dove sono giocabili. Un mercato che 1xBet toglie davvero esce comunque dopo 21 giorni.
+            def _ok_at(day_):
+                out_ = collections.defaultdict(set)
+                for lg_, L_ in _byl.items():
+                    for m_, key_ in _MK.items():
+                        win = [ks for d_, ks in L_ if d_ < day_ or (d_ == day_ and key_ in ks)][-10:]
+                        if len(win) >= 4 and sum(1 for ks in win if key_ in ks) / len(win) >= 0.5: out_[m_].add(lg_)
+                return out_
+            for L_ in _byl.values(): L_.sort(key=lambda z: z[0])
+            _d0 = datetime.date.fromisoformat(_t0); _now_ok = _ok_at(_t0); _mer = {m_: set(_now_ok[m_]) for m_ in _MK}; _grace = collections.defaultdict(list)
+            for back_ in range(1, 22):
+                for m_, S_ in _ok_at((_d0 - datetime.timedelta(days=back_)).isoformat()).items():
+                    for lg_ in S_ - _mer[m_]: _mer[m_].add(lg_); _grace[m_].append(lg_)
+            _mer = {m_: sorted(v_) for m_, v_ in _mer.items()}
+            # controllo della fonte: partite degli ultimi 3 giorni con il mercato, contro i 14 giorni prima, solo nei campionati giocabili
+            _src = {}
+            for m_, key_ in _MK.items():
+                if m_ in ("c",): continue
+                rec_ = [key_ in ks for lg_ in _mer[m_] for d_, ks in _byl.get(lg_, []) if (_d0 - datetime.date.fromisoformat(d_)).days in (0, 1, 2)]
+                old_ = [key_ in ks for lg_ in _mer[m_] for d_, ks in _byl.get(lg_, []) if 3 <= (_d0 - datetime.date.fromisoformat(d_)).days <= 16]
+                if len(rec_) >= 8 and len(old_) >= 20:
+                    r1, r0 = sum(rec_) / len(rec_), sum(old_) / len(old_)
+                    if r0 >= 0.3 and r1 < 0.5 * r0: _src[m_] = f"{round(r1 * 100)}% delle partite negli ultimi 3 giorni contro {round(r0 * 100)}% prima"
+            _MKN = {"s": "1X2 tiri", "st": "1X2 tiri in porta", "f": "1X2 falli", "y": "1X2 gialli", "c1": "1X2 corner 1° tempo", "y1": "1X2 gialli 1° tempo", "o": "1X2 fuorigioco"}
+            if _src:
+                print("::warning title=Quote 1xBet · fonte ridotta::" + " · ".join(f"{_MKN.get(m_, m_)}: {v_}" for m_, v_ in _src.items())
+                      + " · API-Football non passa la quota anche dove 1xBet offre il mercato: nell'app compare N.D. con la spiegazione; Radar e Segnali tengono il mercato (margine di 21 giorni)")
+            QUAL_SRC = _src
             # 24/10/2026: falli 1X2 di Championship, Segunda e 2. Bundesliga visti da Denny su 1xBet dal 23/10 (archivio: E1 1/1, SP2 1/1,
             # D2 2/2 il 23/10). Inseriti subito fino al 2/11, poi decide solo la regola delle ultime 10 (a quel punto hanno le partite).
             if _t0 <= "2026-11-02":
@@ -1417,8 +1487,9 @@ if ODDS_FULL or ODDS_NEAR:
             # 1X2 del 1° tempo di tiri, tiri in porta e falli: 1xBet li offre dove offre quello della partita intera (verifica di Denny,
             # 19/10/2026), ma API-Football non li passa: stessi campionati della partita intera, segnati come presunti
             for m_ in ("s", "st", "f"): _mer[m_ + "1"] = list(_mer[m_])
-            jdump({"soglia": "almeno 5 delle ultime 10 partite", "giocabili": _mer,
-                   "presunti": ["s1", "st1", "f1"]}, os.path.join(OUT, "mercati.json"))
+            jdump({"soglia": "almeno 5 delle ultime 10 partite, in un giorno qualsiasi degli ultimi 21", "giocabili": _mer,
+                   "presunti": ["s1", "st1", "f1"], "fonte_ridotta": {m_: v_ for m_, v_ in _src.items()},
+                   "margine": {m_: sorted(set(v_)) for m_, v_ in _grace.items() if v_}}, os.path.join(OUT, "mercati.json"))
             print("mercati 1X2 giocabili:", {m_: len(v_) for m_, v_ in _mer.items()})
         except Exception as e_: print("::warning title=Mercati giocabili::" + str(e_))
     print("quote:", len(res), "partite,", af_used[0], "richieste,", len(nomatch), "non abbinate")
@@ -1487,6 +1558,16 @@ if QUAL.get("quote") and QUAL["quote"]["abbinate"] + QUAL["quote"]["non_abbinate
 if QUAL.get("squadre_non_riconosciute"): _av.append(f"{len(QUAL['squadre_non_riconosciute'])} squadre di API-Football non riconosciute")
 if QUAL.get("partite_scadute"): _av.append(f"{len(QUAL['partite_scadute'])} partite non giocate con data passata (rinviate o calendario non aggiornato)")
 if QUAL.get("statistiche_scartate"): _av.append(f"{len(QUAL['statistiche_scartate'])} partite con statistiche API impossibili (usato football-data o vuoto)")
+# 27/10/2026: quote 1xBet che la fonte non passa più e formazioni mancate (rigore sul riporto, richiesta di Denny)
+try:
+    _fr = json.load(open(os.path.join(OUT, "mercati.json"))).get("fonte_ridotta") or {}
+    _MKN = {"s": "1X2 tiri", "st": "1X2 tiri in porta", "f": "1X2 falli", "y": "1X2 gialli", "c1": "1X2 corner 1° tempo", "y1": "1X2 gialli 1° tempo", "o": "1X2 fuorigioco"}
+    if _fr: _av.append("Quote 1xBet ridotte dalla fonte (API-Football): " + "; ".join(f"{_MKN.get(k, k)} {v}" for k, v in _fr.items()) + ". Dove manca la quota, controllare su 1xBet")
+    QUAL["quote_fonte_ridotta"] = _fr
+except Exception: pass
+_fz = QUAL.get("formazioni") or {}
+if _fz.get("partite_24h") and len(_fz.get("mancate") or []) > 0.1 * _fz["partite_24h"]:
+    _av.append(f"Formazioni ufficiali: mancate {len(_fz['mancate'])} su {_fz['partite_24h']} partite nelle ultime 24 ore")
 try:
     if not AF_PRO: _av.append("API-Football non disponibile: dati dalle fonti gratuite")
     elif QUAL.get("api_aggiornata") and (datetime.datetime.now(ROME) - datetime.datetime.strptime(QUAL["api_aggiornata"], "%Y-%m-%d %H:%M").replace(tzinfo=ROME)).total_seconds() > 3 * 3600:
