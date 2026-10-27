@@ -4,6 +4,7 @@ on:
     inputs:
       date: { description: "giorni (AAAA-MM-GG, separati da virgola)", required: false, default: "" }
       match: { description: "testo da cercare nelle partite (separati da virgola)", required: false, default: "" }
+      api: { description: "anche i mercati che API-Football passa oggi (poche richieste dalla riserva per le prove)", required: false, default: "no" }
 permissions:
   contents: read
 jobs:
@@ -22,3 +23,8 @@ jobs:
         env:
           DIAG_DATE: ${{ inputs.date }}
           DIAG_MATCH: ${{ inputs.match }}
+      - name: Mercati 1xBet che API-Football passa oggi (nomi, mai quote)
+        if: inputs.api == 'si'
+        run: python3 tools/diagnosi_api_quote.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
