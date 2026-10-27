@@ -108,3 +108,7 @@ note("Radar Mercato · soglia minima di riuscita", [0.55, 0.60, 0.62, 0.65, 0.68
   return `da ${Math.round(t * 100)}%: ${(R.length / nd).toFixed(1)} al giorno · prima metà ${a ? `${a.n} presa ${Math.round(a.h * 100)}% (dich ${Math.round(a.p * 100)}%) ${a.roi >= 0 ? "+" : ""}${(a.roi * 100).toFixed(1)}% ±${(a.ci * 100).toFixed(0)}` : "-"} | seconda ${b ? `${b.n} presa ${Math.round(b.h * 100)}% (dich ${Math.round(b.p * 100)}%) ${b.roi >= 0 ? "+" : ""}${(b.roi * 100).toFixed(1)}% ±${(b.ci * 100).toFixed(0)}` : "-"}`;
 }).join(" ‖ "));
 note("Radar Mercato · soglia 65% per mercato", by(V.filter(r => r.p >= 0.65), r => r.fam + (r.team ? " (squadra)" : "") + " " + (r.side === "O" ? "Over" : "Under")).sort().map(([k, R]) => `${k}: ${fmt(st(R))}`).join(" ‖ "));
+// 27/10/2026: verifica IN AVANTI delle soglie adottate nell'app (65% di base, 70% evidenziate), solo sulle partite dal 28/10 (fissate
+// prima di vedere questi risultati). Decisione con le regole di Quota 2/3: lettura il 7/12/2026, decisione il 18/1/2027.
+const FWD = "2026-10-28", F = V.filter(r => r.d >= FWD);
+note("Radar Mercato · verifica in avanti (dal 28/10)", F.length ? `dal 65%: ${fmt(st(F.filter(r => Math.round(r.p * 100) >= 65)))} ‖ dal 70%: ${fmt(st(F.filter(r => Math.round(r.p * 100) >= 70)))} ‖ sotto il 65% (nascoste): ${fmt(st(F.filter(r => Math.round(r.p * 100) < 65)))}` : "nessuna partita giocata dal 28/10");
