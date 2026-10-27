@@ -2680,10 +2680,11 @@ function whyHTML(home, away, cfg) {
   } catch (x) {}
   const li = L.filter(Boolean);
   if (!li.length) return "";
-  return `<h2>Perché questi numeri</h2>
+  // 27/10/2026 (Denny): in tendina, chiusa all'apertura della partita
+  return `<details class="fold"><summary><h2>Perché questi numeri</h2></summary>
     <ul class="whyl">${li.join("")}</ul>
     ${W.length ? `<h3 class="whyh">E se…</h3><ul class="whyl">${W.map(w => `<li>${w}</li>`).join("")}</ul>` : ""}
-    <p class="small muted" style="margin:6px 0 0">Stessi modelli della Lettura: "E se…" ricalcola togliendo un fattore alla volta, gli altri restano uguali. Spiegazione, non un consiglio di gioco.</p>`;
+    <p class="small muted" style="margin:6px 0 0">Stessi modelli della Lettura: "E se…" ricalcola togliendo un fattore alla volta, gli altri restano uguali. Spiegazione, non un consiglio di gioco.</p></details>`;
 }
 /* 25/10/2026 · Prevista 2.0, fase 1-B: formazioni ufficiali (data/formazioni.json, circa un'ora prima della partita). Falli attesi di ogni
    squadra × e^(0,368·falli fatti dei suoi titolari + 0,377·falli subiti dei titolari avversari − 0,030·cartellini dei suoi titolari), ognuno
