@@ -1,0 +1,30 @@
+name: Verifica Radar Mercato (solo numeri aggregati)
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "29 6 * * 1"   # ogni lunedì, con l'archivio quote cresciuto
+  push:
+    branches: [main]
+    paths: [tools/radar_mercato.js]
+permissions:
+  contents: read
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivi dal magazzino privato
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Dati pubblicati
+        run: |
+          mkdir -p pub && git fetch -q --depth 1 origin pages
+          for f in bundle extra tiri_area fuorigioco; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+          git show FETCH_HEAD:data/bundle_storico.json > pub/bundle_storico.json 2>/dev/null || rm -f pub/bundle_storico.json
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: Verifica
+        run: node tools/radar_mercato.js .
