@@ -3,7 +3,7 @@
 # per ore non ne fa partire nessuno: un solo giro resta attivo fino a ~5 ore e 45 minuti e controlla ogni 5 minuti (0 richieste API se
 # non c'è niente da fare). Un avviso riassuntivo alla fine (gli avvisi di GitHub sono limitati).
 set -u
-END=$(( $(date +%s) + ${LOOP_SECONDS:-20700} )); n=0; npub=0; : > /tmp/fl_log.txt
+END=$(( $(date +%s) + ${LOOP_SECONDS:-20700} )); n=0; npub=0; nkick=0; : > /tmp/fl_log.txt
 REPO="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 publish() {
   for t in 1 2 3 4; do
@@ -36,9 +36,24 @@ while :; do
       && git add -A && git commit -q -m "Formazioni $(date -u '+%F %H:%M')" && for t in 1 2 3; do git push -q -f "$REPO" xi && break; sleep 10; done )
     if [ -s out/formazioni.json ]; then publish && npub=$((npub+1)); fi
   fi
+  # 27/10/2026: anche l'aggiornamento principale (quote, risultati) dipende dai giri programmati di GitHub, che saltano: se l'ultimo è
+  # partito più di 30 minuti fa e non ce n'è uno in coda o in corso, lo fa partire (workflow_dispatch; nessuna richiesta API qui).
+  last=$(curl -s -H "Authorization: Bearer ${GH_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/update.yml/runs?per_page=5" \
+    | python3 -c "import json,sys,datetime
+try:
+    R=json.load(sys.stdin)['workflow_runs']
+    if any(r['status'] in ('queued','in_progress','waiting','pending','requested') for r in R): print('busy')
+    else:
+        t=max(datetime.datetime.fromisoformat(r['created_at'].replace('Z','+00:00')) for r in R)
+        print(int((datetime.datetime.now(datetime.timezone.utc)-t).total_seconds()//60))
+except Exception: print('err')")
+  if [ "$last" != "busy" ] && [ "$last" != "err" ] && [ "$last" -ge 30 ]; then
+    curl -s -o /dev/null -w "%{http_code}" -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+      "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/update.yml/dispatches" -d '{"ref":"main"}' | grep -q 204 && { nkick=$((nkick+1)); echo "aggiornamento principale fatto partire (ultimo $last minuti fa)" >> /tmp/fl_log.txt; }
+  fi
   [ $(( $(date +%s) + 300 )) -ge $END ] && break
   sleep 300
 done
-echo "::notice title=Formazioni (micro, giro lungo)::controlli $n · formazioni prese $(grep -o ': presa' /tmp/fl_log.txt | wc -l) · pubblicazioni sul sito $npub · ultime: $(grep -o '[^·]*: presa' /tmp/fl_log.txt | tail -12 | tr '\n' ';')"
+echo "::notice title=Formazioni (micro, giro lungo)::controlli $n · formazioni prese $(grep -o ': presa' /tmp/fl_log.txt | wc -l) · pubblicazioni sul sito $npub · aggiornamenti principali fatti partire $nkick · ultime: $(grep -o '[^·]*: presa' /tmp/fl_log.txt | tail -12 | tr '\n' ';')"
 grep -q 'non ancora uscita' /tmp/fl_log.txt && echo "::notice title=Formazioni (micro) · tentativi a vuoto::$(grep -o '[^·]*non ancora uscita' /tmp/fl_log.txt | sort | uniq -c | sort -rn | head -10 | tr '\n' ';')"
 exit 0

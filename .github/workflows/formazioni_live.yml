@@ -3,7 +3,8 @@ name: Formazioni ufficiali (micro-processo)
 # richieste API. Pubblica subito la correzione dei falli sul sito (data/formazioni.json), senza aspettare l'aggiornamento principale.
 # 27/10/2026: GitHub fa partire i giri programmati con 30-40 minuti di ritardo e a volte per ore nessuno (27/10: nessun giro dalle 6:00
 # alle 8:36). Ora un giro resta attivo fino a ~5 ore e 45 minuti e controlla ogni 5 minuti (tools/formazioni_loop.sh); i giri
-# programmati ogni 30 minuti servono solo a farne ripartire uno nuovo quando il precedente finisce (mai due insieme).
+# programmati ogni 30 minuti servono solo a farne ripartire uno nuovo quando il precedente finisce (mai due insieme). Lo stesso giro
+# fa partire l'aggiornamento principale se l'ultimo è partito più di 30 minuti fa (quote e risultati sempre freschi).
 on:
   schedule:
     - cron: "*/30 * * * *"
@@ -13,6 +14,7 @@ concurrency:
   cancel-in-progress: false
 permissions:
   contents: write
+  actions: write   # per far partire l'aggiornamento principale quando GitHub salta i suoi giri
 jobs:
   xi:
     runs-on: ubuntu-latest
