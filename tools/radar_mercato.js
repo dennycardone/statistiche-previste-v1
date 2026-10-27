@@ -96,3 +96,8 @@ const pb = r => r.p < 0.5 ? "probabilità sotto 50%" : r.p < 0.6 ? "50-60%" : r.
 note("Radar Mercato · per probabilità (ordinamento Riuscita)", by(V, pb).sort().map(([k, R]) => `${k}: ${fmt(st(R))}`).join(" ‖ "));
 const half = days[Math.floor(days.length / 2)] || "";
 note("Radar Mercato · stabilità", `prima metà (fino al ${half}): ${fmt(st(V.filter(r => r.d < half)))} ‖ seconda metà: ${fmt(st(V.filter(r => r.d >= half)))}`);
+// 27/10/2026: le prime N giocate di ogni giorno con i due ordinamenti dell'app (Guadagno = valore atteso, Riuscita = probabilità)
+const byDay = new Map(); V.forEach(r => (byDay.get(r.d) || byDay.set(r.d, []).get(r.d)).push(r));
+const topN = (N, f) => [...byDay.values()].flatMap(L => L.slice().sort(f).slice(0, N));
+const fEV = (a, b) => b.ev - a.ev || b.p - a.p, fP = (a, b) => b.p - a.p || b.ev - a.ev;
+note("Radar Mercato · prime giocate del giorno: Guadagno contro Riuscita", [1, 3, 5, 10].map(N => `prime ${N}: Guadagno ${fmt(st(topN(N, fEV)))} | Riuscita ${fmt(st(topN(N, fP)))}`).join(" ‖ "));
