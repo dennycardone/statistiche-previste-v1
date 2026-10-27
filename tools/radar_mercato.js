@@ -101,3 +101,10 @@ const byDay = new Map(); V.forEach(r => (byDay.get(r.d) || byDay.set(r.d, []).ge
 const topN = (N, f) => [...byDay.values()].flatMap(L => L.slice().sort(f).slice(0, N));
 const fEV = (a, b) => b.ev - a.ev || b.p - a.p, fP = (a, b) => b.p - a.p || b.ev - a.ev;
 note("Radar Mercato · prime giocate del giorno: Guadagno contro Riuscita", [1, 3, 5, 10].map(N => `prime ${N}: Guadagno ${fmt(st(topN(N, fEV)))} | Riuscita ${fmt(st(topN(N, fP)))}`).join(" ‖ "));
+// 27/10/2026: soglia minima di riuscita per alleggerire il Radar Mercato. Scelta sulla prima metà dei giorni, verifica sulla seconda.
+const nd = Math.max(1, days.length);
+note("Radar Mercato · soglia minima di riuscita", [0.55, 0.60, 0.62, 0.65, 0.68, 0.70, 0.72, 0.75].map(t => {
+  const R = V.filter(r => r.p >= t), a = st(R.filter(r => r.d < half)), b = st(R.filter(r => r.d >= half));
+  return `da ${Math.round(t * 100)}%: ${(R.length / nd).toFixed(1)} al giorno · prima metà ${a ? `${a.n} presa ${Math.round(a.h * 100)}% (dich ${Math.round(a.p * 100)}%) ${a.roi >= 0 ? "+" : ""}${(a.roi * 100).toFixed(1)}% ±${(a.ci * 100).toFixed(0)}` : "-"} | seconda ${b ? `${b.n} presa ${Math.round(b.h * 100)}% (dich ${Math.round(b.p * 100)}%) ${b.roi >= 0 ? "+" : ""}${(b.roi * 100).toFixed(1)}% ±${(b.ci * 100).toFixed(0)}` : "-"}`;
+}).join(" ‖ "));
+note("Radar Mercato · soglia 65% per mercato", by(V.filter(r => r.p >= 0.65), r => r.fam + (r.team ? " (squadra)" : "") + " " + (r.side === "O" ? "Over" : "Under")).sort().map(([k, R]) => `${k}: ${fmt(st(R))}`).join(" ‖ "));
