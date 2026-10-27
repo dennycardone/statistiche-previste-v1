@@ -1464,7 +1464,7 @@ if ODDS_FULL or ODDS_NEAR:
             for back_ in range(1, 22):
                 for m_, S_ in _ok_at((_d0 - datetime.timedelta(days=back_)).isoformat()).items():
                     for lg_ in S_ - _mer[m_]: _mer[m_].add(lg_); _grace[m_].append(lg_)
-            _mer = {m_: sorted(v_) for m_, v_ in _mer.items()}
+            _mer = {m_: sorted(v_ - REMOVED) for m_, v_ in _mer.items()}   # campionati tolti dall'app: fuori anche da qui
             # controllo della fonte: partite degli ultimi 3 giorni con il mercato, contro i 14 giorni prima, solo nei campionati giocabili
             _src = {}
             for m_, key_ in _MK.items():
