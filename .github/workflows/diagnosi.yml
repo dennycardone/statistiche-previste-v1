@@ -1,0 +1,24 @@
+name: Diagnosi quote (solo presenza e orari dei mercati, mai le quote)
+on:
+  workflow_dispatch:
+    inputs:
+      date: { description: "giorni (AAAA-MM-GG, separati da virgola)", required: false, default: "" }
+      match: { description: "testo da cercare nelle partite (separati da virgola)", required: false, default: "" }
+permissions:
+  contents: read
+jobs:
+  diagnosi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivi dal magazzino privato
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Diagnosi
+        run: python3 tools/diagnosi_quote.py
+        env:
+          DIAG_DATE: ${{ inputs.date }}
+          DIAG_MATCH: ${{ inputs.match }}
