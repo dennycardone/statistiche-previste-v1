@@ -8,7 +8,7 @@ import json, glob, pickle, datetime, collections, bisect
 FX = []
 for fn in glob.glob(P2 + "/form2/*.json"):
     D = json.load(open(fn))
-    if "partite" not in D: continue
+    if not isinstance(D.get("partite"), dict) or "lega" not in D: continue   # 28/10/2026: valori.json e altri file non di campionato
     for fid, v in D["partite"].items(): FX.append((v[0][:10], D["lega"], v))
 sched = collections.defaultdict(list)
 for d, lg, v in FX:

@@ -24,7 +24,7 @@ log = lambda *a: print(*a, flush=True)
 FX, INJ = [], collections.defaultdict(list)
 for fn in glob.glob(FORM + "/*.json"):
     D = json.load(open(fn))
-    if "partite" not in D: continue
+    if not isinstance(D.get("partite"), dict) or "lega" not in D: continue   # 28/10/2026: valori.json e altri file non di campionato
     for fid, v in D["partite"].items(): FX.append((v[0], D["lega"], fid, v))
     for x in D.get("infortuni") or []:
         if x[3] == "Missing Fixture": INJ[str(x[0])].append((x[1], x[2]))
