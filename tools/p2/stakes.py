@@ -5,9 +5,12 @@ raggiungere il 4° posto o può essere raggiunta dalla zona retrocessione (ultim
   xi_nulla   1 se nelle ultime 10 giornate non è più in corsa né in alto né in basso (nulla in gioco)
   xi_gap     |differenza di posizione| tra le due squadre / squadre del campionato
 Uscita feat_stakes.pkl con chiavi dell'app (campionato, data, casa, ospite)."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import json, glob, pickle, collections
 F = {}
-for fn in glob.glob("/home/claude/research/p2/base/*.json"):
+for fn in glob.glob(P2 + "/base/*.json"):
     lg = fn.split("/")[-1][:-5]; R = json.load(open(fn)); R.sort(key=lambda r: r["d"])
     by = collections.defaultdict(list)
     for r in R: by[r["se"]].append(r)
@@ -31,6 +34,6 @@ for fn in glob.glob("/home/claude/research/p2/base/*.json"):
                 f[side] = {"xi_late": late, "xi_nulla": int(late and not can_top and not can_fall), "xi_gap": abs(pos[t] - pos[o]) / N}
             F[(lg, r["d"], r["h"], r["a"])] = f
             if r["y"]["g"][0] is not None: pend.append((r["h"], r["a"], r["y"]["g"][0], r["y"]["g"][1]))
-pickle.dump(F, open("/home/claude/research/p2/feat_stakes.pkl", "wb"))
+pickle.dump(F, open(P2 + "/feat_stakes.pkl", "wb"))
 print("partite", len(F), "· squadre-partita con nulla in gioco:", sum(1 for f in F.values() for s in "ha" if f[s]["xi_nulla"]),
       "· nelle ultime 10 giornate:", sum(1 for f in F.values() for s in "ha" if f[s]["xi_late"]))

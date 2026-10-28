@@ -4,12 +4,15 @@ Under 2,5, Gol/No gol, 1X2 gol (lato favorito), 1X2 di corner, tiri, tiri in por
 Ogni giorno si sceglie la combinazione "migliore" (probabilità congiunta massima dentro la fascia che corrisponde a una quota 2 o 3),
 come singola, doppia o tripla di partite diverse. Si confronta la probabilità dichiarata con l'uscita reale, poi si stima una
 calibrazione sulle sole giornate precedenti (binning isotonico) e si ricontrolla. Nessuna quota: le fasce sono di probabilità."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import json, glob, math, sys, itertools, collections, numpy as np, pandas as pd
-sys.path.insert(0, "/home/claude/statistiche-previste-v1/tools"); import harness as H
+sys.path.insert(0, REPO + "/tools"); import harness as H
 from scipy.stats import poisson
 ev = []   # (date, match_id, mercato, p, esito)
 B = []
-for fn in glob.glob("/home/claude/research/p2/base/*.json"):
+for fn in glob.glob(P2 + "/base/*.json"):
     lg = fn.split("/")[-1][:-5]
     for r in json.load(open(fn)): r["lg"] = lg; B.append(r)
 def dc_matrix(lh, la, rho, N=10):
@@ -19,7 +22,7 @@ def dc_matrix(lh, la, rho, N=10):
     return M / M.sum()
 import os
 for mid, r in enumerate(B):
-    if os.path.exists("/home/claude/research/p2/q23_events.pkl"): break
+    if os.path.exists(P2 + "/q23_events.pkl"): break
     if r["d"] < "2023-07-01": continue
     y = r["y"]
     if r.get("g") and y["g"][0] is not None:
@@ -37,9 +40,9 @@ for mid, r in enumerate(B):
         rt = None if m[2] in (-1, None) else m[2]; rT = float("inf") if m[3] == -1 else m[3]
         P = H.h2h(m[0], m[1], rt, rT, m[4] or 0.0); one = P[0] >= P[2]
         ev.append((r["d"], mid, "1X2 " + k, P[0] if one else P[2], int(yy[0] > yy[1]) if one else int(yy[1] > yy[0])))
-E = pd.DataFrame(ev, columns=["date", "mid", "mk", "p", "y"]) if not __import__("os").path.exists("/home/claude/research/p2/q23_events.pkl") else pd.read_pickle("/home/claude/research/p2/q23_events.pkl")
+E = pd.DataFrame(ev, columns=["date", "mid", "mk", "p", "y"]) if not __import__("os").path.exists(P2 + "/q23_events.pkl") else pd.read_pickle(P2 + "/q23_events.pkl")
 print("eventi", len(E), "giorni", E.date.nunique(), flush=True)
-E.to_pickle("/home/claude/research/p2/q23_events.pkl")
+E.to_pickle(P2 + "/q23_events.pkl")
 # calibrazione dei singoli eventi (tutti) per controllo
 E["bin"] = (E.p // 0.05) * 0.05
 print(E[E.p >= 0.5].groupby("bin").agg(n=("y", "size"), presi=("y", "mean"), p=("p", "mean")).round(3).to_string())
@@ -64,7 +67,7 @@ for date, day in E.groupby("date"):
         for n in (1, 2, 3):
             b = pick(day, n, lo, hi)
             if b: rows.append(dict(date=date, quota=q, n=n, p=b[0], y=b[1], mk="+".join(b[2])))
-R = pd.DataFrame(rows); R.to_pickle("/home/claude/research/p2/q23_picks.pkl")
+R = pd.DataFrame(rows); R.to_pickle(P2 + "/q23_picks.pkl")
 print("\nSCELTA DEL GIORNO (massima probabilità nella fascia): dichiarata contro reale")
 for (q, n), g in R.groupby(["quota", "n"]):
     se = math.sqrt(g.y.mean() * (1 - g.y.mean()) / len(g))

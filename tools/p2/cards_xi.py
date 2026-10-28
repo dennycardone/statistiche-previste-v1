@@ -4,10 +4,13 @@ con derby) più una variabile alla volta, pesi stimati sulle sole partite preced
   XF  propensione ai falli commessi dei titolari (somma delle due squadre, log)
   RS  riposo: giorni dall'ultima partita (media delle due squadre, tetto 14)
 Giudizio: log-loss della Binomiale Negativa sul totale, verifica (lug 2024 – giu 2025) e holdout (da lug 2025), IC al 95%."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import sys, math, types, pickle, json, datetime
-sys.path.insert(0, "/home/claude/statistiche-previste-v1"); sys.path.insert(0, "/tmp/claude-0/h2h")
+sys.path.insert(0, REPO + ""); sys.path.insert(0, "/tmp/claude-0/h2h")
 from load import load
-FEAT = pickle.load(open("/home/claude/research/p2/feat2.pkl", "rb")); REST = pickle.load(open("/home/claude/research/p2/feat_rest.pkl", "rb"))
+FEAT = pickle.load(open(P2 + "/feat2.pkl", "rb")); REST = pickle.load(open(P2 + "/feat_rest.pkl", "rb"))
 IDX = {}
 for src, D in (("xi", FEAT), ("rest", REST)):
     for k, f in D.items(): IDX[(src, k[0], k[1], k[2], k[3])] = f
@@ -25,7 +28,7 @@ def RS(lg, d, h, a):
     f = look("rest", lg, d, h, a)
     if not f or not f.get("h") or not f.get("a"): return 0.0
     return (f["h"]["xi_rest"] + f["a"]["xi_rest"]) / 2 - 6.0
-src = open("/home/claude/statistiche-previste-v1/cards_model.py").read()
+src = open(REPO + "/cards_model.py").read()
 def variant(extra):
     s = src
     if extra:

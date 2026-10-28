@@ -9,9 +9,12 @@ partite fittizie. Per ogni squadra e partita:
   - ab_<k>:  peso degli assenti noti rispetto ai titolari abituali
 Unione con la baseline dell'app (base/<lg>.json, nomi dell'app) per data ±1 e risultato, come apif_extra.learn_map.
 Uscita: feat.pkl = {(lg, data, casa, ospite): {"h": {...}, "a": {...}}}."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import json, glob, math, collections, pickle, sys, os
 import numpy as np
-FORM = sys.argv[1] if len(sys.argv) > 1 else "/home/claude/research/lineups/formazioni"
+FORM = sys.argv[1] if len(sys.argv) > 1 else P2 + "/form2"
 DP, DT, K = 0.97, 0.85, 5.0
 STAT = ["sh", "sot", "fc", "fd", "off", "crd", "tk", "duel", "drib"]          # colonne: tiri, tiri in porta, falli fatti, falli subiti, fuorigioco, cartellini
 IDX = {"sh": 9, "sot": 10, "fc": 7, "fd": 8, "off": 12}

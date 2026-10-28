@@ -2,12 +2,15 @@
 uscito 52,8%; Over 1,5 74,6% contro 76,5%). Correzione: gol attesi × (media gol del campionato negli ultimi D giorni / ultimi 365)^β,
 medie con le sole partite dei giorni precedenti, β stimato mese per mese sulle sole partite precedenti (Poisson sui gol per squadra).
 Giudizio con l'harness su Over/Under 2,5 (esito binario) e 1X2 gol."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import json, glob, sys, math, collections, datetime, numpy as np, pandas as pd
 from scipy.stats import poisson
 from scipy.optimize import minimize_scalar
-sys.path.insert(0, "/home/claude/statistiche-previste-v1/tools"); import harness as H
+sys.path.insert(0, REPO + "/tools"); import harness as H
 B = []
-for fn in glob.glob("/home/claude/research/p2/base/*.json"):
+for fn in glob.glob(P2 + "/base/*.json"):
     lg = fn.split("/")[-1][:-5]
     for r in json.load(open(fn)):
         if r.get("g") and r["y"]["g"][0] is not None: r["lg"] = lg; B.append(r)

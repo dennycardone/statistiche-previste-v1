@@ -6,12 +6,15 @@ le varianti dove sono accettati in tutte, quindi stesso bersaglio):
   R1  R0 + il doppio vuoto è 0-0 solo se, nelle partite precedenti del campionato, la quota di doppi vuoti non supera lo 0-0 atteso di oltre 2 punti
   R2  R1 + nei campionati dove la quota di 0-0 SCRITTI supera di oltre 2 punti quella attesa, anche lo 0-0 scritto è un dato mancante
 Modello: lo stesso fuorigioco dell'app (OFFC, rating 365/90 giorni, prudenza 20/5, Binomiale Negativa r = 10,68)."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import json, glob, math, collections, datetime, sys, numpy as np, pandas as pd
-sys.path.insert(0, "/home/claude/statistiche-previste-v1/tools"); import harness as H
+sys.path.insert(0, REPO + "/tools"); import harness as H
 from scipy.stats import nbinom
 OFFC = dict(b0=0.1354244, lmu=0.7332036, att=0.9284822, de=1.1294708); TA, PA, TD, PD, RT = 365, 20, 90, 5, 10.68
 def load(lg):
-    d = json.load(open(f"/home/claude/research/p2/sx/{lg}.json")); L = []
+    d = json.load(open(f"{P2}/sx/{lg}.json")); L = []
     for fid, r in d.items():
         Hs, As = r[3], r[4]
         if not Hs or not As or len(Hs) < 14: continue

@@ -2,11 +2,14 @@
 "scelta" (griglia) contro quella fissa dell'app (corner −0,20, tiri −0,24, le altre 0), giudizio su verifica e holdout con l'harness.
 (2) Correlazioni tra statistiche dei residui (PIT gaussianizzati, stessa squadra e tra le due squadre): falli↔cartellini, tiri↔corner…,
 per capire se un modello congiunto ha qualcosa da imparare oltre a ciò che i modelli già usano."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import json, glob, sys, math, numpy as np, pandas as pd
 from scipy.stats import nbinom, poisson, norm
-sys.path.insert(0, "/home/claude/statistiche-previste-v1/tools"); import harness as H
+sys.path.insert(0, REPO + "/tools"); import harness as H
 B = []
-for fn in glob.glob("/home/claude/research/p2/base/*.json"):
+for fn in glob.glob(P2 + "/base/*.json"):
     lg = fn.split("/")[-1][:-5]
     for r in json.load(open(fn)):
         if r["d"] >= "2023-07-01": r["lg"] = lg; B.append(r)

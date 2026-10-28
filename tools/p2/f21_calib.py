@@ -5,11 +5,14 @@ Modelli confrontati (pesi stimati sui soli mesi precedenti):
   B  correzione per mercato: logit p' = a_m + b_m·logit p
   C  B + scarto per campionato (a_ml, ristretto verso 0 con penalità ridge λ, scelta sul periodo "scelta")
 Giudizio con harness: log-loss binaria, IC al 95% a blocchi per settimana, verifica (lug 2024 – giu 2025) e holdout (da lug 2025)."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import json, glob, math, sys, collections, numpy as np, pandas as pd
-sys.path.insert(0, "/home/claude/statistiche-previste-v1/tools"); import harness as H
-E = pd.read_pickle("/home/claude/research/p2/q23_events.pkl")
+sys.path.insert(0, REPO + "/tools"); import harness as H
+E = pd.read_pickle(P2 + "/q23_events.pkl")
 B = []
-for fn in glob.glob("/home/claude/research/p2/base/*.json"):
+for fn in glob.glob(P2 + "/base/*.json"):
     lg = fn.split("/")[-1][:-5]
     for r in json.load(open(fn)): B.append((lg, r["se"]))
 E["lg"] = E.mid.map(lambda i: B[i][0]); E["season"] = E.mid.map(lambda i: B[i][1])
@@ -68,7 +71,7 @@ for lam in (20, 100, 500):
     sc = r.get("scelta", {}).get("diff", 9)
     if best is None or sc < best[0]: best = (sc, lam, pC)
 print("λ scelto sul periodo di scelta:", best[1])
-E["pB"] = pB; E["pC"] = best[2]; E.to_pickle("/home/claude/research/p2/f21_events.pkl")
+E["pB"] = pB; E["pC"] = best[2]; E.to_pickle(P2 + "/f21_events.pkl")
 # per mercato (holdout): app contro C
 H_ = E[(E.date >= "2025-07-01") & E.pC.notna()]
 ll = lambda p, y: -np.mean(y * np.log(p) + (1 - y) * np.log(1 - p))

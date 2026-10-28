@@ -1,0 +1,73 @@
+name: Archivio di ricerca (ricostruzione settimanale)
+# 28/10/2026 (Denny: "dobbiamo avere tutto l'archivio a disposizione"). Ricostruisce ogni settimana i dati derivati che servono alla
+# ricerca (prima esistevano solo nella cartella di lavoro di Claude, persa il 26/10) e li salva sul ramo "ricerca":
+#   base/<campionato>.json  previsioni walk-forward dell'app (solo dati dei giorni precedenti) su tutte le partite dal 2023 (tools/p2/base.js)
+#   feat2.pkl · feat_rest.pkl · feat_stakes.pkl  caratteristiche dei titolari, riposo, posta in gioco (tools/p2)
+# Le materie prime restano dove sono: rami storico, statextra, formazioni, tempi, valori, xi (pubblici) e archivi privati (quote 1xBet,
+# archivio partite, formazioni registrate, giocate del Radar) nel magazzino privato più la copia cifrata giornaliera sul ramo backup.
+# Questo giro controlla anche che ogni archivio privato sia nella copia cifrata. Nessuna richiesta API.
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "13 2 * * 0"   # domenica notte
+permissions:
+  contents: write
+jobs:
+  ricerca:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - name: Magazzino privato (solo per l'inventario)
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Inventario degli archivi privati (nomi e dimensioni, mai il contenuto)
+        run: |
+          BK="odds_hist.json apif.json odds.json formazioni_hist.json mercato_storico.json"
+          ls -la data | awk 'NR>1 && $5>0 {printf "%s %.1fMB; ", $9, $5/1048576}' > /tmp/inv.txt
+          miss=""; for f in $BK; do [ -f data/$f ] || miss="$miss $f"; done
+          echo "::notice title=Archivio · magazzino privato::$(cat /tmp/inv.txt)"
+          [ -z "$miss" ] || echo "::warning title=Archivio::mancano nel magazzino:$miss"
+      - name: Dati pubblicati e rami delle materie prime
+        run: |
+          mkdir -p pub ricerca/form2 && git fetch -q --depth 1 origin pages
+          for f in bundle bundle_storico extra tiri_area fuorigioco; do git show FETCH_HEAD:data/$f.json > pub/$f.json 2>/dev/null || rm -f pub/$f.json; done
+          git fetch -q --depth 1 origin formazioni && git archive FETCH_HEAD | tar -x -C ricerca/form2
+          echo "formazioni: $(ls ricerca/form2 | wc -l) file"
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy pandas scipy
+      - name: Previsioni walk-forward dell'app su tutte le partite dal 2023 (base/)
+        run: |
+          LGS=$(node -e 'const h=require("fs").readFileSync("index.html","utf8"); const a=h.indexOf("const LEAGUES = ["), b=h.indexOf("];", a); console.log([...h.slice(a,b).matchAll(/code: "([A-Z0-9]+)"/g)].map(m=>m[1]).join(","))')
+          echo "campionati: $LGS"
+          P2_OUT=ricerca/base node tools/p2/base.js "$LGS" 2023
+      - name: Caratteristiche dei titolari, riposo, posta in gioco
+        continue-on-error: true
+        run: |
+          export RICERCA=$PWD/ricerca
+          python3 tools/p2/players.py ricerca/form2 ricerca/feat2.pkl
+          python3 tools/p2/rest.py
+          python3 tools/p2/stakes.py
+      - name: Salva sul ramo ricerca
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(ls ricerca/base/*.json 2>/dev/null | wc -l); [ "$n" -ge 20 ] || { echo "::error title=Archivio di ricerca::solo $n campionati in base/, non salvato"; exit 1; }
+          rm -rf _r && mkdir _r && cp -r ricerca/base _r/ && cp ricerca/*.pkl _r/ 2>/dev/null || true
+          cp tools/p2/ARCHIVIO.md _r/LEGGIMI.md
+          python3 - <<'PY'
+          import json, glob, os, datetime
+          L = {os.path.basename(f)[:-5]: len(json.load(open(f))) for f in sorted(glob.glob("_r/base/*.json"))}
+          json.dump({"agg": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), "partite": L, "totale": sum(L.values()),
+                     "file": sorted(os.listdir("_r"))}, open("_r/indice.json", "w"), indent=1)
+          print(f"::notice title=Archivio di ricerca::{len(L)} campionati, {sum(L.values())} partite con previsioni walk-forward · " + ", ".join(sorted(os.listdir('_r'))))
+          PY
+          cd _r && git init -q -b ricerca && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Archivio di ricerca $(date -u '+%F %H:%M')"
+          for t in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ricerca && break; sleep 20; done

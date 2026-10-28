@@ -2,8 +2,11 @@
 Baseline = previsioni dell'app con i soli dati precedenti (base/*.json). Correzione e^(b·x) sui valori attesi di ogni squadra, pesi
 stimati mese per mese sulle sole partite precedenti (harness.walk_forward), 1X2 ricalcolato con le stesse distribuzioni dell'app
 (harness.h2h). Scelta delle variabili sul periodo "scelta", giudizio su "verifica" e "holdout" (harness.confronta)."""
+import os as _os
+P2 = _os.environ.get("RICERCA", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "ricerca"))   # 28/10/2026: archivio di ricerca (ramo ricerca)
+REPO = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..")
 import json, glob, pickle, collections, sys, datetime, numpy as np, pandas as pd
-sys.path.insert(0, "/home/claude/statistiche-previste-v1/tools"); import harness as H
+sys.path.insert(0, REPO + "/tools"); import harness as H
 FEAT = pickle.load(open(sys.argv[1] if len(sys.argv) > 1 else "feat.pkl", "rb"))
 B = []
 for fn in glob.glob("base/*.json"):
