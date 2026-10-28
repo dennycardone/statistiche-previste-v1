@@ -1,0 +1,29 @@
+name: Studio 1° tempo sulle quote 1xBet (solo numeri aggregati)
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: [tools/quote_1t.py]
+permissions:
+  contents: read
+jobs:
+  studio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivi dal magazzino privato
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Dati pubblicati e statistiche per tempo
+        run: |
+          mkdir -p pub tempi && git fetch -q --depth 1 origin pages
+          for f in bundle bundle_storico; do git show FETCH_HEAD:data/$f.json > pub/$f.json 2>/dev/null || true; done
+          git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy scipy
+      - name: 1xBet e il 1° tempo dei corner
+        run: python3 tools/quote_1t.py
