@@ -6,7 +6,7 @@ on:
   workflow_dispatch: {}
   push:   # parte da solo anche quando cambiano l'app o gli script che preparano i dati
     branches: [main]
-    paths: [index.html, precalc.js, update_data.py, cards_model.py, apif_extra.py, team_ranges.py, derby.py, xi_corr.py]
+    paths: [index.html, precalc.js, update_data.py, cards_model.py, apif_extra.py, team_ranges.py, derby.py, xi_corr.py, tools/mercato_ieri.js]
 concurrency:   # mai due aggiornamenti insieme
   group: aggiorna-dati
   cancel-in-progress: false
@@ -73,6 +73,9 @@ jobs:
           else echo "::warning title=Tempi::ramo tempi non scaricato: resta il tempi.json del giro precedente"; fi
       - name: Previsioni della home
         run: node precalc.js
+      - name: Radar Mercato · giocate bloccate al fischio ed esiti di ieri (data/mercato_ieri.json)
+        run: node tools/mercato_ieri.js
+        continue-on-error: true
       - name: Previsioni Champions League (ramo champions, preparate da champions.yml)
         run: |
           if git ls-remote --exit-code origin champions >/dev/null 2>&1; then
@@ -86,7 +89,7 @@ jobs:
           rm -rf _site && mkdir _site
           # sul sito solo i file che l'app usa (più prossime.json: id API-Football delle prossime partite per il micro-processo delle formazioni): gli archivi grezzi (API-Football, quote storiche, ESPN, CSV) restano nel magazzino privato
           APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
-          DATA="formazioni.json prossime.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
+          DATA="formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
           # 26/10/2026: il micro-processo delle formazioni (formazioni_live.yml) può aver pubblicato formazioni durante questo giro: si tengono
           # (unione con quelle già sul sito, quelle di questo giro hanno la precedenza; via dopo 3 ore dal fischio come in update_data.py)
           git fetch -q --depth 1 origin pages 2>/dev/null && git show FETCH_HEAD:data/formazioni.json > /tmp/fz_sito.json 2>/dev/null || true
