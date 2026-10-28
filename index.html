@@ -5280,7 +5280,8 @@ const BK_C = new Map();
 function bkEntry(e, cfg) {
   const key = e.id + "|" + cfg.key; if (BK_C.has(key)) return BK_C.get(key);
   const LB = bkLines(e); let out = [];
-  if (LB && !e.lg.noStats) withLeague(e.lg.code, () => {   // 28/10/2026: niente giocate nei campionati senza statistiche (National League: solo gol) const c0 = S.cutoff; S.cutoff = null;
+  // 28/10/2026: niente giocate nei campionati senza statistiche (National League: solo gol)
+  if (LB && !e.lg.noStats) withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = null;
     try {
       let G = null, M = null, MT = null, MF = null; try { G = modelGoals(e.home, e.away, cfg); M = model(e.home, e.away, cfg); MT = modelShots(e.home, e.away, cfg); MF = model(e.home, e.away, cfg, "f"); } catch (x) {}
       const x = extraFor(e.home, e.away);
