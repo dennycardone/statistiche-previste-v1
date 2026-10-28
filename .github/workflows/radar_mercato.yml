@@ -5,7 +5,7 @@ on:
     - cron: "29 6 * * 1"   # ogni lunedì, con l'archivio quote cresciuto
   push:
     branches: [main]
-    paths: [tools/radar_mercato.js]
+    paths: [tools/radar_mercato.js, tools/radar_corretta.py]
 permissions:
   contents: read
 jobs:
@@ -28,3 +28,9 @@ jobs:
         with: { node-version: "22" }
       - name: Verifica
         run: node tools/radar_mercato.js .
+        env: { RM_DUMP: rm_all.json }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Probabilità corretta (Prevista + 1xBet senza margine)
+        run: pip install -q numpy && python3 tools/radar_corretta.py
+        env: { RM_DUMP: rm_all.json }

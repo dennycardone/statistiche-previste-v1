@@ -42,7 +42,7 @@ function lines(q) {   // come update_data.py (linee.json)
   }
   return out;
 }
-const rows = []; let nPl = 0, nLB = 0;
+const rows = [], ALL = []; let nPl = 0, nLB = 0;
 for (const [key, v] of Object.entries(OH)) {
   const m = A.S.matches.get(key); if (!m || m.hg == null) continue;
   nPl++;
@@ -70,6 +70,7 @@ for (const [key, v] of Object.entries(OH)) {
         const eo = po * o - 1, eu = (1 - po) * u - 1, side = eo >= eu ? "O" : "U", ev = Math.max(eo, eu);
         const p = side === "O" ? po : 1 - po, odd = side === "O" ? o : u, hit = side === "O" ? real > L : real < L;
         rows.push({ key, d, lg, k, fam: FAM[k], side, p, odd, ev, hit: hit ? 1 : 0, val: ev >= BK_MIN, team: k.length > 1 && k !== "st" });
+        ALL.push({ key, d, lg, k, fam: FAM[k], team: k.length > 1 && k !== "st", L, o, u, po, over: real > L ? 1 : 0 });
       }
     });
   } catch (e) { } finally { A.S.cutoff = c0; }
@@ -112,3 +113,6 @@ note("Radar Mercato · soglia 65% per mercato", by(V.filter(r => r.p >= 0.65), r
 // prima di vedere questi risultati). Decisione con le regole di Quota 2/3: lettura il 7/12/2026, decisione il 18/1/2027.
 const FWD = "2026-10-28", F = V.filter(r => r.d >= FWD);
 note("Radar Mercato · verifica in avanti (dal 28/10)", F.length ? `dal 65%: ${fmt(st(F.filter(r => Math.round(r.p * 100) >= 65)))} ‖ dal 70%: ${fmt(st(F.filter(r => Math.round(r.p * 100) >= 70)))} ‖ sotto il 65% (nascoste): ${fmt(st(F.filter(r => Math.round(r.p * 100) < 65)))}` : "nessuna partita giocata dal 28/10");
+// 28/10/2026: tutte le linee valutate (probabilità di Prevista, quote, esito) per il test della probabilità corretta (tools/radar_corretta.py).
+// File SOLO nel runner, mai pubblicato.
+if (process.env.RM_DUMP) fs.writeFileSync(process.env.RM_DUMP, JSON.stringify(ALL));
