@@ -20,7 +20,7 @@ API_ONLY = {"SRB": (286, "Super Liga", False), "CRO": (210, "HNL", False), "CZE"
 # 26/10/2026: tolte anche Bulgaria (falli mancanti su tutte le partite lug-ott 2026, fuorigioco 0-0 sospetti) e Ungheria, su richiesta
 # 26/10/2026 sera (Denny): tolti anche Israele, Scozia Championship e League One, Finlandia, Polonia, Romania, Serbia, Cina, Croazia.
 # Un solo elenco: niente download, niente richieste API, niente quote; i loro file e le loro partite vengono cancellati.
-REMOVED = {"SVK", "UKR", "BUL", "HUN", "ISR", "SC1", "SC2", "FIN", "POL", "ROU", "SRB", "CHN", "CRO"}
+REMOVED = {"SVK", "UKR", "BUL", "HUN", "ISR", "SC1", "SC2", "FIN", "POL", "ROU", "SRB", "CHN", "CRO", "EC"}   # 28/10/2026: anche la National League
 LEAGUES = [l for l in LEAGUES if l not in REMOVED]
 NEW_LEAGUES = [l for l in NEW_LEAGUES if l not in REMOVED]
 API_ONLY = {k: v for k, v in API_ONLY.items() if k not in REMOVED}
