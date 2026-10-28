@@ -75,3 +75,12 @@ for d, c in byd.items():
     for k, v in c.items():
         if k.startswith("altri:"): oth[k[6:]] += v
 note("Diagnosi quote · altri mercati 1xBet archiviati", ", ".join(f"{k} {v}" for k, v in oth.most_common(40)))
+# 28/10/2026: mercati 1xBet del 1° tempo archiviati (x.h1.*): per mercato, partite con quella quota nei giorni scelti
+H1 = collections.Counter(); NH = 0
+for k, x in OH.items():
+    lg, d = k.split("|")[:2]
+    if DATES and d not in DATES: continue
+    NH += 1
+    q = {**(x.get("prima") or {}).get("q", {}), **(x.get("ultima") or {}).get("q", {})}
+    for m in {qk.split(":")[0] for qk in q if qk.startswith("x.h1.")}: H1[m[5:]] += 1
+note("Diagnosi quote · mercati 1xBet del 1° tempo", f"partite {NH} ‖ " + " ‖ ".join(f"{m} {n}" for m, n in H1.most_common(40)))

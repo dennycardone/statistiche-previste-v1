@@ -5,6 +5,7 @@ on:
       date: { description: "giorni (AAAA-MM-GG, separati da virgola)", required: false, default: "" }
       match: { description: "testo da cercare nelle partite (separati da virgola)", required: false, default: "" }
       api: { description: "anche i mercati che API-Football passa oggi (poche richieste dalla riserva per le prove)", required: false, default: "no" }
+      tempi: { description: "cosa dà API-Football sul 1° tempo (3 richieste dalla riserva)", required: false, default: "no" }
       book: { description: "confronto dei bookmaker (mercati delle statistiche, oggi e domani; fino a 40 richieste dalla riserva)", required: false, default: "no" }
 permissions:
   contents: read
@@ -32,5 +33,10 @@ jobs:
       - name: Confronto dei bookmaker (nomi dei mercati, mai quote)
         if: inputs.book == 'si'
         run: python3 tools/diagnosi_bookmaker.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Dati del 1° tempo su API-Football (nomi e conteggi)
+        if: inputs.tempi == 'si'
+        run: python3 tools/diagnosi_tempi.py
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
