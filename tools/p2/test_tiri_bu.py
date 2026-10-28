@@ -8,8 +8,8 @@ Per ogni partita, con le sole partite precedenti (point-in-time):
   - minuti attesi: media decaduta dei minuti giocati quando parte titolare (ristretta verso la media del ruolo), al massimo 90
   - subentrati: media decaduta per partita dei tiri dei non titolari della squadra
   Lo stesso per i tiri in porta.
-Modello: valore atteso dell'app × e^(b·x) con x = ln(tiri dal basso / valore atteso dell'app): b = 0 è il modello attuale, b = 1 il
-solo modello dal basso; b stimato mese per mese sulle sole partite precedenti (harness.walk_forward). 1X2 "chi ne fa di più" con le
+Modello: valore atteso dell'app × e^(c + b·x) con x = ln(tiri dal basso / valore atteso dell'app): b = 0 è il modello attuale, b = 1 il
+solo modello dal basso, c assorbe lo scarto fisso tra tiri per giocatore e tiri di squadra; b stimato mese per mese sulle sole partite precedenti (harness.walk_forward). 1X2 "chi ne fa di più" con le
 stesse distribuzioni dell'app (harness.h2h). Scelta di K e della variante (minuti attesi o 90') sul periodo "scelta", giudizio su
 verifica e holdout (harness.confronta, regola di adozione).
 Dati: ricerca/form2 (ramo formazioni), ricerca/base (ramo ricerca). Uscita: ricerca/res_tiri_bu.json."""
@@ -51,7 +51,7 @@ def build(K, use_min):
         return min(90.0, (m[0] + 3 * gm) / (m[1] + 3))
     for d, lg, fid, v in FX:
         _, hid, aid, hn, an, hg, ag, xh, xa, P = v
-        if len(xh) >= 10 and len(xa) >= 10 and G[:, 0].sum() > 5e6:
+        if len(xh) >= 10 and len(xa) >= 10 and G[:, 0].sum() > 1e6:   # come players.py (i totali per ruolo decadono: si stabilizzano sotto i 3 milioni)
             f = {}
             for side, tid, xi in (("h", hid, xh), ("a", aid, xa)):
                 B = bench.get(tid)
@@ -112,11 +112,13 @@ def evaluate(FK, k, var):
         for side, j in (("h", 0), ("a", 1)):
             bu = f[side][var]; mu0 = m[j]
             if not (bu > 0 and mu0 > 0): continue
-            T.append(dict(i=i, side=j, date=r["d"], lg=r["lg"], season=r["se"], mu0=mu0, y=y[j], x=math.log(bu / mu0)))
+            T.append(dict(i=i, side=j, date=r["d"], lg=r["lg"], season=r["se"], mu0=mu0, y=y[j], x=math.log(bu / mu0), one=1.0))
     T = pd.DataFrame(T)
     if not len(T): return None, None, 0
     rT = rows[T.i.iloc[0]][0][k][3]; rT = None if rT in (-1, None) else rT
-    T2, coefs = H.walk_forward(T, ["x"], r=rT)
+    # 28/10/2026: con la costante (one): i tiri per giocatore di API-Football sono in media ~29% meno di quelli di squadra; senza costante
+    # questo scarto fisso sposterebbe tutte le previsioni. Conta solo come cambia la formazione rispetto al solito.
+    T2, coefs = H.walk_forward(T, ["x", "one"], r=rT)
     P = []
     for i, g in T2.groupby("i"):
         if len(g) != 2 or g.mu.isna().any(): continue
