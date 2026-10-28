@@ -17,6 +17,7 @@ OH = json.load(open("data/odds_hist.json")); AP = json.load(open("data/apif.json
 def nb_over(mu, r, L):
     k = np.arange(0, int(L) + 1); q = r / (r + mu)
     p = np.exp(gammaln(k + r) - gammaln(r) - gammaln(k + 1) + r * np.log(q) + k * np.log1p(-q)); return 1 - p.sum()
+LAST = {}
 def implied(q, mk, r):
     L = {}
     for k, v in q.items():
@@ -33,7 +34,7 @@ def implied(q, mk, r):
             d = abs(1 / o["O"] - 1 / o["U"])
             if best is None or d < best[0]: best = (d, ln, o["O"], o["U"])
     if not best: return None
-    _, ln, oo, uu = best; p = (1 / oo) / (1 / oo + 1 / uu)
+    _, ln, oo, uu = best; p = (1 / oo) / (1 / oo + 1 / uu); LAST[mk] = (ln, p)
     lo, hi = 0.01, 40.0
     for _ in range(60):
         mid = (lo + hi) / 2
@@ -73,7 +74,7 @@ for d, lg, h, a, c1, ct in rows:
         hh, aa = MAP.get((lg, h)), MAP.get((lg, a))
         if hh and aa:
             IDX[(lg, d, hh, aa)] = math.log(sh(tm[(lg, h)]) / s_lg) + math.log(sh(tm[(lg, a)]) / s_lg)
-            REAL[(lg, d, hh, aa)] = (c1 / ct, s_lg)
+            REAL[(lg, d, hh, aa)] = (c1 / ct, s_lg, c1, ct)
     L[0] = L[0] * 0.999 + c1; L[1] = L[1] * 0.999 + ct
     for t in (h, a): S = tm[(lg, t)]; S[0] = S[0] * DEC + c1; S[1] = S[1] * DEC + ct
 def look(D, lg, d, h, a):
@@ -87,7 +88,7 @@ for k, x in OH.items():
     m90, m1 = implied(q, "x.cou", 60.0), implied(q, "x.h1.total_corners_1st_half", 8.8)
     if not m90 or not m1: continue
     lg, d, h, a = k.split("|")
-    out.append(dict(lg=lg, ratio=m1 / m90, idx=look(IDX, lg, d, h, a), real=look(REAL, lg, d, h, a)))
+    out.append(dict(lg=lg, ratio=m1 / m90, idx=look(IDX, lg, d, h, a), real=look(REAL, lg, d, h, a), l1=LAST["x.h1.total_corners_1st_half"], l90=LAST["x.cou"]))
 R = np.array([o["ratio"] for o in out])
 if not len(R): note("Quote 1° tempo · corner", "nessuna partita con entrambe le linee"); sys.exit(0)
 by = collections.defaultdict(list)
@@ -103,3 +104,9 @@ if len(J) >= 30:
     note("Quote 1° tempo · corner · segue le squadre?", f"partite abbinate {len(J)} · correlazione indice delle squadre ↔ rapporto 1xBet {c(ix, bk):+.3f} · indice ↔ quota reale {c(ix, re_):+.3f} · "
          f"rapporto 1xBet ↔ quota reale {c(bk, re_):+.3f} · quota reale media {re_.mean():.3f} contro rapporto 1xBet {bk.mean():.3f} e quota del campionato {sl.mean():.3f}")
 else: note("Quote 1° tempo · corner · segue le squadre?", f"partite abbinate all'archivio per tempo: {len(J)} (troppo poche)")
+# calibrazione diretta (senza ipotesi sulla dispersione): probabilità Over senza margine di 1xBet contro quanto è successo
+if len(J) >= 30:
+    for lab, key, col in (("1° tempo", "l1", 2), ("partita (controllo)", "l90", 3)):
+        P = np.array([o[key][1] for o in J]); Y = np.array([1.0 if o["real"][col] > o[key][0] else 0.0 for o in J])
+        se = math.sqrt(P.mean() * (1 - P.mean()) / len(P))
+        note(f"Quote 1° tempo · corner · calibrazione Over {lab}", f"partite {len(J)} · Over senza margine di 1xBet {100 * P.mean():.1f} · realizzato {100 * Y.mean():.1f} · differenza {100 * (Y.mean() - P.mean()):+.1f} punti (±{196 * se:.1f})")
