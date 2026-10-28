@@ -18,6 +18,9 @@ Regola: entra nell'app solo se migliora in modo significativo nella verifica, ne
 | 26/10 | Titolari sui cartellini: falli commessi dei titolari (XF) | cartellini | piccolo ma stabile | −0,0002 ±0,0001 / −0,0004 ±0,0002 |
 | 26/10 | Titolari sui cartellini: cartellini dei titolari (XC) | cartellini | no (prima stagione non significativa) | −0,0003 ±0,0004 / −0,0004 ±0,0003 |
 | 28/10 | Tiri e tiri in porta costruiti dal basso (titolari ufficiali: tiri ogni 90' ristretti verso il ruolo × minuti attesi + subentrati), unito al modello con peso stimato mese per mese | tiri, tiri in porta 1X2 | no | tiri +0,0001 / −0,0002, tiri in porta +0,0001 / 0,0000 (IC sempre a cavallo dello zero); peso stimato piccolo (0,03-0,09); tiri per giocatore di API-Football ~29% sotto quelli di squadra |
+| 28/10 | 1° tempo: quota di 1° tempo propria di ogni squadra (prodotto e concesso, K=10) contro la frazione fissa del campionato | tiri 1°T 1X2 | no, ma da riprovare | verifica −0,0007 (IC −0,0014 / +0,0001), holdout −0,0007 (IC −0,0013 / −0,0001), 19/31 e 23/31 campionati: verifica corta (dati per tempo dal 2024-25) |
+| 28/10 | idem | corner 1°T 1X2 | no | −0,0001 / −0,0004 (holdout significativo, verifica no) |
+| 28/10 | idem | tiri in porta 1°T, gol 1°T (1X2 del primo tempo) | no | ≈ 0 |
 
 ## Studi sull'archivio reale delle quote 1xBet (regola dei 100 giorni)
 Stessa regola per tutti: si decide solo con almeno 100 giorni di archivio (primi due terzi solo da guardare, ultimo terzo verifica);
@@ -30,6 +33,7 @@ checkpoint di sola lettura il 7/12/2026 (~60 giorni), decisione il 18/1/2027 (~1
 
 | 27/10 | Radar Mercato: riuscita minima 65% di base, evidenza dal 70% (Over/Under 1xBet di tiri, tiri in porta, corner, falli, cartellini). Archivio 9-27/10: senza soglia presa 52% (dich. 61%), −4,0%; dal 65% +2,0% e +11,3% nelle due metà; dal 70% +20% e +34% (campioni piccoli, soglie viste sui dati). Si giudica SOLO sulle partite dal 28/10: resta se dal 65% il rendimento non è peggiore del −margine 1xBet e la presa è entro ±5 punti dal dichiarato | `tools/radar_mercato.js` (ogni lunedì) | in raccolta |
 ## In coda
+- 1° tempo con falli, fuorigioco e cartellini per tempo (API-Football li dà in statistics_1h, il ramo tempi finora salvava solo corner, tiri, tiri in porta) e ripetizione su tiri e corner con più stagioni di verifica.
 - Infortunati e squalificati (API-Football, archivio con l'ora di registrazione dal 28/10/2026): da testare con `tools/harness.py` quando l'archivio avrà qualche mese (solo segnalazioni viste prima del fischio).
 - Arbitro designato / formazione nota come fattori del Grado (si registrano da oggi: provabili tra qualche mese).
 - Formazioni su tiri e fuorigioco: da riprovare con più partite.
