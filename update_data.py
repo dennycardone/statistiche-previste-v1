@@ -914,6 +914,35 @@ try:
         print("::notice title=Formazioni ufficiali::" + f"{len(FORMZ)} partite con la correzione dei falli, {_nxi} richieste" + ("" if os.path.exists(_VP) else " (valori dei giocatori non disponibili)")
               + (" · " + " · ".join(_DX[:12]) if _DX else ""))
     except Exception as e_: print("::warning title=Formazioni ufficiali::" + str(e_))
+    # 28/10/2026 (Denny): archivio privato di infortunati e squalificati (API-Football "injuries"), con l'ORA in cui li vediamo. Serve a
+    # testarli tra qualche mese come qualsiasi variabile (solo informazioni note prima del fischio: per ogni giocatore la prima e l'ultima
+    # volta vista). Ogni 3 ore, partite di oggi e domani dei nostri campionati: 2-4 richieste. Mai pubblicato; nella copia cifrata.
+    try:
+        _IP = os.path.join(OUT, "infortuni_hist.json"); INJ = json.load(open(_IP)) if os.path.exists(_IP) else {"agg": "", "partite": {}}
+        _nowu2 = datetime.datetime.now(datetime.timezone.utc); _ts2 = _nowu2.strftime("%Y-%m-%d %H:%M")
+        _due2 = not INJ.get("agg") or (_nowu2 - datetime.datetime.strptime(INJ["agg"], "%Y-%m-%d %H:%M").replace(tzinfo=datetime.timezone.utc)).total_seconds() >= 3 * 3600 - 300
+        if _key and _due2:
+            _ids2 = {v: k for k, v in AF_LEAGUES_X.items() if k != "EC"}; _nr2 = _np2 = _ng2 = 0
+            for _k2 in (0, 1):
+                _d2 = (datetime.datetime.now(ROME).date() + datetime.timedelta(days=_k2)).isoformat(); _pg, _pgs = 1, 1
+                while _pg <= _pgs and _nr2 < 8:
+                    R_ = _af("injuries", date=_d2, page=_pg) if _pg > 1 else _af("injuries", date=_d2); _nr2 += 1
+                    _pgs = (R_.get("paging") or {}).get("total", 1) or 1; _pg += 1
+                    for it in R_.get("response") or []:
+                        lg_ = _ids2.get((it.get("league") or {}).get("id")); fx_ = (it.get("fixture") or {}).get("id"); pl_ = it.get("player") or {}
+                        if not lg_ or not fx_ or not pl_.get("id"): continue
+                        P_ = INJ["partite"].setdefault(str(fx_), {"lg": lg_, "ko": ((it.get("fixture") or {}).get("date") or "")[:16], "g": {}})
+                        g_ = P_["g"].get(str(pl_["id"]))
+                        if not g_:
+                            P_["g"][str(pl_["id"])] = {"n": pl_.get("name"), "sq": (it.get("team") or {}).get("id"), "tipo": pl_.get("type"), "motivo": pl_.get("reason"), "prima": _ts2, "ultima": _ts2}; _ng2 += 1
+                        else: g_["ultima"] = _ts2; g_["tipo"] = pl_.get("type") or g_.get("tipo")
+                        _np2 += 1
+            INJ["agg"] = _ts2
+            _lim2 = (_nowu2 - datetime.timedelta(days=400)).strftime("%Y-%m-%d")
+            INJ["partite"] = {k: v for k, v in INJ["partite"].items() if (v.get("ko") or "9")[:10] >= _lim2}
+            jdump(INJ, _IP)
+            print("::notice title=Infortunati e squalificati::" + f"{_nr2} richieste · {_np2} segnalazioni nei nostri campionati (nuove {_ng2}) · archivio {len(INJ['partite'])} partite")
+    except Exception as e_: print("::warning title=Infortunati e squalificati::" + str(e_)[:200])
     try:   # 26/10/2026 (fase 0): fiducia degli abbinamenti dei nomi API-Football → nostri
         _low = [f"{lg_} {k}→{x['nostro']} ({x['voti']} voti)" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["abbinati"].items() if x["fiducia"] == "bassa"]
         _un = [f"{lg_} {k} ({x['partite']} partite): {x['diagnosi']}" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["non_abbinati"].items() if x.get("recenti")]   # solo squadre con partite negli ultimi 200 giorni

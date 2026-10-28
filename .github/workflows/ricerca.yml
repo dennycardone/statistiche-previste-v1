@@ -26,7 +26,7 @@ jobs:
           restore-keys: dati-
       - name: Inventario degli archivi privati (nomi e dimensioni, mai il contenuto)
         run: |
-          BK="odds_hist.json apif.json odds.json formazioni_hist.json mercato_storico.json"
+          BK="odds_hist.json apif.json odds.json formazioni_hist.json mercato_storico.json infortuni_hist.json"
           ls -la data | awk 'NR>1 && $5>0 {printf "%s %.1fMB; ", $9, $5/1048576}' > /tmp/inv.txt
           miss=""; for f in $BK; do [ -f data/$f ] || miss="$miss $f"; done
           echo "::notice title=Archivio · magazzino privato::$(cat /tmp/inv.txt)"

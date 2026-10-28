@@ -13,7 +13,7 @@ o nel magazzino privato di GitHub Actions con la copia cifrata giornaliera.
 | Valori dei giocatori (falli, cartellini) | ramo `valori` | sì |
 | Formazioni ufficiali prese prima del fischio (ultimi giorni) | ramo `xi` | sì |
 | Dati dell'app (bundle, extra, quote del giorno…) | ramo `pages` | sì |
-| Archivio quote 1xBet (`odds_hist.json`), archivio partite (`apif.json`), quote (`odds.json`), formazioni registrate (`formazioni_hist.json`), giocate del Radar bloccate al fischio (`mercato_storico.json`) | magazzino privato di Actions + copia cifrata giornaliera sul ramo `backup` (due copie) | **no** (solo numeri aggregati) |
+| Archivio quote 1xBet (`odds_hist.json`), archivio partite (`apif.json`), quote (`odds.json`), formazioni registrate (`formazioni_hist.json`), giocate del Radar bloccate al fischio (`mercato_storico.json`), infortunati e squalificati con l'ora in cui sono stati visti (`infortuni_hist.json`, dal 28/10/2026) | magazzino privato di Actions + copia cifrata giornaliera sul ramo `backup` (due copie) | **no** (solo numeri aggregati) |
 
 ## Dati derivati per la ricerca (ramo `ricerca`, ricostruito ogni domenica da `.github/workflows/ricerca.yml`)
 - `base/<campionato>.json`: per ogni partita giocata dal 2023 le previsioni dell'app con i soli dati dei giorni precedenti

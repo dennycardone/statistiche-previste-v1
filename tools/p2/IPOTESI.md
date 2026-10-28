@@ -29,6 +29,7 @@ checkpoint di sola lettura il 7/12/2026 (~60 giorni), decisione il 18/1/2027 (~1
 
 | 27/10 | Radar Mercato: riuscita minima 65% di base, evidenza dal 70% (Over/Under 1xBet di tiri, tiri in porta, corner, falli, cartellini). Archivio 9-27/10: senza soglia presa 52% (dich. 61%), −4,0%; dal 65% +2,0% e +11,3% nelle due metà; dal 70% +20% e +34% (campioni piccoli, soglie viste sui dati). Si giudica SOLO sulle partite dal 28/10: resta se dal 65% il rendimento non è peggiore del −margine 1xBet e la presa è entro ±5 punti dal dichiarato | `tools/radar_mercato.js` (ogni lunedì) | in raccolta |
 ## In coda
+- Infortunati e squalificati (API-Football, archivio con l'ora di registrazione dal 28/10/2026): da testare con `tools/harness.py` quando l'archivio avrà qualche mese (solo segnalazioni viste prima del fischio).
 - Arbitro designato / formazione nota come fattori del Grado (si registrano da oggi: provabili tra qualche mese).
 - Formazioni su tiri e fuorigioco: da riprovare con più partite.
 - Meteo e campo (sintetico, dimensioni): servono dati nuovi.
