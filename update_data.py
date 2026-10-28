@@ -869,10 +869,10 @@ try:
                 h, a = MAPS.get(v[1], {}).get(v[2]), MAPS.get(v[1], {}).get(v[3])
                 d_ = ko.astimezone(ROME).date().isoformat()
                 # elenco per il micro-processo: partite non iniziate delle prossime 36 ore con i nostri nomi (id API-Football, nessuna quota)
-                if v[9] == "NS" and -10 < mins <= 36 * 60 and h and a:
+                if v[9] == "NS" and -10 < mins <= 36 * 60 and h and a and v[1] != "EC":   # 28/10/2026: National League senza statistiche né formazioni
                     _NEXT.append({"fid": fid, "lg": v[1], "ko": ko.strftime("%Y-%m-%dT%H:%M"), "d": d_, "h": h, "a": a, "ha": v[2], "aa": v[3]})
                 # riserva: il micro-processo di solito le prende prima; qui solo da 50 minuti prima del fischio
-                if fid not in XI and v[9] == "NS" and -10 < mins <= 50 and _key and _nxi < 80:
+                if fid not in XI and v[9] == "NS" and -10 < mins <= 50 and _key and _nxi < 80 and v[1] != "EC":
                     try:
                         R = _af("fixtures/lineups", fixture=fid).get("response") or []; _nxi += 1
                         got, why = xi_corr.parse_lineups(R, v[2], v[3])
@@ -892,7 +892,7 @@ try:
             # (con quanti minuti di anticipo) o mancata. Avviso se ne manca più di 1 su 10.
             _pres, _mis = [], []
             for fid, v in AP["partite"].items():
-                if v[1] not in AF_LEAGUES_X or v[1] in ("UCL", "UEL"): continue
+                if v[1] not in AF_LEAGUES_X or v[1] in ("UCL", "UEL", "EC"): continue   # EC: API-Football non dà le formazioni della National League
                 ko = datetime.datetime.fromisoformat(v[0] + ":00+00:00"); ago = (_nowu - ko).total_seconds() / 60
                 if not (10 <= ago <= 24 * 60) or v[9] in ("NS", "TBD", "PST", "CANC", "ABD", "AWD", "WO"): continue
                 x = XI.get(fid); nm_ = f"{v[1]} {v[2]}–{v[3]}"
