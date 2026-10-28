@@ -9,7 +9,8 @@ o nel magazzino privato di GitHub Actions con la copia cifrata giornaliera.
 | Partite e statistiche delle stagioni passate (API-Football) | ramo `storico` | sì |
 | Statistiche in più (fuorigioco, tiri in area…) | ramo `statextra` | sì |
 | Formazioni e statistiche per giocatore (dal 2023) | ramo `formazioni` | sì |
-| Statistiche per tempo | ramo `tempi` | sì |
+| Statistiche per tempo (dal 28/10/2026 tutte: corner, tiri, tiri in porta, falli, fuorigioco, gialli, rossi, tiri in area, xG…; dalla stagione 2024-25) | ramo `tempi` | sì |
+| Eventi con il minuto (cartellini, gol) e risultato del 1° tempo, dal 2022 | ramo `eventi` | sì |
 | Valori dei giocatori (falli, cartellini) | ramo `valori` | sì |
 | Formazioni ufficiali prese prima del fischio (ultimi giorni) | ramo `xi` | sì |
 | Dati dell'app (bundle, extra, quote del giorno…) | ramo `pages` | sì |

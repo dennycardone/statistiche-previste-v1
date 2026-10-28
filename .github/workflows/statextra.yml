@@ -10,7 +10,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: statextra
+  group: notte-api   # 28/10/2026: in fila con gli altri download notturni (tempi, eventi, formazioni)
   cancel-in-progress: false
 jobs:
   statextra:

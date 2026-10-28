@@ -3,6 +3,10 @@ on:
   workflow_dispatch: {}
   schedule:
     - cron: "25 23 * * *"   # dopo l'ultimo giro dell'app (23:17 UTC): richieste avanzate dopo la riserva (tools/af_budget.py)
+    - cron: "35 0 * * *"    # 28/10/2026: secondo giro dopo l'azzeramento delle richieste (mezzanotte UTC), sempre dentro la riserva
+concurrency:   # 28/10/2026: mai insieme agli altri download notturni (leggerebbero la stessa disponibilità di richieste)
+  group: notte-api
+  cancel-in-progress: false
 permissions:
   contents: write
 jobs:
@@ -28,10 +32,28 @@ jobs:
           mkdir -p tempi
           if [ ! -f data/apif.json ]; then echo "::error title=Tempi::archivio partite (magazzino privato) non trovato"; exit 1; fi
           ramo tempi tempi
+          mkdir -p eventi && ramo eventi eventi   # 28/10/2026: eventi con il minuto (cartellini e gol per tempo)
+          echo "E0=$(cat eventi/*.json 2>/dev/null | wc -c)" >> "$GITHUB_ENV"
           echo "N0=$(ls tempi/*.json 2>/dev/null | wc -l) S0=$(cat tempi/*.json 2>/dev/null | wc -c)" | tr ' ' '\n' >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: python tools/halves_apifootball.py
+      - name: Priorità 1 · cartellini e gol per tempo dal 2022 (20 partite per richiesta)
+        run: python tools/eventi_apifootball.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Salva sul ramo eventi
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd eventi
+          E1=$(cat *.json 2>/dev/null | wc -c)
+          if [ "$E1" -lt "${E0:-0}" ] || [ "$E1" -eq 0 ]; then echo "archivio eventi non salvato ($E0 → $E1 byte)"; exit 0; fi
+          git init -q -b eventi && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Eventi $(date -u '+%F %H:%M')"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" eventi
+      - name: Priorità 2 · statistiche complete per tempo (nuove partite, poi riscarico dello storico)
+        run: python tools/halves_apifootball.py
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
       - name: Salva sul ramo tempi

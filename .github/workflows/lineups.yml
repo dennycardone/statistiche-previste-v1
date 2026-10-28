@@ -3,6 +3,9 @@ on:
   schedule:
     - cron: "20 23 * * *"   # ogni sera dopo la riserva dell'app: completa il riscarico, poi aggiunge le partite nuove
   workflow_dispatch: {}   # da lanciare a mano (scarico completato il 5/10/2026; 25/10/2026: riscarico con fuorigioco e statistiche estese)
+concurrency:   # 28/10/2026: mai insieme agli altri download notturni
+  group: notte-api
+  cancel-in-progress: false
 permissions:
   contents: write
 jobs:
