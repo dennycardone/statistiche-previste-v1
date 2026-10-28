@@ -18,6 +18,7 @@ Regola: entra nell'app solo se migliora in modo significativo nella verifica, ne
 | 26/10 | Titolari sui cartellini: falli commessi dei titolari (XF) | cartellini | piccolo ma stabile | −0,0002 ±0,0001 / −0,0004 ±0,0002 |
 | 26/10 | Titolari sui cartellini: cartellini dei titolari (XC) | cartellini | no (prima stagione non significativa) | −0,0003 ±0,0004 / −0,0004 ±0,0003 |
 
+| 28/10 | Tiri e tiri in porta costruiti dal basso (titolari ufficiali: tiri ogni 90' ristretti verso il ruolo × minuti attesi + subentrati), unito al modello con peso stimato mese per mese | tiri, tiri in porta 1X2 | no | tiri +0,0001 / −0,0002, tiri in porta +0,0001 / 0,0000 (IC sempre a cavallo dello zero); peso stimato piccolo (0,03-0,09); tiri per giocatore di API-Football ~29% sotto quelli di squadra |
 ## Studi sull'archivio reale delle quote 1xBet (regola dei 100 giorni)
 Stessa regola per tutti: si decide solo con almeno 100 giorni di archivio (primi due terzi solo da guardare, ultimo terzo verifica);
 checkpoint di sola lettura il 7/12/2026 (~60 giorni), decisione il 18/1/2027 (~100 giorni). Sempre la probabilità corretta per esito.
