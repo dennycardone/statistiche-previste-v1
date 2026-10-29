@@ -2844,21 +2844,19 @@ function formImpact(home, away, cfg, k) {
 
 /* ===== Gol: modello + tabella dei risultati (Poisson con correzione Dixon-Coles) ===== */
 const poisP = (k, l) => l > 0 ? Math.exp(-l + k * Math.log(l) - lgamma(k + 1)) : (k === 0 ? 1 : 0);
-/* Multigol squadra (29/10/2026, richiesta di Denny): fasce 0-1, 1-2, 2-3 (larghe 2 gol), poi 0-2, 1-3, 2-4, poi 2-5. Si mostra la fascia
-   più stretta che arriva almeno al 50% di riuscita; a parità di larghezza la più probabile. Probabilità: Poisson sui gol attesi della
-   squadra, tarata per fascia con una logistica su logit(p) stimata sulle sole partite fino al 30/6/2024 (previsioni walk-forward
-   dell'app, ricerca/base). Controllo fuori campione, fascia scelta: verifica (2024-25) dichiarata 65,2% · reale 66,0%; holdout (dal
-   luglio 2025) 65,1% · 65,0%. */
+/* Multigol squadra (29/10/2026, richiesta di Denny): due fasce per squadra.
+   1) la più stretta più probabile: tra 0-1, 1-2, 2-3 (larghe 2 gol) quella con la probabilità più alta;
+   2) la più sicura: tra tutte (0-1, 1-2, 2-3, 0-2, 1-3, 2-4, 2-5) quella con la probabilità più alta.
+   Probabilità: Poisson sui gol attesi della squadra, tarata per fascia con una logistica su logit(p) stimata sulle sole partite fino
+   al 30/6/2024 (previsioni walk-forward dell'app, ricerca/base). Controllo fuori campione, dichiarata · uscita:
+   più stretta 2024-25 64,7% · 65,5%, dal luglio 2025 64,5% · 64,4%; più sicura 84,9% · 85,5% e 84,7% · 84,5%. */
 const MG_BANDS = [[0, 1, -0.101, 1.103], [1, 2, -0.051, 1.255], [2, 3, 0.091, 1.059], [0, 2, -0.2, 1.104], [1, 3, -0.03, 1.094], [2, 4, 0.089, 1.078], [2, 5, 0.103, 1.102]];
 function multiGol(l) {
   if (!(l > 0) || !isFinite(l)) return null;
   const cal = (p, a, b) => { const q = Math.min(Math.max(p, 1e-4), 1 - 1e-4), z = a + b * Math.log(q / (1 - q)); return 1 / (1 + Math.exp(-z)); };
   const B = MG_BANDS.map(([lo, hi, a, b]) => { let p = 0; for (let k = lo; k <= hi; k++) p += poisP(k, l); return { lo, hi, p: cal(p, a, b) }; });
-  for (const w of [1, 2, 3]) {
-    const c = B.filter(x => x.hi - x.lo === w).sort((x, y) => y.p - x.p)[0];
-    if (c && c.p >= 0.5) return c;
-  }
-  return B[B.length - 1];
+  const top = L => L.reduce((x, y) => (y.p > x.p ? y : x));
+  return { stretta: top(B.filter(x => x.hi - x.lo === 1)), sicura: top(B) };
 }
 function dcTau(x, y, lh, la, rho) {
   if (x === 0 && y === 0) return 1 - lh * la * rho;
@@ -3148,7 +3146,7 @@ function render() {
 
   out.innerHTML = `
   <section id="mbase" hidden>
-    <p class="small muted" style="margin:0">Sotto i gol attesi di ogni squadra: multigol squadra. Tra le fasce 0-1, 1-2, 2-3, poi 0-2, 1-3, 2-4, poi 2-5 è la più stretta con almeno il 50% di riuscita (a parità di larghezza la più probabile). Probabilità dai gol attesi della squadra, tarata per fascia sulle partite fino a giugno 2024 e controllata dopo: 2024-25 dichiarata 65,2% · uscita 66,0%; dal luglio 2025 65,1% · 65,0%. Informativa: API-Football non passa le quote multigol di 1xBet.</p>
+    <p class="small muted" style="margin:0">Sotto i gol attesi di ogni squadra: multigol squadra. Due fasce: la più stretta più probabile (tra 0-1, 1-2 e 2-3) e la più sicura (tra 0-1, 0-2, 1-2, 1-3, 2-3, 2-4 e 2-5). Probabilità dai gol attesi della squadra, tarate per fascia sulle partite fino a giugno 2024 e controllate dopo (dichiarata · uscita): più stretta 2024-25 64,7% · 65,5%, dal luglio 2025 64,5% · 64,4%; più sicura 84,9% · 85,5% e 84,7% · 84,5%. Informativa: API-Football non passa le quote multigol di 1xBet.</p>
     <p class="small muted" style="margin:0">Sotto i cartellini di ogni squadra: range della media all'80%. È l'intervallo in cui cade la media vera di quella squadra in quella partita, data l'incertezza dei dati prima della partita (più largo a inizio stagione e per le squadre con poco storico). Non è il numero di cartellini che verranno dati: per quello conta la media. Calcolo: cartellini presi×provocati con arbitro sulle partite degli ultimi 365 giorni, incertezza tarata sul backtest confrontando due stime indipendenti della stessa partita (verifica: 80,1% dentro l'80%). Il totale è la somma delle due medie.</p>
     <p class="small muted" style="margin:0">${esc(LG[S.league].name)} · statistica richiesta: <b>${hl.label}</b></p>
     ${staleNote()}
@@ -4500,7 +4498,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
   // range della media all'80% per squadra (team_ranges.py): media × exp(±1,2816 × errore standard tarato sul backtest)
   const se = x && x[9] ? x[9] : null, rg = (m, s) => ok(m) && s ? `<em class="sx-rg" title="Forbice: dove cade la media 8 volte su 10">${f1(m * Math.exp(-1.2816 * s))}–${f1(m * Math.exp(1.2816 * s))}</em>` : "";
   // 29/10/2026 (Denny): sotto i gol di ogni squadra, al posto della forbice, il multigol squadra (multiGol)
-  const mgx = m => { const b = multiGol(m); return b ? `<em class="sx-rg" title="Multigol squadra: la fascia più stretta con almeno il 50% di riuscita (probabilità tarata sullo storico)">Multigol ${b.lo}-${b.hi} · ${Math.round(b.p * 100)}%</em>` : ""; };
+  const mgx = m => { const b = multiGol(m); return b ? `<em class="sx-rg" title="Multigol squadra: la fascia più stretta più probabile e la fascia più sicura (probabilità tarate sullo storico)">MG ${b.stretta.lo}-${b.stretta.hi} · ${Math.min(99, Math.round(b.stretta.p * 100))}%<br>MG ${b.sicura.lo}-${b.sicura.hi} · ${Math.min(99, Math.round(b.sicura.p * 100))}%</em>` : ""; };
   // partita giocata: numero grande = dato reale, sotto la previsione fatta prima del calcio d'inizio; ✓/✗ = indovinato chi ne fa di più
   const row = (lab, h, a, t, d = 1, sh = null, sa = null, rh = null, ra = null) => {
     const T = ok(t) ? (d === 2 ? f2(t) : f1(t)) : "N/D";
@@ -4544,7 +4542,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
       ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot, 1, null, null, m && m.hf, m && m.af)}
       ${row("Fuorigioco", O && !O.nd ? O.lh : null, O && !O.nd ? O.la : null, O && !O.nd ? O.tot : null, 1, null, null, m && offR ? offR.oh : null, m && offR ? offR.oa : null)}
       ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
-      ${G || se ? `<p class="sx-fb">${G ? `<b>Multigol</b> · sotto i gol: la fascia di gol della squadra più stretta con almeno il 50% di riuscita` : ""}${G && se ? "<br>" : ""}${se ? `<b>Forbice</b> · sotto i cartellini: dove cade la media di quella squadra 8 volte su 10` : ""}</p>` : ""}`}
+      ${G || se ? `<p class="sx-fb">${G ? `<b>Multigol (MG)</b> · sotto i gol: la fascia più stretta più probabile, poi la fascia più sicura` : ""}${G && se ? "<br>" : ""}${se ? `<b>Forbice</b> · sotto i cartellini: dove cade la media di quella squadra 8 volte su 10` : ""}</p>` : ""}`}
     </div>`;
 }
 /* ===== Valori attesi per tempo di corner, tiri e tiri in porta (15/10/2026), sotto le righe della Lettura =====
