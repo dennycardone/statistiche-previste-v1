@@ -548,6 +548,17 @@ select{pointer-events:none}
 #selBk .bkieri{display:flex;flex-direction:column;gap:4px;font-size:12.5px;line-height:1.4;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}#selBk .bkieri p{margin:0}#selBk .bkric{color:var(--ink-3);font-size:11.5px}#selBk .bkdone .mk{font-style:normal;font-weight:700;margin-top:2px}#selBk .bkdone .mk.ok{color:var(--good)}#selBk .bkdone .mk.ko{color:var(--warn)}#selBk .bk70{display:block;font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.06em;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:0 4px;margin-bottom:2px;text-align:center}#selBk .vtag{font-family:var(--display);font-stretch:75%;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-ink);background:var(--gold);border-radius:4px;padding:2px 7px;white-space:nowrap}
 .whyl{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.45}.whyh{font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin:12px 0 0;color:var(--ink-2)}.xibox{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface-2)}.xicols{display:grid;grid-template-columns:1fr 1fr;gap:8px}.xicols ul{list-style:none;margin:2px 0 0;padding:0;font-size:12.5px}.xitag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:1px 5px;border-radius:5px;background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--ink);margin-left:6px;vertical-align:middle}.bklist{display:flex;flex-direction:column;gap:6px}.bksort{align-items:center;gap:6px}.qsm{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
 .bkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"m m" "p n";align-items:center;gap:6px 10px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;cursor:pointer}
+.opwarn{margin:0 0 8px;padding:8px 10px;border-radius:10px;font-size:12.5px;line-height:1.4;background:color-mix(in srgb,var(--gold) 10%,var(--surface-2));border:1px solid color-mix(in srgb,var(--gold) 35%,var(--line))}
+.opcassa{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin:0 0 6px}.opcassa input{width:96px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;font-size:16px}
+.oph{margin:12px 0 6px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2)}.oph small{color:var(--hot);font-size:13px;margin-left:4px}
+.oplist{display:flex;flex-direction:column;gap:6px}.oprow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"m m" "x w";gap:4px 10px;align-items:center;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;cursor:pointer}
+.opm{grid-area:m;display:flex;flex-direction:column;min-width:0}.opm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.opm small{font-size:11.5px}
+.opx{grid-area:x;display:flex;flex-direction:column;gap:2px;min-width:0}.opmk{font-weight:700;font-size:13.5px}.opx small{font-size:11.5px;line-height:1.35}
+.opw{grid-area:w;display:flex;flex-direction:column;align-items:flex-end;font-variant-numeric:tabular-nums}.opw b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--gold)}.opw small{font-size:11px;color:var(--ink-3)}
+.opw.in{display:inline-flex;flex-direction:row;gap:6px;align-items:baseline;margin-left:6px}
+.opxi,.opct{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:var(--hot);color:var(--hot-ink)}.opct{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
+.opcomb{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 6px;background:var(--surface-2)}.opch{margin:0 0 4px;font-size:13px}.opleg{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:5px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}.opleg b{font-size:13px}.opleg span{font-size:12px;color:var(--ink-2)}
+.opnone{margin:0 0 4px;font-size:12.5px;color:var(--ink-3)}.opfoot{margin:10px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.4}
 .bkrow:hover{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
 .bkm{grid-area:m}.bkp{grid-area:p}.bkn{grid-area:n;flex-direction:row!important;align-items:baseline!important;gap:8px}.bkm,.bkp,.bkn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.bkm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkm small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bkmk{font-size:11.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkp b{font-family:var(--display);font-stretch:75%;font-size:16px;letter-spacing:.02em}.bkp b.ov{color:var(--s2)}.bkp b.un{color:var(--accent)}
@@ -594,7 +605,7 @@ select{pointer-events:none}
 .gitem .gil{display:flex;flex-direction:column;min-width:0}.gitem .gil b{font-size:15px}.gitem .gil small{font-size:12px}
 .gitem .gir{display:flex;align-items:center;gap:10px;flex:0 0 auto}.gitem .gin{font-size:13px;color:var(--ink-2);white-space:nowrap}.gitem .gin b{font-size:16px;color:var(--ink)}
 .gitem[open] summary .gil b{color:var(--accent)}
-.rtabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--hot);min-height:20px}
+.rtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--hot);min-height:20px}
 .gword.sm{font-size:16px}.gsay.sm{font-size:13.5px}
 .selp2{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center;font-size:14px}.selp2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp2 .gin{font-size:12.5px;color:var(--ink-2);white-space:nowrap}.selp2 .gin b{font-size:15px;color:var(--ink)}
 .mhead .hsw-n{max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;font-family:var(--body);font-stretch:88%;font-size:11px;font-weight:700;color:var(--gold-ink);background:var(--gold);border-radius:999px;padding:2px 8px;white-space:nowrap;animation:hswp 2.4s ease-in-out 3}
@@ -860,7 +871,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 <symbol id="i-tendenze" viewBox="0 0 24 24"><path d="M5 20v-6M12 20V9M19 20v-8"/><circle class="d" cx="12" cy="4.5" r="2"/></symbol>
 <symbol id="i-ritardi" viewBox="0 0 24 24"><path d="M6 3h12M6 21h12M7.5 3c0 5 4.5 6 4.5 9s-4.5 4-4.5 9M16.5 3c0 5-4.5 6-4.5 9s4.5 4 4.5 9"/><circle class="d" cx="12" cy="17.6" r="1.9"/></symbol>
 <symbol id="i-aplus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.6"/><circle class="d" cx="12" cy="12" r="1.9"/></symbol>
-<symbol id="i-mercato" viewBox="0 0 24 24"><path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1.5 1.5 0 0 1 0 2.1l-7 7a1.5 1.5 0 0 1-2.1 0z"/><circle class="d" cx="8.3" cy="8.3" r="1.9"/></symbol>
+<symbol id="i-op" viewBox="0 0 24 24"><rect x="4.5" y="3" width="15" height="18" rx="2.5"/><path d="M8 7.5h8M8 12h2M12 12h2M8 16h2M12 16h4"/></symbol><symbol id="i-mercato" viewBox="0 0 24 24"><path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1.5 1.5 0 0 1 0 2.1l-7 7a1.5 1.5 0 0 1-2.1 0z"/><circle class="d" cx="8.3" cy="8.3" r="1.9"/></symbol>
 <symbol id="i-tutte" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle class="d" cx="15.5" cy="15" r="1.7"/></symbol>
 <symbol id="i-gol" viewBox="0 0 24 24"><path d="M2.5 19V6.5h19V19"/><path d="M6 6.5v9M10 6.5v9M14 6.5v9M18 6.5v9M2.5 11h19M2.5 15.5h19" opacity=".4"/><circle class="d" cx="16" cy="18" r="2.4"/></symbol>
 <symbol id="i-arbitro" viewBox="0 0 24 24"><path d="M3 9.5h11.5l6.5-2.5v4.5l-4 1.2"/><circle cx="9.5" cy="14" r="5.5"/><circle class="d" cx="9.5" cy="14" r="1.8"/></symbol>
@@ -897,9 +908,11 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <div class="seg rtabs" role="tablist" aria-label="Sezioni del Radar" id="selTabs">
       <button type="button" class="segb" data-rt="all" aria-pressed="true"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Grado <b id="rtC"></b></button>
       <button type="button" class="segb" data-rt="bk" aria-pressed="false"><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato <b id="rtB"></b></button>
+      <button type="button" class="segb" data-rt="op" aria-pressed="false"><svg class="ic ic-op" aria-hidden="true"><use href="#i-op"/></svg>Operatività <b id="rtO"></b></button>
     </div>
     <section class="card aplus" id="selAplus" aria-label="A+ sul radar" hidden></section>
     <section class="card" id="selBk" aria-label="Linea 1xBet" hidden></section>
+    <section class="card" id="selOp" aria-label="Operatività" hidden></section>
     <section class="card" id="selAll" aria-label="Partite in arrivo">
       <div class="selhead"><h2><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Partite in arrivo</h2></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
@@ -5068,7 +5081,7 @@ document.querySelectorAll("#genPer .segb").forEach(b => b.addEventListener("clic
 /* ===== Confidence Score: interfaccia (Radar, scheda partita) ===== */
 const CONF_C = new Map();   // previsioni con punteggio per partita e metodo (sessione)
 const CONF_STATUS = { aplus: `<svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>Segnale A+`, watch: `<i class="sdot on"></i>Da seguire`, none: `<i class="sdot"></i>Nessun segnale` };
-const SEL = { f: "all", h: 24, day: 0, bkSort: lsGet("statPreviste.bkSort") === "p" ? "p" : "ev", bkAll: lsGet("statPreviste.bkAll") === "1" };   // Radar: Oggi e/o Domani (12/10/2026, al posto di 24/48/72 ore)
+const SEL = { f: "all", h: 24, day: 0, opN: null, bkSort: lsGet("statPreviste.bkSort") === "p" ? "p" : "ev", bkAll: lsGet("statPreviste.bkAll") === "1" };   // Radar: Oggi e/o Domani (12/10/2026, al posto di 24/48/72 ore)
 function entryOdds(e) {
   if (e.m) return e.m.odds || null;
   const f = S.fixtures.find(x => x.div === e.lg.code && x.home === e.home && x.away === e.away && isoD(x.date) === e.d);
@@ -5374,14 +5387,138 @@ function renderSelBk(ents, cfg, when) {
   box.querySelectorAll("[data-bks]").forEach(b => b.addEventListener("click", () => { SEL.bkSort = b.dataset.bks; lsSet("statPreviste.bkSort", SEL.bkSort); renderSelBk(selEntries(), cfg, when); }));
   if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelBk(selEntries(), cfg, when); }, 30);
 }
+/* ===== Operatività (30/10/2026, richiesta di Denny): le partite del giorno scelto passate dai filtri validati finora, in verifica ===========
+   Probabilità corretta = 1 / (1 + e^-(b0 + b1·logit(Prevista) + b2·logit(1xBet senza margine))), coefficienti del gruppo "statistiche"
+   stimati ogni mattina su tutti i giorni già giocati dell'archivio 1xBet (data/corretta.json, tools/corretta_coef.py: stessi pesi dello
+   studio Quota 2/3). Esito ammesso solo con le quote 1xBet attuali di tutto il mercato e valore atteso corretto > 0.
+   Perimetro: 1X2 corner, tiri, tiri in porta, falli, fuorigioco, gialli e Over/Under cartellini; niente gol; tiri e tiri in porta solo
+   sotto quota 2,30 (a quota alta perdono: studio sorprese del 30/10).
+   1 · Singole: una per partita, quella col valore atteso più alto; XI = falli sbloccati o rafforzati dalle formazioni ufficiali.
+   2 · Quota 2 / Quota 3: doppia (quota 1,85-2,20) e tripla (2,75-3,35) di partite diverse con il valore atteso congiunto più alto e non
+       negativo (metodo "EV, astensione se EV < 0" dello studio settimanale), solo statistiche.
+   3 · Controtendenza: corner, fuorigioco, gialli (falli solo con le formazioni ufficiali), sfavorita 1xBet a quota ≥ 2,30 che Prevista
+       dà più probabile della favorita (caso A) e con valore atteso corretto > 0.
+   Peso: Kelly 1/8 sulla probabilità corretta, al massimo 3% per giocata; se il totale del giorno supera il 10% della cassa, tutti i pesi
+   si riducono in proporzione. Cassa solo nel localStorage del telefono. */
+let CORR = null, CORR_LOADING = false;
+const OP_K = [["c", "Corner", "x.c1x2"], ["s", "Tiri", "x.s1x2"], ["st", "Tiri in porta", "x.st1x2"], ["f", "Falli", "x.f1x2"], ["o", "Fuorigioco", "x.off.offsides_1x2"], ["y", "Gialli", "x.y1x2"]];
+const opLg = p => { const q = Math.min(Math.max(p, 1e-4), 1 - 1e-4); return Math.log(q / (1 - q)); };
+function opCorr(p, m) { const b = CORR && CORR.gruppi && CORR.gruppi.statistiche && CORR.gruppi.statistiche.b; if (!b) return null; return 1 / (1 + Math.exp(-(b[0] + b[1] * opLg(p) + b[2] * opLg(m)))); }
+const opKelly = (p, q) => Math.min(0.03, Math.max(0, (p * q - 1) / (q - 1)) / 8);
+const OP_MINW = 0.001;   // sotto lo 0,1% di peso (Kelly 1/8) il vantaggio è trascurabile: la giocata non si mostra
+const OP_C = new Map();
+function opEntry(e, cfg) {   // esiti con quota 1xBet attuale e probabilità corretta per una partita da giocare
+  const key = e.id + "|" + cfg.key + "|" + (CORR ? CORR.agg : ""); if (OP_C.has(key)) return OP_C.get(key);
+  const out = [];
+  if (!e.lg.noStats && !NO_1XBET.has(e.lg.code)) withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = null;
+    try {
+      let M = null, MT = null, MF = null, O = null; try { M = model(e.home, e.away, cfg); MT = modelShots(e.home, e.away, cfg); MF = model(e.home, e.away, cfg, "f"); O = offModel(e.home, e.away); } catch (x) {}
+      if (statMissing(e.lg.code, "hc")) M = null; if (statMissing(e.lg.code, "hf")) MF = null;
+      if (MT && statMissing(e.lg.code, "hs")) MT = { ...MT, MS: null }; if (MT && statMissing(e.lg.code, "hst")) MT = { ...MT, MD: null };
+      const x = extraFor(e.home, e.away), LB = bkLines(e), al = EXTRA && EXTRA.alpha, rk = al > 2e-4 ? 1 / al : Infinity;
+      const R = { c: M, s: MT && MT.MS, st: MT && MT.MD, f: MF, o: O && !O.nd ? O : null, y: x && x[6] && x[7] ? { lh: x[6], la: x[7] } : null };
+      const lab = ["1", "X", "2"];
+      for (const [k, name, qk] of OP_K) {
+        const Rm = R[k]; if (!Rm || !isFinite(Rm.lh) || !isFinite(Rm.la)) continue;
+        const q = q1x2(e, qk, LB); if (!q || q.stale || !q.every(v => v > 1)) continue;
+        const hp = R_ => k === "o" ? headToHeadProb(R_.lh, R_.la, Infinity, OFF_R_TEAM) : k === "y" ? headToHeadProb(R_.lh, R_.la, Infinity, rk) : headToHeadProb(R_.lh, R_.la, R_.r, R_.rTeam, R_.cop);
+        const P = hp(Rm), p = [P.home, P.draw, P.away];
+        const P0 = k === "f" && MF.xiF && MF.preXi ? hp({ ...MF, lh: MF.preXi.lh, la: MF.preXi.la }) : null, p0 = P0 ? [P0.home, P0.draw, P0.away] : null;
+        const inv = q.map(v => 1 / v), s_ = inv.reduce((a, b) => a + b, 0), mm = inv.map(v => v / s_);
+        const fav = q[0] <= q[2] ? 0 : 2, und = 2 - fav;
+        for (let i = 0; i < 3; i++) {
+          const pc = opCorr(p[i], mm[i]); if (pc == null) continue;
+          const ev = pc * q[i] - 1, pc0 = p0 ? opCorr(p0[i], mm[i]) : null, ev0 = pc0 != null ? pc0 * q[i] - 1 : null;
+          out.push({ e, k, mk: name, side: lab[i], who: i === 0 ? e.home : i === 2 ? e.away : "pari", p: p[i], m: mm[i], pc, q: q[i], ev,
+            xi: ev0 != null && ev > 0 && (ev0 <= 0 ? "sbloccata" : ev > ev0 + 1e-9 ? "rafforzata" : null), hasXi: !!p0,
+            und: i === und, invA: i === und && p[und] > p[fav] });
+        }
+      }
+      // Over/Under cartellini: linea 1xBet più equilibrata (data/linee.json) e cartellini attesi del modello v2
+      const kL = LB && LB.k;
+      if (kL && x && x[4] && kL[1] > 1 && kL[2] > 1) {
+        const [L, o, u] = kL, po = pOver(pmfTotal(x[4], rk, Math.ceil(L) + 2), L), mo = (1 / o) / (1 / o + 1 / u);
+        for (const [side, pp, qq, mmm] of [["Over", po, o, mo], ["Under", 1 - po, u, 1 - mo]]) {
+          const pc = opCorr(pp, mmm); if (pc == null) continue;
+          out.push({ e, k: "kou", mk: "Cartellini", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1 });
+        }
+      }
+    } finally { S.cutoff = c0; } });
+  OP_C.set(key, out); return out;
+}
+function opBest(L, nLeg, lo, hi) {   // combinazione di partite diverse con quota totale nella fascia e valore atteso congiunto massimo (≥ 0)
+  const C = L.filter(c => c.q > 1 && c.q <= hi / Math.pow(1.15, nLeg - 1)).sort((a, b) => b.ev - a.ev).slice(0, 40); let best = null;
+  const rec = (start, legs) => {
+    if (legs.length === nLeg) { const q = legs.reduce((a, c) => a * c.q, 1); if (q < lo || q > hi) return; const p = legs.reduce((a, c) => a * c.pc, 1), ev = p * q - 1;
+      if (ev >= 0 && opKelly(p, q) >= OP_MINW && (!best || ev > best.ev)) best = { legs: legs.slice(), q, p, ev }; return; }
+    for (let i = start; i < C.length; i++) { if (legs.some(l => l.e.id === C[i].e.id)) continue; legs.push(C[i]); rec(i + 1, legs); legs.pop(); }
+  };
+  rec(0, []); return best;
+}
+const opCassa = () => { const v = parseFloat((lsGet("statPreviste.cassa") || "").replace(",", ".")); return v > 0 ? v : null; };
+function renderSelOp(ents, cfg, when) {
+  const box = $("#selOp"); if (!box) return;
+  const head = `<div class="selhead"><h2><svg class="ic ic-op" aria-hidden="true"><use href="#i-op"/></svg>Operatività</h2><span class="vtag">in verifica</span></div>
+    <p class="opwarn">Calcolatore sui modelli ancora in verifica (lettura 7/12, decisione 18/1): probabilità corretta (Prevista + 1xBet senza margine) e pesi Kelly 1/8. Sono calcoli, non previsioni certe né promesse di vincita.</p>`;
+  if (!CORR) {
+    box.hidden = SEL.tab !== "op"; box.innerHTML = head + `<p class="apnone">${CORR_LOADING ? "Carico i coefficienti della probabilità corretta…" : "PROBABILITÀ CORRETTA NON DISPONIBILE"}</p>` + RG_LINE;
+    if (!CORR_LOADING) { CORR_LOADING = true; getData("corretta.json").then(j => { CORR = j && j.gruppi ? j : { gruppi: {} }; CORR_LOADING = false; OP_C.clear(); if (!$("#viewSel").hidden) renderSelOp(selEntries(), cfg, when); }).catch(() => { CORR_LOADING = false; CORR = { gruppi: {} }; }); }
+    SEL.opN = null; radarTabs(); return;
+  }
+  if (SEL.day < 0 || !(CORR.gruppi && CORR.gruppi.statistiche)) {
+    SEL.opN = 0; box.hidden = SEL.tab !== "op"; box.innerHTML = head + `<p class="apnone">${SEL.day < 0 ? "SOLO PARTITE DA GIOCARE: SCEGLI OGGI O UN GIORNO FUTURO" : "PROBABILITÀ CORRETTA NON DISPONIBILE"}</p>` + RG_LINE; radarTabs(); return;
+  }
+  const t0 = performance.now(), todo = [];
+  for (const e of ents) { const k = e.id + "|" + cfg.key + "|" + (CORR.agg || ""); if (!OP_C.has(k)) { if (performance.now() - t0 < 200) { try { opEntry(e, cfg); } catch (x) { OP_C.set(k, []); } } else todo.push(e); } }
+  const A = ents.flatMap(e => OP_C.get(e.id + "|" + cfg.key + "|" + (CORR.agg || "")) || []);
+  const okHi = c => !((c.k === "s" || c.k === "st") && c.q >= 2.30);
+  // 1 · singole: una per partita (valore atteso corretto più alto)
+  const byE = new Map(); for (const c of A) if (c.ev > 0 && okHi(c) && opKelly(c.pc, c.q) >= OP_MINW) { const b = byE.get(c.e.id); if (!b || c.ev > b.ev) byE.set(c.e.id, c); }
+  const S1 = [...byE.values()].sort((a, b) => (b.xi ? 1 : 0) - (a.xi ? 1 : 0) || b.ev - a.ev);
+  // 2 · Quota 2 / Quota 3
+  const P2 = A.filter(okHi), D2 = opBest(P2, 2, 1.85, 2.20), T3 = opBest(P2, 3, 2.75, 3.35);
+  // 3 · Controtendenza (caso A)
+  const S3 = A.filter(c => c.invA && c.q >= 2.30 && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW && (c.k === "c" || c.k === "o" || c.k === "y" || (c.k === "f" && c.hasXi))).sort((a, b) => b.ev - a.ev);
+  // pesi: Kelly 1/8 con tetto 3%; totale del giorno al massimo 10% (riduzione proporzionale)
+  const W = new Map(), wOf = o => W.get(o) || 0;
+  for (const c of S1) W.set(c, opKelly(c.pc, c.q));
+  for (const c of S3) if (!S1.includes(c)) W.set(c, opKelly(c.pc, c.q));
+  for (const b of [D2, T3]) if (b) W.set(b, opKelly(b.p, b.q));
+  const tot = [...W.values()].reduce((a, b) => a + b, 0), sc = tot > 0.10 ? 0.10 / tot : 1;
+  const cassa = opCassa(), money = f => cassa ? ` · ${(f * sc * cassa).toFixed(2).replace(".", ",")}` : "";
+  const wTxt = o => { const f = wOf(o), v = f * sc * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${money(f)}</small>`; };
+  const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
+  const row = (c, extra = "") => `<button type="button" class="oprow" data-id="${esc(c.e.id)}"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(lgName(c.e.lg))} · ${when(c.e)}</small></span>
+      <span class="opx">${c.xi ? `<i class="opxi">XI ${c.xi}</i>` : ""}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)} · quota minima di equilibrio ${f2(1 / c.pc)}</small></span>
+      <span class="opw">${wTxt(c)}</span></button>`;
+  const comb = (b, name) => b ? `<div class="opcomb"><p class="opch"><b>${name}</b> · quota ${f2(b.q)} · corretta ${pc(b.p)} · valore atteso ${b.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(b.ev) * 100)}% <span class="opw in">${wTxt(b)}</span></p>
+      ${b.legs.map(c => `<button type="button" class="opleg" data-id="${esc(c.e.id)}"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${f2(c.q)}</span></button>`).join("")}</div>`
+    : `<p class="opnone">${name}: nessuna combinazione a valore (astensione)</p>`;
+  const nSel = S1.length + S3.filter(c => !S1.includes(c)).length + (D2 ? 1 : 0) + (T3 ? 1 : 0);
+  SEL.opN = todo.length ? null : nSel; box.hidden = SEL.tab !== "op"; radarTabs();
+  const cfgC = CORR.gruppi.statistiche, fc = cfgC.fuori_campione || {};
+  box.innerHTML = head + `<label class="opcassa">Cassa <input id="opCassa" type="text" inputmode="decimal" placeholder="es. 100" value="${cassa ? String(cassa).replace(".", ",") : ""}" aria-label="Cassa di riferimento"><small class="muted">solo su questo telefono</small></label>
+    ${todo.length ? `<p class="small muted" style="margin:0">Calcolo… ${ents.length - todo.length}/${ents.length} partite</p>` : ""}
+    ${!nSel && !todo.length ? `<p class="apnone">NESSUNA SELEZIONE A VALORE ${SEL.day === 0 ? "OGGI" : "· " + selDaysTxt().toUpperCase()} (ASTENSIONE)</p>` : ""}
+    <h3 class="oph">1 · Singole di valore (statistiche) <small>${S1.length}</small></h3>
+    ${S1.length ? `<div class="oplist">${S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola a valore (astensione)</p>`}
+    <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(D2, "Quota 2 · doppia")}${comb(T3, "Quota 3 · tripla")}
+    <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>
+    ${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita 1xBet</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione a valore (astensione)</p>`}
+    <p class="opfoot">Peso = Kelly 1/8 sulla probabilità corretta (al massimo 3% per giocata; sotto lo 0,1% la giocata non si mostra${sc < 1 ? `; oggi ridotti in proporzione per stare nel 10% della cassa, totale ${Math.round(tot * 100)}% → 10%` : "; totale del giorno al massimo 10%"}). Quota minima di equilibrio = 1 / probabilità corretta. Coefficienti del ${esc((CORR.agg || "").slice(8, 10) + "/" + (CORR.agg || "").slice(5, 7))} su ${cfgC.esiti} esiti in ${cfgC.giorni} giorni${fc.esiti ? ` (fuori campione log-loss: Prevista ${fc.logloss_prevista}, 1xBet ${fc.logloss_1xbet}, corretta ${fc.logloss_corretta})` : ""}. Esclusi gol, tiri e tiri in porta a quota alta e le forbici sulle strasfavorite.</p>` + RG_LINE;
+  box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
+  const inp = box.querySelector("#opCassa"); if (inp) inp.addEventListener("change", () => { const v = parseFloat(inp.value.replace(",", ".")); lsSet("statPreviste.cassa", v > 0 ? String(v) : ""); renderSelOp(selEntries(), cfg, when); });
+  if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelOp(selEntries(), cfg, when); }, 30);
+}
 /* Radar a due schede: Grado · Mercato (11/10/2026: tolta "Segnali A+", gli A+ sono già nel Grado) */
 function radarTabs() {
   if (!SEL.tab || SEL.tab === "aplus") SEL.tab = "all";
   const set = (id, n) => { const el = $(id); if (el) el.textContent = n == null ? "" : n; };
-  set("#rtB", SEL.bkN); set("#rtC", SEL.cN);
+  set("#rtB", SEL.bkN); set("#rtC", SEL.cN); set("#rtO", SEL.opN);
   document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.rt === SEL.tab)));
   $("#selAplus").hidden = true; $("#selAll").hidden = SEL.tab !== "all";
   const bk = $("#selBk"); if (bk && bk.innerHTML) bk.hidden = SEL.tab !== "bk";
+  const op = $("#selOp"); if (op && op.innerHTML) op.hidden = SEL.tab !== "op";
 }
 document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { SEL.tab = b.dataset.rt; radarTabs(); }));
 let SEL_T = 0;
@@ -5398,6 +5535,7 @@ function renderSel() {
     .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
   try { renderSelBk(ents, cfg, when); } catch (x) { console.warn(x); }
+  try { renderSelOp(ents, cfg, when); } catch (x) { console.warn(x); }
   aBox.innerHTML = `<div class="selhead"><h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${selDaysTxt()}</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button type="button" class="apcard" data-id="${esc(e.id)}">
       <span class="aptag"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
@@ -5642,9 +5780,10 @@ async function reloadIfNew() {
       STATO = ST;
     }
     if (ch("quote_mov")) { const q = await getData("quote_mov.json", "json", ST); if (q) QMOV = q; }
+    if (CORR && ch("corretta")) { const q = await getData("corretta.json", "json", ST); if (q && q.gruppi) { CORR = q; OP_C.clear(); } }
     if (MIERI && ch("mercato_ieri")) { const q = await getData("mercato_ieri.json", "json", ST); if (q) MIERI = q; }
     for (const C of CUPS) if (ch(C.file.slice(0, -5))) { const j = await getData(C.file, "json", ST); if (j) CUPD[C.code] = j; }
-    try { BK_C.clear(); RIT_P.clear(); CONF_MR.clear(); GEN_NEXT.clear(); refStats.idx = null; clearCache(); } catch (e) {}
+    try { BK_C.clear(); OP_C.clear(); RIT_P.clear(); CONF_MR.clear(); GEN_NEXT.clear(); refStats.idx = null; clearCache(); } catch (e) {}
     const inMatch = !$("#viewMatch").hidden;
     refreshAll();
     if (inMatch && S.league === keep.lg && keep.h && keep.a && ($("#home").value !== keep.h || $("#away").value !== keep.a)) { $("#home").value = keep.h; $("#away").value = keep.a; render(); }
