@@ -1,0 +1,37 @@
+name: Analisi IA delle partite (in prova, non entra nei numeri)
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "41 */2 * * *"   # ogni 2 ore: partite che iniziano fra 1 e 30 ore, una sola analisi per partita (salvata prima del fischio)
+concurrency:
+  group: analisi-ia
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  analisi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dati pubblicati e archivio delle analisi
+        run: |
+          mkdir -p pub analisi && git fetch -q --depth 1 origin pages
+          for f in bundle bundle_storico extra tiri_area fuorigioco formazioni prossime; do git show FETCH_HEAD:data/$f.json > pub/$f.json 2>/dev/null || rm -f pub/$f.json; done
+          if git ls-remote --exit-code origin analisi >/dev/null 2>&1; then git fetch -q --depth 1 origin analisi && git archive FETCH_HEAD | tar -x -C analisi; fi
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - name: Contesto delle partite (stesso modello dell'app)
+        run: node tools/ia_contesto.js . pub ia_input.json
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Analisi IA
+        run: python3 tools/analisi_ia.py
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          IA_MODEL: ${{ vars.IA_MODEL }}
+      - name: Salva sul ramo analisi
+        run: |
+          [ -s analisi/analisi_ia.json ] || exit 0
+          cd analisi && git init -q -b analisi && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Analisi IA $(date -u '+%F %H:%M')" && for t in 1 2 3; do git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" analisi && break; sleep 10; done
