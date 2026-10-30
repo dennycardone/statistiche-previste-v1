@@ -63,3 +63,29 @@ for k in ("HD", "HD4"):
 for r in R:
     if "Boca" in r["pair"] and "River" in r["pair"] and id(r) in P["base"][0]:
         log(f"  {r['d']} {r['pair']}: reali {r['T']} · base {P['base'][0][id(r)][0]:.2f} · HD {P['HD'][0][id(r)][0]:.2f} · HD4 {P['HD4'][0][id(r)][0]:.2f}")
+
+# 30/10/2026 (2): effetto della COPPIA appreso dai residui del modello completo (non solo nei derby): negli scontri precedenti fra le
+# stesse due squadre, cartellini reali contro previsti dal modello di base (walk-forward, quindi con derby e arbitro già dentro),
+# ristretti verso 1 con K partite fittizie; il peso lo stima il modello mese per mese. Se esistono coppie "calde" in modo stabile,
+# il peso esce positivo e Boca–River si alza da sola; se è rumore, il peso va a zero.
+base_pred = P["base"][0]
+for K in (2, 4, 8):
+    hist = collections.defaultdict(list)
+    for r in R:
+        key = frozenset(r["pair"].split("–"))
+        H_ = hist[key]
+        r[f"res{K}"] = r["base"] + [math.log((sum(t for t, _ in H_) + K * 5.0) / (sum(p for _, p in H_) + K * 5.0)) if H_ else 0.0]
+        if id(r) in base_pred: H_.append((r["T"], base_pred[id(r)][0]))
+    P[f"res{K}"] = wf(f"res{K}")
+    log(f"res{K}", "peso della coppia (ultimo)", round(P[f"res{K}"][1][-1], 3))
+    for L in (4.5, 5.5):
+        rows = []
+        for r in R:
+            o, n = P["base"][0].get(id(r)), P[f"res{K}"][0].get(id(r))
+            if not o or not n: continue
+            uo, un = nb_cdf(o[0], o[1], int(L)), nb_cdf(n[0], n[1], int(L))
+            rows.append(dict(date=r["d"], lg=r["lg"], season=season(r["d"]), y=0 if r["T"] > L else 2, p_old=np.array([1 - uo, 0, uo]), p_new=np.array([1 - un, 0, un])))
+        log(H.riepilogo(f"Cartellini Over {L} · effetto coppia K={K}", H.confronta(pd.DataFrame(rows))))
+    for r in R:
+        if "Boca" in r["pair"] and "River" in r["pair"] and id(r) in P[f"res{K}"][0]:
+            log(f"  {r['d']} {r['pair']}: reali {r['T']} · base {P['base'][0][id(r)][0]:.2f} · coppia K={K} {P[f'res{K}'][0][id(r)][0]:.2f}")
