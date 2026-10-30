@@ -89,17 +89,7 @@ jobs:
           rm -rf _site && mkdir _site
           # sul sito solo i file che l'app usa (più prossime.json: id API-Football delle prossime partite per il micro-processo delle formazioni): gli archivi grezzi (API-Football, quote storiche, ESPN, CSV) restano nel magazzino privato
           APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
-          # 30/10/2026: analisi IA delle partite (analisi_ia.yml, ramo analisi): sul sito solo quelle da 2 giorni fa in avanti
-          rm -rf _an && mkdir -p _an
-          if git ls-remote --exit-code origin analisi >/dev/null 2>&1; then (git fetch -q --depth 1 origin analisi && git archive FETCH_HEAD | tar -x -C _an) || true; fi
-          python3 - <<'PY' || echo "::warning title=Analisi IA::file per il sito non preparato"
-          import json, os, datetime
-          if os.path.exists("_an/analisi_ia.json"):
-              A = json.load(open("_an/analisi_ia.json")); lim = (datetime.date.today() - datetime.timedelta(days=2)).isoformat()
-              P = {k: {f: v.get(f) for f in ("ora", "modello", "testo", "fattori", "segnali", "fonti")} for k, v in A.get("partite", {}).items() if k.split("|")[1] >= lim}
-              json.dump({"agg": A.get("agg"), "partite": P}, open("data/analisi_ia.json", "w"), ensure_ascii=False, separators=(",", ":"))
-          PY
-          DATA="analisi_ia.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
+          DATA="formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
           # 26/10/2026: il micro-processo delle formazioni (formazioni_live.yml) può aver pubblicato formazioni durante questo giro: si tengono
           # (unione con quelle già sul sito, quelle di questo giro hanno la precedenza; via dopo 3 ore dal fischio come in update_data.py)
           git fetch -q --depth 1 origin pages 2>/dev/null && git show FETCH_HEAD:data/formazioni.json > /tmp/fz_sito.json 2>/dev/null || true
