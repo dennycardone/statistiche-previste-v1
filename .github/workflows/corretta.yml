@@ -1,0 +1,46 @@
+name: Probabilità corretta per l'app (solo coefficienti)
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "47 4 * * *"   # ogni mattina, con le partite di ieri nell'archivio quote
+  push:
+    branches: [main]
+    paths: [tools/corretta_coef.py]
+concurrency:
+  group: corretta
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  corretta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivi dal magazzino privato
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Dati pubblicati e statistiche per tempo
+        run: |
+          mkdir -p pub tempi && git fetch -q --depth 1 origin pages
+          for f in bundle extra tiri_area fuorigioco tempi; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+          git show FETCH_HEAD:data/bundle_storico.json > pub/bundle_storico.json 2>/dev/null || rm -f pub/bundle_storico.json
+          git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: pip install -q numpy
+      - name: Esiti reali in più (gialli per squadra)
+        run: python3 tools/esiti_extra.py
+        continue-on-error: true
+      - name: Probabilità di Prevista con i soli dati precedenti e quote 1xBet
+        run: node tools/quota23.js .
+      - name: Coefficienti
+        run: python3 tools/corretta_coef.py
+      - name: Salva sul ramo corretta (solo coefficienti)
+        run: |
+          mkdir -p _c && cp corretta.json _c/ && cd _c && git init -q -b corretta && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Probabilità corretta $(date -u '+%F %H:%M')" && for t in 1 2 3; do git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" corretta && break; sleep 10; done

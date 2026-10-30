@@ -89,7 +89,9 @@ jobs:
           rm -rf _site && mkdir _site
           # sul sito solo i file che l'app usa (più prossime.json: id API-Football delle prossime partite per il micro-processo delle formazioni): gli archivi grezzi (API-Football, quote storiche, ESPN, CSV) restano nel magazzino privato
           APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
-          DATA="formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
+          # 30/10/2026: coefficienti della probabilità corretta per la vista Operatività (corretta.yml, ramo corretta; solo numeri aggregati)
+          if git ls-remote --exit-code origin corretta >/dev/null 2>&1; then (git fetch -q --depth 1 origin corretta && git show FETCH_HEAD:corretta.json > data/corretta.json) || rm -f data/corretta.json; fi
+          DATA="corretta.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
           # 26/10/2026: il micro-processo delle formazioni (formazioni_live.yml) può aver pubblicato formazioni durante questo giro: si tengono
           # (unione con quelle già sul sito, quelle di questo giro hanno la precedenza; via dopo 3 ore dal fischio come in update_data.py)
           git fetch -q --depth 1 origin pages 2>/dev/null && git show FETCH_HEAD:data/formazioni.json > /tmp/fz_sito.json 2>/dev/null || true
