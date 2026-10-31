@@ -51,6 +51,18 @@ except Exception: print('err')")
     curl -s -o /dev/null -w "%{http_code}" -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
       "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/update.yml/dispatches" -d '{"ref":"main"}' | grep -q 204 && { nkick=$((nkick+1)); echo "aggiornamento principale fatto partire (ultimo $last minuti fa)" >> /tmp/fl_log.txt; }
   fi
+  # 31/10/2026: probabilità corretta della vista Operatività (corretta.yml): GitHub fa partire il giro delle 4:47 UTC anche 6 ore dopo;
+  # dalle 5:00 UTC, se oggi non è ancora partito, lo fa partire (nessuna richiesta API, solo l'archivio quote già scaricato)
+  if [ "$(date -u +%H)" -ge 5 ]; then
+    cr=$(curl -s -H "Authorization: Bearer ${GH_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/corretta.yml/runs?per_page=3" \
+      | python3 -c "import json,sys,datetime
+try:
+    R=json.load(sys.stdin)['workflow_runs']; oggi=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT04')
+    print('ok' if any(r['created_at']>=oggi for r in R) else 'manca')
+except Exception: print('err')")
+    if [ "$cr" = "manca" ]; then curl -s -o /dev/null -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+      "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/corretta.yml/dispatches" -d '{"ref":"main"}' && echo "probabilità corretta fatta partire" >> /tmp/fl_log.txt; fi
+  fi
   [ $(( $(date +%s) + 300 )) -ge $END ] && break
   sleep 300
 done
