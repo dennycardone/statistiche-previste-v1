@@ -28,6 +28,8 @@ const CORR = JSON.parse(rd("corretta.json") || "null");
 if (!CORR || !CORR.gruppi || !CORR.gruppi.statistiche) { console.log("::notice title=Operatività storico::probabilità corretta non disponibile: nessun aggiornamento"); process.exit(0); }
 const QMOV = JSON.parse(rd("quote_mov.json") || "{\"partite\":{}}"), LINEE = JSON.parse(rd("linee.json") || "{\"partite\":{}}");
 const OH = JSON.parse(rd("odds_hist.json") || "{}");
+// gialli per squadra (il mercato 1X2 gialli conta solo i gialli): esiti.json di tools/esiti_extra.py, dalle statistiche API-Football
+let ES = {}; try { ES = JSON.parse(fs.readFileSync(path.join(DIR, "esiti.json"), "utf8")); } catch (e) { ES = {}; }
 const man = JSON.parse(rd("manifest.json"));
 A.resetState();
 for (const f of man.files || []) { const t = rd(f); if (t) A.addParsed(A.parseCSV(t)); }
@@ -78,8 +80,8 @@ for (const e of entries) {
       if (e.m.hk == null || e.m.ak == null) { all = false; continue; }
       g.r = e.m.hk + e.m.ak; g.ok = sd === "Over" ? (g.r > L ? 1 : 0) : (g.r < L ? 1 : 0); continue;
     }
-    const K = RK[g.k], hv = K && e.m[K[0]], av = K && e.m[K[1]];
-    if (hv == null || av == null) { if (g.k !== "y") all = false; continue; }   // gialli per squadra: esito non disponibile nei file dell'app
+    const Y = g.k === "y" && ES[e.id] && ES[e.id].y, K = RK[g.k], hv = Y ? Y[0] : K && e.m[K[0]], av = Y ? Y[1] : K && e.m[K[1]];
+    if (hv == null || av == null) { all = false; continue; }
     g.r = `${hv}-${av}`; g.ok = g.side === "1" ? (hv > av ? 1 : 0) : g.side === "2" ? (av > hv ? 1 : 0) : (hv === av ? 1 : 0);
   }
   if (all) { x.fine = 1; x.ris = `${e.m.hg}-${e.m.ag}`; nRes++; }
