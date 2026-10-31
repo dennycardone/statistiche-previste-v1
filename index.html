@@ -5583,7 +5583,12 @@ function renderSel() {
   // alla partita (come la scheda Rendimento) ed esito ✓/✗
   const past = SEL.day < 0, pday = past ? addDays(localIso(), SEL.day) : null;
   const cfg = MODES[$("#decay").value] || MODES.dyn, ents = past ? allEntries().filter(e => e.m && e.d === pday) : selEntries();
-  const ghit = (e, r) => { if (!e.m) return null; try { const t = r.side === "1" ? e.home : r.side === "2" ? e.away : null; return confHit(e.m, r.mk, r.side, t); } catch (x) { return null; } };
+  const ghit = (e, r) => { const m = e.m; if (!m) return null;
+    try {
+      if (r.mk === "k" && /^[OU]/.test(r.side || "")) { if (m.hk == null || m.ak == null) return null; const L = +r.side.slice(1), t = m.hk + m.ak; return r.side[0] === "U" ? t < L : t > L; }   // cartellini Over/Under
+      if (r.side === "1" || r.side === "2") { const K = MET[r.mk]; if (!K || m[K.h] == null || m[K.a] == null) return null; return r.side === "1" ? m[K.h] > m[K.a] : m[K.a] > m[K.h]; }   // chi ne fa di più
+      return confHit(m, r.mk, r.side, null);   // gol
+    } catch (x) { return null; } };
   const gmk = (e, r) => { const h = ghit(e, r); return h == null ? "" : h ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`; };
   const noModel = !Object.keys(CONF_COEF).length;
   const aBox = $("#selAplus"), list = $("#selList");
