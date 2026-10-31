@@ -558,6 +558,7 @@ select{pointer-events:none}
 .opw.in{display:inline-flex;flex-direction:row;gap:6px;align-items:baseline;margin-left:6px}
 .opxi,.opct{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:var(--hot);color:var(--hot-ink)}.opct{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
 .opcomb{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 6px;background:var(--surface-2)}.opch{margin:0 0 4px;font-size:13px}.opleg{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:5px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}.opleg b{font-size:13px}.opleg span{font-size:12px;color:var(--ink-2)}
+.opdone{cursor:default}.opw .mk{margin-top:2px}
 .opnone{margin:0 0 4px;font-size:12.5px;color:var(--ink-3)}.opfoot{margin:10px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.4}
 .bkrow:hover{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
 .bkm{grid-area:m}.bkp{grid-area:p}.bkn{grid-area:n;flex-direction:row!important;align-items:baseline!important;gap:8px}.bkm,.bkp,.bkn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.bkm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkm small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -607,6 +608,7 @@ select{pointer-events:none}
 .gitem[open] summary .gil b{color:var(--accent)}
 .rtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--hot);min-height:20px}
 .gword.sm{font-size:16px}.gsay.sm{font-size:13.5px}
+.selp2 .mk{margin-left:4px}.gsum{margin:0 0 8px}
 .selp2{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center;font-size:14px}.selp2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp2 .gin{font-size:12.5px;color:var(--ink-2);white-space:nowrap}.selp2 .gin b{font-size:15px;color:var(--ink)}
 .mhead .hsw-n{max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;font-family:var(--body);font-stretch:88%;font-size:11px;font-weight:700;color:var(--gold-ink);background:var(--gold);border-radius:999px;padding:2px 8px;white-space:nowrap;animation:hswp 2.4s ease-in-out 3}
 @keyframes hswp{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
@@ -5409,10 +5411,10 @@ function opCorr(p, m) { const b = CORR && CORR.gruppi && CORR.gruppi.statistiche
 const opKelly = (p, q) => Math.min(0.03, Math.max(0, (p * q - 1) / (q - 1)) / 8);
 const OP_MINW = 0.001;   // sotto lo 0,1% di peso (Kelly 1/8) il vantaggio è trascurabile: la giocata non si mostra
 const OP_C = new Map();
-function opEntry(e, cfg) {   // esiti con quota 1xBet attuale e probabilità corretta per una partita da giocare
-  const key = e.id + "|" + cfg.key + "|" + (CORR ? CORR.agg : ""); if (OP_C.has(key)) return OP_C.get(key);
+function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilità corretta per una partita da giocare (cut: solo dati precedenti, per lo storico)
+  const key = e.id + "|" + cfg.key + "|" + (CORR ? CORR.agg : "") + (cut ? "|" + +cut : ""); if (OP_C.has(key)) return OP_C.get(key);
   const out = [];
-  if (!e.lg.noStats && !NO_1XBET.has(e.lg.code)) withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = null;
+  if (!e.lg.noStats && !NO_1XBET.has(e.lg.code)) withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = cut || null; if (cut && e.m) S.season = e.m.season;
     try {
       let M = null, MT = null, MF = null, O = null; try { M = model(e.home, e.away, cfg); MT = modelShots(e.home, e.away, cfg); MF = model(e.home, e.away, cfg, "f"); O = offModel(e.home, e.away); } catch (x) {}
       if (statMissing(e.lg.code, "hc")) M = null; if (statMissing(e.lg.code, "hf")) MF = null;
@@ -5457,6 +5459,70 @@ function opBest(L, nLeg, lo, hi) {   // combinazione di partite diverse con quot
   };
   rec(0, []); return best;
 }
+function opSelect(A) {   // regole della vista (le stesse per lo storico: tools/operativita_ieri.js)
+  const okHi = c => !((c.k === "s" || c.k === "st") && c.q >= 2.30);
+  // 1 · singole: una per partita (valore atteso corretto più alto)
+  const byE = new Map(); for (const c of A) if (c.ev > 0 && okHi(c) && opKelly(c.pc, c.q) >= OP_MINW) { const b = byE.get(c.e.id); if (!b || c.ev > b.ev) byE.set(c.e.id, c); }
+  const S1 = [...byE.values()].sort((a, b) => b.ev - a.ev);
+  // 2 · Quota 2 / Quota 3
+  const P2 = A.filter(okHi), D2 = opBest(P2, 2, 1.85, 2.20), T3 = opBest(P2, 3, 2.75, 3.35);
+  // 3 · Controtendenza (caso A)
+  const S3 = A.filter(c => c.invA && c.q >= 2.30 && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW && (c.k === "c" || c.k === "o" || c.k === "y" || c.k === "f")).sort((a, b) => b.ev - a.ev);
+  // pesi: Kelly 1/8 con tetto 3%; totale del giorno al massimo 10% (riduzione proporzionale)
+  const W = new Map();
+  for (const c of S1) W.set(c, opKelly(c.pc, c.q));
+  for (const c of S3) if (!S1.includes(c)) W.set(c, opKelly(c.pc, c.q));
+  for (const b of [D2, T3]) if (b) W.set(b, opKelly(b.p, b.q));
+  const tot = [...W.values()].reduce((a, b) => a + b, 0), sc = tot > 0.10 ? 0.10 / tot : 1;
+  return { S1, D2, T3, S3, W, tot, sc };
+}
+/* 31/10/2026 (Denny): storico di Operatività. data/operativita_ieri.json (tools/operativita_ieri.js): per ogni partita degli ultimi 7 giorni
+   gli esiti candidati bloccati al fischio (quote 1xBet e probabilità corretta di allora; prima del 31/10 ricostruiti con i soli dati
+   precedenti) con l'esito. Qui si applicano le stesse regole della vista (opSelect): singole, Quota 2/3, Controtendenza e pesi. */
+let OPIERI = null, OPIERI_LOADING = false;
+function opPastDay(day) {
+  const A = Object.entries((OPIERI && OPIERI.partite) || {}).filter(([, x]) => x.d === day)
+    .flatMap(([id, x]) => { const e = { id, home: x.h, away: x.a, lgn: x.lgn, ora: x.ora, d: x.d, ris: x.ris, ric: x.ric }; return x.c.map(c => ({ ...c, e })); });
+  return opSelect(A);
+}
+function opRes(o) { if (o.legs) return o.legs.some(l => l.ok === 0) ? 0 : o.legs.every(l => l.ok === 1) ? 1 : null; return o.ok == null ? null : o.ok; }
+function opSum(items) {   // items: [o, peso]; presa, rendimento a peso e sulla cassa
+  const D = items.filter(([o]) => opRes(o) != null); if (!D.length) return null;
+  const k = D.filter(([o]) => opRes(o) === 1).length, w = D.reduce((a, [, f]) => a + f, 0), pl = D.reduce((a, [o, f]) => a + f * (opRes(o) ? o.q - 1 : -1), 0);
+  return { n: D.length, k, att: items.length - D.length, y: w > 0 ? pl / w : 0, cassa: pl, flat: D.reduce((a, [o]) => a + (opRes(o) ? o.q - 1 : -1), 0) / D.length };
+}
+const opSumTxt = (lab, S_) => S_ ? `<b>${lab}</b>: ${S_.n} ${S_.n === 1 ? "giocata" : "giocate"} · prese <b>${S_.k}</b> (${pc(S_.k / S_.n)}) · rendimento a peso <b>${S_.y >= 0 ? "+" : "−"}${Math.abs(S_.y * 100).toFixed(1).replace(".", ",")}%</b> · sulla cassa ${S_.cassa >= 0 ? "+" : "−"}${Math.abs(S_.cassa * 100).toFixed(2).replace(".", ",")}% · a puntata fissa ${S_.flat >= 0 ? "+" : "−"}${Math.round(Math.abs(S_.flat) * 100)}%${S_.att ? ` · ${S_.att} in attesa del dato` : ""}` : `<b>${lab}</b>: nessuna giocata con esito`;
+function renderOpPast(box, head, cfg, when) {
+  box.hidden = SEL.tab !== "op";
+  if (!OPIERI) {
+    box.innerHTML = head + `<p class="apnone">${OPIERI_LOADING ? "Carico lo storico…" : "STORICO NON DISPONIBILE"}</p>` + RG_LINE; SEL.opN = null; radarTabs();
+    if (!OPIERI_LOADING) { OPIERI_LOADING = true; getData("operativita_ieri.json").then(j => { OPIERI = j || { partite: {} }; OPIERI_LOADING = false; if (SEL.day < 0) renderSelOp([], cfg, when); }).catch(() => { OPIERI_LOADING = false; OPIERI = { partite: {} }; }); }
+    return;
+  }
+  const day = addDays(localIso(), SEL.day), dl = selDaysTxt();
+  const X = opPastDay(day), sc = X.sc, w = o => (X.W.get(o) || 0) * sc;
+  const all = d => { const Y = opPastDay(d); return [Y, o => (Y.W.get(o) || 0) * Y.sc]; };
+  const days7 = [...new Set(Object.values(OPIERI.partite || {}).map(x => x.d))].filter(d => d < localIso());
+  const blockItems = (Y, wf) => ({ s1: Y.S1.map(o => [o, wf(o)]), q: [Y.D2, Y.T3].filter(Boolean).map(o => [o, wf(o)]), s3: Y.S3.map(o => [o, wf(o)]) });
+  const week = { s1: [], q: [], s3: [] }; for (const d of days7) { const [Y, wf] = all(d), B = blockItems(Y, wf); for (const k in week) week[k].push(...B[k]); }
+  const B = blockItems(X, w), ric = Object.values(OPIERI.partite || {}).some(x => x.d === day && x.ric);
+  const mk = o => { const r = opRes(o); return r == null ? `<small class="muted">in attesa</small>` : r ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`; };
+  const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
+  const wT = o => { const v = w(o) * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso</small>`; };
+  const row = (c, extra = "") => `<div class="oprow opdone"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(c.e.lgn)} · ${esc(c.e.ora || "")}${c.e.ris ? " · finita " + esc(c.e.ris) : ""}${c.e.ric ? " · ricostruita" : ""}</small></span>
+      <span class="opx">${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""}</small></span>
+      <span class="opw">${wT(c)}${mk(c)}</span></div>`;
+  const comb = (b, name) => b ? `<div class="opcomb"><p class="opch"><b>${name}</b> · quota ${f2(b.q)} · corretta ${pc(b.p)} <span class="opw in">${wT(b)}${mk(b)}</span></p>
+      ${b.legs.map(c => `<div class="opleg"><b>${esc(c.e.home)} – ${esc(c.e.away)}${c.e.ris ? ` <small class="muted">${esc(c.e.ris)}</small>` : ""}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${f2(c.q)} ${c.ok == null ? "" : c.ok ? "✓" : "✗"}</span></div>`).join("")}</div>`
+    : `<p class="opnone">${name}: nessuna combinazione a valore (astensione)</p>`;
+  SEL.opN = B.s1.length + B.s3.filter(([o]) => !X.S1.includes(o)).length + B.q.length; radarTabs();
+  box.innerHTML = head + `<div class="bkieri"><p>${opSumTxt(`Singole · ${dl.toLowerCase()}`, opSum(B.s1))}</p><p>${opSumTxt("Quota 2 / Quota 3", opSum(B.q))}</p><p>${opSumTxt("Controtendenza", opSum(B.s3))}</p>
+      <p>${opSumTxt("Ultimi 7 giorni · singole", opSum(week.s1))}</p><p>${opSumTxt("Ultimi 7 giorni · Quota 2 / Quota 3", opSum(week.q))}</p><p>${opSumTxt("Ultimi 7 giorni · Controtendenza", opSum(week.s3))}</p>
+      <p class="bkric">Giocate bloccate al fischio (quote 1xBet e probabilità corretta di allora)${ric ? "; prima del 31/10 ricostruite con i soli dati e i soli giorni precedenti a ogni partita" : ""}. Rendimento a peso = guadagno sui pesi Kelly 1/8 della vista diviso il totale puntato; sulla cassa = in percentuale della cassa.</p></div>
+    <h3 class="oph">1 · Singole di valore (statistiche) <small>${X.S1.length}</small></h3>${X.S1.length ? `<div class="oplist">${X.S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola (astensione)</p>`}
+    <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(X.D2, "Quota 2 · doppia")}${comb(X.T3, "Quota 3 · tripla")}
+    <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${X.S3.length}</small></h3>${X.S3.length ? `<div class="oplist">${X.S3.map(c => row(c, `<i class="opct">sfavorita 1xBet</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}` + RG_LINE;
+}
 const opCassa = () => { const v = parseFloat((lsGet("statPreviste.cassa") || "").replace(",", ".")); return v > 0 ? v : null; };
 function renderSelOp(ents, cfg, when) {
   const box = $("#selOp"); if (!box) return;
@@ -5467,26 +5533,14 @@ function renderSelOp(ents, cfg, when) {
     if (!CORR_LOADING) { CORR_LOADING = true; getData("corretta.json").then(j => { CORR = j && j.gruppi ? j : { gruppi: {} }; CORR_LOADING = false; OP_C.clear(); if (!$("#viewSel").hidden) renderSelOp(selEntries(), cfg, when); }).catch(() => { CORR_LOADING = false; CORR = { gruppi: {} }; }); }
     SEL.opN = null; radarTabs(); return;
   }
-  if (SEL.day < 0 || !(CORR.gruppi && CORR.gruppi.statistiche)) {
-    SEL.opN = 0; box.hidden = SEL.tab !== "op"; box.innerHTML = head + `<p class="apnone">${SEL.day < 0 ? "SOLO PARTITE DA GIOCARE: SCEGLI OGGI O UN GIORNO FUTURO" : "PROBABILITÀ CORRETTA NON DISPONIBILE"}</p>` + RG_LINE; radarTabs(); return;
+  if (SEL.day < 0) { renderOpPast(box, head, cfg, when); return; }
+  if (!(CORR.gruppi && CORR.gruppi.statistiche)) {
+    SEL.opN = 0; box.hidden = SEL.tab !== "op"; box.innerHTML = head + `<p class="apnone">PROBABILITÀ CORRETTA NON DISPONIBILE</p>` + RG_LINE; radarTabs(); return;
   }
   const t0 = performance.now(), todo = [];
   for (const e of ents) { const k = e.id + "|" + cfg.key + "|" + (CORR.agg || ""); if (!OP_C.has(k)) { if (performance.now() - t0 < 200) { try { opEntry(e, cfg); } catch (x) { OP_C.set(k, []); } } else todo.push(e); } }
   const A = ents.flatMap(e => OP_C.get(e.id + "|" + cfg.key + "|" + (CORR.agg || "")) || []);
-  const okHi = c => !((c.k === "s" || c.k === "st") && c.q >= 2.30);
-  // 1 · singole: una per partita (valore atteso corretto più alto)
-  const byE = new Map(); for (const c of A) if (c.ev > 0 && okHi(c) && opKelly(c.pc, c.q) >= OP_MINW) { const b = byE.get(c.e.id); if (!b || c.ev > b.ev) byE.set(c.e.id, c); }
-  const S1 = [...byE.values()].sort((a, b) => b.ev - a.ev);
-  // 2 · Quota 2 / Quota 3
-  const P2 = A.filter(okHi), D2 = opBest(P2, 2, 1.85, 2.20), T3 = opBest(P2, 3, 2.75, 3.35);
-  // 3 · Controtendenza (caso A)
-  const S3 = A.filter(c => c.invA && c.q >= 2.30 && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW && (c.k === "c" || c.k === "o" || c.k === "y" || c.k === "f")).sort((a, b) => b.ev - a.ev);
-  // pesi: Kelly 1/8 con tetto 3%; totale del giorno al massimo 10% (riduzione proporzionale)
-  const W = new Map(), wOf = o => W.get(o) || 0;
-  for (const c of S1) W.set(c, opKelly(c.pc, c.q));
-  for (const c of S3) if (!S1.includes(c)) W.set(c, opKelly(c.pc, c.q));
-  for (const b of [D2, T3]) if (b) W.set(b, opKelly(b.p, b.q));
-  const tot = [...W.values()].reduce((a, b) => a + b, 0), sc = tot > 0.10 ? 0.10 / tot : 1;
+  const { S1, D2, T3, S3, W, tot, sc } = opSelect(A), wOf = o => W.get(o) || 0;
   const cassa = opCassa(), money = f => cassa ? ` · ${(f * sc * cassa).toFixed(2).replace(".", ",")}` : "";
   const wTxt = o => { const f = wOf(o), v = f * sc * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${money(f)}</small>`; };
   const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
@@ -5525,7 +5579,12 @@ function radarTabs() {
 document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { SEL.tab = b.dataset.rt; radarTabs(); }));
 let SEL_T = 0;
 function renderSel() {
-  const cfg = MODES[$("#decay").value] || MODES.dyn, ents = selEntries();
+  // 31/10/2026 (Denny): storico del Grado. Giorno passato = partite giocate di quel giorno, previsioni ricalcolate con i soli dati precedenti
+  // alla partita (come la scheda Rendimento) ed esito ✓/✗
+  const past = SEL.day < 0, pday = past ? addDays(localIso(), SEL.day) : null;
+  const cfg = MODES[$("#decay").value] || MODES.dyn, ents = past ? allEntries().filter(e => e.m && e.d === pday) : selEntries();
+  const ghit = (e, r) => { if (!e.m) return null; try { const t = r.side === "1" ? e.home : r.side === "2" ? e.away : null; return confHit(e.m, r.mk, r.side, t); } catch (x) { return null; } };
+  const gmk = (e, r) => { const h = ghit(e, r); return h == null ? "" : h ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`; };
   const noModel = !Object.keys(CONF_COEF).length;
   const aBox = $("#selAplus"), list = $("#selList");
   if (noModel) { aBox.innerHTML = `<h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><p class="muted" style="margin:0">Grado non disponibile.</p>`; list.innerHTML = ""; return; }
@@ -5536,22 +5595,29 @@ function renderSel() {
   const apm = got.map(([e, L]) => [e, L.filter(r => r.status === "aplus").map(r => ({ ...r, h: e.home, a: e.away, qt: quotaFor(e, r.mk, r.side) })).sort((a, b) => b.q - a.q)]).filter(([, L]) => L.length)
     .sort((a, b) => b[1][0].q - a[1][0].q || Math.max(...b[1].map(r => r.score)) - Math.max(...a[1].map(r => r.score)));
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
-  try { renderSelBk(ents, cfg, when); } catch (x) { console.warn(x); }
-  try { renderSelOp(ents, cfg, when); } catch (x) { console.warn(x); }
+  try { renderSelBk(past ? [] : ents, cfg, when); } catch (x) { console.warn(x); }
+  try { renderSelOp(past ? [] : ents, cfg, when); } catch (x) { console.warn(x); }
   aBox.innerHTML = `<div class="selhead"><h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${selDaysTxt()}</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button type="button" class="apcard" data-id="${esc(e.id)}">
       <span class="aptag"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
-      <span class="apm">${esc(e.home)} – ${esc(e.away)}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
+      <span class="apm">${esc(e.home)} – ${esc(e.away)}${past && e.m ? ` <small class="muted">${e.m.hg}-${e.m.ag}</small>` : ""}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
       ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(plainLab(r))}</span><small class="muted">${esc(confLab(r))}</small>
         <span class="gline"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gword sm">${GRADE_WORD[r.cls]}</span>${gradeDots(gradeRate(r), r.cls)}</span>
-        <span class="gsay sm">Previsioni come questa sono uscite <b>${Math.round(gradeRate(r) * 100)} volte su 100</b>.</span>
+        <span class="gsay sm">Previsioni come questa sono uscite <b>${Math.round(gradeRate(r) * 100)} volte su 100</b>.${past ? " " + gmk(e, r) : ""}</span>
         ${r.qt ? `<span class="small muted">${oddsTxt({ o: r.qt })}</span>` : ""}</span>`).join("")}
       </button>`).join("")}</div>` : `<p class="apnone">NESSUN SEGNALE A+ DISPONIBILE</p>`);
   const rows = got.map(([e, L]) => [e, L.filter(pass)]).filter(([, L]) => L.length).sort((a, b) => b[1][0].score - a[1][0].score || a[0].d.localeCompare(b[0].d));
-  list.innerHTML = !ents.length ? `<p class="muted" style="margin:0">${SEL.day < 0 ? `Il Grado riguarda le partite da giocare: per ${selDaysTxt().toLowerCase()} il Mercato mostra le giocate con l'esito.` : `Nessuna partita ${SEL.day === 0 ? "oggi" : SEL.day === 1 ? "domani" : selDaysTxt().toLowerCase()} ancora da giocare.`}</p>` :
-    (rows.length ? rows.map(([e, L]) => `<button type="button" class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
-      ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}${r.mk === "f" && FORMAZ && FORMAZ.partite && FORMAZ.partite[e.id] ? `<span class="xitag" title="Falli corretti con le formazioni ufficiali">XI</span>` : ""}</span>${qSm(quotaFor(e, r.mk, r.side)) || "<small></small>"}<span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100</span></span>`).join("")}</button>`).join("")
-      : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : "");
+  let gsum = "";
+  if (past && !todo.length) {   // riepilogo del giorno: le previsioni mostrate (fino a 3 per partita) e gli A+
+    const sh = rows.flatMap(([e, L]) => L.slice(0, 3).map(r => [e, r])), ap = apm.flatMap(([e, L]) => L.map(r => [e, r]));
+    const sm = (X, lab) => { const D = X.map(([e, r]) => [ghit(e, r), gradeRate(r)]).filter(z => z[0] != null); if (!D.length) return `<b>${lab}</b>: nessuna con esito`;
+      const k = D.filter(z => z[0]).length; return `<b>${lab}</b>: ${D.length} · uscite <b>${k}</b> (${pc(k / D.length)}) · attese in media ${pc(D.reduce((a, z) => a + z[1], 0) / D.length)}`; };
+    gsum = `<div class="bkieri gsum"><p>${sm(sh, `Previsioni mostrate · ${selDaysTxt().toLowerCase()}`)}</p><p>${sm(ap, "Segnali A+")}</p><p class="bkric">Previsioni ricalcolate con i soli dati precedenti a ogni partita, con il metodo e il filtro scelti.</p></div>`;
+  }
+  list.innerHTML = gsum + (!ents.length ? `<p class="muted" style="margin:0">${past ? `Nessuna partita giocata ${selDaysTxt().toLowerCase()} nei nostri campionati.` : `Nessuna partita ${SEL.day === 0 ? "oggi" : SEL.day === 1 ? "domani" : selDaysTxt().toLowerCase()} ancora da giocare.`}</p>` :
+    (rows.length ? rows.map(([e, L]) => `<button type="button" class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}${past && e.m ? ` <small class="muted">${e.m.hg}-${e.m.ag}</small>` : ""}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
+      ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}${r.mk === "f" && FORMAZ && FORMAZ.partite && FORMAZ.partite[e.id] ? `<span class="xitag" title="Falli corretti con le formazioni ufficiali">XI</span>` : ""}</span>${qSm(quotaFor(e, r.mk, r.side)) || "<small></small>"}<span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100${past ? gmk(e, r) : ""}</span></span>`).join("")}</button>`).join("")
+      : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : ""));
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));
   SEL.aN = todo.length ? null : apm.reduce((a, [, L]) => a + L.length, 0); SEL.cN = ents.length; radarTabs();
   $("#selNote").textContent = `Previsioni con il metodo scelto in alto (${cfg.label}): per ogni partita le previsioni più solide, dal grado A+ al C, con quante volte sono uscite le previsioni con lo stesso grado.`;
@@ -5782,6 +5848,7 @@ async function reloadIfNew() {
       STATO = ST;
     }
     if (ch("quote_mov")) { const q = await getData("quote_mov.json", "json", ST); if (q) QMOV = q; }
+    if (OPIERI && ch("operativita_ieri")) { const q = await getData("operativita_ieri.json", "json", ST); if (q) OPIERI = q; }
     if (CORR && ch("corretta")) { const q = await getData("corretta.json", "json", ST); if (q && q.gruppi) { CORR = q; OP_C.clear(); } }
     if (MIERI && ch("mercato_ieri")) { const q = await getData("mercato_ieri.json", "json", ST); if (q) MIERI = q; }
     for (const C of CUPS) if (ch(C.file.slice(0, -5))) { const j = await getData(C.file, "json", ST); if (j) CUPD[C.code] = j; }
