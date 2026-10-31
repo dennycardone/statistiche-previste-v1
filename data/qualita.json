@@ -1,0 +1,100 @@
+{
+ "stat_extra": {
+  "partite": 895,
+  "fuorigioco": 793,
+  "archivio": "2026-10-31 19:09"
+ },
+ "formazioni": {
+  "partite_24h": 119,
+  "prese_prima": 114,
+  "anticipo_medio_min": 27,
+  "mancate": [
+   "SC3 Stirling Albion–Forfar Athletic",
+   "SC3 Edinburgh City–Dumbarton",
+   "SC3 Kelty Hearts–Elgin City",
+   "SC3 Spartans–Annan Athletic",
+   "SC3 Stranraer–Clyde"
+  ]
+ },
+ "nomi": {
+  "fiducia_bassa": [],
+  "non_abbinati": [
+   "F2 Rouen (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "P1 Torreense (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "SC0 Partick (18 partite): senza corrispondenza nei nostri dati",
+   "SC0 Dunfermline (4 partite): senza corrispondenza nei nostri dati",
+   "SC0 Arbroath (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "B1 Patro Eisden (4 partite): senza corrispondenza nei nostri dati",
+   "B1 Liège (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "D2 Rot-Weiß Essen (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "SC3 Brora Rangers (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "RUS Rotor Volgograd (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "SWZ FC Aarau (4 partite): senza corrispondenza nei nostri dati",
+   "UCL Inter Club d'Escaldes (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Vikingur Reykjavik (10 partite): senza corrispondenza nei nostri dati",
+   "UCL Sutjeska (4 partite): senza corrispondenza nei nostri dati",
+   "UCL The New Saints (12 partite): senza corrispondenza nei nostri dati",
+   "UCL Lech Poznan (8 partite): senza corrispondenza nei nostri dati",
+   "UCL Shamrock Rovers (14 partite): senza corrispondenza nei nostri dati",
+   "UCL Lincoln Red Imps FC (16 partite): senza corrispondenza nei nostri dati",
+   "UCL KI Klaksvik (16 partite): senza corrispondenza nei nostri dati",
+   "UCL Flora Tallinn (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Larne (8 partite): senza corrispondenza nei nostri dati",
+   "UCL Petrocub (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Celje (10 partite): senza corrispondenza nei nostri dati",
+   "UCL Borac Banja Luka (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Egnatia Rrogozhinë (8 partite): senza corrispondenza nei nostri dati",
+   "UCL KuPS (8 partite): senza corrispondenza nei nostri dati",
+   "UCL FC Iberia 1999 (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Drita (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Ararat-Armenia (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Riga (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Kauno Žalgiris (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Vardar Skopje (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Floriana (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Levski Sofia (8 partite): senza corrispondenza nei nostri dati",
+   "UCL Tre Fiori (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Atert Bissen (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Gyori ETO FC (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL ML Vitebsk (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Universitatea Craiova (4 partite): senza corrispondenza nei nostri dati",
+   "UCL Mjallby AIF (4 partite): senza corrispondenza nei nostri dati"
+  ],
+  "abbinati": 1060
+ },
+ "fuorigioco": {
+  "campionati": 31,
+  "partite": 34584,
+  "da_doppio_null": 2175
+ },
+ "partite_non_api": [],
+ "giocate_mancanti": [],
+ "squadre_non_riconosciute": [],
+ "partite_scadute": [],
+ "statistiche_scartate": [
+  "D2 30/10 Energie Cottbus - VfL Bochum: falli"
+ ],
+ "calendario_da_espn": [],
+ "quote": {
+  "aggiornate": "31/10/2026 19:39",
+  "abbinate": 352,
+  "non_abbinate": 0,
+  "esempi_non_abbinate": []
+ },
+ "api_aggiornata": "2026-10-31 19:09",
+ "quote_fonte_ridotta": {
+  "s": "0% delle partite negli ultimi 3 giorni contro 91% prima",
+  "st": "0% delle partite negli ultimi 3 giorni contro 88% prima",
+  "f": "0% delle partite negli ultimi 3 giorni contro 57% prima",
+  "y": "0% delle partite negli ultimi 3 giorni contro 62% prima",
+  "c1": "5% delle partite negli ultimi 3 giorni contro 94% prima",
+  "y1": "0% delle partite negli ultimi 3 giorni contro 63% prima",
+  "o": "0% delle partite negli ultimi 3 giorni contro 55% prima"
+ },
+ "avvisi": [
+  "1 partite con statistiche API impossibili (usato football-data o vuoto)",
+  "Quote 1xBet ridotte dalla fonte (API-Football): 1X2 tiri 0% delle partite negli ultimi 3 giorni contro 91% prima; 1X2 tiri in porta 0% delle partite negli ultimi 3 giorni contro 88% prima; 1X2 falli 0% delle partite negli ultimi 3 giorni contro 57% prima; 1X2 gialli 0% delle partite negli ultimi 3 giorni contro 62% prima; 1X2 corner 1° tempo 5% delle partite negli ultimi 3 giorni contro 94% prima; 1X2 gialli 1° tempo 0% delle partite negli ultimi 3 giorni contro 63% prima; 1X2 fuorigioco 0% delle partite negli ultimi 3 giorni contro 55% prima. Dove manca la quota, controllare su 1xBet"
+ ],
+ "stato": "da controllare",
+ "giro": "31/10/2026 20:11"
+}
