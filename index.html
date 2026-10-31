@@ -5393,10 +5393,11 @@ function renderSelBk(ents, cfg, when) {
    studio Quota 2/3). Esito ammesso solo con le quote 1xBet attuali di tutto il mercato e valore atteso corretto > 0.
    Perimetro: 1X2 corner, tiri, tiri in porta, falli, fuorigioco, gialli e Over/Under cartellini; niente gol; tiri e tiri in porta solo
    sotto quota 2,30 (a quota alta perdono: studio sorprese del 30/10).
-   1 · Singole: una per partita, quella col valore atteso più alto; XI = falli sbloccati o rafforzati dalle formazioni ufficiali.
+   1 · Singole: una per partita, quella col valore atteso più alto (31/10, Denny: nessuna attesa delle formazioni ufficiali; se ci sono, i
+       falli le usano già come nel resto dell'app).
    2 · Quota 2 / Quota 3: doppia (quota 1,85-2,20) e tripla (2,75-3,35) di partite diverse con il valore atteso congiunto più alto e non
        negativo (metodo "EV, astensione se EV < 0" dello studio settimanale), solo statistiche.
-   3 · Controtendenza: corner, fuorigioco, gialli (falli solo con le formazioni ufficiali), sfavorita 1xBet a quota ≥ 2,30 che Prevista
+   3 · Controtendenza: corner, fuorigioco, gialli e falli, sfavorita 1xBet a quota ≥ 2,30 che Prevista
        dà più probabile della favorita (caso A) e con valore atteso corretto > 0.
    Peso: Kelly 1/8 sulla probabilità corretta, al massimo 3% per giocata; se il totale del giorno supera il 10% della cassa, tutti i pesi
    si riducono in proporzione. Cassa solo nel localStorage del telefono. */
@@ -5474,11 +5475,11 @@ function renderSelOp(ents, cfg, when) {
   const okHi = c => !((c.k === "s" || c.k === "st") && c.q >= 2.30);
   // 1 · singole: una per partita (valore atteso corretto più alto)
   const byE = new Map(); for (const c of A) if (c.ev > 0 && okHi(c) && opKelly(c.pc, c.q) >= OP_MINW) { const b = byE.get(c.e.id); if (!b || c.ev > b.ev) byE.set(c.e.id, c); }
-  const S1 = [...byE.values()].sort((a, b) => (b.xi ? 1 : 0) - (a.xi ? 1 : 0) || b.ev - a.ev);
+  const S1 = [...byE.values()].sort((a, b) => b.ev - a.ev);
   // 2 · Quota 2 / Quota 3
   const P2 = A.filter(okHi), D2 = opBest(P2, 2, 1.85, 2.20), T3 = opBest(P2, 3, 2.75, 3.35);
   // 3 · Controtendenza (caso A)
-  const S3 = A.filter(c => c.invA && c.q >= 2.30 && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW && (c.k === "c" || c.k === "o" || c.k === "y" || (c.k === "f" && c.hasXi))).sort((a, b) => b.ev - a.ev);
+  const S3 = A.filter(c => c.invA && c.q >= 2.30 && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW && (c.k === "c" || c.k === "o" || c.k === "y" || c.k === "f")).sort((a, b) => b.ev - a.ev);
   // pesi: Kelly 1/8 con tetto 3%; totale del giorno al massimo 10% (riduzione proporzionale)
   const W = new Map(), wOf = o => W.get(o) || 0;
   for (const c of S1) W.set(c, opKelly(c.pc, c.q));
@@ -5489,7 +5490,7 @@ function renderSelOp(ents, cfg, when) {
   const wTxt = o => { const f = wOf(o), v = f * sc * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${money(f)}</small>`; };
   const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
   const row = (c, extra = "") => `<button type="button" class="oprow" data-id="${esc(c.e.id)}"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(lgName(c.e.lg))} · ${when(c.e)}</small></span>
-      <span class="opx">${c.xi ? `<i class="opxi">XI ${c.xi}</i>` : ""}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)} · quota minima di equilibrio ${f2(1 / c.pc)}</small></span>
+      <span class="opx">${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)} · quota minima di equilibrio ${f2(1 / c.pc)}</small></span>
       <span class="opw">${wTxt(c)}</span></button>`;
   const comb = (b, name) => b ? `<div class="opcomb"><p class="opch"><b>${name}</b> · quota ${f2(b.q)} · corretta ${pc(b.p)} · valore atteso ${b.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(b.ev) * 100)}% <span class="opw in">${wTxt(b)}</span></p>
       ${b.legs.map(c => `<button type="button" class="opleg" data-id="${esc(c.e.id)}"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${f2(c.q)}</span></button>`).join("")}</div>`
