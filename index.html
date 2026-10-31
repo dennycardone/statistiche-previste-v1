@@ -558,7 +558,7 @@ select{pointer-events:none}
 .opw.in{display:inline-flex;flex-direction:row;gap:6px;align-items:baseline;margin-left:6px}
 .opxi,.opct{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:var(--hot);color:var(--hot-ink)}.opct{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
 .opcomb{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 6px;background:var(--surface-2)}.opch{margin:0 0 4px;font-size:13px}.opleg{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:5px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}.opleg b{font-size:13px}.opleg span{font-size:12px;color:var(--ink-2)}
-.opdone{cursor:default}.opw .mk{margin-top:2px}
+.opdone{cursor:default}.opw .oppos{color:var(--good);font-weight:700}.opw .opneg{color:var(--dot-r);font-weight:700}.opw .mk{margin-top:2px}
 .opnone{margin:0 0 4px;font-size:12.5px;color:var(--ink-3)}.opfoot{margin:10px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.4}
 .bkrow:hover{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
 .bkm{grid-area:m}.bkp{grid-area:p}.bkn{grid-area:n;flex-direction:row!important;align-items:baseline!important;gap:8px}.bkm,.bkp,.bkn{display:flex;flex-direction:column;min-width:0;line-height:1.2}.bkm b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bkm small{font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -5491,7 +5491,8 @@ function opSum(items) {   // items: [o, peso]; presa, rendimento a peso e sulla 
   const k = D.filter(([o]) => opRes(o) === 1).length, w = D.reduce((a, [, f]) => a + f, 0), pl = D.reduce((a, [o, f]) => a + f * (opRes(o) ? o.q - 1 : -1), 0);
   return { n: D.length, k, att: items.length - D.length, y: w > 0 ? pl / w : 0, cassa: pl, flat: D.reduce((a, [o]) => a + (opRes(o) ? o.q - 1 : -1), 0) / D.length };
 }
-const opSumTxt = (lab, S_) => S_ ? `<b>${lab}</b>: ${S_.n} ${S_.n === 1 ? "giocata" : "giocate"} · prese <b>${S_.k}</b> (${pc(S_.k / S_.n)}) · rendimento a peso <b>${S_.y >= 0 ? "+" : "−"}${Math.abs(S_.y * 100).toFixed(1).replace(".", ",")}%</b> · sulla cassa ${S_.cassa >= 0 ? "+" : "−"}${Math.abs(S_.cassa * 100).toFixed(2).replace(".", ",")}% · a puntata fissa ${S_.flat >= 0 ? "+" : "−"}${Math.round(Math.abs(S_.flat) * 100)}%${S_.att ? ` · ${S_.att} in attesa del dato` : ""}` : `<b>${lab}</b>: nessuna giocata con esito`;
+const opEur = v => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2).replace(".", ",")} €`;
+const opSumTxt = (lab, S_) => S_ ? `<b>${lab}</b>: ${S_.n} ${S_.n === 1 ? "giocata" : "giocate"} · prese <b>${S_.k}</b> (${pc(S_.k / S_.n)}) · rendimento a peso <b>${S_.y >= 0 ? "+" : "−"}${Math.abs(S_.y * 100).toFixed(1).replace(".", ",")}%</b> · sulla cassa ${S_.cassa >= 0 ? "+" : "−"}${Math.abs(S_.cassa * 100).toFixed(2).replace(".", ",")}%${opCassa() ? ` (<b>${opEur(S_.cassa * opCassa())}</b> su ${String(opCassa()).replace(".", ",")} €)` : ""} · a puntata fissa ${S_.flat >= 0 ? "+" : "−"}${Math.round(Math.abs(S_.flat) * 100)}%${S_.att ? ` · ${S_.att} in attesa del dato` : ""}` : `<b>${lab}</b>: nessuna giocata con esito`;
 function renderOpPast(box, head, cfg, when) {
   box.hidden = SEL.tab !== "op";
   if (!OPIERI) {
@@ -5508,7 +5509,8 @@ function renderOpPast(box, head, cfg, when) {
   const B = blockItems(X, w), ric = Object.values(OPIERI.partite || {}).some(x => x.d === day && x.ric);
   const mk = o => { const r = opRes(o); return r == null ? `<small class="muted">in attesa</small>` : r ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`; };
   const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
-  const wT = o => { const v = w(o) * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso</small>`; };
+  const cassa = opCassa();
+  const wT = o => { const v = w(o) * 100, r = opRes(o); return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${cassa ? ` · ${(w(o) * cassa).toFixed(2).replace(".", ",")} €` : ""}</small>${cassa && r != null ? `<small class="num ${r ? "oppos" : "opneg"}">${opEur(w(o) * cassa * (r ? o.q - 1 : -1))}</small>` : ""}`; };
   const row = (c, extra = "") => `<div class="oprow opdone"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(c.e.lgn)} · ${esc(c.e.ora || "")}${c.e.ris ? " · finita " + esc(c.e.ris) : ""}${c.e.ric ? " · ricostruita" : ""}</small></span>
       <span class="opx">${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""}</small></span>
       <span class="opw">${wT(c)}${mk(c)}</span></div>`;
@@ -5518,7 +5520,7 @@ function renderOpPast(box, head, cfg, when) {
   SEL.opN = B.s1.length + B.s3.filter(([o]) => !X.S1.includes(o)).length + B.q.length; radarTabs();
   box.innerHTML = head + `<div class="bkieri"><p>${opSumTxt(`Singole · ${dl.toLowerCase()}`, opSum(B.s1))}</p><p>${opSumTxt("Quota 2 / Quota 3", opSum(B.q))}</p><p>${opSumTxt("Controtendenza", opSum(B.s3))}</p>
       <p>${opSumTxt("Ultimi 7 giorni · singole", opSum(week.s1))}</p><p>${opSumTxt("Ultimi 7 giorni · Quota 2 / Quota 3", opSum(week.q))}</p><p>${opSumTxt("Ultimi 7 giorni · Controtendenza", opSum(week.s3))}</p>
-      <p class="bkric">Giocate bloccate al fischio (quote 1xBet e probabilità corretta di allora)${ric ? "; prima del 31/10 ricostruite con i soli dati e i soli giorni precedenti a ogni partita" : ""}. Rendimento a peso = guadagno sui pesi Kelly 1/8 della vista diviso il totale puntato; sulla cassa = in percentuale della cassa.</p></div>
+      ${cassa ? "" : `<p class="bkric">Imposta la cassa nella vista di oggi per vedere importi e guadagni in euro.</p>`}<p class="bkric">Giocate bloccate al fischio (quote 1xBet e probabilità corretta di allora)${ric ? "; prima del 31/10 ricostruite con i soli dati e i soli giorni precedenti a ogni partita" : ""}. Rendimento a peso = guadagno sui pesi Kelly 1/8 della vista diviso il totale puntato; sulla cassa = in percentuale della cassa.</p></div>
     <h3 class="oph">1 · Singole di valore (statistiche) <small>${X.S1.length}</small></h3>${X.S1.length ? `<div class="oplist">${X.S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola (astensione)</p>`}
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(X.D2, "Quota 2 · doppia")}${comb(X.T3, "Quota 3 · tripla")}
     <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${X.S3.length}</small></h3>${X.S3.length ? `<div class="oplist">${X.S3.map(c => row(c, `<i class="opct">sfavorita 1xBet</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}` + RG_LINE;
@@ -5541,7 +5543,7 @@ function renderSelOp(ents, cfg, when) {
   for (const e of ents) { const k = e.id + "|" + cfg.key + "|" + (CORR.agg || ""); if (!OP_C.has(k)) { if (performance.now() - t0 < 200) { try { opEntry(e, cfg); } catch (x) { OP_C.set(k, []); } } else todo.push(e); } }
   const A = ents.flatMap(e => OP_C.get(e.id + "|" + cfg.key + "|" + (CORR.agg || "")) || []);
   const { S1, D2, T3, S3, W, tot, sc } = opSelect(A), wOf = o => W.get(o) || 0;
-  const cassa = opCassa(), money = f => cassa ? ` · ${(f * sc * cassa).toFixed(2).replace(".", ",")}` : "";
+  const cassa = opCassa(), money = f => cassa ? ` · ${(f * sc * cassa).toFixed(2).replace(".", ",")} €` : "";
   const wTxt = o => { const f = wOf(o), v = f * sc * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${money(f)}</small>`; };
   const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
   const row = (c, extra = "") => `<button type="button" class="oprow" data-id="${esc(c.e.id)}"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(lgName(c.e.lg))} · ${when(c.e)}</small></span>
