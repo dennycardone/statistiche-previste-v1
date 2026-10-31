@@ -78,6 +78,7 @@ jobs:
       - name: Operatività · candidati bloccati al fischio ed esiti (data/operativita_ieri.json)
         run: |
           if git ls-remote --exit-code origin corretta >/dev/null 2>&1; then (git fetch -q --depth 1 origin corretta && git show FETCH_HEAD:corretta.json > data/corretta.json) || true; fi
+          python3 tools/esiti_extra.py data/bundle_storico.json data/bundle.json || echo "gialli per squadra non disponibili"
           node tools/operativita_ieri.js
         continue-on-error: true
       - name: Previsioni Champions League (ramo champions, preparate da champions.yml)
