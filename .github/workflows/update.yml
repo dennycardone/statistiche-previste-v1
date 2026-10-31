@@ -6,7 +6,7 @@ on:
   workflow_dispatch: {}
   push:   # parte da solo anche quando cambiano l'app o gli script che preparano i dati
     branches: [main]
-    paths: [index.html, precalc.js, update_data.py, cards_model.py, apif_extra.py, team_ranges.py, derby.py, xi_corr.py, tools/mercato_ieri.js]
+    paths: [index.html, precalc.js, update_data.py, cards_model.py, apif_extra.py, team_ranges.py, derby.py, xi_corr.py, tools/mercato_ieri.js, tools/operativita_ieri.js]
 concurrency:   # mai due aggiornamenti insieme
   group: aggiorna-dati
   cancel-in-progress: false
@@ -75,6 +75,10 @@ jobs:
         run: node precalc.js
       - name: Radar Mercato · giocate bloccate al fischio ed esiti di ieri (data/mercato_ieri.json)
         run: node tools/mercato_ieri.js
+      - name: Operatività · candidati bloccati al fischio ed esiti (data/operativita_ieri.json)
+        run: |
+          if git ls-remote --exit-code origin corretta >/dev/null 2>&1; then (git fetch -q --depth 1 origin corretta && git show FETCH_HEAD:corretta.json > data/corretta.json) || true; fi
+          node tools/operativita_ieri.js
         continue-on-error: true
       - name: Previsioni Champions League (ramo champions, preparate da champions.yml)
         run: |
@@ -91,7 +95,7 @@ jobs:
           APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
           # 30/10/2026: coefficienti della probabilità corretta per la vista Operatività (corretta.yml, ramo corretta; solo numeri aggregati)
           if git ls-remote --exit-code origin corretta >/dev/null 2>&1; then (git fetch -q --depth 1 origin corretta && git show FETCH_HEAD:corretta.json > data/corretta.json) || rm -f data/corretta.json; fi
-          DATA="corretta.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
+          DATA="corretta.json operativita_ieri.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
           # 26/10/2026: il micro-processo delle formazioni (formazioni_live.yml) può aver pubblicato formazioni durante questo giro: si tengono
           # (unione con quelle già sul sito, quelle di questo giro hanno la precedenza; via dopo 3 ore dal fischio come in update_data.py)
           git fetch -q --depth 1 origin pages 2>/dev/null && git show FETCH_HEAD:data/formazioni.json > /tmp/fz_sito.json 2>/dev/null || true
@@ -144,7 +148,7 @@ jobs:
             rm -rf _bk && mkdir _bk && git fetch -q --depth 1 origin backup && git archive FETCH_HEAD | tar -x -C _bk && last=$(git log -1 --format=%ct FETCH_HEAD)
           fi
           if [ $(( $(date +%s) - last )) -lt 72000 ]; then echo "copia di oggi già fatta"; exit 0; fi
-          F=""; for f in odds_hist.json apif.json odds.json formazioni_hist.json mercato_storico.json infortuni_hist.json; do [ -f data/$f ] && F="$F $f"; done
+          F=""; for f in odds_hist.json apif.json odds.json formazioni_hist.json mercato_storico.json operativita_storico.json infortuni_hist.json; do [ -f data/$f ] && F="$F $f"; done
           [ -n "$F" ] || exit 0
           mkdir -p _bk2 && tar -czf - -C data $F | openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -pass env:BK | split -b 90m - _bk2/archivio.enc.
           if ls _bk/archivio.enc.* >/dev/null 2>&1; then mkdir -p _bk2/precedente && cp _bk/archivio.enc.* _bk/data.txt _bk2/precedente/ 2>/dev/null || true; fi
