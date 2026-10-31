@@ -6,13 +6,18 @@ Riserva = 300 fisse + 250 per ogni ora che manca a mezzanotte UTC. Alle 23:25 UT
 28/10/2026: ricalcolata sui consumi reali dopo la rimozione di 14 campionati e con il micro-processo delle formazioni e gli infortuni:
 mercoledì 28/10 dalle 5:44 alle 21:24 UTC da 473 a 1.852 richieste, ~90 l'ora (comprese le diagnosi). Riserva = 300 fisse + 175 per
 ogni ora che manca a mezzanotte UTC (margine per i weekend più pieni). Alle 23:25 UTC ~400 di riserva; alle 0:35 UTC (secondo giro
-notturno, dopo l'azzeramento) ~4.300."""
+notturno, dopo l'azzeramento) ~4.300.
+31/10/2026: sabato le richieste sono FINITE alle 18:30 UTC (risultati e statistiche delle partite della sera fermi fino a mezzanotte UTC):
+dalle 10:36 alle 18:07 UTC l'app ne ha usate ~285 l'ora (molte partite: quote e formazioni). Riserva per giorno della settimana (UTC):
+sabato e domenica 300 fisse + 330 l'ora; gli altri giorni 300 + 175 l'ora. Nei weekend il riscarico notturno dopo l'azzeramento
+in pratica si ferma (lascia tutto all'app); il giro delle 23:25 UTC usa ancora le richieste avanzate della giornata."""
 import datetime
 
 def app_reserve(now=None):
     now = now or datetime.datetime.now(datetime.timezone.utc)
     left = 24 - (now.hour + now.minute / 60)
-    return int(300 + 175 * left)
+    rate = 330 if now.weekday() >= 5 else 175   # 5 = sabato, 6 = domenica
+    return int(300 + rate * left)
 
 def requests_of(status_json):
     """Blocco "requests" della chiamata status; vuoto se le richieste sono finite ("response" è una lista)."""
