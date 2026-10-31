@@ -1,0 +1,37 @@
+name: Prova storico Operatività (anteprima, nessuna pubblicazione sul sito)
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivi dal magazzino privato
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Dati pubblicati, tempi e codice dell'anteprima
+        run: |
+          mkdir -p pub tempi && git fetch -q --depth 1 origin pages
+          for f in bundle extra tiri_area fuorigioco tempi; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+          git show FETCH_HEAD:data/bundle_storico.json > pub/bundle_storico.json 2>/dev/null || rm -f pub/bundle_storico.json
+          git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
+          git fetch -q --depth 1 origin anteprima-storico && git show FETCH_HEAD:index.html > index.html && git show FETCH_HEAD:tools/operativita_ieri.js > tools/operativita_ieri.js
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: pip install -q numpy
+      - run: python3 tools/esiti_extra.py
+        continue-on-error: true
+      - run: node tools/quota23.js . && python3 tools/corretta_coef.py && cp corretta.json data/corretta.json
+      - name: Storico
+        run: node tools/operativita_ieri.js
+      - name: Risultato sul ramo prova-storico (solo il file che verrà pubblicato)
+        run: |
+          mkdir -p _p && cp data/operativita_ieri.json data/corretta.json _p/ && cd _p && git init -q -b prova-storico && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m prova && git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" prova-storico

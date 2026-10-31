@@ -35,6 +35,11 @@ for name, test in (("statistiche", lambda c: c["mk"] not in GOL), ("gol", lambda
         bb = fit_lr([[lg_(c["p"]), lg_(c["m"])] for c in tr], [c["y"] for c in tr])
         for c in ev[d]:
             om.append(c["p"]); ob.append(c["m"]); op.append(1 / (1 + math.exp(-(bb[0] + bb[1] * lg_(c["p"]) + bb[2] * lg_(c["m"]))))); ys.append(c["y"])
+    if name == "statistiche":   # 31/10/2026: coefficienti stimati sui soli giorni precedenti, per la ricostruzione dello storico di Operatività
+        OUT["per_giorno"] = {}
+        for i, d in enumerate(days[-10:], start=len(days) - 10):
+            tr = [c for dd in days[:i] for c in ev[dd]]
+            if i >= 7 and len(tr) >= 300: OUT["per_giorno"][d] = [round(float(x), 4) for x in fit_lr([[lg_(c["p"]), lg_(c["m"])] for c in tr], [c["y"] for c in tr])]
     L_ = lambda P: round(-statistics.mean(math.log(max(1e-6, p if y else 1 - p)) for p, y in zip(P, ys)), 4) if ys else None
     OUT["gruppi"][name] = {"b": [round(float(x), 4) for x in b], "esiti": len(E), "giorni": len(days), "dal": days[0], "al": days[-1],
                            "fuori_campione": {"esiti": len(ys), "logloss_prevista": L_(om), "logloss_1xbet": L_(ob), "logloss_corretta": L_(op)}}
