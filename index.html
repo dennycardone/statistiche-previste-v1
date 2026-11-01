@@ -5459,22 +5459,31 @@ function opBest(L, nLeg, lo, hi) {   // combinazione di partite diverse con quot
   };
   rec(0, []); return best;
 }
-function opSelect(A) {   // regole della vista (le stesse per lo storico: tools/operativita_ieri.js)
+function opSelect(A, minW = 0) {   // regole della vista (le stesse per lo storico); minW = puntata minima come frazione della cassa (0,20 € / cassa)
   const okHi = c => !((c.k === "s" || c.k === "st") && c.q >= 2.30);
   // 1 · singole: una per partita (valore atteso corretto più alto)
   const byE = new Map(); for (const c of A) if (c.ev > 0 && okHi(c) && opKelly(c.pc, c.q) >= OP_MINW) { const b = byE.get(c.e.id); if (!b || c.ev > b.ev) byE.set(c.e.id, c); }
-  const S1 = [...byE.values()].sort((a, b) => b.ev - a.ev);
+  let S1 = [...byE.values()].sort((a, b) => b.ev - a.ev);
   // 2 · Quota 2 / Quota 3
-  const P2 = A.filter(okHi), D2 = opBest(P2, 2, 1.85, 2.20), T3 = opBest(P2, 3, 2.75, 3.35);
+  const P2 = A.filter(okHi); let D2 = opBest(P2, 2, 1.85, 2.20), T3 = opBest(P2, 3, 2.75, 3.35);
   // 3 · Controtendenza (caso A)
-  const S3 = A.filter(c => c.invA && c.q >= 2.30 && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW && (c.k === "c" || c.k === "o" || c.k === "y" || c.k === "f")).sort((a, b) => b.ev - a.ev);
+  let S3 = A.filter(c => c.invA && c.q >= 2.30 && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW && (c.k === "c" || c.k === "o" || c.k === "y" || c.k === "f")).sort((a, b) => b.ev - a.ev);
   // pesi: Kelly 1/8 con tetto 3%; totale del giorno al massimo 10% (riduzione proporzionale)
   const W = new Map();
   for (const c of S1) W.set(c, opKelly(c.pc, c.q));
   for (const c of S3) if (!S1.includes(c)) W.set(c, opKelly(c.pc, c.q));
   for (const b of [D2, T3]) if (b) W.set(b, opKelly(b.p, b.q));
-  const tot = [...W.values()].reduce((a, b) => a + b, 0), sc = tot > 0.10 ? 0.10 / tot : 1;
-  return { S1, D2, T3, S3, W, tot, sc };
+  let tot = 0, sc = 1, cut = 0;
+  // 1/11/2026 (Denny): puntata minima 0,20 €. Dopo la riduzione al 10% si tolgono le giocate sotto il minimo e si ricalcola la riduzione
+  // sulle rimaste (che possono così salire), finché tutte sono almeno al minimo
+  for (let it = 0; it < 50; it++) {
+    tot = [...W.values()].reduce((a, b) => a + b, 0); sc = tot > 0.10 ? 0.10 / tot : 1;
+    if (!minW) break;
+    const low = [...W.entries()].filter(([, f]) => f * sc < minW - 1e-12).map(([o]) => o); if (!low.length) break;
+    for (const o of low) W.delete(o); cut += low.length;
+    S1 = S1.filter(o => W.has(o)); S3 = S3.filter(o => W.has(o) || S1.includes(o)); if (D2 && !W.has(D2)) D2 = null; if (T3 && !W.has(T3)) T3 = null;
+  }
+  return { S1, D2, T3, S3, W, tot, sc, cut };
 }
 /* 31/10/2026 (Denny): storico di Operatività. data/operativita_ieri.json (tools/operativita_ieri.js): per ogni partita degli ultimi 7 giorni
    gli esiti candidati bloccati al fischio (quote 1xBet e probabilità corretta di allora; prima del 31/10 ricostruiti con i soli dati
@@ -5483,7 +5492,7 @@ let OPIERI = null, OPIERI_LOADING = false;
 function opPastDay(day) {
   const A = Object.entries((OPIERI && OPIERI.partite) || {}).filter(([, x]) => x.d === day)
     .flatMap(([id, x]) => { const e = { id, home: x.h, away: x.a, lgn: x.lgn, ora: x.ora, d: x.d, ris: x.ris, ric: x.ric }; return x.c.map(c => ({ ...c, e })); });
-  return opSelect(A);
+  const cs = opCassa(); return opSelect(A, cs ? 0.20 / cs : 0);
 }
 function opRes(o) { if (o.legs) return o.legs.some(l => l.ok === 0) ? 0 : o.legs.every(l => l.ok === 1) ? 1 : null; return o.ok == null ? null : o.ok; }
 function opSum(items) {   // items: [o, peso]; presa, rendimento a peso e sulla cassa
@@ -5542,7 +5551,7 @@ function renderSelOp(ents, cfg, when) {
   const t0 = performance.now(), todo = [];
   for (const e of ents) { const k = e.id + "|" + cfg.key + "|" + (CORR.agg || ""); if (!OP_C.has(k)) { if (performance.now() - t0 < 200) { try { opEntry(e, cfg); } catch (x) { OP_C.set(k, []); } } else todo.push(e); } }
   const A = ents.flatMap(e => OP_C.get(e.id + "|" + cfg.key + "|" + (CORR.agg || "")) || []);
-  const { S1, D2, T3, S3, W, tot, sc } = opSelect(A), wOf = o => W.get(o) || 0;
+  const OPMIN = 0.20, cassa0 = opCassa(), { S1, D2, T3, S3, W, tot, sc, cut } = opSelect(A, cassa0 ? OPMIN / cassa0 : 0), wOf = o => W.get(o) || 0;
   const cassa = opCassa(), money = f => cassa ? ` · ${(f * sc * cassa).toFixed(2).replace(".", ",")} €` : "";
   const wTxt = o => { const f = wOf(o), v = f * sc * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${money(f)}</small>`; };
   const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
@@ -5563,7 +5572,7 @@ function renderSelOp(ents, cfg, when) {
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(D2, "Quota 2 · doppia")}${comb(T3, "Quota 3 · tripla")}
     <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>
     ${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita 1xBet</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione a valore (astensione)</p>`}
-    <p class="opfoot">Peso = Kelly 1/8 sulla probabilità corretta (al massimo 3% per giocata; sotto lo 0,1% la giocata non si mostra${sc < 1 ? `; oggi ridotti in proporzione per stare nel 10% della cassa, totale ${Math.round(tot * 100)}% → 10%` : "; totale del giorno al massimo 10%"}). Quota minima di equilibrio = 1 / probabilità corretta. Coefficienti del ${esc((CORR.agg || "").slice(8, 10) + "/" + (CORR.agg || "").slice(5, 7))} su ${cfgC.esiti} esiti in ${cfgC.giorni} giorni${fc.esiti ? ` (fuori campione log-loss: Prevista ${fc.logloss_prevista}, 1xBet ${fc.logloss_1xbet}, corretta ${fc.logloss_corretta})` : ""}. Esclusi gol, tiri e tiri in porta a quota alta e le forbici sulle strasfavorite.</p>` + RG_LINE;
+    <p class="opfoot">Peso = Kelly 1/8 sulla probabilità corretta (al massimo 3% per giocata; sotto lo 0,1% la giocata non si mostra${cassa0 ? `; puntata minima 0,20 €${cut ? `: tolte ${cut} giocate sotto il minimo e pesi ricalcolati sulle altre` : ""}` : "; imposta la cassa per applicare la puntata minima di 0,20 €"}${sc < 1 ? `; oggi ridotti in proporzione per stare nel 10% della cassa, totale ${Math.round(tot * 100)}% → 10%` : "; totale del giorno al massimo 10%"}). Quota minima di equilibrio = 1 / probabilità corretta. Coefficienti del ${esc((CORR.agg || "").slice(8, 10) + "/" + (CORR.agg || "").slice(5, 7))} su ${cfgC.esiti} esiti in ${cfgC.giorni} giorni${fc.esiti ? ` (fuori campione log-loss: Prevista ${fc.logloss_prevista}, 1xBet ${fc.logloss_1xbet}, corretta ${fc.logloss_corretta})` : ""}. Esclusi gol, tiri e tiri in porta a quota alta e le forbici sulle strasfavorite.</p>` + RG_LINE;
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   const inp = box.querySelector("#opCassa"); if (inp) inp.addEventListener("change", () => { const v = parseFloat(inp.value.replace(",", ".")); lsSet("statPreviste.cassa", v > 0 ? String(v) : ""); renderSelOp(selEntries(), cfg, when); });
   if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelOp(selEntries(), cfg, when); }, 30);
