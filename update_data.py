@@ -791,6 +791,16 @@ try:
                     x = AP["partite"].get(fid)
                     if x and H and A:   # risposta senza statistiche: restano quelle che c'erano (non si cancellano)
                         x[7] = [_stat(H, k) for k in KS_]; x[8] = [_stat(A, k) for k in KS_]; n_new += 1
+                        # 2/11/2026: gialli e rossi anche dagli eventi della stessa risposta (Lazio-Cagliari 1/11: rosso al 91' negli eventi ma
+                        # non ancora nelle statistiche → 4 cartellini invece di 5); si tiene il valore più alto tra statistiche ed eventi
+                        _ev = {f["teams"]["home"]["id"]: [0, 0], f["teams"]["away"]["id"]: [0, 0]}
+                        for _e in f.get("events") or []:
+                            _tid = (_e.get("team") or {}).get("id"); _d = (_e.get("detail") or "")
+                            if _e.get("type") != "Card" or _tid not in _ev or not (_e.get("player") or {}).get("id"): continue
+                            _ev[_tid][1 if ("Red" in _d or "Second" in _d) else 0] += 1
+                        for _row, _tid in ((x[7], f["teams"]["home"]["id"]), (x[8], f["teams"]["away"]["id"])):
+                            if _row[4] is not None: _row[4] = max(_row[4], _ev[_tid][0])
+                            if _row[5] is not None: _row[5] = max(_row[5], _ev[_tid][1])
                         AP["stats_at"][fid] = _utc.strftime("%Y-%m-%dT%H:%M")
                         AP.setdefault("visto", {}).setdefault(fid, {}).setdefault("st", _utc.strftime("%Y-%m-%dT%H:%M"))
             _old = (_utc - datetime.timedelta(days=10)).strftime("%Y-%m-%dT%H:%M")

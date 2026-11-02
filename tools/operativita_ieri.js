@@ -18,7 +18,7 @@ const CODE = blk("const BK_ROWS", "\nlet QMOV") + "\nvar QMOV = null;\n" + blk("
 const noop = () => {};
 const ctx = vm.createContext({ console, Math, Date, JSON, Intl, Map, Set, Number, String, Object, Array, isFinite, isNaN, parseFloat, parseInt, Infinity, NaN, Float64Array, WeakMap,
   document: { addEventListener: noop, querySelector: () => null, querySelectorAll: () => [] }, localStorage: { getItem: () => null, setItem: noop, removeItem: noop }, matchMedia: () => ({ matches: false }), performance: { now: () => Date.now() } });
-vm.runInContext(html.slice(start, end) + "\nvar LINEE = null;\n" + CODE + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, isoD, addDays, withLeague, attachOffs, opEntry, OP_C, setCorr: c => { CORR = c; OP_C.clear(); }, setOdds: (q, l) => { QMOV = q; LINEE = l; } };", ctx);
+vm.runInContext(html.slice(start, end) + "\nvar LINEE = null;\n" + CODE + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, isoD, addDays, withLeague, attachOffs, opEntry, opSelect, opKelly, OP_C, setCorr: c => { CORR = c; OP_C.clear(); }, setOdds: (q, l) => { QMOV = q; LINEE = l; } };", ctx);
 const A = ctx.API;
 const rd = f => { try { return fs.readFileSync(path.join(DATA, f), "utf8"); } catch (e) { return null; } };
 for (const [v, f] of [["EXTRA", "extra.json"], ["MERCATI", "mercati.json"], ["TAREA", "tiri_area.json"], ["FORMAZ", "formazioni.json"], ["OFFS", "fuorigioco.json"]]) {
@@ -69,10 +69,46 @@ for (const e of entries) {
   if (c.length) { H[e.id] = { lg: e.lg.code, lgn: e.lg.name, paese: e.lg.country, d: e.d, ora: e.time, h: e.home, a: e.away, t: null, ric: 1, c }; nRic++; }
 }
 A.setCorr(CORR); A.setOdds(QMOV, LINEE);
+/* 2/11/2026 (Denny: "il giorno prima non riporta la Quota 2 che mi aveva consigliato"). REGISTRO delle proposte: lo storico ricalcolato con le
+   ultime quote prima del fischio non coincide con quello che l'app mostrava quando lo si guardava (quote e giocate cambiano nel corso della
+   giornata). Da oggi ogni proposta della giornata (singola, Controtendenza, Quota 2, Quota 3) viene FISSATA al primo giro in cui compare, con
+   quota, probabilità corretta e peso di quel momento, e non cambia più: l'app mostra il registro (oggi e giorni passati), lo storico è lo
+   stesso registro con l'esito. Pesi: Kelly 1/8 (tetto 3%); budget del giorno 10% della cassa, assegnato in ordine di comparsa (le proposte
+   nuove si riducono se il budget rimasto non basta, a budget finito non si fissano più proposte). */
+const LP = path.join(DATA, "operativita_registro.json");
+let LR = {}; try { LR = JSON.parse(fs.readFileSync(LP, "utf8")); } catch (e) { LR = {}; }
+const romeDate = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date());
+const nowIso = new Date().toISOString().slice(0, 16);
+const base = e => ({ id: e.id, lg: e.lg.code, lgn: e.lg.name, ora: e.time, h: e.home, a: e.away });
+const prop = c => ({ ...base(c.e), k: c.k, mk: c.mk, side: c.side, who: c.who, p: r4(c.p), pc: r4(c.pc), q: c.q, ev: r4(c.ev), und: c.und ? 1 : 0 });
+let nLock = 0;
+{
+  const todayE = entries.filter(e => !e.lg.noStats && !e.m && e.d === romeDate && koOf(e) > now);
+  const Ad = todayE.flatMap(e => A.opEntry(e, cfg));
+  const X = A.opSelect(Ad, 0);
+  const day = LR[romeDate] || (LR[romeDate] = { singole: [], contro: [], q2: null, q3: null });
+  const used = () => [...day.singole, ...day.contro, day.q2, day.q3].filter(Boolean).reduce((a, o) => a + (o.w || 0), 0);
+  const neu = [];
+  for (const c of X.S1) if (!day.singole.some(o => o.id === c.e.id)) neu.push(["singole", { ...prop(c), f: A.opKelly(c.pc, c.q) }]);
+  for (const c of X.S3) if (!day.contro.some(o => o.id === c.e.id)) {
+    const dup = day.singole.concat(neu.filter(n => n[0] === "singole").map(n => n[1])).some(o => o.id === c.e.id && o.k === c.k && o.side === c.side);
+    neu.push(["contro", { ...prop(c), f: dup ? 0 : A.opKelly(c.pc, c.q), dup: dup ? 1 : 0 }]);
+  }
+  const comb = b => ({ legs: b.legs.map(prop), q: r4(b.q), p: r4(b.p), ev: r4(b.ev), f: A.opKelly(b.p, b.q) });
+  if (!day.q2 && X.D2) neu.push(["q2", comb(X.D2)]);
+  if (!day.q3 && X.T3) neu.push(["q3", comb(X.T3)]);
+  const Rm = Math.max(0, 0.10 - used()), tf = neu.reduce((a, [, o]) => a + o.f, 0), sc = tf > 0 ? Math.min(1, Rm / tf) : 0;
+  for (const [kind, o] of neu) {
+    o.w = r4(o.f * sc); o.t = nowIso;
+    if (!o.dup && o.w < 1e-4) continue;   // budget del giorno finito
+    if (kind === "q2" || kind === "q3") day[kind] = o; else day[kind].push(o);
+    nLock++;
+  }
+}
 // esiti
 const RK = { c: ["hc", "ac"], s: ["hs", "as"], st: ["hst", "ast"], f: ["hf", "af"], o: ["ho", "ao"] };
 for (const e of entries) {
-  const x = H[e.id]; if (!e.m || !x || x.fine) continue;
+  const x = H[e.id]; if (!e.m || !x || (x.fine && e.d < A.addDays(t0, -3))) continue;   // 2/11/2026: esiti ricalcolati per 3 giorni
   let all = true;
   for (const g of x.c) {
     if (g.k === "kou") {
@@ -86,9 +122,27 @@ for (const e of entries) {
   }
   if (all) { x.fine = 1; x.ris = `${e.m.hg}-${e.m.ag}`; nRes++; }
 }
+// esiti delle proposte del registro (ricalcolati per 3 giorni, come i candidati)
+const byId = new Map(entries.map(e => [e.id, e]));
+function grade(g) {
+  const e = byId.get(g.id); if (!e || !e.m) return;
+  if (g.k === "kou") { const [sd, ln] = g.side.split(" "), L = parseFloat(ln.replace(",", ".")); if (e.m.hk == null || e.m.ak == null) return; g.r = e.m.hk + e.m.ak; g.ok = sd === "Over" ? (g.r > L ? 1 : 0) : (g.r < L ? 1 : 0); g.ris = `${e.m.hg}-${e.m.ag}`; return; }
+  const Y = g.k === "y" && ES[e.id] && ES[e.id].y, K = RK[g.k], hv = Y ? Y[0] : K && e.m[K[0]], av = Y ? Y[1] : K && e.m[K[1]];
+  if (hv == null || av == null) return;
+  g.r = `${hv}-${av}`; g.ok = g.side === "1" ? (hv > av ? 1 : 0) : g.side === "2" ? (av > hv ? 1 : 0) : (hv === av ? 1 : 0); g.ris = `${e.m.hg}-${e.m.ag}`;
+}
+for (const [d, day] of Object.entries(LR)) {
+  if (d < A.addDays(t0, -4)) continue;
+  for (const o of [...day.singole, ...day.contro]) grade(o);
+  for (const b of [day.q2, day.q3]) if (b) { b.legs.forEach(grade); b.ok = b.legs.some(l => l.ok === 0) ? 0 : b.legs.every(l => l.ok === 1) ? 1 : null; }
+}
+for (const d of Object.keys(LR)) if (d < A.addDays(t0, -60)) delete LR[d];
+fs.writeFileSync(LP, JSON.stringify(LR));
+const PR = {}; for (const [d, day] of Object.entries(LR)) if (d >= A.addDays(t0, -7)) PR[d] = day;
+fs.writeFileSync(path.join(DATA, "operativita.json"), JSON.stringify({ agg: nowIso, giorni: PR }));
 const lim = A.addDays(t0, -60); for (const k of Object.keys(H)) if (H[k].d < lim) delete H[k];
 fs.writeFileSync(SP, JSON.stringify(H));
 const lo = A.addDays(t0, -7), P = {};
 for (const [k, x] of Object.entries(H)) if (x.d >= lo && x.d < t0 && x.c.length) P[k] = x;
 fs.writeFileSync(path.join(DATA, "operativita_ieri.json"), JSON.stringify({ agg: new Date().toISOString().slice(0, 16), da: lo, partite: P }));
-console.log(`::notice title=Operatività storico::partite aggiornate prima del fischio ${nUpd} · ricostruite ${nRic} · con esito in questo giro ${nRes} · pubblicate (ultimi 7 giorni) ${Object.keys(P).length} partite`);
+console.log(`::notice title=Operatività storico::registro: proposte fissate in questo giro ${nLock} (oggi ${romeDate}) · partite aggiornate prima del fischio ${nUpd} · ricostruite ${nRic} · con esito in questo giro ${nRes} · pubblicate (ultimi 7 giorni) ${Object.keys(P).length} partite`);
