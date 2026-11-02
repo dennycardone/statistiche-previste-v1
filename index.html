@@ -5485,6 +5485,40 @@ function opSelect(A, minW = 0) {   // regole della vista (le stesse per lo stori
   }
   return { S1, D2, T3, S3, W, tot, sc, cut };
 }
+/* 2/11/2026: registro delle proposte (tools/operativita_ieri.js). Ogni proposta è fissata al primo giro in cui compare (quota, probabilità
+   corretta e peso di quel momento) e non cambia più: quello che l'app mostra oggi è esattamente quello che finisce nello storico. */
+let OPREG = null, OPREG_LOADING = false;
+function renderOpLedger(box, head, day, dkey) {
+  box.hidden = SEL.tab !== "op";
+  const cassa = opCassa(), minOk = o => !cassa || o.dup || (o.w || 0) * cassa >= 0.20 - 1e-9, isToday = dkey === localIso();
+  const S1 = (day.singole || []).filter(minOk), S3 = (day.contro || []).filter(minOk), Q = [day.q2, day.q3].filter(o => o && minOk(o));
+  const hidden = (day.singole || []).length + (day.contro || []).length + [day.q2, day.q3].filter(Boolean).length - S1.length - S3.length - Q.length;
+  const hm = t => { try { return new Date(t + ":00Z").toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Rome" }); } catch (x) { return ""; } };
+  const ent = id => { try { return allEntries().find(x => x.id === id); } catch (x) { return null; } };
+  const status = o => { if (o.ok === 1) return `<i class="mk ok">✓</i>`; if (o.ok === 0) return `<i class="mk ko">✗</i>`;
+    const e = o.legs ? null : ent(o.id); if (e && koStarted(e.d, e.time)) return `<small class="muted">in corso</small>`; return isToday ? `<small class="muted">da giocare</small>` : `<small class="muted">in attesa</small>`; };
+  const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
+  const eur = v => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2).replace(".", ",")} €`;
+  const wT = o => { if (o.dup) return `<small class="num">già tra le singole</small>`; const v = (o.w || 0) * 100, r = opRes(o);
+    return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${cassa ? ` · ${(o.w * cassa).toFixed(2).replace(".", ",")} €` : ""}</small>${cassa && r != null ? `<small class="num ${r ? "oppos" : "opneg"}">${eur(o.w * cassa * (r ? o.q - 1 : -1))}</small>` : ""}`; };
+  const row = (c, extra = "") => `<button type="button" class="oprow" data-id="${esc(c.id)}"><span class="opm"><b>${esc(c.h)} – ${esc(c.a)}</b><small class="muted">${esc(c.lgn)} · ${esc(c.ora || "")}${c.ris ? " · finita " + esc(c.ris) : ""} · proposta alle ${hm(c.t)}</small></span>
+      <span class="opx">${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)} · quota minima di equilibrio ${f2(1 / c.pc)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""}</small></span>
+      <span class="opw">${wT(c)}${status(c)}</span></button>`;
+  const comb = (b, name) => b && minOk(b) ? `<div class="opcomb"><p class="opch"><b>${name}</b> · quota ${f2(b.q)} · corretta ${pc(b.p)} · proposta alle ${hm(b.t)} <span class="opw in">${wT(b)}${status(b)}</span></p>
+      ${b.legs.map(c => `<button type="button" class="opleg" data-id="${esc(c.id)}"><b>${esc(c.h)} – ${esc(c.a)}${c.ris ? ` <small class="muted">${esc(c.ris)}</small>` : ""}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${f2(c.q)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""} ${c.ok == null ? "" : c.ok ? "✓" : "✗"}</span></button>`).join("")}</div>`
+    : `<p class="opnone">${name}: ${b ? "sotto la puntata minima di 0,20 €" : "nessuna proposta"}</p>`;
+  const sumOf = L => opSum(L.filter(o => !o.dup).map(o => [o, o.w || 0]));
+  const usedW = [...S1, ...S3, ...Q].filter(o => !o.dup).reduce((a, o) => a + (o.w || 0), 0);
+  SEL.opN = S1.length + S3.filter(o => !o.dup).length + Q.length; radarTabs();
+  box.innerHTML = head + (isToday ? `<label class="opcassa">Cassa <input id="opCassa" type="text" inputmode="decimal" placeholder="es. 100" value="${cassa ? String(cassa).replace(".", ",") : ""}" aria-label="Cassa di riferimento"><small class="muted">solo su questo telefono</small></label>` : "")
+    + `<div class="bkieri"><p>${opSumTxt("Singole", sumOf(S1))}</p><p>${opSumTxt("Quota 2 / Quota 3", sumOf(Q))}</p><p>${opSumTxt("Controtendenza", sumOf(S3))}</p>
+      <p class="bkric">Registro: ogni proposta è fissata quando compare (quota, probabilità corretta e peso di quel momento) e non cambia più; budget del giorno 10% della cassa, usato ${(usedW * 100).toFixed(1).replace(".", ",")}%.${cassa ? ` Puntata minima 0,20 €${hidden ? `: ${hidden} ${hidden === 1 ? "proposta nascosta perché sotto" : "proposte nascoste perché sotto"}` : ""}.` : " Imposta la cassa per gli importi in euro e la puntata minima di 0,20 €."}</p></div>
+    <h3 class="oph">1 · Singole di valore (statistiche) <small>${S1.length}</small></h3>${S1.length ? `<div class="oplist">${S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola (astensione)</p>`}
+    <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(day.q2, "Quota 2 · doppia")}${comb(day.q3, "Quota 3 · tripla")}
+    <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita 1xBet</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}` + RG_LINE;
+  box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ent(b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
+  const inp = box.querySelector("#opCassa"); if (inp) inp.addEventListener("change", () => { const v = parseFloat(inp.value.replace(",", ".")); lsSet("statPreviste.cassa", v > 0 ? String(v) : ""); renderSelOp(selEntries(), MODES[$("#decay").value] || MODES.dyn, e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`); });
+}
 /* 31/10/2026 (Denny): storico di Operatività. data/operativita_ieri.json (tools/operativita_ieri.js): per ogni partita degli ultimi 7 giorni
    gli esiti candidati bloccati al fischio (quote 1xBet e probabilità corretta di allora; prima del 31/10 ricostruiti con i soli dati
    precedenti) con l'esito. Qui si applicano le stesse regole della vista (opSelect): singole, Quota 2/3, Controtendenza e pesi. */
@@ -5544,7 +5578,15 @@ function renderSelOp(ents, cfg, when) {
     if (!CORR_LOADING) { CORR_LOADING = true; getData("corretta.json").then(j => { CORR = j && j.gruppi ? j : { gruppi: {} }; CORR_LOADING = false; OP_C.clear(); if (!$("#viewSel").hidden) renderSelOp(selEntries(), cfg, when); }).catch(() => { CORR_LOADING = false; CORR = { gruppi: {} }; }); }
     SEL.opN = null; radarTabs(); return;
   }
-  if (SEL.day < 0) { renderOpPast(box, head, cfg, when); return; }
+  // 2/11/2026: oggi e giorni passati dal REGISTRO delle proposte fissate (data/operativita.json); domani e oltre: calcolo provvisorio
+  if (SEL.day <= 0) {
+    if (!OPREG) { box.hidden = SEL.tab !== "op"; box.innerHTML = head + `<p class="apnone">${OPREG_LOADING ? "Carico il registro delle proposte…" : "REGISTRO NON DISPONIBILE"}</p>` + RG_LINE; SEL.opN = null; radarTabs();
+      if (!OPREG_LOADING) { OPREG_LOADING = true; getData("operativita.json").then(j => { OPREG = j && j.giorni ? j : { giorni: {} }; OPREG_LOADING = false; if (!$("#viewSel").hidden) renderSelOp(selEntries(), cfg, when); }).catch(() => { OPREG_LOADING = false; OPREG = { giorni: {} }; }); }
+      return; }
+    const dkey = addDays(localIso(), SEL.day);
+    if (OPREG.giorni[dkey]) { renderOpLedger(box, head, OPREG.giorni[dkey], dkey); return; }
+    if (SEL.day < 0) { renderOpPast(box, head, cfg, when); return; }
+  }
   if (!(CORR.gruppi && CORR.gruppi.statistiche)) {
     SEL.opN = 0; box.hidden = SEL.tab !== "op"; box.innerHTML = head + `<p class="apnone">PROBABILITÀ CORRETTA NON DISPONIBILE</p>` + RG_LINE; radarTabs(); return;
   }
@@ -5566,6 +5608,7 @@ function renderSelOp(ents, cfg, when) {
   const cfgC = CORR.gruppi.statistiche, fc = cfgC.fuori_campione || {};
   box.innerHTML = head + `<label class="opcassa">Cassa <input id="opCassa" type="text" inputmode="decimal" placeholder="es. 100" value="${cassa ? String(cassa).replace(".", ",") : ""}" aria-label="Cassa di riferimento"><small class="muted">solo su questo telefono</small></label>
     ${todo.length ? `<p class="small muted" style="margin:0">Calcolo… ${ents.length - todo.length}/${ents.length} partite</p>` : ""}
+    ${SEL.day > 0 ? `<p class="opnone"><b>Provvisorie</b>: le proposte di questo giorno si fissano nel registro solo il giorno stesso, con le quote di quel momento.</p>` : ""}
     ${!nSel && !todo.length ? `<p class="apnone">NESSUNA SELEZIONE A VALORE ${SEL.day === 0 ? "OGGI" : "· " + selDaysTxt().toUpperCase()} (ASTENSIONE)</p>` : ""}
     <h3 class="oph">1 · Singole di valore (statistiche) <small>${S1.length}</small></h3>
     ${S1.length ? `<div class="oplist">${S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola a valore (astensione)</p>`}
@@ -5864,6 +5907,7 @@ async function reloadIfNew() {
       STATO = ST;
     }
     if (ch("quote_mov")) { const q = await getData("quote_mov.json", "json", ST); if (q) QMOV = q; }
+    if (OPREG && ch("operativita")) { const q = await getData("operativita.json", "json", ST); if (q && q.giorni) OPREG = q; }
     if (OPIERI && ch("operativita_ieri")) { const q = await getData("operativita_ieri.json", "json", ST); if (q) OPIERI = q; }
     if (CORR && ch("corretta")) { const q = await getData("corretta.json", "json", ST); if (q && q.gruppi) { CORR = q; OP_C.clear(); } }
     if (MIERI && ch("mercato_ieri")) { const q = await getData("mercato_ieri.json", "json", ST); if (q) MIERI = q; }

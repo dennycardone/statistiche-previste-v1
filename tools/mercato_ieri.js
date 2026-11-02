@@ -62,7 +62,7 @@ for (const e of entries) {
     H[e.id] = { lg: e.lg.code, lgn: e.lg.name, paese: e.lg.country, d: e.d, ora: e.time, h: e.home, a: e.away, t: null, ric: 1, g: out };
   }
   const x = H[e.id];
-  if (e.m && x && !x.fine) {   // partita giocata: valori reali ed esito di ogni giocata bloccata
+  if (e.m && x && (!x.fine || e.d >= A.addDays(t0, -3))) {   // 2/11/2026: esiti ricalcolati per 3 giorni (statistiche corrette dopo la partita)   // partita giocata: valori reali ed esito di ogni giocata bloccata
     let all = true;
     for (const g of x.g) {
       const K = REALK[g.mk]; const hv = K && e.m[K[0]], av = K && e.m[K[1]];
