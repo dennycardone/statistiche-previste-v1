@@ -216,3 +216,26 @@ for lab, rule in CAND[:2] + CAND[-1:]:
         fin, dds = np.array(fin), np.array(dds)
         mc.append(f"{lab} · {per} ({len(dl)} giorni): profitto nel {100 * (fin > 100).mean():.0f}% delle simulazioni · cassa mediana {np.median(fin):.1f} (5°-95° {np.percentile(fin, 5):.1f} – {np.percentile(fin, 95):.1f}) · calo massimo al 95° percentile {100 * np.percentile(dds, 95):.1f}% · {7 * nb / len(dl):.1f} giocate a settimana")
 note("4 · Monte Carlo 10.000 delle regole candidate (Kelly 1/8, tetti 3% e 10%)", " ‖ ".join(mc))
+
+# ---------------- 5 · verifica in avanti dal 4/11/2026 (regole fissate il 3/11): puntata fissa 1% contro Kelly 1/8, tre perimetri
+FWD = "2026-11-04"
+SPENTI = ("O/U corner squadra", "1X2 tiri", "O/U tiri in porta totali", "O/U tiri in porta squadra")
+PERIM = [("Under cartellini totali", lambda o: o["mkt"] == "O/U cartellini totali" and o["side"] == "Under" and o["ev"] > 0),
+         ("Nucleo pulito (senza i 3 mercati spenti)", lambda o: o["ev"] > 0 and o["mkt"] not in SPENTI),
+         ("Perimetro di Operatività", lambda o: o["ev"] > 0 and o["mkt"] in ("1X2 corner", "1X2 falli", "1X2 fuorigioco", "1X2 gialli", "O/U cartellini totali", "O/U tiri totali"))]
+def sim_flat(dl, rule):
+    cash, peak, mdd, nb = 100.0, 100.0, 0.0, 0
+    for d in dl:
+        S = day_bets(d, rule); stake = min(0.01, 0.10 / len(S)) if S else 0
+        cash *= 1 + sum(stake * ((o["q"] - 1) if o["y"] else -1) for o in S); nb += len(S); peak = max(peak, cash); mdd = max(mdd, (peak - cash) / peak)
+    return cash, mdd, nb
+FD = [d for d in ED if d >= FWD]
+if FD:
+    out = []
+    for lab, rule in PERIM:
+        cf, mf, nb = sim_flat(FD, rule); ck, mk_, nk, _ = simulate(FD, "singole", rule)
+        s_ = stats(one_per_match([o for o in E if rule(o) and o["d"] >= FWD]))
+        out.append(f"{lab}: {fmt(s_)} · cassa con fissa 1% {cf:.1f} (calo max {100 * mf:.1f}%) · con Kelly 1/8 {ck:.1f} (calo max {100 * mk_:.1f}%)")
+    note(f"5 · verifica in avanti dal 4/11 ({len(FD)} giorni)", " ‖ ".join(out))
+else:
+    note("5 · verifica in avanti dal 4/11", "nessun giorno giocato dal 4/11 con probabilità corretta: si parte dal prossimo lunedì")

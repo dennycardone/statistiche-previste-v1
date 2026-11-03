@@ -80,7 +80,7 @@ let LR = {}; try { LR = JSON.parse(fs.readFileSync(LP, "utf8")); } catch (e) { L
 const romeDate = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date());
 const nowIso = new Date().toISOString().slice(0, 16);
 const base = e => ({ id: e.id, lg: e.lg.code, lgn: e.lg.name, ora: e.time, h: e.home, a: e.away });
-const prop = c => ({ ...base(c.e), k: c.k, mk: c.mk, side: c.side, who: c.who, p: r4(c.p), pc: r4(c.pc), q: c.q, ev: r4(c.ev), und: c.und ? 1 : 0 });
+const prop = c => ({ ...base(c.e), k: c.k, mk: c.mk, side: c.side, who: c.who, p: r4(c.p), pc: r4(c.pc), q: c.q, ev: r4(c.ev), und: c.und ? 1 : 0, hasXi: c.hasXi ? 1 : 0 });
 let nLock = 0;
 {
   const todayE = entries.filter(e => !e.lg.noStats && !e.m && e.d === romeDate && koOf(e) > now);
@@ -111,10 +111,10 @@ for (const e of entries) {
   const x = H[e.id]; if (!e.m || !x || (x.fine && e.d < A.addDays(t0, -3))) continue;   // 2/11/2026: esiti ricalcolati per 3 giorni
   let all = true;
   for (const g of x.c) {
-    if (g.k === "kou") {
-      const [sd, ln] = g.side.split(" "), L = parseFloat(ln.replace(",", "."));
-      if (e.m.hk == null || e.m.ak == null) { all = false; continue; }
-      g.r = e.m.hk + e.m.ak; g.ok = sd === "Over" ? (g.r > L ? 1 : 0) : (g.r < L ? 1 : 0); continue;
+    if (g.k === "kou" || g.k === "sou") {
+      const [sd, ln] = g.side.split(" "), L = parseFloat(ln.replace(",", ".")), K = g.k === "kou" ? ["hk", "ak"] : ["hs", "as"];
+      if (e.m[K[0]] == null || e.m[K[1]] == null) { all = false; continue; }
+      g.r = e.m[K[0]] + e.m[K[1]]; g.ok = sd === "Over" ? (g.r > L ? 1 : 0) : (g.r < L ? 1 : 0); continue;
     }
     const Y = g.k === "y" && ES[e.id] && ES[e.id].y, K = RK[g.k], hv = Y ? Y[0] : K && e.m[K[0]], av = Y ? Y[1] : K && e.m[K[1]];
     if (hv == null || av == null) { all = false; continue; }
@@ -126,7 +126,7 @@ for (const e of entries) {
 const byId = new Map(entries.map(e => [e.id, e]));
 function grade(g) {
   const e = byId.get(g.id); if (!e || !e.m) return;
-  if (g.k === "kou") { const [sd, ln] = g.side.split(" "), L = parseFloat(ln.replace(",", ".")); if (e.m.hk == null || e.m.ak == null) return; g.r = e.m.hk + e.m.ak; g.ok = sd === "Over" ? (g.r > L ? 1 : 0) : (g.r < L ? 1 : 0); g.ris = `${e.m.hg}-${e.m.ag}`; return; }
+  if (g.k === "kou" || g.k === "sou") { const [sd, ln] = g.side.split(" "), L = parseFloat(ln.replace(",", ".")), K = g.k === "kou" ? ["hk", "ak"] : ["hs", "as"]; if (e.m[K[0]] == null || e.m[K[1]] == null) return; g.r = e.m[K[0]] + e.m[K[1]]; g.ok = sd === "Over" ? (g.r > L ? 1 : 0) : (g.r < L ? 1 : 0); g.ris = `${e.m.hg}-${e.m.ag}`; return; }
   const Y = g.k === "y" && ES[e.id] && ES[e.id].y, K = RK[g.k], hv = Y ? Y[0] : K && e.m[K[0]], av = Y ? Y[1] : K && e.m[K[1]];
   if (hv == null || av == null) return;
   g.r = `${hv}-${av}`; g.ok = g.side === "1" ? (hv > av ? 1 : 0) : g.side === "2" ? (av > hv ? 1 : 0) : (hv === av ? 1 : 0); g.ris = `${e.m.hg}-${e.m.ag}`;
