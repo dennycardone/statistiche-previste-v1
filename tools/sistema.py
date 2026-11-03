@@ -194,3 +194,25 @@ for lab, mode, rule in (("singole · regola scelta", "singole", rule0), ("mix 80
     fin, dds = np.array(fin), np.array(dds)
     mc.append(f"{lab}: probabilità di chiudere in profitto {100 * (fin > 100).mean():.0f}% · cassa finale mediana {np.median(fin):.1f} (5°-95° percentile {np.percentile(fin, 5):.1f} – {np.percentile(fin, 95):.1f}) · calo massimo al 95° percentile {100 * np.percentile(dds, 95):.1f}% · {7 * nb / len(ED):.1f} giocate a settimana (orizzonte {len(ED)} giorni)")
 note("3 · Monte Carlo 10.000", " ‖ ".join(mc))
+# ---------------- 4 · stabilità delle regole candidate nelle due metà (nessuna scelta: confronto descrittivo)
+CAND = [("tutti i mercati, valore > 0", lambda o: o["ev"] > 0),
+        ("Under cartellini totali, valore > 0", lambda o: o["mkt"] == "O/U cartellini totali" and o["side"] == "Under" and o["ev"] > 0),
+        ("Over cartellini totali, valore > 0", lambda o: o["mkt"] == "O/U cartellini totali" and o["side"] == "Over" and o["ev"] > 0),
+        ("quota oltre 2,40, valore > 0", lambda o: o["q"] >= 2.40 and o["ev"] > 0),
+        ("quota 1,45-1,85, valore > 0", lambda o: 1.45 <= o["q"] < 1.85 and o["ev"] > 0),
+        ("1X2 corner, valore > 0", lambda o: o["mkt"] == "1X2 corner" and o["ev"] > 0),
+        ("O/U corner squadra, valore > 0", lambda o: o["mkt"] == "O/U corner squadra" and o["ev"] > 0),
+        ("senza 1X2 tiri, O/U corner squadra, O/U tiri in porta, valore > 0", lambda o: o["ev"] > 0 and o["mkt"] not in ("1X2 tiri", "O/U corner squadra", "O/U tiri in porta totali", "O/U tiri in porta squadra"))]
+note("4 · stabilità nelle due metà (una giocata per partita)", " ‖ ".join(
+    f"{lab}: PRIMA {fmt(stats(one_per_match([o for o in E if rule(o) and o['d'] < half])))} → SECONDA {fmt(stats(one_per_match([o for o in E if rule(o) and o['d'] >= half])))}" for lab, rule in CAND))
+mc = []
+for lab, rule in CAND[:2] + CAND[-1:]:
+    for per, dl in (("tutto", ED), ("solo seconda metà", [d for d in ED if d >= half])):
+        _, _, nb, r = simulate(dl, "singole", rule)
+        fin, dds = [], []
+        for _ in range(10000):
+            x = r[rng.integers(0, len(r), len(r))]; eq = 100 * np.cumprod(1 + x); pk = np.maximum.accumulate(np.r_[100, eq])
+            fin.append(eq[-1]); dds.append(float(np.max((pk[1:] - eq) / pk[1:])))
+        fin, dds = np.array(fin), np.array(dds)
+        mc.append(f"{lab} · {per} ({len(dl)} giorni): profitto nel {100 * (fin > 100).mean():.0f}% delle simulazioni · cassa mediana {np.median(fin):.1f} (5°-95° {np.percentile(fin, 5):.1f} – {np.percentile(fin, 95):.1f}) · calo massimo al 95° percentile {100 * np.percentile(dds, 95):.1f}% · {7 * nb / len(dl):.1f} giocate a settimana")
+note("4 · Monte Carlo 10.000 delle regole candidate (Kelly 1/8, tetti 3% e 10%)", " ‖ ".join(mc))
