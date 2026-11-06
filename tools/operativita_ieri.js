@@ -39,7 +39,7 @@ const koOf = e => Date.parse(`${e.d}T${/^\d\d:\d\d$/.test(e.time) ? e.time : "23
 const SP = path.join(DATA, "operativita_storico.json");
 let H = {}; try { H = JSON.parse(fs.readFileSync(SP, "utf8")); } catch (e) { H = {}; }
 const now = Date.now(), t0 = A.isoD(new Date()), cfg = A.MODES.dyn, r4 = x => Math.round(x * 1e4) / 1e4;
-const strip = c => ({ k: c.k, mk: c.mk, side: c.side, who: c.who, p: r4(c.p), m: r4(c.m), pc: r4(c.pc), q: c.q, ev: r4(c.ev), und: c.und ? 1 : 0, invA: c.invA ? 1 : 0, hasXi: c.hasXi ? 1 : 0 });
+const strip = c => ({ k: c.k, mk: c.mk, side: c.side, who: c.who, p: r4(c.p), m: r4(c.m), pc: r4(c.pc), q: c.q, ev: r4(c.ev), und: c.und ? 1 : 0, invA: c.invA ? 1 : 0, hasXi: c.hasXi ? 1 : 0, nb: c.nb || 1, qmax: c.qmax || c.q, bk: c.bk || "1xBet" });
 // quote dall'archivio privato (ultima vista prima del fischio) nello stesso formato di quote_mov.json e linee.json
 const oddsOf = v => { const q = {}; for (const [k, x] of Object.entries((v.ultima || {}).q || {})) { const o = Array.isArray(x) ? x[0] : x; if (o > 1) q[k] = o; } return q; };
 function kLine(q) {   // linea Over/Under cartellini più equilibrata (come update_data.py · linee.json)
@@ -80,7 +80,7 @@ let LR = {}; try { LR = JSON.parse(fs.readFileSync(LP, "utf8")); } catch (e) { L
 const romeDate = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date());
 const nowIso = new Date().toISOString().slice(0, 16);
 const base = e => ({ id: e.id, lg: e.lg.code, lgn: e.lg.name, ora: e.time, h: e.home, a: e.away });
-const prop = c => ({ ...base(c.e), k: c.k, mk: c.mk, side: c.side, who: c.who, p: r4(c.p), pc: r4(c.pc), q: c.q, ev: r4(c.ev), und: c.und ? 1 : 0, hasXi: c.hasXi ? 1 : 0 });
+const prop = c => ({ ...base(c.e), k: c.k, mk: c.mk, side: c.side, who: c.who, p: r4(c.p), pc: r4(c.pc), q: c.q, ev: r4(c.ev), und: c.und ? 1 : 0, hasXi: c.hasXi ? 1 : 0, nb: c.nb || 1, qmax: c.qmax || c.q, bk: c.bk || "1xBet" });
 let nLock = 0;
 {
   const todayE = entries.filter(e => !e.lg.noStats && !e.m && e.d === romeDate && koOf(e) > now);
