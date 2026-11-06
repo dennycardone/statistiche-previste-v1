@@ -66,6 +66,10 @@ except Exception: print('err')")
   [ $(( $(date +%s) + 300 )) -ge $END ] && break
   sleep 300
 done
-echo "::notice title=Formazioni (micro, giro lungo)::controlli $n · formazioni prese $(grep -o ': presa' /tmp/fl_log.txt | wc -l) · pubblicazioni sul sito $npub · aggiornamenti principali fatti partire $nkick · ultime: $(grep -o '[^·]*: presa' /tmp/fl_log.txt | tail -12 | tr '\n' ';')"
+# 6/11/2026: il giro successivo lo fa partire questo stesso giro (il 6/11 GitHub non ha avviato nessun giro programmato dalle 15:50 alle
+# 17:36 UTC: 2 formazioni perse e nessun aggiornamento per 2 ore); con la concorrenza "formazioni-live" parte appena questo finisce
+curl -s -o /dev/null -w "%{http_code}" -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/formazioni_live.yml/dispatches" -d '{"ref":"main"}' | grep -q 204 && echo "giro successivo fatto partire" >> /tmp/fl_log.txt
+echo "::notice title=Formazioni (micro, giro lungo)::controlli $n · formazioni prese $(grep -o ': presa' /tmp/fl_log.txt | wc -l) · pubblicazioni sul sito $npub · aggiornamenti principali fatti partire $nkick · giro successivo $(grep -q 'giro successivo' /tmp/fl_log.txt && echo avviato || echo NON avviato) · ultime: $(grep -o '[^·]*: presa' /tmp/fl_log.txt | tail -12 | tr '\n' ';')"
 grep -q 'non ancora uscita' /tmp/fl_log.txt && echo "::notice title=Formazioni (micro) · tentativi a vuoto::$(grep -o '[^·]*non ancora uscita' /tmp/fl_log.txt | sort | uniq -c | sort -rn | head -10 | tr '\n' ';')"
 exit 0
