@@ -43,5 +43,17 @@ for name, test in (("statistiche", lambda c: c["mk"] not in GOL), ("gol", lambda
     L_ = lambda P: round(-statistics.mean(math.log(max(1e-6, p if y else 1 - p)) for p, y in zip(P, ys)), 4) if ys else None
     OUT["gruppi"][name] = {"b": [round(float(x), 4) for x in b], "esiti": len(E), "giorni": len(days), "dal": days[0], "al": days[-1],
                            "fuori_campione": {"esiti": len(ys), "logloss_prevista": L_(om), "logloss_1xbet": L_(ob), "logloss_corretta": L_(op)}}
+# 6/11/2026 (Denny): l'app usa ora la media dei book (senza margine) al posto di 1xBet; i pesi restano stimati su 1xBet (archivio lungo).
+# In parallelo, sugli esiti che hanno le tre quote medie: log-loss di media dei book, 1xBet e corretta con l'una o con l'altra (stessi pesi).
+for L in grp.values():
+    s_ = sum(1 / c["q1m"] for c in L if c.get("q1m")); full = all(c.get("q1m") for c in L)
+    for c in L: c["mm"] = (1 / c["q1m"]) / s_ if full and s_ > 0 else None
+bS = OUT["gruppi"].get("statistiche", {}).get("b")
+EM = [c for c in C if c["mk"] not in GOL and c.get("m") is not None and c.get("mm") is not None]
+if bS and EM:
+    cr = lambda c, m: 1 / (1 + math.exp(-(bS[0] + bS[1] * lg_(c["p"]) + bS[2] * lg_(m))))
+    LL = lambda P: round(-statistics.mean(math.log(max(1e-6, p if c["y"] else 1 - p)) for p, c in zip(P, EM)), 4)
+    OUT["media_book"] = {"esiti": len(EM), "dal": min(c["d"] for c in EM), "logloss_media_book": LL([c["mm"] for c in EM]), "logloss_1xbet": LL([c["m"] for c in EM]),
+                         "logloss_corretta_1xbet": LL([cr(c, c["m"]) for c in EM]), "logloss_corretta_media_book": LL([cr(c, c["mm"]) for c in EM])}
 json.dump(OUT, open("corretta.json", "w"), separators=(",", ":"))
-print("::notice title=Probabilità corretta::" + " ‖ ".join(f"{k}: pesi {v['b']} · {v['esiti']} esiti in {v['giorni']} giorni · fuori campione {v['fuori_campione']}" for k, v in OUT["gruppi"].items()))
+print("::notice title=Probabilità corretta::" + " ‖ ".join(f"{k}: pesi {v['b']} · {v['esiti']} esiti in {v['giorni']} giorni · fuori campione {v['fuori_campione']}" for k, v in OUT["gruppi"].items()) + f" ‖ media dei book in parallelo: {OUT.get('media_book') or 'ancora nessun esito'}")

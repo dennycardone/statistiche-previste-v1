@@ -556,6 +556,7 @@ select{pointer-events:none}
 .opx{grid-area:x;display:flex;flex-direction:column;gap:2px;min-width:0}.opmk{font-weight:700;font-size:13.5px}.opx small{font-size:11.5px;line-height:1.35}
 .opw{grid-area:w;display:flex;flex-direction:column;align-items:flex-end;font-variant-numeric:tabular-nums}.opw b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--gold)}.opw small{font-size:11px;color:var(--ink-3)}
 .opw.in{display:inline-flex;flex-direction:row;gap:6px;align-items:baseline;margin-left:6px}
+.qbk{font-size:inherit;color:var(--ink-3);font-weight:400}.qr .qbk,.bk-mx{display:block;font-size:10.5px;color:var(--ink-3);font-weight:500}.qmin{margin:6px 10px 2px;padding:6px 8px;border:1px dashed var(--line);border-radius:6px}.qmin p{margin:2px 0}
 .opxi,.opct{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:var(--hot);color:var(--hot-ink)}.opct{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
 .opcomb{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 6px;background:var(--surface-2)}.opch{margin:0 0 4px;font-size:13px}.opleg{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:5px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}.opleg b{font-size:13px}.opleg span{font-size:12px;color:var(--ink-2)}
 .opdone{cursor:default}.opnuc{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:color-mix(in srgb,var(--good) 22%,transparent);color:var(--good)}.opw .oppos{color:var(--good);font-weight:700}.opw .opneg{color:var(--dot-r);font-weight:700}.opw .mk{margin-top:2px}
@@ -1039,7 +1040,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <section class="card" id="mref" aria-label="Arbitro e cartellini" hidden></section>
       <section class="card" id="mcmp" aria-label="Confronto con la partita giocata" hidden></section>
       <main id="out" class="wrap" style="padding:0;margin:0;width:100%"></main>
-      <section class="card" id="mquote" aria-label="Quote 1xBet" hidden></section>
+      <section class="card" id="mquote" aria-label="Quote" hidden></section>
     </div>
     <div class="mpane" data-mp="sig" hidden>
       <section class="card mconf" id="mconf" aria-label="Grado"></section>
@@ -1123,8 +1124,8 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <p><b>Fuorigioco.</b> Fuorigioco attesi di ogni squadra = regressione di Poisson con fuorigioco medi del campionato per sede (365 giorni), rating dei fuorigioco commessi dalla squadra (365 giorni, prudenza P = 20) e rating dei fuorigioco provocati dalla difesa avversaria (90 giorni, prudenza P = 5); Binomiale Negativa per squadra (r = 10,68) e sul totale (r = 21,56), 1X2 a squadre indipendenti. Dati API-Football dalla stagione 2023-24: API-Football scrive lo 0-0 di fuorigioco come dato vuoto per entrambe le squadre; un doppio vuoto diventa 0-0 solo se la partita ha le altre statistiche avanzate e il campionato, nelle partite dei giorni precedenti, ha i fuorigioco con regolarità e quasi mai uno 0-0 scritto in chiaro (altrimenti resta un dato mancante). N/D nelle coppe e nei campionati dove nelle ultime 20 partite meno di 15 hanno i fuorigioco. Nel test walk-forward (luglio 2025 – ottobre 2026, 16.629 partite) prevede meglio delle medie delle squadre; Elo e tiri non aggiungono nulla. Il confronto con le quote 1xBet è mostrato senza bollino "valore" finché non è verificato. Dal 25/10/2026 il 1X2 fuorigioco è anche in Precedenti, Rendimento, Tendenze, Digiuni, Grado e Segnali, con le stesse regole degli altri mercati (solo nei campionati dove 1xBet lo quota): nel test walk-forward su 38.168 partite dal 2023-24 le probabilità del lato favorito escono come dichiarate (es. 65-70%: presi 69%; 70-75%: 76%); soglia dei Segnali 65% (da luglio 2025: presi 73% su 903 segnalazioni); Grado stimato sulle stagioni precedenti (A+ preso 90% su 31, A 91% su 82, B 78%, C 74%).</p>
       <p><b>Perché questi numeri ed "E se…".</b> Nella Lettura di ogni partita da giocare, una frase per statistica spiega i numeri: attesi di ogni squadra contro la media del campionato nella stessa sede (casa o trasferta) e i due fattori che pesano di più in quella partita, presi dai modelli verificati (per i corner e i falli i rating di attacco e difesa delle due squadre; per i falli anche la formazione ufficiale e l'arbitro; per i fuorigioco i fuorigioco commessi e quelli provocati dalla linea difensiva avversaria; per i cartellini i fattori del modello v3: squadre, arbitro, falli, scontri diretti, derby). "E se…" ricalcola nel telefono la stessa previsione togliendo un fattore alla volta (formazioni ufficiali, arbitro, derby, linea difensiva nella media del campionato) e mostra quanto cambiano gli attesi e le probabilità; gli altri fattori restano uguali. Non sono numeri nuovi né consigli di gioco: è lo stesso modello, letto pezzo per pezzo. Sono indicati solo i fattori che spostano la previsione di almeno il 4%.</p>
       <p><b>Valori per tempo.</b> Sotto tiri, tiri in porta e corner la Lettura mostra i valori attesi del 1° e del 2° tempo: valore atteso della partita × quota del 1° tempo del campionato per sede, calcolata dai soli dati reali per tempo di API-Football (dalla stagione 2024-25, solo partite in cui i due tempi sommati coincidono con il totale; campionati con almeno 200 partite). Falli: API-Football non dà i dati per tempo.</p>
-      <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote di 1xBet, unico bookmaker di riferimento): quote controllate circa ogni 30 minuti, risultati e statistiche circa ogni ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football. In Radar, Segnali e pallini della home gli 1X2 di corner, tiri, tiri in porta, falli e fuorigioco compaiono solo nei campionati dove 1xBet li quota (almeno 5 delle ultime 10 partite, in un giorno qualsiasi degli ultimi 21, calcolato a ogni aggiornamento sull'archivio delle quote); nella scheda partita ci sono sempre. Le quote 1xBet arrivano solo tramite API-Football: quando una quota non arriva compare <b>N.D.</b> (non significa che 1xBet non offra il mercato); una quota che la fonte non passa più è indicata con l'ora in cui è stata vista l'ultima volta. Un controllo automatico segnala quando la fonte smette di passare un mercato (dal 24/10/2026 succede per falli, gialli e fuorigioco); una partita spostata di data conserva le quote viste prima dello spostamento. Nel Radar Mercato si vedono di base solo le giocate con riuscita almeno 65% (le altre con "Tutte"); quelle dal 70% sono segnate "70%+". Verifica sull'archivio 1xBet dal 9 al 27/10/2026 (1.207 giocate proposte): senza soglia presa 52% contro 61% dichiarato, rendimento −4%; dal 65% presa 59% e 64% nelle due metà del periodo, rendimento +2% e +11% (margini d'errore ancora ampi). Resta "in verifica": la soglia si giudica solo sulle partite dal 27/10 in avanti (lettura il 7/12, decisione il 18/1). Scegliendo un giorno passato nella tendina Data (fino a 7 giorni fa) il Radar Mercato mostra le giocate di quel giorno con valore reale ed esito (✓/✗), il riepilogo del giorno e degli ultimi 7 giorni (prese, probabilità dichiarata in media, rendimento a puntata fissa): dal 28/10 sono le giocate bloccate al calcio d'inizio, cioè l'ultima versione vista prima del fischio, con la linea e la quota di quel momento; i giorni precedenti sono ricostruiti con i soli dati precedenti alla partita e segnati. Le formazioni ufficiali sono prese da API-Football circa 60-20 minuti prima del fischio (controllo ogni 10 minuti, con un secondo tentativo nello stesso giro); un rapporto giornaliero conta quante sono state prese prima del fischio e quali sono mancate.</p>
-      <p><b>Operatività (Radar, in verifica).</b> Per le partite da giocare del giorno scelto: probabilità corretta (Prevista e 1xBet senza margine, pesi stimati ogni mattina su tutti i giorni già giocati dell'archivio 1xBet), solo esiti con quote 1xBet attuali e valore atteso positivo. Singole di statistiche (una per partita; dal 3/11 solo 1X2 corner, falli, fuorigioco, gialli, Over/Under cartellini totali e tiri totali: spenti 1X2 tiri, tiri in porta e corner per squadra, niente gol), Quota 2 e Quota 3 del giorno (valore atteso congiunto più alto, astensione se negativo) e Controtendenza (sfavorita 1xBet a quota 2,30 o più che Prevista dà più probabile della favorita, su corner, fuorigioco, gialli e falli). Peso: Kelly 1/8, al massimo 3% per giocata e 10% al giorno; puntata minima 0,20 €; cassa salvata solo sul telefono. Dal 2/11 ogni proposta è fissata nel registro quando compare (quota, probabilità corretta e peso di quel momento) e non cambia più: lo storico è lo stesso registro con l'esito. Calcoli su modelli ancora in verifica (lettura 7/12, decisione 18/1), non promesse di vincita.</p>
+      <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote dei bookmaker): quote controllate circa ogni 30 minuti, risultati e statistiche circa ogni ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football. In Radar, Segnali e pallini della home gli 1X2 di corner, tiri, tiri in porta, falli e fuorigioco compaiono solo nei campionati dove 1xBet li quota (almeno 5 delle ultime 10 partite, in un giorno qualsiasi degli ultimi 21, calcolato a ogni aggiornamento sull'archivio delle quote); nella scheda partita ci sono sempre. Quote: dal 7/11/2026 l'app mostra e usa nei calcoli la <b>media dei bookmaker</b> che API-Football passa per quel mercato, tolte le quote fuori linea (oltre il 12% dalla mediana: linee ferme o errori), con accanto quanti book e la quota più alta con il suo book, es. 1,92 (media 4 book · max 2,00 Betano); dove c'è un solo book si usa quello (per 1X2 di falli, gialli e fuorigioco di solito solo 1xBet o nessuno). Gli studi già fissati (Grado, Quota 2/3, Controtendenza, sistema) restano misurati su 1xBet; la media dei book è seguita in parallelo. Le quote arrivano solo tramite API-Football: quando una quota non arriva compare <b>N.D.</b> (non significa che i book non offrano il mercato); una quota che la fonte non passa più è indicata con l'ora in cui è stata vista l'ultima volta. Un controllo automatico segnala quando la fonte smette di passare un mercato (dal 24/10/2026 succede per falli, gialli e fuorigioco); una partita spostata di data conserva le quote viste prima dello spostamento. Nel Radar Mercato si vedono di base solo le giocate con riuscita almeno 65% (le altre con "Tutte"); quelle dal 70% sono segnate "70%+". Verifica sull'archivio 1xBet dal 9 al 27/10/2026 (1.207 giocate proposte): senza soglia presa 52% contro 61% dichiarato, rendimento −4%; dal 65% presa 59% e 64% nelle due metà del periodo, rendimento +2% e +11% (margini d'errore ancora ampi). Resta "in verifica": la soglia si giudica solo sulle partite dal 27/10 in avanti (lettura il 7/12, decisione il 18/1). Scegliendo un giorno passato nella tendina Data (fino a 7 giorni fa) il Radar Mercato mostra le giocate di quel giorno con valore reale ed esito (✓/✗), il riepilogo del giorno e degli ultimi 7 giorni (prese, probabilità dichiarata in media, rendimento a puntata fissa): dal 28/10 sono le giocate bloccate al calcio d'inizio, cioè l'ultima versione vista prima del fischio, con la linea e la quota di quel momento; i giorni precedenti sono ricostruiti con i soli dati precedenti alla partita e segnati. Le formazioni ufficiali sono prese da API-Football circa 60-20 minuti prima del fischio (controllo ogni 10 minuti, con un secondo tentativo nello stesso giro); un rapporto giornaliero conta quante sono state prese prima del fischio e quali sono mancate.</p>
+      <p><b>Operatività (Radar, in verifica).</b> Per le partite da giocare del giorno scelto: probabilità corretta (Prevista e media dei book senza margine; pesi stimati ogni mattina su tutti i giorni già giocati dell'archivio 1xBet, il più lungo), solo esiti con quote attuali e valore atteso positivo, calcolato sulla quota media. Singole di statistiche (una per partita; dal 3/11 solo 1X2 corner, falli, fuorigioco, gialli, Over/Under cartellini totali e tiri totali: spenti 1X2 tiri, tiri in porta e corner per squadra, niente gol), Quota 2 e Quota 3 del giorno (valore atteso congiunto più alto, astensione se negativo) e Controtendenza (sfavorita dei book a quota 2,30 o più che Prevista dà più probabile della favorita, su corner, fuorigioco, gialli e falli). Peso: Kelly 1/8, al massimo 3% per giocata e 10% al giorno; puntata minima 0,20 €; cassa salvata solo sul telefono. Dal 2/11 ogni proposta è fissata nel registro quando compare (quota, probabilità corretta e peso di quel momento) e non cambia più: lo storico è lo stesso registro con l'esito. Calcoli su modelli ancora in verifica (lettura 7/12, decisione 18/1), non promesse di vincita. Quote da cercare: per 1X2 di falli, gialli e fuorigioco senza quota via API, con un segnale forte (Grado A o A+, spostamento dei falli di almeno 8 punti con le formazioni ufficiali, gialli con Prevista dal 60%), la quota minima sotto cui lasciar stare: 1,08 / probabilità prudente (corretta come se il mercato fosse d'accordo con Prevista). Solo indicazione: non entra in pesi, registro e rendimenti.</p>
       <p><b>Media dinamica – tiri e tiri in porta.</b> Anche tiri e tiri in porta usano modelli verificati: regressioni di Poisson che partono dalla media di lega per sede (365 giorni). Tiri: rating tiri fatti × concessi degli ultimi 4 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4) con una parte casa/trasferta, tiri delle ultime 10 (fatti dalla squadra, concessi dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 ed Elo. Tiri in porta: rating tiri in porta (una partita di un anno fa pesa il 37%, prudenza P = 8), rating dei tiri totali (chi tira molto finisce per avere più tiri in porta), tiri delle ultime 8 ed Elo. Coefficienti stimati su 8 campionati, solo stagioni in cui football-data misura i tiri nello stesso modo (quota in porta fino al 40%); nel test walk-forward migliori della versione precedente in tutti gli 8 campionati e, per squadra, in ogni stagione. Totale: Binomiale Negativa r = 150 per i tiri e r = 100 per i tiri in porta; per squadra r = 25 e r = 40.</p>
       <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre, calcolato dall'app dai risultati delle partite dei giorni precedenti (le stesse stagioni caricate): nel test rende quasi quanto l'Elo ufficiale di ClubElo. Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è ancora, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG). Dal 18/10/2026 i gol attesi tengono conto anche della qualità dei tiri: a parità di tiri in porta, chi arriva più spesso al tiro dentro l'area (e l'avversario che lo concede) segna di più (tiri in area di API-Football, 365 giorni; nel test walk-forward con il codice dell'app su 17.119 partite da luglio 2025 le previsioni dei gol sono migliorate in entrambe le stagioni).</p>
       <p><b>Perché non c'è più la Media classica.</b> Fino al 19/10/2026 c'era anche la Media classica (casa = quanto fa in casa + quanto concede in trasferta l'ospite, diviso 2). Nel controllo su 44 campionati (stagioni 2023-24 – 2026-27, circa 32.000 partite per mercato, sempre con i soli dati dei giorni precedenti) prevedeva peggio della Dinamica in tutti i mercati (log-loss sul lato favorito: corner +0,029, falli +0,016, tiri +0,029, tiri in porta +0,026); i suoi gol erano già quelli della Dinamica. Anche la "concordanza" tra i due metodi non aiutava: le previsioni forti della Dinamica (dal 70%) che la Classica contraddiceva, il 7–11%, uscivano quanto le altre in corner, tiri e tiri in porta (nei falli un po' meno, su soli 264 casi).</p>
@@ -2919,7 +2920,7 @@ function modelGoals(home, away, cfg) {
 function marketOdds(home, away) {   // 10/10/2026: quote di 1xBet (data/odds.json); riserva: quote nel calendario
   let o = null;
   const e = CUR && CUR.home === home && CUR.away === away ? CUR : null, P = e && ODDS && ODDS.partite && ODDS.partite[e.id];
-  if (P && P.q) { const g = k => P.q[k] && P.q[k][0] > 1 ? P.q[k][0] : null; o = { h: g("1x2:1"), d: g("1x2:X"), a: g("1x2:2"), o: g("ou2.5:O"), u: g("ou2.5:U") }; }
+  if (P && P.q) { const g = k => P.q["m." + k] && P.q["m." + k][0] > 1 ? P.q["m." + k][0] : P.q[k] && P.q[k][0] > 1 ? P.q[k][0] : null; o = { h: g("1x2:1"), d: g("1x2:X"), a: g("1x2:2"), o: g("ou2.5:O"), u: g("ou2.5:U") }; o.nb = P.q["m.1x2:1"] ? P.q["m.1x2:1"][1] : 1; }
   if (!o || !(o.h || o.o)) { const f = S.fixtures.find(x => x.div === S.league && x.home === home && x.away === away && x.odds); if (!f) return null; o = f.odds; }
   const res = {};
   if (o.h && o.d && o.a) { const s = 1 / o.h + 1 / o.d + 1 / o.a; res.p1 = 1 / o.h / s; res.px = 1 / o.d / s; res.p2 = 1 / o.a / s; res.m1x2 = s - 1; }
@@ -2949,7 +2950,7 @@ function goalsCard(home, away, G, hl) {
     <p class="small muted" style="margin:0">Anche il risultato più probabile esce raramente più di una volta su 8: leggilo come una distribuzione, non come un pronostico secco.</p>
     <h3 style="font-size:16px;text-transform:uppercase;letter-spacing:.06em">Modello e mercato</h3>
     ${mkRows ? `${rowsTable(["", "Modello", "Mercato", "Diff."], mkRows)}
-      <p class="small muted" style="margin:0">Mercato = quote 1xBet senza margine${mk.m1x2 != null ? ` (margine 1X2 ${pc1(mk.m1x2)})` : ""}. • differenza moderata, •• grande. Qui il confronto è solo su 1X2 e Over/Under 2,5.</p>`
+      <p class="small muted" style="margin:0">Mercato = ${mk.raw && mk.raw.nb > 1 ? `media di ${mk.raw.nb} book` : "quote 1xBet"} senza margine${mk.m1x2 != null ? ` (margine 1X2 ${pc1(mk.m1x2)})` : ""}. • differenza moderata, •• grande. Qui il confronto è solo su 1X2 e Over/Under 2,5.</p>`
       : `<p class="small muted" style="margin:0">Quote non ancora disponibili per questa partita: di solito arrivano pochi giorni prima.</p>`}
     <h3 style="font-size:16px;text-transform:uppercase;letter-spacing:.06em">Confronto tra le statistiche</h3>
     ${modesTable(home, away, hl, m => modelGoals(home, away, m), 0.2, 0.5, f2)}
@@ -2972,8 +2973,8 @@ function probCard(home, away, { G, M, MF, MT }) {
         ["Gol / No gol", `<b>${pc(G.btts)}</b> / ${pc(1 - G.btts)}`, f2(1 / G.btts)]])}
       <p class="small" style="margin:0">Risultati più probabili: ${G.top.slice(0, 3).map(t => `<b>${t.x}-${t.y}</b> ${pc1(t.p)}`).join(" · ")}</p>
       ${mk ? `${rowsTable(["Mercato", "Modello", "Quote", "Diff."], [["1", pc(G.p1), pc(mk.p1), diff(mk.p1, G.p1)], ["X", pc(G.px), pc(mk.px), diff(mk.px, G.px)], ["2", pc(G.p2), pc(mk.p2), diff(mk.p2, G.p2)],
-          ["Over 2,5", pc(G.over[1]), pc(mk.over), diff(mk.over, G.over[1])]])}<p class="small muted" style="margin:0">Quote 1xBet senza margine. • differenza moderata, •• grande.</p>`
-        : `<p class="small muted" style="margin:0">Quote 1xBet non ancora disponibili per questa partita (arrivano pochi giorni prima).</p>`}`,
+          ["Over 2,5", pc(G.over[1]), pc(mk.over), diff(mk.over, G.over[1])]])}<p class="small muted" style="margin:0">${mk.raw && mk.raw.nb > 1 ? `Media di ${mk.raw.nb} book` : "Quote 1xBet"} senza margine. • differenza moderata, •• grande.</p>`
+        : `<p class="small muted" style="margin:0">Quote non ancora disponibili per questa partita (arrivano pochi giorni prima).</p>`}`,
     c: M ? ouTable(TH, TH.map(t => pOver(M.pmf, t))) : `<p class="muted" style="margin:0">N/D</p>`,
     f: MF ? ouTable(THF, THF.map(t => pOver(MF.pmf, t))) : `<p class="muted" style="margin:0">N/D</p>`,
     s: MT ? ouTable(THS, THS.map(t => pOver(MT.MS.pmf, t))) : `<p class="muted" style="margin:0">N/D</p>`,
@@ -4389,29 +4390,34 @@ function renderQuote() {
   const box = $("#mquote"); if (!box) return;
   const e = CUR; if (!e || e.m || $("#home").value !== e.home || $("#away").value !== e.away) { box.hidden = true; return; }
   const ser = QMOV && QMOV.partite && QMOV.partite[e.id];
-  if (!ser || !ser.length) { box.hidden = false; box.className = "card qmv"; box.innerHTML = `<h2>Quote 1xBet</h2><p class="muted" style="margin:0">${NO_1XBET.has(e.lg.code) ? NO_1XBET_TXT : QMOV ? "Quote 1xBet non ancora disponibili per questa partita (di solito arrivano 1-7 giorni prima; tiri, tiri in porta e falli poche ore prima)." : "Carico le quote…"}</p>` + RG_LINE; return; }
+  if (!ser || !ser.length) { box.hidden = false; box.className = "card qmv"; box.innerHTML = `<h2>Quote</h2><p class="muted" style="margin:0">${NO_1XBET.has(e.lg.code) ? NO_1XBET_TXT : QMOV ? "Quote non ancora disponibili per questa partita (di solito arrivano 1-7 giorni prima; tiri, tiri in porta e falli poche ore prima)." : "Carico le quote…"}</p>` + RG_LINE; return; }
   const fmt = v => v.toFixed(2).replace(".", ","), hm = t => t.slice(11, 16), dshort = t => `${t.slice(8, 10)}/${t.slice(5, 7)} ${hm(t)}`;
   let html = "";
   for (const [lab, mk] of QM_GROUPS) {
-    const keys = [...new Set(ser.flatMap(([, q]) => Object.keys(q)).filter(k => k.split(":")[0] === mk))];
+    const mm = mk.replace(/^x\./, "m.").replace(/^(1x2|ou\d\.5|gg)$/, "m.$1"), all = ser.flatMap(([, q]) => Object.keys(q));
+    const mkU = all.some(k => k.split(":")[0] === mm) ? mm : mk;
+    const keys = [...new Set(all.filter(k => k.split(":")[0] === mkU))];
     if (!keys.length) continue;
     const ord = s => ["1", "X", "2", "1X", "12", "X2", "Over", "Under", "Gol", "No gol"].indexOf(s);
     keys.sort((a, b) => ord(QM_SEL(a.split(":")[1])) - ord(QM_SEL(b.split(":")[1])));
     html += `<div class="qg">${lab}</div>` + keys.map(k => {
-      const pts = ser.filter(([, q]) => q[k] > 1).map(([t, q]) => [t, q[k]]); if (!pts.length) return "";
-      const v = pts.map(p => p[1]), a = v[0], z = v[v.length - 1], d = z - a, cls = Math.abs(d) < 0.005 ? "eq" : d < 0 ? "dn" : "up";
-      return `<div class="qr"><span>${esc(QM_SEL(k.split(":")[1]))}</span><span title="prima quota vista: ${dshort(pts[0][0])}">${fmt(a)}</span><span><b>${fmt(z)}</b></span><span class="${cls}">${cls === "eq" ? "=" : (d < 0 ? "▼ " : "▲ ") + fmt(Math.abs(d))}</span><span>${qSpark(v)}</span></div>`;
+      const V = x => Array.isArray(x) ? x[0] : x;
+      const pts = ser.filter(([, q]) => V(q[k]) > 1).map(([t, q]) => [t, V(q[k]), q[k]]); if (!pts.length) return "";
+      const v = pts.map(p => p[1]), a = v[0], z = v[v.length - 1], d = z - a, cls = Math.abs(d) < 0.005 ? "eq" : d < 0 ? "dn" : "up", lz = pts[pts.length - 1][2];
+      const det = Array.isArray(lz) ? (lz[1] > 1 ? `<small class="qbk">${lz[1]} book${lz[2] > lz[0] + 0.005 ? ` · max ${fmt(lz[2])} ${esc(lz[3])}` : ""}</small>` : lz[3] ? `<small class="qbk">${esc(lz[3])}</small>` : "") : "";
+      return `<div class="qr"><span>${esc(QM_SEL(k.split(":")[1]))}</span><span title="prima quota vista: ${dshort(pts[0][0])}">${fmt(a)}</span><span><b>${fmt(z)}</b>${det}</span><span class="${cls}">${cls === "eq" ? "=" : (d < 0 ? "▼ " : "▲ ") + fmt(Math.abs(d))}</span><span>${qSpark(v)}</span></div>`;
     }).join("");
   }
   const last = ser[ser.length - 1][0], first = ser[0][0];
   box.hidden = false; box.className = "card qmv";
-  box.innerHTML = `<h2>Quote 1xBet</h2><p class="qsub">Prima vista ${dshort(first)} · ultimo cambio ${dshort(last)} · controllo ogni 30 minuti circa nel giorno della partita</p>
+  box.innerHTML = `<h2>Quote · media dei book</h2><p class="qsub">Media dei bookmaker passati da API-Football, tolte le quote fuori linea (dove ce n'è uno solo, quel book) · Prima vista ${dshort(first)} · ultimo cambio ${dshort(last)} · controllo ogni 30 minuti circa nel giorno della partita</p>
     <div class="qr h"><span>Esito</span><span>Apertura</span><span>Ora</span><span>Variaz.</span><span>Andamento</span></div>${html || `<p class="muted">Nessun mercato.</p>`}
     <p class="small muted" style="margin:0">▼ quota in calo (il bookmaker la ritiene più probabile) · ▲ quota in salita.</p>` + RG_LINE;
 }
 const RG_LINE = `<p class="rgline">Quote solo informative · Prevista non è un bookmaker · 18+ · Gioca responsabilmente</p>`;
 const isVal = c => !!(c && c.po != null && !c.gol && c.ev >= BK_MIN);
-const bkLines = e => (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null;
+// 6/11/2026: linee della media dei book (mb, [linea, media Over, media Under, n. book, max Over, book, max Under, book]) dove ci sono, altrimenti 1xBet
+const bkLines = e => { const b = (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null; return b && b.mb ? { ...b, ...b.mb } : b; };
 function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u, n, po, side, p, odd, ev, real, hit} o null (N.D.)
   const { G, M, MT, x, MF, O } = Mods, ok = v => v != null && isFinite(v) && v > 0;
   const al = EXTRA && EXTRA.alpha, rk = al > 2e-4 ? 1 / al : Infinity;
@@ -4430,11 +4436,11 @@ function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u,
   const REAL = { o: Mods.offR ? [Mods.offR.oh, Mods.offR.oa] : null, g: m && [m.hg, m.ag], s: m && [m.hs, m.as], st: m && [m.hst, m.ast], c: m && [m.hc, m.ac], f: m && [m.hf, m.af], k: m && [m.hk, m.ak] };
   const cell = (k, base, i) => {
     const c = k && LB && LB[k]; if (!c) return null;
-    const [L, o, u, n] = c, po = D[k](L);
+    const [L, o, u, n, oM, oB, uM, uB] = c, po = D[k](L);
     const R = REAL[base], real = R && R[0] != null && R[1] != null ? (i === 0 ? R[0] : i === 2 ? R[1] : R[0] + R[1]) : null;
     if (po == null || !isFinite(po)) return { L, o, u, n, po: null, real, gol: base === "g" || base === "o" };
     const eo = po * o - 1, eu = (1 - po) * u - 1, side = eo >= eu ? "O" : "U";
-    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, ev: Math.max(eo, eu), real, gol: base === "g" || base === "o", hit: real == null ? null : side === "O" ? real > L : real < L };
+    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, mx: side === "O" ? oM : uM, bk: side === "O" ? oB : uB, ev: Math.max(eo, eu), real, gol: base === "g" || base === "o", hit: real == null ? null : side === "O" ? real > L : real < L };
   };
   return ("O" in Mods ? BK_ROWS.concat([["Fuorigioco", "o", "ho", "ao"]]) : BK_ROWS).map(([lab, t, h, a]) => ({ lab, t: cell(t, t, 1), h: cell(h, t, 0), a: cell(a, t, 2), mk: t }));
 }
@@ -4450,24 +4456,58 @@ function off1x2HTML(O, LB, offR) {   // fuorigioco 1X2: modello (squadre indipen
 /* campionati che 1xBet non quota su API-Football (verifica 18/10/2026: MLS solo con altri bookmaker; si usa solo 1xBet) */
 const NO_1XBET = new Set(["USA"]), NO_1XBET_TXT = "1xBet non quota questo campionato.";
 function q1x2(e, key, LB) {   // 27/10/2026: o.ts = ora del giro da cui viene la quota; o.stale = il mercato non c'è più nell'ultimo giro
-  const ser = QMOV && QMOV.partite && e && QMOV.partite[e.id], o = [null, null, null], ix = { Home: 0, Draw: 1, Away: 2 };
-  let ts = null;
-  if (ser) for (let i = ser.length - 1; i >= 0 && o.some(x => x == null); i--) for (const [k, v] of Object.entries(ser[i][1])) {
-    const [mk, sel] = k.split(":"); if (mk === key && ix[sel] != null && o[ix[sel]] == null && v > 1) { o[ix[sel]] = v; ts = ser[i][0]; } }
-  if (o.some(x => x == null) && key === "x.off.offsides_1x2" && LB && LB.o1x2) return LB.o1x2;
-  if (!o.every(x => x)) return null;
-  o.ts = ts; o.stale = !!(ser && ts && ts !== ser[ser.length - 1][0]); return o;
+  // 6/11/2026 (Denny): prima la MEDIA dei book (chiavi "m.": [media, n. book, massima, book della massima]), se manca la sola 1xBet ("x.")
+  const ser = QMOV && QMOV.partite && e && QMOV.partite[e.id], ix = { Home: 0, Draw: 1, Away: 2 };
+  const pick = kk => {
+    const o = [null, null, null], n = [1, 1, 1], mx = [null, null, null], bk = ["1xBet", "1xBet", "1xBet"]; let ts = null;
+    if (ser) for (let i = ser.length - 1; i >= 0 && o.some(x => x == null); i--) for (const [k, v] of Object.entries(ser[i][1])) {
+      const [mk, sel] = k.split(":"), a = Array.isArray(v) ? v : [v, 1, v, "1xBet"], j = ix[sel];
+      if (mk === kk && j != null && o[j] == null && a[0] > 1) { o[j] = a[0]; n[j] = a[1]; mx[j] = a[2]; bk[j] = a[3]; ts = ser[i][0]; } }
+    if (!o.every(x => x)) return null;
+    o.ts = ts; o.n = n; o.max = mx; o.book = bk; o.stale = !!(ser && ts && ts !== ser[ser.length - 1][0]); return o;
+  };
+  const o = pick(key.replace(/^x\./, "m.")) || pick(key);
+  if (o) return o;
+  if (key === "x.off.offsides_1x2" && LB && LB.o1x2) return LB.o1x2;
+  return null;
 }
+/* "1,92 (media 4 book · max 2,00 Betano)": la massima solo se è più alta della media (le quote fuori linea sono già tolte) */
+const qBk = (q, n, mx, bk) => !(q > 1) ? "N.D." : `${f2(q)}${n > 1 ? ` <small class="qbk">(media ${n} book${mx > q + 0.005 ? ` · max ${f2(mx)} ${esc(bk || "")}` : ""})</small>` : bk && bk !== "1xBet" ? ` <small class="qbk">(${esc(bk)})</small>` : ""}`;
 const qWhen = ts => ts ? `${ts.slice(8, 10)}/${ts.slice(5, 7)} ${ts.slice(11, 16)}` : "";
+/* 6/11/2026 (Denny): 1X2 falli, gialli e fuorigioco quasi mai quotati via API. Con un segnale forte (Grado A o A+ su falli e fuorigioco,
+   spostamento grande dei falli con le formazioni ufficiali, gialli: probabilità del modello ≥ 60%) → "Quota minima da cercare":
+   1,08 / probabilità prudente, dove prudente = corretta con il mercato uguale a Prevista (se i pesi della corretta non ci sono: Prevista − 5 punti). */
+const QMIN_M = 0.08;
+function qMinCerca(e, key, p, R) {
+  const mk = key === "x.f1x2" ? "f" : key === "x.y1x2" ? "y" : "o";
+  let best = null;
+  for (const i of [0, 2]) {
+    const side = i === 0 ? "1" : "2"; let why = null;
+    if (mk !== "y") { const L = e && !e.m && typeof confEntry === "function" ? confEntry(e, MODES.dyn, true) : null, r = L && L.find(r => r.mk === mk && r.side === side);
+      if (r && (r.cls === "A+" || r.cls === "A")) why = `Grado ${r.cls}`; }
+    if (!why && mk === "f" && R && R.xiF && R.preXi) { const P0 = headToHeadProb(R.preXi.lh, R.preXi.la, R.r, R.rTeam, R.cop), d = p[i] - (i === 0 ? P0.home : P0.away); if (d >= 0.08) why = `formazioni ufficiali +${Math.round(d * 100)} punti`; }
+    if (!why && mk === "y" && p[i] >= 0.60) why = `gialli: Prevista ${pc(p[i])}`;
+    if (!why) continue;
+    const pc_ = typeof opCorr === "function" ? opCorr(p[i], p[i]) : null, pp = pc_ != null ? Math.min(pc_, p[i]) : p[i] - 0.05;
+    if (!(pp > 0.05)) continue;
+    const c = { i, side, who: i === 0 ? e.home : e.away, pp, qmin: (1 + QMIN_M) / pp, why };
+    if (!best || c.pp > best.pp) best = c;
+  }
+  return best;
+}
 function stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB) {
   const lab = ["1", "X", "2"], rs = [];
   const add = (name, key, R, hr, ar, indep) => {
     if (!R || !isFinite(R.lh) || !isFinite(R.la)) return;
     const P = indep ? headToHeadProb(R.lh, R.la, Infinity, indep) : headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop), p = [P.home, P.draw, P.away];
     const q = q1x2(e, key, LB), real = hr != null && ar != null ? (hr > ar ? 0 : hr === ar ? 1 : 2) : null;
+    const qm = real == null && /^x\.(f1x2|y1x2|off\.)/.test(key) ? qMinCerca(e, key, p, R) : null;
+    if (qm) mins.push({ name, ...qm, q });
+    const nb = q && q.n ? Math.min(...q.n) : 0;
     if (!q && real == null) { rs.push(`<tr><th>${name}</th>${p.map(x => `<td>${pc(x)}<small class="muted">N.D.</small></td>`).join("")}</tr>`); return; }
-    rs.push(`<tr><th>${name}${real != null ? `<small class="muted">reale ${hr}-${ar}</small>` : q && q.stale ? `<small class="muted">quota del ${qWhen(q.ts)}</small>` : ""}</th>${p.map((x, i) => `<td${real === i ? ` class="hit"` : ""}>${pc(x)}<small class="muted">${q ? "@" + f2(q[i]) : "N.D."}</small></td>`).join("")}</tr>`);
+    rs.push(`<tr><th>${name}${real != null ? `<small class="muted">reale ${hr}-${ar}</small>` : q && q.stale ? `<small class="muted">quota del ${qWhen(q.ts)}</small>` : q ? `<small class="muted">${nb > 1 ? `media ${nb} book` : esc(q.book ? q.book[0] : "1xBet")}</small>` : ""}</th>${p.map((x, i) => `<td${real === i ? ` class="hit"` : ""}>${pc(x)}<small class="muted">${q ? "@" + f2(q[i]) + (q.max && q.n[i] > 1 && q.max[i] > q[i] + 0.005 ? `<br>max ${f2(q.max[i])} ${esc(q.book[i])}` : "") : "N.D."}</small></td>`).join("")}</tr>`);
   };
+  const mins = [];
   add("Corner", "x.c1x2", M, m && m.hc, m && m.ac);
   add("Tiri", "x.s1x2", MT && MT.MS, m && m.hs, m && m.as);
   add("Tiri in porta", "x.st1x2", MT && MT.MD, m && m.hst, m && m.ast);
@@ -4476,19 +4516,20 @@ function stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB) {
   // 19/10/2026: cartellini per squadra del modello v2 (ripartizione casa/ospite col possesso palla); il mercato 1xBet conta solo i gialli
   if (x && x[6] && x[7]) { const al = EXTRA && EXTRA.alpha, rk = al > 2e-4 ? 1 / al : Infinity; add("Gialli", "x.y1x2", { lh: x[6], la: x[7] }, m && m.hk, m && m.ak, rk); }
   if (!rs.length) return "";
-  return `<div class="bk1x2"><p class="bk1x2-h"><b>1X2 · chi ne fa di più</b> · nostra probabilità e quota 1xBet</p>
+  return `<div class="bk1x2"><p class="bk1x2-h"><b>1X2 · chi ne fa di più</b> · nostra probabilità e quota media dei book</p>
     <table><thead><tr><th></th>${lab.map(l => `<th>${l}</th>`).join("")}</tr></thead><tbody>${rs.join("")}</tbody></table>
-    <p class="bk1x2-n">Solo confronto, senza bollino valore: la verifica sulle quote 1xBet archiviate è ancora in corso. Gialli: il modello conta gialli e rossi, il mercato 1xBet solo i gialli.</p></div>`;
+    ${mins.length ? `<div class="qmin">${mins.map(m => `<p><b>Quota minima da cercare</b> · ${esc(m.name)} ${m.side} (${esc(m.who)}): <b class="num">${f2(m.qmin)}</b> <small class="muted">${esc(m.why)} · probabilità prudente ${pc(m.pp)}${m.q ? ` · quota via API @${f2(m.q[m.i])}` : " · nessun book via API"}</small></p>`).join("")}<p class="bk1x2-n">Sotto questa quota lascia stare: è la quota di equilibrio della probabilità prudente più un margine dell'8%. Prudente = probabilità corretta come se il mercato fosse d'accordo con Prevista (i pesi della corretta smorzano le probabilità troppo nette).</p></div>` : ""}
+    <p class="bk1x2-n">Quota = media dei book passati da API-Football (tolte le quote fuori linea), con la più alta se diversa; dove c'è un solo book, quel book. Solo confronto, senza bollino valore. Gialli: il modello conta gialli e rossi, il mercato solo i gialli.</p></div>`;
 }
 function bkCellHTML(c, center, lab) {
   const head = center ? `<small>${lab}</small>` : "";
   if (!c) return `<span class="${center ? "sx-m" : "sx-v"} bk">${head}<b class="bk-nd">N.D.</b></span>`;
-  const ln = `<b class="bk-ln"><small class="bk-lt">Linea 1xBet</small><i>O/U</i> ${th1(c.L)}</b>`;
+  const ln = `<b class="bk-ln"><small class="bk-lt">${c.n > 1 ? `Linea · media ${c.n} book` : `Linea ${esc(c.bk || "1xBet")}`}</small><i>O/U</i> ${th1(c.L)}</b>`;
   if (c.po == null) return `<span class="${center ? "sx-m" : "sx-v"} bk">${head}${ln}<small class="bk-q">O ${f2(c.o)} · U ${f2(c.u)}</small></span>`;
   const val = isVal(c), evt = `${c.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(c.ev) * 100)}%`;
   return `<span class="${center ? "sx-m" : "sx-v"} bk${val ? " val" : ""}">${head}${ln}
     <span class="bk-s ${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} <b>${pc(c.p)}</b></span>
-    <span class="bk-q">@${f2(c.odd)}${c.gol ? "" : ` <em class="${val ? "pos" : c.ev > 0 ? "" : "neg"}">${evt}</em>`}</span>
+    <span class="bk-q">@${f2(c.odd)}${c.gol ? "" : ` <em class="${val ? "pos" : c.ev > 0 ? "" : "neg"}">${evt}</em>`}${c.n > 1 && c.mx > c.odd + 0.005 ? `<small class="bk-mx">max ${f2(c.mx)} ${esc(c.bk || "")}</small>` : ""}</span>
     ${c.real != null ? `<span class="bk-r">reale <b>${c.real}</b> ${c.hit ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`}</span>` : ""}</span>`;
 }
 function matchHeroHTML(home, away, e, cfg, G) {
@@ -5095,7 +5136,7 @@ let ODDS = null;
 function oddsFor(e, r) {
   const P = ODDS && ODDS.partite && ODDS.partite[e.id]; if (!P) return null;
   const k = r.mk in GOAL_LINE ? `ou${GOAL_LINE[r.mk]}:${r.side === "U" ? "U" : "O"}` : r.mk === "gg" ? `gg:${r.side === "N" ? "N" : "S"}` : r.mk === "c" && (r.side === "1" || r.side === "2") ? `c1x2:${r.side}` : null;
-  const v = k && P.q[k]; return v && v[0] > 1 ? { o: v[0], n: v[1] } : null;
+  const mk_ = k && (k.startsWith("c1x2:") ? "m.c1x2:" + { 1: "Home", X: "Draw", 2: "Away" }[k.slice(5)] : "m." + k), v = k && (P.q[mk_] || P.q[k]); return v && v[0] > 1 ? { o: v[0], n: v[1], mx: v[2], bk: v[3] } : null;
 }
 /* 25/10/2026: quota 1xBet di una previsione (Grado, Radar, Segnali), solo se c'è: gol e Gol/No gol (odds.json), 1X2 di corner, tiri,
    tiri in porta e falli (ultima quota vista, quote_mov.json), cartellini se la linea principale di 1xBet è la stessa (linee.json). */
@@ -5109,7 +5150,7 @@ function quotaFor(e, mk, side) {
   return null;
 }
 const qSm = q => q > 1 ? `<small class="qsm">@${f2(q)}</small>` : "";
-const oddsTxt = q => q ? `Quota 1xBet <b class="num">${q.o.toFixed(2).replace(".", ",")}</b>` : "";
+const oddsTxt = q => q ? `Quota <b class="num">${qBk(q.o, q.n, q.mx, q.bk)}</b>` : "";
 function confEntry(e, cfg, peek) {   // lista delle previsioni con punteggio; peek = non calcolare
   const key = e.id + "|" + cfg.key;
   if (CONF_C.has(key)) return CONF_C.get(key);
@@ -5425,9 +5466,10 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilit�
       const lab = ["1", "X", "2"];
       for (const [k, name, qk] of OP_K) {
         const Rm = R[k]; if (!Rm || !isFinite(Rm.lh) || !isFinite(Rm.la)) continue;
-        const q = q1x2(e, qk, LB); if (!q || q.stale || !q.every(v => v > 1)) continue;
+        const q = q1x2(e, qk, LB);
         const hp = R_ => k === "o" ? headToHeadProb(R_.lh, R_.la, Infinity, OFF_R_TEAM) : k === "y" ? headToHeadProb(R_.lh, R_.la, Infinity, rk) : headToHeadProb(R_.lh, R_.la, R_.r, R_.rTeam, R_.cop);
         const P = hp(Rm), p = [P.home, P.draw, P.away];
+        if (!q || q.stale || !q.every(v => v > 1)) { if (!cut && k !== "c" && typeof document !== "undefined") { const m_ = qMinCerca(e, qk, p, k === "f" ? MF : null); if (m_) (out.cerca = out.cerca || []).push({ e, mk: name, ...m_ }); } continue; }
         const P0 = k === "f" && MF.xiF && MF.preXi ? hp({ ...MF, lh: MF.preXi.lh, la: MF.preXi.la }) : null, p0 = P0 ? [P0.home, P0.draw, P0.away] : null;
         const inv = q.map(v => 1 / v), s_ = inv.reduce((a, b) => a + b, 0), mm = inv.map(v => v / s_);
         const fav = q[0] <= q[2] ? 0 : 2, und = 2 - fav;
@@ -5435,6 +5477,7 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilit�
           const pc = opCorr(p[i], mm[i]); if (pc == null) continue;
           const ev = pc * q[i] - 1, pc0 = p0 ? opCorr(p0[i], mm[i]) : null, ev0 = pc0 != null ? pc0 * q[i] - 1 : null;
           out.push({ e, k, mk: name, side: lab[i], who: i === 0 ? e.home : i === 2 ? e.away : "pari", p: p[i], m: mm[i], pc, q: q[i], ev,
+            nb: q.n ? q.n[i] : 1, qmax: q.max ? q.max[i] : q[i], bk: q.book ? q.book[i] : "1xBet",
             xi: ev0 != null && ev > 0 && (ev0 <= 0 ? "sbloccata" : ev > ev0 + 1e-9 ? "rafforzata" : null), hasXi: !!p0,
             und: i === und, invA: i === und && p[und] > p[fav] });
         }
@@ -5445,7 +5488,8 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilit�
         const [L, o, u] = kL, po = pOver(pmfTotal(x[4], rk, Math.ceil(L) + 2), L), mo = (1 / o) / (1 / o + 1 / u);
         for (const [side, pp, qq, mmm] of [["Over", po, o, mo], ["Under", 1 - po, u, 1 - mo]]) {
           const pc = opCorr(pp, mmm); if (pc == null) continue;
-          out.push({ e, k: "kou", mk: "Cartellini", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1 });
+          out.push({ e, k: "kou", mk: "Cartellini", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1,
+            nb: kL[3] || 1, qmax: (side === "Over" ? kL[4] : kL[6]) || qq, bk: (side === "Over" ? kL[5] : kL[7]) || "1xBet" });
         }
       }
       // 3/11/2026: Over/Under tiri totali (in prova nel nucleo): linea 1xBet più equilibrata e tiri attesi del modello
@@ -5454,7 +5498,8 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilit�
         const [L, o, u] = sL, po = pOver(pmfTotal(MS.lh + MS.la, MS.r, Math.ceil(L) + 2), L), mo = (1 / o) / (1 / o + 1 / u);
         for (const [side, pp, qq, mmm] of [["Over", po, o, mo], ["Under", 1 - po, u, 1 - mo]]) {
           const pc = opCorr(pp, mmm); if (pc == null) continue;
-          out.push({ e, k: "sou", mk: "Tiri", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1 });
+          out.push({ e, k: "sou", mk: "Tiri", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1,
+            nb: sL[3] || 1, qmax: (side === "Over" ? sL[4] : sL[6]) || qq, bk: (side === "Over" ? sL[5] : sL[7]) || "1xBet" });
         }
       }
     } finally { S.cutoff = c0; } });
@@ -5512,10 +5557,10 @@ function renderOpLedger(box, head, day, dkey) {
   const wT = o => { if (o.dup) return `<small class="num">già tra le singole</small>`; const v = (o.w || 0) * 100, r = opRes(o);
     return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${cassa ? ` · ${(o.w * cassa).toFixed(2).replace(".", ",")} €` : ""}</small>${cassa && r != null ? `<small class="num ${r ? "oppos" : "opneg"}">${eur(o.w * cassa * (r ? o.q - 1 : -1))}</small>` : ""}`; };
   const row = (c, extra = "") => `<button type="button" class="oprow" data-id="${esc(c.id)}"><span class="opm"><b>${esc(c.h)} – ${esc(c.a)}</b><small class="muted">${esc(c.lgn)} · ${esc(c.ora || "")}${c.ris ? " · finita " + esc(c.ris) : ""} · proposta alle ${hm(c.t)}</small></span>
-      <span class="opx">${opTag(c)}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)} · quota minima di equilibrio ${f2(1 / c.pc)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""}</small></span>
+      <span class="opx">${opTag(c)}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${opQ(c)} · quota minima di equilibrio ${f2(1 / c.pc)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""}</small></span>
       <span class="opw">${wT(c)}${status(c)}</span></button>`;
   const comb = (b, name) => b && minOk(b) ? `<div class="opcomb"><p class="opch"><b>${name}</b> · quota ${f2(b.q)} · corretta ${pc(b.p)} · proposta alle ${hm(b.t)} <span class="opw in">${wT(b)}${status(b)}</span></p>
-      ${b.legs.map(c => `<button type="button" class="opleg" data-id="${esc(c.id)}"><b>${esc(c.h)} – ${esc(c.a)}${c.ris ? ` <small class="muted">${esc(c.ris)}</small>` : ""}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${f2(c.q)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""} ${c.ok == null ? "" : c.ok ? "✓" : "✗"}</span></button>`).join("")}</div>`
+      ${b.legs.map(c => `<button type="button" class="opleg" data-id="${esc(c.id)}"><b>${esc(c.h)} – ${esc(c.a)}${c.ris ? ` <small class="muted">${esc(c.ris)}</small>` : ""}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${opQ(c)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""} ${c.ok == null ? "" : c.ok ? "✓" : "✗"}</span></button>`).join("")}</div>`
     : `<p class="opnone">${name}: ${b ? "sotto la puntata minima di 0,20 €" : "nessuna proposta"}</p>`;
   const sumOf = L => opSum(L.filter(o => !o.dup).map(o => [o, o.w || 0]));
   const usedW = [...S1, ...S3, ...Q].filter(o => !o.dup).reduce((a, o) => a + (o.w || 0), 0);
@@ -5525,7 +5570,8 @@ function renderOpLedger(box, head, day, dkey) {
       <p class="bkric">Registro: ogni proposta è fissata quando compare (quota, probabilità corretta e peso di quel momento) e non cambia più; budget del giorno 10% della cassa, usato ${(usedW * 100).toFixed(1).replace(".", ",")}%.${cassa ? ` Puntata minima 0,20 €${hidden ? `: ${hidden} ${hidden === 1 ? "proposta nascosta perché sotto" : "proposte nascoste perché sotto"}` : ""}.` : " Imposta la cassa per gli importi in euro e la puntata minima di 0,20 €."}</p></div>
     <h3 class="oph">1 · Singole di valore (statistiche) <small>${S1.length}</small></h3>${S1.length ? `<div class="oplist">${S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola (astensione)</p>`}
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(day.q2, "Quota 2 · doppia")}${comb(day.q3, "Quota 3 · tripla")}
-    <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita 1xBet</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}` + RG_LINE;
+    <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita dei book</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}`
+    + (isToday ? opCercaHTML(selEntries(), MODES.dyn, e => e.time || "") : "") + RG_LINE;
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ent(b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   const inp = box.querySelector("#opCassa"); if (inp) inp.addEventListener("change", () => { const v = parseFloat(inp.value.replace(",", ".")); lsSet("statPreviste.cassa", v > 0 ? String(v) : ""); renderSelOp(selEntries(), MODES[$("#decay").value] || MODES.dyn, e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`); });
 }
@@ -5565,25 +5611,39 @@ function renderOpPast(box, head, cfg, when) {
   const cassa = opCassa();
   const wT = o => { const v = w(o) * 100, r = opRes(o); return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${cassa ? ` · ${(w(o) * cassa).toFixed(2).replace(".", ",")} €` : ""}</small>${cassa && r != null ? `<small class="num ${r ? "oppos" : "opneg"}">${opEur(w(o) * cassa * (r ? o.q - 1 : -1))}</small>` : ""}`; };
   const row = (c, extra = "") => `<div class="oprow opdone"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(c.e.lgn)} · ${esc(c.e.ora || "")}${c.e.ris ? " · finita " + esc(c.e.ris) : ""}${c.e.ric ? " · ricostruita" : ""}</small></span>
-      <span class="opx">${opTag(c)}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""}</small></span>
+      <span class="opx">${opTag(c)}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${opQ(c)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""}</small></span>
       <span class="opw">${wT(c)}${mk(c)}</span></div>`;
   const comb = (b, name) => b ? `<div class="opcomb"><p class="opch"><b>${name}</b> · quota ${f2(b.q)} · corretta ${pc(b.p)} <span class="opw in">${wT(b)}${mk(b)}</span></p>
-      ${b.legs.map(c => `<div class="opleg"><b>${esc(c.e.home)} – ${esc(c.e.away)}${c.e.ris ? ` <small class="muted">${esc(c.e.ris)}</small>` : ""}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${f2(c.q)} ${c.ok == null ? "" : c.ok ? "✓" : "✗"}</span></div>`).join("")}</div>`
+      ${b.legs.map(c => `<div class="opleg"><b>${esc(c.e.home)} – ${esc(c.e.away)}${c.e.ris ? ` <small class="muted">${esc(c.e.ris)}</small>` : ""}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${opQ(c)} ${c.ok == null ? "" : c.ok ? "✓" : "✗"}</span></div>`).join("")}</div>`
     : `<p class="opnone">${name}: nessuna combinazione a valore (astensione)</p>`;
   SEL.opN = B.s1.length + B.s3.filter(([o]) => !X.S1.includes(o)).length + B.q.length; radarTabs();
   box.innerHTML = head + `<div class="bkieri"><p>${opSumTxt(`Singole · ${dl.toLowerCase()}`, opSum(B.s1))}</p><p>${opSumTxt("Quota 2 / Quota 3", opSum(B.q))}</p><p>${opSumTxt("Controtendenza", opSum(B.s3))}</p>
       <p>${opSumTxt("Ultimi 7 giorni · singole", opSum(week.s1))}</p><p>${opSumTxt("Ultimi 7 giorni · Quota 2 / Quota 3", opSum(week.q))}</p><p>${opSumTxt("Ultimi 7 giorni · Controtendenza", opSum(week.s3))}</p>
-      ${cassa ? "" : `<p class="bkric">Imposta la cassa nella vista di oggi per vedere importi e guadagni in euro.</p>`}<p class="bkric">Giocate bloccate al fischio (quote 1xBet e probabilità corretta di allora)${ric ? "; prima del 31/10 ricostruite con i soli dati e i soli giorni precedenti a ogni partita" : ""}. Rendimento a peso = guadagno sui pesi Kelly 1/8 della vista diviso il totale puntato; sulla cassa = in percentuale della cassa.</p></div>
+      ${cassa ? "" : `<p class="bkric">Imposta la cassa nella vista di oggi per vedere importi e guadagni in euro.</p>`}<p class="bkric">Giocate bloccate al fischio (quote e probabilità corretta di allora; fino al 6/11 quote 1xBet, poi media dei book)${ric ? "; prima del 31/10 ricostruite con i soli dati e i soli giorni precedenti a ogni partita" : ""}. Rendimento a peso = guadagno sui pesi Kelly 1/8 della vista diviso il totale puntato; sulla cassa = in percentuale della cassa.</p></div>
     <h3 class="oph">1 · Singole di valore (statistiche) <small>${X.S1.length}</small></h3>${X.S1.length ? `<div class="oplist">${X.S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola (astensione)</p>`}
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(X.D2, "Quota 2 · doppia")}${comb(X.T3, "Quota 3 · tripla")}
-    <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${X.S3.length}</small></h3>${X.S3.length ? `<div class="oplist">${X.S3.map(c => row(c, `<i class="opct">sfavorita 1xBet</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}` + RG_LINE;
+    <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${X.S3.length}</small></h3>${X.S3.length ? `<div class="oplist">${X.S3.map(c => row(c, `<i class="opct">sfavorita dei book</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}` + RG_LINE;
+}
+const opQ = c => qBk(c.q, c.nb, c.qmax, c.bk);
+/* 6/11/2026: 4 · Quote da cercare. 1X2 falli, gialli e fuorigioco senza quota via API ma con un segnale forte (qMinCerca): solo indicazione,
+   non entra nel registro, nei pesi né nei rendimenti. */
+function opCercaHTML(ents, cfg, when) {
+  if (!CORR || !CORR.gruppi || !CORR.gruppi.statistiche) return "";
+  const t0 = performance.now(), L = [];
+  for (const e of ents) { if (e.m || koStarted(e.d, e.time)) continue; const k = e.id + "|" + cfg.key + "|" + (CORR.agg || "");
+    if (!OP_C.has(k) && performance.now() - t0 < 250) { try { opEntry(e, cfg); } catch (x) { OP_C.set(k, []); } }
+    const o = OP_C.get(k); if (o && o.cerca) L.push(...o.cerca); }
+  L.sort((a, b) => b.pp - a.pp);
+  return `<h3 class="oph">4 · Quote da cercare (nessun book via API) <small>${L.length}</small></h3>${L.length ? `<div class="oplist">${L.slice(0, 12).map(c => `<button type="button" class="oprow" data-id="${esc(c.e.id)}"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(lgName(c.e.lg))} · ${when(c.e)}</small></span>
+      <span class="opx"><span class="opmk">${esc(c.mk)} · ${c.side} ${esc(c.who)}</span><small class="muted">${esc(c.why)} · probabilità prudente ${pc(c.pp)}</small></span>
+      <span class="opw"><b class="num">≥ ${f2(c.qmin)}</b><small>quota minima</small></span></button>`).join("")}</div><p class="opnone">Solo indicazione, fuori da pesi e registro: gioca solo se trovi almeno questa quota (equilibrio della probabilità prudente + 8%).</p>` : `<p class="opnone">Nessun segnale forte su falli, gialli e fuorigioco senza quota</p>`}`;
 }
 const opTag = c => (c.k === "kou" && /^Under/.test(c.side) ? `<i class="opnuc">Under cartellini · nucleo</i>` : "") + (c.k === "f" && c.hasXi ? `<i class="opxi">XI</i>` : "");
 const opCassa = () => { const v = parseFloat((lsGet("statPreviste.cassa") || "").replace(",", ".")); return v > 0 ? v : null; };
 function renderSelOp(ents, cfg, when) {
   const box = $("#selOp"); if (!box) return;
   const head = `<div class="selhead"><h2><svg class="ic ic-op" aria-hidden="true"><use href="#i-op"/></svg>Operatività</h2><span class="vtag">in verifica</span></div>
-    <p class="opwarn">Calcolatore sui modelli ancora in verifica (lettura 7/12, decisione 18/1): probabilità corretta (Prevista + 1xBet senza margine) e pesi Kelly 1/8. Sono calcoli, non previsioni certe né promesse di vincita.</p>`;
+    <p class="opwarn">Calcolatore sui modelli ancora in verifica (lettura 7/12, decisione 18/1): probabilità corretta (Prevista + media dei book senza margine) e pesi Kelly 1/8. Sono calcoli, non previsioni certe né promesse di vincita.</p>`;
   if (!CORR) {
     box.hidden = SEL.tab !== "op"; box.innerHTML = head + `<p class="apnone">${CORR_LOADING ? "Carico i coefficienti della probabilità corretta…" : "PROBABILITÀ CORRETTA NON DISPONIBILE"}</p>` + RG_LINE;
     if (!CORR_LOADING) { CORR_LOADING = true; getData("corretta.json").then(j => { CORR = j && j.gruppi ? j : { gruppi: {} }; CORR_LOADING = false; OP_C.clear(); if (!$("#viewSel").hidden) renderSelOp(selEntries(), cfg, when); }).catch(() => { CORR_LOADING = false; CORR = { gruppi: {} }; }); }
@@ -5609,10 +5669,10 @@ function renderSelOp(ents, cfg, when) {
   const wTxt = o => { const f = wOf(o), v = f * sc * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${money(f)}</small>`; };
   const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" || c.k === "sou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
   const row = (c, extra = "") => `<button type="button" class="oprow" data-id="${esc(c.e.id)}"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(lgName(c.e.lg))} · ${when(c.e)}</small></span>
-      <span class="opx">${opTag(c)}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${f2(c.q)} · quota minima di equilibrio ${f2(1 / c.pc)}</small></span>
+      <span class="opx">${opTag(c)}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${opQ(c)} · quota minima di equilibrio ${f2(1 / c.pc)}</small></span>
       <span class="opw">${wTxt(c)}</span></button>`;
   const comb = (b, name) => b ? `<div class="opcomb"><p class="opch"><b>${name}</b> · quota ${f2(b.q)} · corretta ${pc(b.p)} · valore atteso ${b.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(b.ev) * 100)}% <span class="opw in">${wTxt(b)}</span></p>
-      ${b.legs.map(c => `<button type="button" class="opleg" data-id="${esc(c.e.id)}"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${f2(c.q)}</span></button>`).join("")}</div>`
+      ${b.legs.map(c => `<button type="button" class="opleg" data-id="${esc(c.e.id)}"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><span>${legTxt(c)} · corretta ${pc(c.pc)} · @${opQ(c)}</span></button>`).join("")}</div>`
     : `<p class="opnone">${name}: nessuna combinazione a valore (astensione)</p>`;
   const nSel = S1.length + S3.filter(c => !S1.includes(c)).length + (D2 ? 1 : 0) + (T3 ? 1 : 0);
   SEL.opN = todo.length ? null : nSel; box.hidden = SEL.tab !== "op"; radarTabs();
@@ -5625,7 +5685,8 @@ function renderSelOp(ents, cfg, when) {
     ${S1.length ? `<div class="oplist">${S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola a valore (astensione)</p>`}
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(D2, "Quota 2 · doppia")}${comb(T3, "Quota 3 · tripla")}
     <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>
-    ${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita 1xBet</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione a valore (astensione)</p>`}
+    ${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita dei book</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione a valore (astensione)</p>`}
+    ${opCercaHTML(ents, cfg, when)}
     <p class="opfoot">Peso = Kelly 1/8 sulla probabilità corretta (al massimo 3% per giocata; sotto lo 0,1% la giocata non si mostra${cassa0 ? `; puntata minima 0,20 €${cut ? `: tolte ${cut} giocate sotto il minimo e pesi ricalcolati sulle altre` : ""}` : "; imposta la cassa per applicare la puntata minima di 0,20 €"}${sc < 1 ? `; oggi ridotti in proporzione per stare nel 10% della cassa, totale ${Math.round(tot * 100)}% → 10%` : "; totale del giorno al massimo 10%"}). Quota minima di equilibrio = 1 / probabilità corretta. Coefficienti del ${esc((CORR.agg || "").slice(8, 10) + "/" + (CORR.agg || "").slice(5, 7))} su ${cfgC.esiti} esiti in ${cfgC.giorni} giorni${fc.esiti ? ` (fuori campione log-loss: Prevista ${fc.logloss_prevista}, 1xBet ${fc.logloss_1xbet}, corretta ${fc.logloss_corretta})` : ""}. Esclusi gol, tiri e tiri in porta a quota alta e le forbici sulle strasfavorite.</p>` + RG_LINE;
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   const inp = box.querySelector("#opCassa"); if (inp) inp.addEventListener("change", () => { const v = parseFloat(inp.value.replace(",", ".")); lsSet("statPreviste.cassa", v > 0 ? String(v) : ""); renderSelOp(selEntries(), cfg, when); });

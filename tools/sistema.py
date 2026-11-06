@@ -31,7 +31,9 @@ for (key, mk), S in G.items():
     bfav = "1" if S["1"]["q1"] <= S["2"]["q1"] else "2"; pfav = "1" if S["1"]["p"] >= S["2"]["p"] else "2"
     for s in "1X2":
         conc = "pareggio" if s == "X" else ("concorde" if s == bfav == pfav else "inversione" if s == pfav != bfav else "contro Prevista")
-        O.append(dict(key=key, d=key.split("|")[1], mkt=mk, side=s, p=S[s]["p"], q=S[s]["q1"], y=S[s]["y"], m=inv[s] / t, conc=conc))
+        O.append(dict(key=key, d=key.split("|")[1], mkt=mk, side=s, p=S[s]["p"], q=S[s]["q1"], y=S[s]["y"], m=inv[s] / t, conc=conc,
+                      qm=S[s].get("q1m") if all(S[x].get("q1m") for x in "1X2") else None,   # 6/11/2026: media dei book, in parallelo
+                      mm=(1 / S[s]["q1m"]) / sum(1 / S[x]["q1m"] for x in "1X2") if all(S[x].get("q1m") for x in "1X2") else None))
         if mk == "1X2 falli" and S[s].get("pxi") is not None:
             O.append(dict(key=key, d=key.split("|")[1], mkt="1X2 falli · formazioni", side=s, p=S[s]["pxi"], q=S[s]["q1"], y=S[s]["y"], m=inv[s] / t, conc=conc))
 # Over/Under (linea più equilibrata)
@@ -63,6 +65,7 @@ for i, d in enumerate(days):
     b = fit_lr([[lg_(o["p"]), lg_(o["m"])] for o in tr], [o["y"] for o in tr])
     for o in byd[d]:
         o["pc"] = 1 / (1 + math.exp(-(b[0] + b[1] * lg_(o["p"]) + b[2] * lg_(o["m"])))); o["ev"] = o["pc"] * o["q"] - 1
+        if o.get("qm"): o["pcm"] = 1 / (1 + math.exp(-(b[0] + b[1] * lg_(o["p"]) + b[2] * lg_(o["mm"])))); o["evm"] = o["pcm"] * o["qm"] - 1
 E = [o for o in O if o.get("pc") is not None]
 ED = sorted({o["d"] for o in E}); half = ED[len(ED) // 2]
 marg = np.mean([1 / o["m"] * 0 + 1 for o in []]) if False else None
@@ -239,3 +242,15 @@ if FD:
     note(f"5 · verifica in avanti dal 4/11 ({len(FD)} giorni)", " ‖ ".join(out))
 else:
     note("5 · verifica in avanti dal 4/11", "nessun giorno giocato dal 4/11 con probabilità corretta: si parte dal prossimo lunedì")
+
+# ---------------- 6 · in parallelo (6/11/2026, Denny): media dei book contro 1xBet, sugli stessi 1X2 delle statistiche del perimetro di Operatività
+# (le regole e gli studi restano fissati su 1xBet; qui solo il confronto: stesse partite, stessi pesi della corretta)
+OPM = ("1X2 corner", "1X2 falli", "1X2 fuorigioco", "1X2 gialli")
+MB = [o for o in E if o.get("pcm") is not None and o["mkt"] in OPM]
+if MB:
+    a = one_per_match([o for o in MB if o["ev"] > 0])
+    bm = one_per_match([dict(o, q=o["qm"], ev=o["evm"], pc=o["pcm"]) for o in MB if o["evm"] > 0])
+    note(f"6 · media dei book in parallelo ({len(MB)} esiti con le tre quote medie, dal {min(o['d'] for o in MB)})",
+         f"1xBet: {fmt(stats(a))} ‖ media dei book: {fmt(stats(bm))} ‖ quota media 1xBet {np.mean([o['q'] for o in MB]):.3f} contro media dei book {np.mean([o['qm'] for o in MB]):.3f}")
+else:
+    note("6 · media dei book in parallelo", "ancora nessun esito con le quote medie (archivio dal 7/11/2026)")

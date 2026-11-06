@@ -1327,6 +1327,12 @@ if ODDS_FULL or ODDS_NEAR:
         if top[1] < 0.6 or top[2] < 0.6: return None
         if len(best) > 1 and best[1][0] >= top[0] - 0.15: return None   # ambiguo: due sfide quasi uguali
         return top[3]
+    def _magg(v):   # media dei book senza le quote fuori linea (oltre ±12% dalla mediana: linee ferme o errori) → [media, n, massima, book]
+        v = {b_: o_ for b_, o_ in v.items() if o_ and o_ > 1}
+        if not v: return None
+        md = statistics.median(v.values()); k_ = {b_: o_ for b_, o_ in v.items() if abs(o_ / md - 1) <= 0.12} or v
+        bmx = max(k_, key=k_.get)
+        return [round(sum(k_.values()) / len(k_), 2), len(k_), round(k_[bmx], 2), bmx]
     def med(xs):
         xs = [x for x in xs if x and x > 1]
         return round(statistics.median(xs), 2) if xs else None
@@ -1345,13 +1351,27 @@ if ODDS_FULL or ODDS_NEAR:
         lg = BY_ID[f["league"]["id"]]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
         m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
         if not m: nomatch.append(f"{lg} {f['teams']['home']['name']} - {f['teams']['away']['name']}"); return
-        acc, xacc = {}, {}
+        acc, xacc, macc = {}, {}, {}
         for b in e.get("bookmakers", []):
             for bet in b.get("bets", []):
                 for v in bet.get("values", []):
                     try: o = float(v["odd"])
                     except Exception: continue
                     nm, val = bet["name"], str(v["value"])
+                    # 6/11/2026 (Denny): quote di TUTTI i book passati da API-Football, chiavi "m." = media dei book (senza le quote fuori linea),
+                    # con numero di book, quota massima e book che la offre. Le chiavi esistenti (1xBet "x.", mediane) restano identiche:
+                    # gli studi fissati su 1xBet non cambiano.
+                    _mk = None
+                    if nm == "Match Winner": _mk = "m.1x2:" + {"Home": "1", "Draw": "X", "Away": "2"}.get(val, "")
+                    elif nm == "Goals Over/Under" and val.split(" ")[-1] in ("1.5", "2.5", "3.5"): _mk = "m.ou" + val.split(" ")[-1] + ":" + val.split(" ")[0][0]
+                    elif nm == "Both Teams Score": _mk = "m.gg:" + {"Yes": "S", "No": "N"}.get(val, "")
+                    elif nm in NICHE or nm in XBETS:
+                        _v = {"1": "Home", "X": "Draw", "2": "Away"}.get(val, val) if re.search(r"1x2", nm, re.I) else val
+                        _mk = "m." + (NICHE.get(nm) or XBETS[nm]) + ":" + _v
+                    elif re.search(r"offside", nm, re.I):
+                        _v = {"1": "Home", "X": "Draw", "2": "Away"}.get(val, val)
+                        _mk = "m.off." + re.sub(r"[^a-z0-9]+", "_", nm.lower()).strip("_") + ":" + _v
+                    if _mk and not _mk.endswith(":") and o > 1: macc.setdefault(_mk, {})[b["name"]] = o
                     if nm in XBETS: xacc.setdefault(XBETS[nm] + ":" + val, {})[b["name"]] = o   # mercati secondari: solo archivio (mediana, per le analisi)
                     if nm in XBETS and b["name"] == "1xBet": xacc.setdefault("x." + XBETS[nm] + ":" + val, {})[b["name"]] = o   # 1xBet: linee dell'app
                     # 11/10/2026: mercati del primo tempo di 1xBet (corner, tiri, falli, cartellini…): solo archivio, per studiarli (nessuna richiesta in più)
@@ -1373,9 +1393,12 @@ if ODDS_FULL or ODDS_NEAR:
                     acc.setdefault(key, {})[b["name"]] = o
         q = {kk: [med(list(v.values())), len(v)] for kk, v in acc.items()}
         q = {kk: v for kk, v in q.items() if v[0]}
+        mq = {kk: _magg(v) for kk, v in macc.items()}
+        q.update({kk: v for kk, v in mq.items() if v and kk.split(":")[0] in ("m.1x2", "m.ou1.5", "m.ou2.5", "m.ou3.5", "m.gg", "m.c1x2")})
         if q: res[f"{lg}|{m[0]}|{m[1]}|{m[2]}"] = {"q": q, "nb": len(e.get("bookmakers", [])), "agg": e.get("update", "")[:16]}
         xq = {kk: [med(list(v.values())), len(v)] for kk, v in xacc.items()}
         xq = {kk: v for kk, v in xq.items() if v[0]}
+        xq.update({kk: v for kk, v in mq.items() if v})
         if q or xq: allq[f"{lg}|{m[0]}|{m[1]}|{m[2]}"] = {**q, **xq}
     try:
         # richieste rimaste oggi (la chiamata status non conta); ne lascio 5 di margine
@@ -1423,7 +1446,8 @@ if ODDS_FULL or ODDS_NEAR:
         jdump(OD, odds_path)
     # Archivio per verificare in futuro i mercati (corner, cartellini, tiri in porta…): per ogni partita la prima quota vista e l'ultima
     # prima del calcio d'inizio, con l'ora. Non si cancella mai: serve proprio a misurare a posteriori.
-    MOV_KEYS = {"1x2", "ou1.5", "ou2.5", "ou3.5", "gg", "x.c1x2", "x.cdc", "x.s1x2", "x.st1x2", "x.f1x2", "x.fdc", "x.y1x2", "x.ydc", "x.off.offsides_1x2"}
+    MOV_KEYS = {"1x2", "ou1.5", "ou2.5", "ou3.5", "gg", "x.c1x2", "x.cdc", "x.s1x2", "x.st1x2", "x.f1x2", "x.fdc", "x.y1x2", "x.ydc", "x.off.offsides_1x2",
+                "m.1x2", "m.ou1.5", "m.ou2.5", "m.ou3.5", "m.gg", "m.c1x2", "m.s1x2", "m.st1x2", "m.f1x2", "m.y1x2", "m.off.offsides_1x2"}
     if allq:
         hp = os.path.join(OUT, "odds_hist.json")
         OH = jload_archive(hp)
@@ -1468,7 +1492,7 @@ if ODDS_FULL or ODDS_NEAR:
                     if qk not in x["prima"]["q"]: x["prima"]["q"][qk] = qv; x["prima"].setdefault("ore", {})[qk] = ts
             x["ultima"] = {"ora": ts, "q": {**x.get("ultima", {}).get("q", {}), **q}}
             # movimento delle quote 1xBet (sezione "Quote 1xBet" della Lettura): una tappa per ogni giro in cui qualcosa cambia
-            snap = {qk: qv[0] for qk, qv in q.items() if qk.split(":")[0] in MOV_KEYS}
+            snap = {qk: (qv if qk.startswith("m.") else qv[0]) for qk, qv in q.items() if qk.split(":")[0] in MOV_KEYS}
             if snap:
                 ser = x.setdefault("serie", [])
                 if not ser or ser[-1][1] != snap: ser.append([ts, snap]); del ser[:-60]
@@ -1542,12 +1566,15 @@ try:
     except NameError: OH = json.load(open(os.path.join(OUT, "odds_hist.json")))
     LMK = {"g": "gou", "hg": "hgou", "ag": "agou", "c": "cou", "hc": "hcou", "ac": "acou", "k": "kou", "hk": "hk", "ak": "ak", "st": "sot", "hst": "hsot", "ast": "asot",
            "s": "sou", "f": "fou", "hf": "hfou", "af": "afou"}
-    LMK = {k: "x." + v for k, v in LMK.items()}   # 10/10/2026: linee solo di 1xBet
-    LMK.update({"o": "x.off.offsides_total", "ho": "x.off.offsides_home_total", "ao": "x.off.offsides_away_total"})   # 18/10/2026: fuorigioco
+    # 6/11/2026: linee di 1xBet ("x.") come prima e, a parte in "mb", quelle della media dei book (chiavi "m."): la versione dell'app che le usa
+    # le preferisce, quella precedente non le vede
+    LMK = {k: ("m." + v, "x." + v) for k, v in LMK.items()}
+    LMK.update({"o": ("m.off.offsides_total", "x.off.offsides_total"), "ho": ("m.off.offsides_home_total", "x.off.offsides_home_total"), "ao": ("m.off.offsides_away_total", "x.off.offsides_away_total")})
     LN = {}
     for kk, x in OH.items():
-        q = x.get("ultima", {}).get("q", {}); ent = {}
-        for short, mk in LMK.items():
+        q = x.get("ultima", {}).get("q", {}); ent = {}; mb = {}
+        for short, mks in LMK.items():
+          for mk in mks:
             lines = {}
             for k2, v in q.items():
                 if not k2.startswith(mk + ":"): continue
@@ -1558,26 +1585,32 @@ try:
             if short == "g":   # gol totali: anche le linee 1,5 · 2,5 · 3,5 delle quote principali
                 for ln in (1.5, 2.5, 3.5):
                     for sd in ("O", "U"):
-                        v = q.get(f"x.gou:{'Over' if sd == 'O' else 'Under'} {ln}")
+                        v = q.get(f"{'m.' if mk.startswith('m.') else 'x.'}gou:{'Over' if sd == 'O' else 'Under'} {ln}") or (q.get(f"m.ou{ln}:{sd}") if mk.startswith("m.") else None)
                         if v and sd not in lines.get(ln, {}): lines.setdefault(ln, {})[sd] = v
             best = None
             for ln, o in lines.items():
                 if "O" in o and "U" in o and o["O"][0] > 1 and o["U"][0] > 1:
                     d = abs(1 / o["O"][0] - 1 / o["U"][0])
                     if best is None or d < best[0] - 1e-9 or (abs(d - best[0]) < 1e-9 and min(o["O"][1], o["U"][1]) > best[4]):
-                        best = (d, ln, o["O"][0], o["U"][0], min(o["O"][1], o["U"][1]))
-            if best: ent[short] = [best[1], best[2], best[3], best[4]]
-        _o3 = [q.get("x.off.offsides_1x2:" + s_, [None])[0] for s_ in ("Home", "Draw", "Away")]   # fuorigioco 1X2 (1xBet)
-        if all(v_ and v_ > 1 for v_ in _o3): ent["o1x2"] = _o3
+                        best = (d, ln, o["O"][0], o["U"][0], min(o["O"][1], o["U"][1]), o["O"], o["U"])
+            if best:
+                bo, bu = best[5], best[6]
+                if mk.startswith("m."):   # [linea, media Over, media Under, n. book, max Over, book, max Under, book]
+                    mb[short] = [best[1], best[2], best[3], best[4], bo[2] if len(bo) > 3 else best[2], bo[3] if len(bo) > 3 else "", bu[2] if len(bu) > 3 else best[3], bu[3] if len(bu) > 3 else ""]
+                else: ent[short] = [best[1], best[2], best[3], best[4]]
+        for pre, dst in (("x.", ent), ("m.", mb)):   # fuorigioco 1X2
+            _o3 = [q.get(pre + "off.offsides_1x2:" + s_, [None])[0] for s_ in ("Home", "Draw", "Away")]
+            if all(v_ and v_ > 1 for v_ in _o3): dst["o1x2"] = _o3
+        if mb: ent["mb"] = mb
         if ent: ent["t"] = x["ultima"].get("ora", ""); LN[kk] = ent
-    json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football): ultima quota vista prima del calcio d'inizio", "partite": LN},
+    json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football) e, in mb, media dei bookmaker senza le quote fuori linea: ultima quota vista prima del calcio d'inizio", "partite": LN},
               open(os.path.join(OUT, "linee.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("linee bookmaker:", len(LN), "partite")
     # movimento delle quote 1xBet delle partite da oggi in avanti (data/quote_mov.json, pubblico: solo partite non ancora giocate)
     _t0 = rome_now.strftime("%Y-%m-%d"); QM = {}
     for kk, x in OH.items():
         if kk.split("|")[1] >= _t0 and x.get("serie"): QM[kk] = x["serie"]
-    json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football)", "partite": QM},
+    json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "media dei bookmaker (chiavi m.) e 1xBet (chiavi x.), via API-Football", "partite": QM},
               open(os.path.join(OUT, "quote_mov.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("movimento quote:", len(QM), "partite")
 except Exception as e:

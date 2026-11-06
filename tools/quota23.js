@@ -30,7 +30,8 @@ for (const [key, v] of Object.entries(OH)) {
   nPl++;
   const [lg, d, h, a] = key.split("|"), es = ES[key] || {};
   const add = (mk, side, p, hit, k, pxi) => { if (p == null || !isFinite(p) || hit == null) return; const q0 = q(v, "prima", k), q1 = q(v, "ultima", k); if (!q0 && !q1) return;
-    out.push({ key, d, lg, t: m.time || "", mk, side, p: Math.round(p * 1e4) / 1e4, pxi: pxi != null && isFinite(pxi) ? Math.round(pxi * 1e4) / 1e4 : null, y: hit ? 1 : 0, q0, q1 }); };
+    const q1m = q(v, "ultima", k.startsWith("x.") ? "m." + k.slice(2) : "m." + k);   // 6/11/2026: media dei book, in parallelo (gli studi restano su 1xBet)
+    out.push({ key, d, lg, t: m.time || "", mk, side, p: Math.round(p * 1e4) / 1e4, pxi: pxi != null && isFinite(pxi) ? Math.round(pxi * 1e4) / 1e4 : null, y: hit ? 1 : 0, q0, q1, q1m }); };
   const c0 = A.S.cutoff; A.S.cutoff = m.date;
   try {
     A.withLeague(lg, () => {
