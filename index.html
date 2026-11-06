@@ -5469,7 +5469,7 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilitÃ
         const q = q1x2(e, qk, LB);
         const hp = R_ => k === "o" ? headToHeadProb(R_.lh, R_.la, Infinity, OFF_R_TEAM) : k === "y" ? headToHeadProb(R_.lh, R_.la, Infinity, rk) : headToHeadProb(R_.lh, R_.la, R_.r, R_.rTeam, R_.cop);
         const P = hp(Rm), p = [P.home, P.draw, P.away];
-        if (!q || q.stale || !q.every(v => v > 1)) { if (!cut && k !== "c" && typeof document !== "undefined") { const m_ = qMinCerca(e, qk, p, k === "f" ? MF : null); if (m_) (out.cerca = out.cerca || []).push({ e, mk: name, ...m_ }); } continue; }
+        if (!q || q.stale || !q.every(v => v > 1)) { if (!cut && k !== "c" && typeof document !== "undefined" && typeof qMinCerca === "function") { const m_ = qMinCerca(e, qk, p, k === "f" ? MF : null); if (m_) (out.cerca = out.cerca || []).push({ e, mk: name, ...m_ }); } continue; }
         const P0 = k === "f" && MF.xiF && MF.preXi ? hp({ ...MF, lh: MF.preXi.lh, la: MF.preXi.la }) : null, p0 = P0 ? [P0.home, P0.draw, P0.away] : null;
         const inv = q.map(v => 1 / v), s_ = inv.reduce((a, b) => a + b, 0), mm = inv.map(v => v / s_);
         const fav = q[0] <= q[2] ? 0 : 2, und = 2 - fav;
