@@ -1366,7 +1366,7 @@ if ODDS_FULL or ODDS_NEAR:
                     elif nm == "Goals Over/Under" and val.split(" ")[-1] in ("1.5", "2.5", "3.5"): _mk = "m.ou" + val.split(" ")[-1] + ":" + val.split(" ")[0][0]
                     elif nm == "Both Teams Score": _mk = "m.gg:" + {"Yes": "S", "No": "N"}.get(val, "")
                     elif nm in NICHE or nm in XBETS:
-                        _v = {"1": "Home", "X": "Draw", "2": "Away"}.get(val, val) if re.search(r"1x2", nm, re.I) else val
+                        _v = {"1": "Home", "X": "Draw", "2": "Away"}.get(val, val) if re.search(r"1x2", nm, re.I) else {"1X": "Home/Draw", "12": "Home/Away", "X2": "Draw/Away"}.get(val, val) if re.search(r"double", nm, re.I) else val
                         _mk = "m." + (NICHE.get(nm) or XBETS[nm]) + ":" + _v
                     elif re.search(r"offside", nm, re.I):
                         _v = {"1": "Home", "X": "Draw", "2": "Away"}.get(val, val)
