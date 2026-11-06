@@ -1447,7 +1447,7 @@ if ODDS_FULL or ODDS_NEAR:
     # Archivio per verificare in futuro i mercati (corner, cartellini, tiri in porta…): per ogni partita la prima quota vista e l'ultima
     # prima del calcio d'inizio, con l'ora. Non si cancella mai: serve proprio a misurare a posteriori.
     MOV_KEYS = {"1x2", "ou1.5", "ou2.5", "ou3.5", "gg", "x.c1x2", "x.cdc", "x.s1x2", "x.st1x2", "x.f1x2", "x.fdc", "x.y1x2", "x.ydc", "x.off.offsides_1x2",
-                "m.1x2", "m.ou1.5", "m.ou2.5", "m.ou3.5", "m.gg", "m.c1x2", "m.s1x2", "m.st1x2", "m.f1x2", "m.y1x2", "m.off.offsides_1x2"}
+                "m.1x2", "m.ou1.5", "m.ou2.5", "m.ou3.5", "m.gg", "m.c1x2", "m.s1x2", "m.st1x2", "m.f1x2", "m.y1x2", "m.off.offsides_1x2", "m.cdc", "m.fdc", "m.ydc"}
     if allq:
         hp = os.path.join(OUT, "odds_hist.json")
         OH = jload_archive(hp)
