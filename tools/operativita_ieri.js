@@ -14,11 +14,12 @@ process.on("uncaughtException", e => { console.log("::warning title=Operatività
 const html = fs.readFileSync(path.join(DIR, "index.html"), "utf8");
 const start = html.indexOf("<script>") + 8, end = html.indexOf("/* ===== FINE MODELLO");
 const blk = (a, b) => { const i = html.indexOf(a), j = html.indexOf(b, i); if (i < 0 || j < 0) throw new Error("blocco non trovato: " + a); return html.slice(i, j); };
-const CODE = blk("const BK_ROWS", "\nlet QMOV") + "\nvar QMOV = null;\n" + blk("const isVal", "function off1x2HTML") + "\n" + blk("const NO_1XBET", "const qWhen") + "\n" + blk("let CORR = null", "const opCassa");
+const CUPB = "\nvar CUR = null;\n" + blk("/* ===== Champions League (13/10/2026)", "/* ===== Scheda partita");   // 8/11/2026: nazionali (naz.json) come le coppe
+const CODE = CUPB + blk("const BK_ROWS", "\nlet QMOV") + "\nvar QMOV = null;\n" + blk("const isVal", "function off1x2HTML") + "\n" + blk("const NO_1XBET", "const qWhen") + "\n" + blk("let CORR = null", "const opCassa");
 const noop = () => {};
 const ctx = vm.createContext({ console, Math, Date, JSON, Intl, Map, Set, Number, String, Object, Array, isFinite, isNaN, parseFloat, parseInt, Infinity, NaN, Float64Array, WeakMap,
   document: { addEventListener: noop, querySelector: () => null, querySelectorAll: () => [] }, localStorage: { getItem: () => null, setItem: noop, removeItem: noop }, matchMedia: () => ({ matches: false }), performance: { now: () => Date.now() } });
-vm.runInContext(html.slice(start, end) + "\nvar LINEE = null;\n" + CODE + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, isoD, addDays, withLeague, attachOffs, opEntry, opSelect, opKelly, OP_C, setCorr: c => { CORR = c; OP_C.clear(); }, setOdds: (q, l) => { QMOV = q; LINEE = l; } };", ctx);
+vm.runInContext(html.slice(start, end) + "\nvar LINEE = null;\n" + CODE + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, nazEntries, setNaz: j => { CUPD.NAZ = j; }, isoD, addDays, withLeague, attachOffs, opEntry, opSelect, opKelly, OP_C, setCorr: c => { CORR = c; OP_C.clear(); }, setOdds: (q, l) => { QMOV = q; LINEE = l; } };", ctx);
 const A = ctx.API;
 const rd = f => { try { return fs.readFileSync(path.join(DATA, f), "utf8"); } catch (e) { return null; } };
 for (const [v, f] of [["EXTRA", "extra.json"], ["MERCATI", "mercati.json"], ["TAREA", "tiri_area.json"], ["FORMAZ", "formazioni.json"], ["OFFS", "fuorigioco.json"]]) {
@@ -49,7 +50,9 @@ function kLine(q) {   // linea Over/Under cartellini più equilibrata (come upda
   return best ? [best[1], best[2], best[3], 0] : null;
 }
 let nUpd = 0, nRes = 0, nRic = 0;
-const seen = new Set(), entries = A.allEntries(t0, 8).filter(e => !seen.has(e.id) && seen.add(e.id));
+// 8/11/2026 (Denny): anche le nazionali (previsioni da naz.json, file dell'app)
+try { const nj = JSON.parse(fs.readFileSync(path.join(DIR, "data", "naz.json"), "utf8")); A.setNaz(nj); } catch (e) {}
+const seen = new Set(), entries = A.allEntries(t0, 8).concat(A.nazEntries().filter(e => e.d >= A.addDays(t0, -8) && e.d <= A.addDays(t0, 14))).filter(e => !seen.has(e.id) && seen.add(e.id));
 A.setCorr(CORR); A.setOdds(QMOV, LINEE);
 for (const e of entries) {
   if (e.lg.noStats) continue;

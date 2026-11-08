@@ -26,6 +26,7 @@ const RT = vm.runInContext("OFF_R_TEAM", ctx);
 const q = (v, part, k) => { const x = v[part] && v[part].q && v[part].q[k]; const o = Array.isArray(x) ? x[0] : x; return o > 1 ? o : null; };
 const out = []; let nPl = 0;
 for (const [key, v] of Object.entries(OH)) {
+  if (key.startsWith("NAZ|")) continue;   // 8/11/2026: nazionali fuori dagli studi (solo scheda partita)
   const m = A.S.matches.get(key); if (!m || m.hg == null) continue;
   nPl++;
   const [lg, d, h, a] = key.split("|"), es = ES[key] || {};

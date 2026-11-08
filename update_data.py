@@ -825,6 +825,20 @@ try:
                 if f"{lg_}.csv" not in files: files.append(f"{lg_}.csv")
                 print("campionato API-Football", lg_, len(rows_) - 1, "partite")
         except Exception as e_: print("campionato API-Football", lg_, e_)
+    # 8/11/2026: nazionali (tools/naz_model.py, ramo nazionali scaricato in nazionali/): file NAZ come un campionato solo API-Football
+    # (precedenti, rendimento, statistiche delle partite giocate); le previsioni arrivano da data/naz.json come per le coppe
+    NAZ_A = {}
+    try:
+        _nf = os.path.join(os.path.dirname(OUT), "nazionali", "NAZ.json")
+        if os.path.exists(_nf):
+            NAZ_A = json.load(open(_nf)).get("partite", {})
+            import sys; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools")); from naz_nomi import it as NAZ_IT   # nomi in italiano
+            rows_ = apif_extra.build_csv("NAZ", "Nazionali", [[v[0], "NAZ", NAZ_IT(v[2]), NAZ_IT(v[3]), v[4], v[5], v[6], v[7], v[8], v[9]] for v in NAZ_A.values()], True, ROME, today.year - 7)
+            if len(rows_) > 1:
+                buf = io.StringIO(); csv.writer(buf, lineterminator="\n").writerows(rows_); save("NAZ.csv", buf.getvalue())
+                if "NAZ.csv" not in files: files.append("NAZ.csv")
+                print("nazionali:", len(rows_) - 1, "partite")
+    except Exception as e_: print("nazionali", e_)
     # nostre partite (giocate e in calendario) per abbinare i nomi e le date
     ours, pairs = collections.defaultdict(list), collections.defaultdict(list)
     for fn in files:
@@ -1311,6 +1325,16 @@ if ODDS_FULL or ODDS_NEAR:
                 ours.setdefault(r["Div"].strip(), set()).add((dd, r["HomeTeam"].strip(), r["AwayTeam"].strip()))
         except Exception as e:
             print("quote: calendario", fn, e)
+    # 8/11/2026: nazionali (partite in arrivo dall'archivio di naz_model.py; nomi = quelli di API-Football), quote archiviate da subito
+    NAZ_IDS = (1, 4, 5, 960, 32, 34, 31, 30, 29, 9, 6)
+    try:
+        for v in (globals().get("NAZ_A") or {}).values():
+            if v[9] in ("NS", "TBD") or v[9] in ("1H", "HT", "2H", "ET", "P", "BT", "LIVE"):
+                _dl = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(ROME).date()
+                ours.setdefault("NAZ", set()).add((_dl, NAZ_IT(v[2]), NAZ_IT(v[3])))
+                globals().setdefault("MAPS", {}).setdefault("NAZ", {}).update({v[2]: NAZ_IT(v[2]), v[3]: NAZ_IT(v[3])})   # nome API → nome italiano (abbinamento delle quote)
+        for _i in NAZ_IDS: BY_ID[_i] = "NAZ"
+    except Exception as e: print("quote: nazionali", e)
     def pick(lg, dd, h, a):   # sfida del nostro calendario che corrisponde (stesso campionato, ±1 giorno), altrimenti None
         cand = [(d, x, y) for d, x, y in ours.get(lg, ()) if abs((d - dd).days) <= 1]
         if not cand: return None

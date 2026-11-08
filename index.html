@@ -556,7 +556,7 @@ select{pointer-events:none}
 .opx{grid-area:x;display:flex;flex-direction:column;gap:2px;min-width:0}.opmk{font-weight:700;font-size:13.5px}.opx small{font-size:11.5px;line-height:1.35}
 .opw{grid-area:w;display:flex;flex-direction:column;align-items:flex-end;font-variant-numeric:tabular-nums}.opw b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--gold)}.opw small{font-size:11px;color:var(--ink-3)}
 .opw.in{display:inline-flex;flex-direction:row;gap:6px;align-items:baseline;margin-left:6px}
-.qbk{font-size:inherit;color:var(--ink-3);font-weight:400}.qbk2{display:block;font-size:11px;line-height:1.25;color:var(--ink-3);font-weight:400}.qr .qbk{display:block;font-size:10.5px;white-space:nowrap;color:var(--ink-3);font-weight:500}.bk-mx{display:block;font-size:10.5px;color:var(--ink-3);font-weight:500}.qmin{margin:6px 10px 2px;padding:6px 8px;border:1px dashed var(--line);border-radius:6px}.qmin p{margin:2px 0}
+.qbk{font-size:inherit;color:var(--ink-3);font-weight:400}.ucomp{grid-column:1/-1;font-size:11px;color:var(--ink-3);font-weight:400}.navv{margin:8px 0 0;padding:8px 10px;border-radius:8px;border:1px dashed var(--line);font-size:12px;color:var(--ink-2)}.qbk2{display:block;font-size:11px;line-height:1.25;color:var(--ink-3);font-weight:400}.qr .qbk{display:block;font-size:10.5px;white-space:nowrap;color:var(--ink-3);font-weight:500}.bk-mx{display:block;font-size:10.5px;color:var(--ink-3);font-weight:500}.tscroll{overflow-x:auto}.qmin{margin:6px 10px 2px;padding:6px 8px;border:1px dashed var(--line);border-radius:6px}.qmin p{margin:2px 0}
 .opxi,.opct{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:var(--hot);color:var(--hot-ink)}.opct{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
 .opcomb{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 6px;background:var(--surface-2)}.opch{margin:0 0 4px;font-size:13px}.opleg{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:5px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}.opleg b{font-size:13px}.opleg span{font-size:12px;color:var(--ink-2)}
 .opdone{cursor:default}.opnuc{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:color-mix(in srgb,var(--good) 22%,transparent);color:var(--good)}.opw .oppos{color:var(--good);font-weight:700}.opw .opneg{color:var(--dot-r);font-weight:700}.opw .mk{margin-top:2px}
@@ -1126,6 +1126,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <p><b>Valori per tempo.</b> Sotto tiri, tiri in porta e corner la Lettura mostra i valori attesi del 1° e del 2° tempo: valore atteso della partita × quota del 1° tempo del campionato per sede, calcolata dai soli dati reali per tempo di API-Football (dalla stagione 2024-25, solo partite in cui i due tempi sommati coincidono con il totale; campionati con almeno 200 partite). Falli: API-Football non dà i dati per tempo.</p>
       <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote dei bookmaker): quote controllate circa ogni 30 minuti, risultati e statistiche circa ogni ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football. In Radar, Segnali e pallini della home gli 1X2 di corner, tiri, tiri in porta, falli e fuorigioco compaiono solo nei campionati dove 1xBet li quota (almeno 5 delle ultime 10 partite, in un giorno qualsiasi degli ultimi 21, calcolato a ogni aggiornamento sull'archivio delle quote); nella scheda partita ci sono sempre. Quote: dal 7/11/2026 l'app mostra e usa nei calcoli la <b>media dei bookmaker</b> che API-Football passa per quel mercato, tolte le quote fuori linea (oltre il 12% dalla mediana: linee ferme o errori), con accanto quanti book e la quota più alta con il suo book, es. 1,92 (media 4 book · max 2,00 Betano); dove c'è un solo book si usa quello (per 1X2 di falli, gialli e fuorigioco di solito solo 1xBet o nessuno). Gli studi già fissati (Grado, Quota 2/3, Controtendenza, sistema) restano misurati su 1xBet; la media dei book è seguita in parallelo. Le quote arrivano solo tramite API-Football: quando una quota non arriva compare <b>N.D.</b> (non significa che i book non offrano il mercato); una quota che la fonte non passa più è indicata con l'ora in cui è stata vista l'ultima volta. Un controllo automatico segnala quando la fonte smette di passare un mercato (dal 24/10/2026 succede per falli, gialli e fuorigioco); una partita spostata di data conserva le quote viste prima dello spostamento. Nel Radar Mercato si vedono di base solo le giocate con riuscita almeno 65% (le altre con "Tutte"); quelle dal 70% sono segnate "70%+". Verifica sull'archivio 1xBet dal 9 al 27/10/2026 (1.207 giocate proposte): senza soglia presa 52% contro 61% dichiarato, rendimento −4%; dal 65% presa 59% e 64% nelle due metà del periodo, rendimento +2% e +11% (margini d'errore ancora ampi). Resta "in verifica": la soglia si giudica solo sulle partite dal 27/10 in avanti (lettura il 7/12, decisione il 18/1). Scegliendo un giorno passato nella tendina Data (fino a 7 giorni fa) il Radar Mercato mostra le giocate di quel giorno con valore reale ed esito (✓/✗), il riepilogo del giorno e degli ultimi 7 giorni (prese, probabilità dichiarata in media, rendimento a puntata fissa): dal 28/10 sono le giocate bloccate al calcio d'inizio, cioè l'ultima versione vista prima del fischio, con la linea e la quota di quel momento; i giorni precedenti sono ricostruiti con i soli dati precedenti alla partita e segnati. Le formazioni ufficiali sono prese da API-Football circa 60-20 minuti prima del fischio (controllo ogni 10 minuti, con un secondo tentativo nello stesso giro); un rapporto giornaliero conta quante sono state prese prima del fischio e quali sono mancate.</p>
       <p><b>Operatività (Radar, in verifica).</b> Per le partite da giocare del giorno scelto: probabilità corretta (Prevista e media dei book senza margine; pesi stimati ogni mattina su tutti i giorni già giocati dell'archivio 1xBet, il più lungo), solo esiti con quote attuali e valore atteso positivo, calcolato sulla quota media. Singole di statistiche (una per partita; dal 3/11 solo 1X2 corner, falli, fuorigioco, gialli, Over/Under cartellini totali e tiri totali: spenti 1X2 tiri, tiri in porta e corner per squadra, niente gol), Quota 2 e Quota 3 del giorno (valore atteso congiunto più alto, astensione se negativo) e Controtendenza (sfavorita dei book a quota 2,30 o più che Prevista dà più probabile della favorita, su corner, fuorigioco, gialli e falli). Peso: Kelly 1/8, al massimo 3% per giocata e 10% al giorno; puntata minima 0,20 €; cassa salvata solo sul telefono. Dal 2/11 ogni proposta è fissata nel registro quando compare (quota, probabilità corretta e peso di quel momento) e non cambia più: lo storico è lo stesso registro con l'esito. Calcoli su modelli ancora in verifica (lettura 7/12, decisione 18/1), non promesse di vincita. Quote da cercare: per 1X2 di falli, gialli e fuorigioco senza quota via API, con un segnale forte (Grado A o A+, spostamento dei falli di almeno 8 punti con le formazioni ufficiali, gialli con Prevista dal 60%), la quota minima sotto cui lasciar stare: 1,08 / probabilità prudente (corretta come se il mercato fosse d'accordo con Prevista). Solo indicazione: non entra in pesi, registro e rendimenti.</p>
+      <p><b>Nazionali</b> (dall'8/11/2026): partite ufficiali (Mondiale, Europeo, Nations League, Copa América, Coppa d'Africa e qualificazioni; amichevoli escluse), dati API-Football dal 2020. Modello per squadra: fatti e subiti con peso che si dimezza ogni 18 mesi, ritirati verso la media (4 partite fittizie). Verifica walk-forward contro la media (scelta, verifica, holdout): chi ne fa di più su corner, tiri, tiri in porta, falli e cartellini migliore in tutti i periodi; totale di tiri, tiri in porta e falli migliore; totale dei corner come la media, totale dei cartellini peggio della media nell'ultimo periodo; fuorigioco non disponibili. Classifica = girone della partita. Grado, Radar, Operatività e Segnali usano le stesse regole dei club, non ancora verificate sulle nazionali.</p>
       <p><b>Media dinamica – tiri e tiri in porta.</b> Anche tiri e tiri in porta usano modelli verificati: regressioni di Poisson che partono dalla media di lega per sede (365 giorni). Tiri: rating tiri fatti × concessi degli ultimi 4 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4) con una parte casa/trasferta, tiri delle ultime 10 (fatti dalla squadra, concessi dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 ed Elo. Tiri in porta: rating tiri in porta (una partita di un anno fa pesa il 37%, prudenza P = 8), rating dei tiri totali (chi tira molto finisce per avere più tiri in porta), tiri delle ultime 8 ed Elo. Coefficienti stimati su 8 campionati, solo stagioni in cui football-data misura i tiri nello stesso modo (quota in porta fino al 40%); nel test walk-forward migliori della versione precedente in tutti gli 8 campionati e, per squadra, in ogni stagione. Totale: Binomiale Negativa r = 150 per i tiri e r = 100 per i tiri in porta; per squadra r = 25 e r = 40.</p>
       <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre, calcolato dall'app dai risultati delle partite dei giorni precedenti (le stesse stagioni caricate): nel test rende quasi quanto l'Elo ufficiale di ClubElo. Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è ancora, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG). Dal 18/10/2026 i gol attesi tengono conto anche della qualità dei tiri: a parità di tiri in porta, chi arriva più spesso al tiro dentro l'area (e l'avversario che lo concede) segna di più (tiri in area di API-Football, 365 giorni; nel test walk-forward con il codice dell'app su 17.119 partite da luglio 2025 le previsioni dei gol sono migliorate in entrambe le stagioni).</p>
       <p><b>Perché non c'è più la Media classica.</b> Fino al 19/10/2026 c'era anche la Media classica (casa = quanto fa in casa + quanto concede in trasferta l'ospite, diviso 2). Nel controllo su 44 campionati (stagioni 2023-24 – 2026-27, circa 32.000 partite per mercato, sempre con i soli dati dei giorni precedenti) prevedeva peggio della Dinamica in tutti i mercati (log-loss sul lato favorito: corner +0,029, falli +0,016, tiri +0,029, tiri in porta +0,026); i suoi gol erano già quelli della Dinamica. Anche la "concordanza" tra i due metodi non aiutava: le previsioni forti della Dinamica (dal 70%) che la Classica contraddiceva, il 7–11%, uscivano quanto le altre in corner, tiri e tiri in porta (nei falli un po' meno, su soli 264 casi).</p>
@@ -1701,9 +1702,12 @@ const LG = Object.fromEntries(LEAGUES.map(l => [l.code, l]));
 // Champions League (13/10/2026): solo per la scheda partita e il blocco "Coppe europee" di Partite; non è in LEAGUES, quindi resta fuori da Radar, Segnali, Tendenze e Digiuni
 LG.UCL = { code: "UCL", name: "Champions League", country: "Europa", file: "api/UCL.csv", newCountry: "UCL", api: true };
 LG.UEL = { code: "UEL", name: "Europa League", country: "Europa", file: "api/UEL.csv", newCountry: "UEL", api: true };   // 13/10/2026
-const CUPS = [{ code: "UCL", file: "ucl.json" }, { code: "UEL", file: "uel.json" }], CUPD = {}, isCup = c => CUPS.some(x => x.code === c);
+// 8/11/2026 (Denny): nazionali (partite ufficiali, amichevoli escluse) come le coppe: solo scheda partita e blocco in Partite; previsioni da
+// data/naz.json (tools/naz_model.py). 8/11/2026 sera (Denny): anche in Radar, Operatività, Grado e Segnali.
+LG.NAZ = { code: "NAZ", name: "Nazionali", country: "Nazionali", file: "api/NAZ.csv", newCountry: "NAZ", api: true, cal: true };
+const CUPS = [{ code: "UCL", file: "ucl.json" }, { code: "UEL", file: "uel.json" }, { code: "NAZ", file: "naz.json" }], CUPD = {}, isCup = c => CUPS.some(x => x.code === c);
 const lgName = l => `${l.country} · ${l.name}`;   // prima la nazione, poi il campionato
-const NEW_BY_COUNTRY = Object.fromEntries(LEAGUES.filter(l => l.newCountry).flatMap(l => [[l.newCountry, l.code], [l.code, l.code]])); NEW_BY_COUNTRY.UCL = "UCL"; NEW_BY_COUNTRY.UEL = "UEL";   // nome del paese o codice (GitHub riscrive la colonna con il codice)
+const NEW_BY_COUNTRY = Object.fromEntries(LEAGUES.filter(l => l.newCountry).flatMap(l => [[l.newCountry, l.code], [l.code, l.code]])); NEW_BY_COUNTRY.UCL = "UCL"; NEW_BY_COUNTRY.UEL = "UEL"; NEW_BY_COUNTRY.NAZ = "NAZ";   // nome del paese o codice (GitHub riscrive la colonna con il codice)
 const seasonLabel = (y, cal) => cal ? String(y) : `${y}/${String((y + 1) % 100).padStart(2, "0")}`;
 const numOrNull = v => (v === undefined || v === null || String(v).trim() === "") ? null : (isFinite(+v) ? +v : null);
 
@@ -3957,7 +3961,7 @@ $("#resetBtn").addEventListener("click", () => { lsDel(STORE_KEY); loadEmbedded(
 $("#swap").addEventListener("click", () => { CUR = null; S.cutoff = null; const h = $("#home").value; $("#home").value = $("#away").value; $("#away").value = h; render(); });
 ["#home", "#away"].forEach(s => $(s).addEventListener("change", () => { CUR = null; S.cutoff = null; render(); }));
 $("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; if (!$("#viewMatch").hidden) render(); renderNext(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewGen").hidden) renderGen(); if (!$("#viewRit").hidden) renderRit(); if (!$("#viewSel").hidden) renderSel(); });
-$("#league").innerHTML = LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("") + `<option value="UCL" hidden>Champions League</option><option value="UEL" hidden>Europa League</option>`;
+$("#league").innerHTML = LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("") + `<option value="UCL" hidden>Champions League</option><option value="UEL" hidden>Europa League</option><option value="NAZ" hidden>Nazionali</option>`;
 $("#league").addEventListener("change", e => { CUR = null; S.cutoff = null; S.league = e.target.value; let sv = {}; try { sv = JSON.parse(lsGet(PICK_KEY) || "{}") || {}; } catch (x) {} sv.league = S.league; lsSet(PICK_KEY, JSON.stringify(sv)); refreshAll(); });
 
 /* ===== Quote inserite dall'utente (salvate solo su questo telefono) ===== */
@@ -4194,6 +4198,7 @@ function renderSched() {
 /* ===== Champions League (13/10/2026): previsioni per squadra da data/ucl.json (tools/ucl_model.py su GitHub: rating comune campionati + coppe,
    ricalcolato a ogni giro con i risultati nuovi; per ogni statistica il modello con l'errore più basso sulle partite già giocate) ===== */
 const uclEntries = () => CUPS.flatMap(c => CUPD[c.code] && CUPD[c.code].partite ? CUPD[c.code].partite.map(x => uclEntry(x, c.code)) : []);
+const nazEntries = () => CUPD.NAZ && CUPD.NAZ.partite ? CUPD.NAZ.partite.map(x => uclEntry(x, "NAZ")) : [];   // 8/11/2026: nazionali in Radar, Operatività e Segnali
 function uclRound(r) {
   const m = /League Stage - (\d+)/.exec(r || ""); if (m) return `Fase campionato · ${m[1]}ª giornata`;
   return { "Knockout Round Play-offs": "Spareggi fase a eliminazione", "Round of 16": "Ottavi di finale", "Quarter-finals": "Quarti di finale", "Semi-finals": "Semifinali", "Final": "Finale" }[r] || r || "";
@@ -4208,20 +4213,22 @@ function uclRowHTML(e) {
     <span class="tt"><span class="${r && r[0] > r[1] ? "w" : ""}">${uLogo(x.lh)}${esc(x.h)}</span><b>${r ? r[0] : ""}</b><span class="${r && r[1] > r[0] ? "w" : ""}">${uLogo(x.la)}${esc(x.a)}</span><b>${r ? r[1] : ""}</b></span>
   </button>`;
 }
-function uclBlockHTML(list) {   // "Coppe europee": un blocco per coppa (Champions, poi Europa League)
-  return `<div class="lgsec">Coppe europee<small>${list.length} partite</small></div>` + CUPS.map(c => {
-    const L = list.filter(e => e.lg.code === c.code); if (!L.length) return "";
-    const cl = !SCHED.open.has(c.code);
-    return `<section class="lgblock${cl ? " closed" : ""}" aria-label="${esc(LG[c.code].name)}" data-lg="${c.code}">
-    <button type="button" class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">🏆</span><span class="nm"><small>Europa</small><b>${esc(LG[c.code].name)}</b></span><span class="cnt">${L.length}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
-    ${L.map(uclRowHTML).join("")}</section>`; }).join("");
+function uclBlockHTML(list) {   // "Coppe europee": un blocco per coppa (Champions, poi Europa League); 8/11/2026: "Nazionali", un blocco per competizione
+  const blk = (key, title, small, flag, L) => { const cl = !SCHED.open.has(key);
+    return `<section class="lgblock${cl ? " closed" : ""}" aria-label="${esc(title)}" data-lg="${esc(key)}">
+    <button type="button" class="lghead" aria-expanded="${!cl}"><span class="flag" aria-hidden="true">${flag}</span><span class="nm"><small>${esc(small)}</small><b>${esc(title)}</b></span><span class="cnt">${L.length}</span><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+    ${L.map(uclRowHTML).join("")}</section>`; };
+  const cup = list.filter(e => e.lg.code !== "NAZ"), naz = list.filter(e => e.lg.code === "NAZ");
+  const comps = [...new Set(naz.map(e => e.ucl.comp || "Nazionali"))];
+  return (cup.length ? `<div class="lgsec">Coppe europee<small>${cup.length} partite</small></div>` + CUPS.filter(c => c.code !== "NAZ").map(c => { const L = cup.filter(e => e.lg.code === c.code); return L.length ? blk(c.code, LG[c.code].name, "Europa", "🏆", L) : ""; }).join("") : "")
+    + (naz.length ? `<div class="lgsec">Nazionali<small>${naz.length} partite</small></div>` + comps.map(cn => blk("NAZ:" + cn, cn, "Nazionali", "🌍", naz.filter(e => (e.ucl.comp || "Nazionali") === cn))).join("") : "");
 }
 /* partita di Champions come voce del palinsesto: stessa scheda dei campionati (Lettura, Precedenti, Classifica, Rendimento, quote 1xBet).
    Precedenti, classifica e rendimento dal file UCL (API-Football, solo fase principale); i valori attesi da data/ucl.json. */
 function uclEntry(x, comp = "UCL") {
   const k = new Date(x.dt + "Z"), d = localIso(k), date = new Date(d + "T00:00:00Z");
   const m = [...S.matches.values()].find(q => q.div === comp && q.home === x.h && q.away === x.a && isoD(q.date) === d) || null;
-  return { id: `${comp}|${d}|${x.h}|${x.a}`, lg: LG[comp], date, d, time: `${String(k.getHours()).padStart(2, "0")}:${String(k.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a, m, ucl: x };
+  return { id: `${comp}|${d}|${x.h}|${x.a}`, lg: comp === "NAZ" && x.comp ? { ...LG.NAZ, name: x.comp } : LG[comp], date, d,   // nazionali: nome della competizione time: `${String(k.getHours()).padStart(2, "0")}:${String(k.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a, m, ucl: x };
 }
 const entryById = id => allEntries(localIso(), 30).find(x => x.id === id) || uclEntries().find(x => x.id === id) || null;
 /* previsione Champions della partita (quella congelata prima del calcio d'inizio se è già giocata) */
@@ -4247,7 +4254,8 @@ function openEntry(e, fromNav) {
   for (const t of [e.home, e.away]) if (![...$("#home").options].some(o => o.value === t)) { $("#home").add(new Option(t, t)); $("#away").add(new Option(t, t)); }
   $("#home").value = e.home; $("#away").value = e.away;
   S.cutoff = e.m ? e.date : null;
-  const gt = document.querySelector('.mtab[data-mt="sig"]'); if (gt) gt.style.display = isCup(e.lg.code) ? "none" : "";   // Champions: Grado non ancora verificato
+  const gt = document.querySelector('.mtab[data-mt="sig"]'); if (gt) gt.style.display = isCup(e.lg.code) && e.lg.code !== "NAZ" ? "none" : "";   // Champions: Grado non ancora verificato
+  const ct = document.querySelector('.mtab[data-mt="tab"]'); if (ct) ct.style.display = e.lg.code === "NAZ" && !nazGroup(e.home, e.away) ? "none" : "";   // nazionali: classifica del girone (se c'è)
   showView("match"); setMTab("prev"); render();
   scrollTo({ top: 0, behavior: "auto" });
 }
@@ -4313,11 +4321,18 @@ function standings(list, mode) {
   }
   return [...T.values()].sort((a, b) => b.pt - a.pt || (b.gf - b.gs) - (a.gf - a.gs) || b.gf - a.gf || a.t.localeCompare(b.t));
 }
+/* 8/11/2026: nazionali, classifica del girone della partita (naz.json: gironi ricostruiti dalle partite della stessa competizione) */
+function nazGroup(home, away) {
+  const D = CUPD.NAZ, x = D && uclPredFor(home, away), g = x && x.gruppo != null && D.gruppi ? D.gruppi[x.gruppo] : null; if (!g) return null;
+  const K = new Set(g.partite.map(p => p.join("|")));
+  return { nome: g.nome, list: [...S.matches.values()].filter(m => m.div === "NAZ" && K.has(`${isoD(m.date)}|${m.home}|${m.away}`)).sort((a, b) => a.date - b.date), squadre: g.squadre };
+}
 function renderTable(home, away) {
   const box = $("#tableOut"); if (!box) return;
   const c0 = S.cutoff; S.cutoff = null;
-  let list; try { list = seasonMatches(); } finally { S.cutoff = c0; }
+  let list, NG = null; try { NG = S.league === "NAZ" ? nazGroup(home, away) : null; list = NG ? NG.list : seasonMatches(); } finally { S.cutoff = c0; }
   const mode = MV.tab, rows = standings(list, mode === "form" || mode === "avg" ? "tot" : mode);
+  if (NG) for (const t of NG.squadre) if (!rows.some(r => r.t === t)) rows.push({ t, g: 0, v: 0, n: 0, p: 0, gf: 0, gs: 0, pt: 0, form: [], sum: {}, cnt: {} });   // girone appena iniziato
   $("#avgSeg").hidden = mode !== "avg";
   // medie: ordine della classifica generale, valori solo delle partite della sede scelta
   const sub = mode === "avg" ? new Map(standings(list, MV.avg).map(r => [r.t, r])) : null;
@@ -4336,7 +4351,7 @@ function renderTable(home, away) {
     body = rows.map((r, i) => `<tr${cls(r)}><td>${i + 1}</td>${nm(r)}<td>${r.g}</td><td>${r.v}</td><td>${r.n}</td><td>${r.p}</td><td>${r.gf}:${r.gs}</td><td><b>${r.pt}</b></td></tr>`);
   }
   const last = list.length ? list[list.length - 1].date : null;
-  box.innerHTML = `<h2>${esc(L_.name)} ${S.season != null ? seasonLabel(S.season, L_.cal) : ""}</h2>
+  box.innerHTML = `<h2>${NG ? esc(NG.nome) : `${esc(L_.name)} ${S.season != null ? seasonLabel(S.season, L_.cal) : ""}`}</h2>
     <p class="small muted" data-dz="keep" style="margin:0">${{ tot: "Classifica generale", home: "Solo partite in casa", away: "Solo partite in trasferta", form: "Ultime 5 partite, dalla più vecchia alla più recente", avg: `Medie a partita di quanto fa ogni squadra (fatti, non subiti) · ${{ tot: "tutte le partite", home: "solo in casa", away: "solo in trasferta" }[MV.avg]}` }[mode]} · ${list.length} partite, aggiornata al ${last ? dstr(last) : "N/D"}.</p>
     ${home && away && home !== away ? `<div class="stdleg"><span class="mh">${crest(S.league, home)}${esc(home)}</span><span class="ma">${crest(S.league, away)}${esc(away)}</span></div>` : ""}
     <div class="tbl-wrap std"><table><thead><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody>${body.join("")}</tbody></table></div>`;
@@ -4547,7 +4562,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
   const ini = t => t.replace(/[^A-Za-zÀ-ÿ0-9 ]/g, " ").split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]+$/.test(w)).map(w => w[0]).join("").slice(0, 3).toUpperCase() || t.slice(0, 3).toUpperCase();
   const badge = (t, fb) => { const u = logoOf(S.league, t); if (u) return `<span class="bdg lg"><img src="${esc(u)}" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('lg');this.parentElement.textContent='${esc(ini(t)).replace(/'/g, "")}'"></span>`;
     const c = clubCols(CRESTS[S.league] && CRESTS[S.league][t]); return `<span class="bdg" style="--c1:${c[0] || fb};--c2:${c[1] || c[0] || fb}" aria-hidden="true">${esc(ini(t))}</span>`; };
-  let tb = []; try { tb = standings(seasonMatches(), "tot"); } catch (x) {}
+  let tb = []; try { const NG = S.league === "NAZ" ? nazGroup(home, away) : null; tb = S.league === "NAZ" ? (NG ? standings(NG.list.filter(q => !S.cutoff || q.date < S.cutoff), "tot") : []) : standings(seasonMatches(), "tot"); } catch (x) {}   // nazionali: classifica del girone
   const pos = t => { const i = tb.findIndex(r => r.t === t); return i >= 0 ? `${i + 1}° · ${tb[i].pt} pt` : "&nbsp;"; };
   const x = extraFor(home, away);
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}` : "Confronto libero";
@@ -4590,7 +4605,8 @@ function matchHeroHTML(home, away, e, cfg, G) {
         : NO_1XBET.has(S.league) ? `<p class="bk-none">${NO_1XBET_TXT}</p>` : `<p class="bk-none">${S1 ? "Linee Over/Under" : "Linea"} non disponibil${S1 ? "i" : "e"} per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + S1 + RG_LINE
       ;
   }
-  return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Disciplina: arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button></span></div>
+  const nzc = S.league === "NAZ" && e && e.ucl && e.ucl.comp;   // nazionali: nome della competizione come per i campionati
+  return `<div class="sx-band"><span class="flag" aria-hidden="true">${nzc ? "🌍" : FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(nzc || L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Disciplina: arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button></span></div>
     <div class="sx">
       <div class="sx-r sx-h">
         <span class="sx-t">${badge(home, "var(--s1)")}<b>${esc(home)}</b><small>${pos(home)}</small></span>
@@ -4628,7 +4644,7 @@ function renderMatchExtras(home, away) {
   const G = home && away && home !== away ? modelGoals(home, away, cfg) : null;
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}` : "Confronto libero";
   $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G); HEROCTX = { home, away, e, cfg, G };
-  if (!isCup(S.league)) renderMatchConf(home, away, e, cfg);
+  if (!isCup(S.league) || S.league === "NAZ") renderMatchConf(home, away, e, cfg);
   $("#mref").hidden = true; REFCTX = { home, away, e };
   { const bx = $("#mxi"); let MFx = null; try { MFx = !m && home && away && home !== away ? model(home, away, cfg, "f") : null; } catch (x) {}   // formazioni ufficiali (fase 1-B)
     bx.hidden = !(MFx && MFx.xiF); bx.innerHTML = MFx && MFx.xiF ? xiBoxHTML(home, away, MFx) : ""; }   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
@@ -5358,7 +5374,7 @@ function selEntries() {   // partite da giocare nelle prossime SEL.h ore (orario
   // 30/10/2026 (Denny): un solo giorno, da 7 giorni fa a fra 7 giorni (Oggi + tendina Data); i giorni passati non hanno partite da giocare
   if (SEL.day < 0) return [];
   const want = addDays(localIso(), SEL.day);
-  return allEntries().filter(e => !e.m && e.d === want && !koStarted(e.d, e.time));   // una partita iniziata esce dal Radar
+  return allEntries().concat(nazEntries()).filter(e => !e.m && e.d === want && !koStarted(e.d, e.time));   // una partita iniziata esce dal Radar · 8/11/2026: anche le nazionali
 }
 /* Radar: giocate con valore sulla linea dei bookmaker (stesse probabilità della scheda match), solo partite con la linea disponibile */
 const BK_C = new Map();
@@ -5791,7 +5807,7 @@ function showView(v) {
   if (v === "rit") renderRit();
   if (v === "sel") renderSel();
 }
-$("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option><option value="UCL">Champions League</option><option value="UEL">Europa League</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
+$("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option><option value="UCL">Champions League</option><option value="UEL">Europa League</option><option value="NAZ">Nazionali</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#sigLeague", "#sigGames", "#sigC3"].forEach(id => $(id).addEventListener("change", renderSignals));
 $("#sigMode").addEventListener("change", () => { $("#decay").value = $("#sigMode").value; renderSignals(); renderNext(); });
 $("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; });
@@ -5955,7 +5971,7 @@ addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
   if (online) getData("fuorigioco.json").then(j => { if (j && j.campionati) { OFFS = j; attachOffs(); clearCache(); if (typeof STATC !== "undefined") STATC.clear(); CONF_C.clear(); CONF_MR.clear(); ROWC.clear(); RIT_P.clear(); if (!$("#viewSel").hidden) renderSel(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewRit").hidden) renderRit(); if (!$("#viewGen").hidden) renderGen(); if (!$("#viewMatch").hidden && HEROCTX) { const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); } } }).catch(() => {});
   if (online) getData("quote_mov.json").then(j => { QMOV = j || { partite: {} }; if (!$("#viewSel").hidden) renderSel(); if (!$("#viewSig").hidden) renderSignals(); if (!$("#viewMatch").hidden) { renderQuote(); if (MV.hero === "bk" && HEROCTX) { const H = HEROCTX; $("#mhead").innerHTML = matchHeroHTML(H.home, H.away, H.e, H.cfg, H.G); } } }).catch(() => { QMOV = { partite: {} }; });
   // Champions League: previsioni pronte (dopo l'avvio); link #u=… alla partita
-  if (online) for (const C of CUPS) getData(C.file).then(j => { if (!j) return; CUPD[C.code] = j; if (typeof clearCache === "function") clearCache(); GEN_NEXT.clear();
+  if (online) for (const C of CUPS) getData(C.file).then(j => { if (!j) return; CUPD[C.code] = j; if (j.loghi) LOGOS[C.code] = j.loghi; if (typeof clearCache === "function") clearCache(); GEN_NEXT.clear();
     if (!$("#viewSig").hidden) renderSignals();
     if (!$("#viewStats").hidden) renderSched();
     const hm = new RegExp("^#p=(" + C.code + ".+)$").exec(location.hash), e = hm && entryById(decodeURIComponent(hm[1]));
@@ -5992,7 +6008,7 @@ async function reloadIfNew() {
     if (OPIERI && ch("operativita_ieri")) { const q = await getData("operativita_ieri.json", "json", ST); if (q) OPIERI = q; }
     if (CORR && ch("corretta")) { const q = await getData("corretta.json", "json", ST); if (q && q.gruppi) { CORR = q; OP_C.clear(); } }
     if (MIERI && ch("mercato_ieri")) { const q = await getData("mercato_ieri.json", "json", ST); if (q) MIERI = q; }
-    for (const C of CUPS) if (ch(C.file.slice(0, -5))) { const j = await getData(C.file, "json", ST); if (j) CUPD[C.code] = j; }
+    for (const C of CUPS) if (ch(C.file.slice(0, -5))) { const j = await getData(C.file, "json", ST); if (j) { CUPD[C.code] = j; if (j.loghi) LOGOS[C.code] = j.loghi; } }
     try { BK_C.clear(); OP_C.clear(); RIT_P.clear(); CONF_MR.clear(); GEN_NEXT.clear(); refStats.idx = null; clearCache(); } catch (e) {}
     const inMatch = !$("#viewMatch").hidden;
     refreshAll();

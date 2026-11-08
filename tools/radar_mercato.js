@@ -44,6 +44,7 @@ function lines(q) {   // come update_data.py (linee.json)
 }
 const rows = [], ALL = []; let nPl = 0, nLB = 0;
 for (const [key, v] of Object.entries(OH)) {
+  if (key.startsWith("NAZ|")) continue;   // 8/11/2026: nazionali fuori dagli studi (solo scheda partita)
   const m = A.S.matches.get(key); if (!m || m.hg == null) continue;
   nPl++;
   const LB = lines((v.ultima || {}).q || {}); if (!Object.keys(LB).length) continue;
