@@ -54,6 +54,9 @@ jobs:
           rm -rf valori && mkdir -p valori
           if git ls-remote --exit-code origin valori >/dev/null 2>&1; then (git fetch -q --depth 1 origin valori && git archive FETCH_HEAD | tar -x -C valori) || echo "::warning title=Valori giocatori::ramo valori non scaricato: niente correzione dei falli in questo giro"; fi
           # 26/10/2026: formazioni prese dal micro-processo (formazioni_live.yml, ramo xi)
+          # 8/11/2026: nazionali (naz_model.py, ramo nazionali): archivio per il file NAZ dell'app e le quote, previsioni naz.json
+          rm -rf nazionali && mkdir -p nazionali
+          if git ls-remote --exit-code origin nazionali >/dev/null 2>&1; then (git fetch -q --depth 1 origin nazionali && git archive FETCH_HEAD | tar -x -C nazionali && cp nazionali/naz.json data/naz.json) || echo "::warning title=Nazionali::ramo nazionali non scaricato"; fi
           rm -rf xi_live && mkdir -p xi_live
           if git ls-remote --exit-code origin xi >/dev/null 2>&1; then (git fetch -q --depth 1 origin xi && git archive FETCH_HEAD | tar -x -C xi_live) || echo "::warning title=Formazioni ufficiali::ramo xi non scaricato"; fi
       - uses: actions/setup-python@v5
@@ -96,7 +99,7 @@ jobs:
           APP="index.html manifest.webmanifest icon.svg icon-maskable.svg icon-*.png mona-sans.woff mona-sans-OFL.txt sw.js og.png"
           # 30/10/2026: coefficienti della probabilità corretta per la vista Operatività (corretta.yml, ramo corretta; solo numeri aggregati)
           if git ls-remote --exit-code origin corretta >/dev/null 2>&1; then (git fetch -q --depth 1 origin corretta && git show FETCH_HEAD:corretta.json > data/corretta.json) || rm -f data/corretta.json; fi
-          DATA="corretta.json operativita.json operativita_ieri.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json tempi.json fuorigioco.json tiri_area.json"
+          DATA="corretta.json operativita.json operativita_ieri.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json naz.json tempi.json fuorigioco.json tiri_area.json"
           # 26/10/2026: il micro-processo delle formazioni (formazioni_live.yml) può aver pubblicato formazioni durante questo giro: si tengono
           # (unione con quelle già sul sito, quelle di questo giro hanno la precedenza; via dopo 3 ore dal fischio come in update_data.py)
           git fetch -q --depth 1 origin pages 2>/dev/null && git show FETCH_HEAD:data/formazioni.json > /tmp/fz_sito.json 2>/dev/null || true

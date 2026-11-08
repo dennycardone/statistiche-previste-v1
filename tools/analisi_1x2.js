@@ -30,6 +30,7 @@ const MK = [["c", "Corner 1X2", /^x\.c1x2:(.+)$/], ["s", "Tiri 1X2", /^x\.s1x2:(
 const odds3 = (q, re) => { const o = [null, null, null]; for (const [k, v] of Object.entries(q || {})) { const m = re.exec(k); if (m && SEL[m[1]] != null && v[0] > 1) o[SEL[m[1]]] = v[0]; } return o.every(x => x) ? o : null; };
 const rows = []; let nPl = 0;
 for (const [key, v] of Object.entries(OH)) {
+  if (key.startsWith("NAZ|")) continue;   // 8/11/2026: nazionali fuori dagli studi (solo scheda partita)
   const m = A.S.matches.get(key); if (!m || m.hg == null) continue;
   nPl++;
   const [lg, d, h, a] = key.split("|"), es = ES[key] || {};

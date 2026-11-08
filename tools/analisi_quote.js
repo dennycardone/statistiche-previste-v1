@@ -25,7 +25,7 @@ const cdf = (pmf, L) => { let o = 0, eq = 0; pmf.forEach((p, k) => { if (k > L) 
 const conv = (ph, pa) => { const out = new Array(ph.length + pa.length).fill(0); ph.forEach((x, i) => pa.forEach((y, j) => out[i + j] += x * y)); return out; };
 const rows = [];
 let nMatch = 0, nPlayed = 0;
-for (const [k, v] of Object.entries(OH)) {
+for (const [k, v] of Object.entries(OH)) { if (k.startsWith("NAZ|")) continue;   // 8/11/2026: nazionali fuori
   nMatch++;
   const m = A.S.matches.get(k); if (!m || m.hg == null) continue;
   nPlayed++;
