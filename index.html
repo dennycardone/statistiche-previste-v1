@@ -4253,6 +4253,7 @@ function openEntry(e, fromNav) {
   $("#home").value = e.home; $("#away").value = e.away;
   S.cutoff = e.m ? e.date : null;
   const gt = document.querySelector('.mtab[data-mt="sig"]'); if (gt) gt.style.display = isCup(e.lg.code) ? "none" : "";   // Champions: Grado non ancora verificato
+  const ct = document.querySelector('.mtab[data-mt="tab"]'); if (ct) ct.style.display = e.lg.code === "NAZ" ? "none" : "";   // nazionali: classifica senza senso
   showView("match"); setMTab("prev"); render();
   scrollTo({ top: 0, behavior: "auto" });
 }
@@ -4577,7 +4578,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
   const badge = (t, fb) => { const u = logoOf(S.league, t); if (u) return `<span class="bdg lg"><img src="${esc(u)}" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('lg');this.parentElement.textContent='${esc(ini(t)).replace(/'/g, "")}'"></span>`;
     const c = clubCols(CRESTS[S.league] && CRESTS[S.league][t]); return `<span class="bdg" style="--c1:${c[0] || fb};--c2:${c[1] || c[0] || fb}" aria-hidden="true">${esc(ini(t))}</span>`; };
   let tb = []; try { tb = standings(seasonMatches(), "tot"); } catch (x) {}
-  const pos = t => { const i = tb.findIndex(r => r.t === t); return i >= 0 ? `${i + 1}° · ${tb[i].pt} pt` : "&nbsp;"; };
+  const pos = t => { if (S.league === "NAZ") return "&nbsp;"; const i = tb.findIndex(r => r.t === t); return i >= 0 ? `${i + 1}° · ${tb[i].pt} pt` : "&nbsp;"; };   // nazionali: nessuna classifica
   const x = extraFor(home, away);
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}` : "Confronto libero";
   let M = null, MF = null, MT = null; try { M = model(home, away, cfg); MF = model(home, away, cfg, "f"); MT = modelShots(home, away, cfg); } catch (err) {}
