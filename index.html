@@ -556,7 +556,7 @@ select{pointer-events:none}
 .opx{grid-area:x;display:flex;flex-direction:column;gap:2px;min-width:0}.opmk{font-weight:700;font-size:13.5px}.opx small{font-size:11.5px;line-height:1.35}
 .opw{grid-area:w;display:flex;flex-direction:column;align-items:flex-end;font-variant-numeric:tabular-nums}.opw b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--gold)}.opw small{font-size:11px;color:var(--ink-3)}
 .opw.in{display:inline-flex;flex-direction:row;gap:6px;align-items:baseline;margin-left:6px}
-.qbk{font-size:inherit;color:var(--ink-3);font-weight:400}.qbk2{display:block;font-size:11px;line-height:1.25;color:var(--ink-3);font-weight:400}.qr .qbk{display:block;font-size:10.5px;white-space:nowrap;color:var(--ink-3);font-weight:500}.bk-mx{display:block;font-size:10.5px;color:var(--ink-3);font-weight:500}.qmin{margin:6px 10px 2px;padding:6px 8px;border:1px dashed var(--line);border-radius:6px}.qmin p{margin:2px 0}
+.qbk{font-size:inherit;color:var(--ink-3);font-weight:400}.qbk2{display:block;font-size:11px;line-height:1.25;color:var(--ink-3);font-weight:400}.qr .qbk{display:block;font-size:10.5px;white-space:nowrap;color:var(--ink-3);font-weight:500}.bk-mx{display:block;font-size:10.5px;color:var(--ink-3);font-weight:500}.combo table th small{display:block}.tscroll{overflow-x:auto}.qmin{margin:6px 10px 2px;padding:6px 8px;border:1px dashed var(--line);border-radius:6px}.qmin p{margin:2px 0}
 .opxi,.opct{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:var(--hot);color:var(--hot-ink)}.opct{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
 .opcomb{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 6px;background:var(--surface-2)}.opch{margin:0 0 4px;font-size:13px}.opleg{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:5px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}.opleg b{font-size:13px}.opleg span{font-size:12px;color:var(--ink-2)}
 .opdone{cursor:default}.opnuc{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:color-mix(in srgb,var(--good) 22%,transparent);color:var(--good)}.opw .oppos{color:var(--good);font-weight:700}.opw .opneg{color:var(--dot-r);font-weight:700}.opw .mk{margin-top:2px}
@@ -4504,6 +4504,29 @@ function qMinCerca(e, key, p, R) {
   }
   return best;
 }
+/* 8/11/2026 (Denny): combo corner casa + ospite (Over casa e Over ospite insieme). Nessun book la passa via API-Football: la si stima.
+   Probabilità di Prevista = Over casa × Over ospite (corner attesi e dispersione di squadra del modello corner, le due squadre trattate come
+   indipendenti). Linee: quelle principali dei book per squadra e una sotto ciascuna. Quota equa dei book = prodotto delle due singole senza
+   margine (solo sulle linee che i book quotano). Quota minima da cercare = 1,08 / probabilità di Prevista. Solo indicazione, in verifica. */
+function comboCornerHTML(e, m, M, LB) {
+  if (!M || !(M.lh > 0) || !(M.la > 0)) return "";
+  const r = M.rTeam != null ? M.rTeam : M.r, pO = (mu, L) => pOver(pmfTotal(mu, r, Math.ceil(L) + 30), L);
+  const hc = LB && LB.hc, ac = LB && LB.ac, Lh = hc ? hc[0] : Math.floor(M.lh) - 0.5, La = ac ? ac[0] : Math.floor(M.la) - 0.5;
+  const nv = c => c && c[1] > 1 && c[2] > 1 ? (1 / c[1]) / (1 / c[1] + 1 / c[2]) : null, bh = nv(hc), ba = nv(ac);
+  const rows = [];
+  for (const A of [Lh - 1, Lh]) for (const B of [La - 1, La]) {
+    if (A < 0.5 || B < 0.5) continue;
+    const ph = pO(M.lh, A), pa = pO(M.la, B), p = ph * pa;
+    const book = A === Lh && B === La && bh && ba ? 1 / (bh * ba) : null;
+    const real = m && m.hc != null && m.ac != null ? (m.hc > A && m.ac > B) : null;
+    rows.push(`<tr${real === true ? ' class="hit"' : ""}><th>O ${th1(A)} + O ${th1(B)}<small class="muted">${real != null ? `${real ? "✓" : "✗"} reale ${m.hc}-${m.ac}` : `${pc(ph)} · ${pc(pa)}`}</small></th>
+      <td><b>${pc(p)}</b></td><td class="num">${f2(1 / p)}</td><td class="num">${book ? f2(book) : "—"}</td><td class="num"><b>${f2((1 + QMIN_M) / p)}</b></td></tr>`);
+  }
+  if (!rows.length) return "";
+  return `<div class="bk1x2 combo"><p class="bk1x2-h"><b>Combo corner · casa + ospite</b> · ${esc(e.home)} Over e ${esc(e.away)} Over insieme · attesi ${f1(M.lh)} – ${f1(M.la)}</p>
+    <div class="tscroll"><table><thead><tr><th>Casa + ospite</th><th>Prob.</th><th>Equa</th><th>Book</th><th>Minima</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
+    <p class="bk1x2-n">Nessun book passa la combo via API-Football: confronta la <b>Minima</b> con la quota della combinata sul tuo sito; sotto, lascia stare. Prob. = Over casa × Over ospite di Prevista (squadre indipendenti; sotto la combo le due singole). Equa = 1 / Prob. Book = le due singole dei book senza margine moltiplicate (solo sulle linee principali${hc && ac ? `, ${th1(Lh)} e ${th1(La)}` : ", qui non quotate"}). Minima = Equa + 8%. In verifica: sulle singole i corner per squadra finora hanno reso in negativo.</p></div>`;
+}
 function stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB) {
   const lab = ["1", "X", "2"], rs = [];
   const add = (name, key, R, hr, ar, indep) => {
@@ -4587,7 +4610,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
     const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0);
     const S1 = NO_1XBET.has(S.league) && !LB ? "" : stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB);
     bkBody = (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
-        : NO_1XBET.has(S.league) ? `<p class="bk-none">${NO_1XBET_TXT}</p>` : `<p class="bk-none">${S1 ? "Linee Over/Under" : "Linea"} non disponibil${S1 ? "i" : "e"} per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + S1 + RG_LINE
+        : NO_1XBET.has(S.league) ? `<p class="bk-none">${NO_1XBET_TXT}</p>` : `<p class="bk-none">${S1 ? "Linee Over/Under" : "Linea"} non disponibil${S1 ? "i" : "e"} per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + S1 + comboCornerHTML(e, m, M, LB) + RG_LINE
       ;
   }
   return `<div class="sx-band"><span class="flag" aria-hidden="true">${FLAGS[L_.country] || "⚽"}</span><span class="nm"><small>${esc(L_.country)} · ${dt}</small><b>${esc(L_.name)}</b></span><span class="bx"><button class="ref refbtn" type="button" data-refsheet aria-label="Disciplina: arbitro e cartellini"><small>Arbitro <i class="ibtn sm">i</i></small>${x && x[0] ? esc(x[0]) : "da definire"}</button></span></div>
