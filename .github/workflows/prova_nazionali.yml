@@ -1,0 +1,15 @@
+name: Prova · nazionali (temporaneo, solo numeri aggregati)
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: [tools/p2/nazionali.py, .github/workflows/prova_nazionali.yml]
+permissions:
+  contents: read
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/p2/nazionali.py
+        env: { APIFOOTBALL_KEY: "${{ secrets.APIFOOTBALL_KEY }}" }
