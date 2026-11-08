@@ -3486,8 +3486,17 @@ function computeSignals(o) {
               mu = isCup(L.code) ? (uk && uk.k ? uk.k[0] + uk.k[1] : null) : x && x[4];
             if (!mu) continue;
             const P = cardProbs(mu); let pick = null;
+            // 8/11/2026 (Denny): se i book propongono una linea cartellini, il segnale è SOLO su quella linea (niente Over 3,5 con la linea a 5,5);
+            // soglia della linea più vicina tra 2,5 e 5,5. Senza linea dei book resta la regola di prima, segnata "linea nostra".
+            const LBk = bkLines({ id: `${L.code}|${isoD(f.date)}|${f.home}|${f.away}` }), bl = LBk && LBk.k && LBk.k[0];
+            if (bl) {
+              const al = EXTRA && EXTRA.alpha, po = pOver(pmfTotal(mu, al > 2e-4 ? 1 / al : Infinity, 30), bl), tl = Math.min(5.5, Math.max(2.5, bl));
+              if (po >= th("kO" + tl)) pick = { line: bl, fav: "Over " + th1(bl), p: po, bkl: true };
+              else if (1 - po >= th("kU" + tl)) pick = { line: bl, fav: "Under " + th1(bl), p: 1 - po, under: true, bkl: true };
+            } else {
             for (let i = CARD_LINES.length - 1; i >= 0; i--) if (P[i] >= th("kO" + CARD_LINES[i])) { pick = { line: CARD_LINES[i], fav: "Over " + th1(CARD_LINES[i]), p: P[i] }; break; }
             if (!pick) for (let i = 0; i < CARD_LINES.length; i++) if (1 - P[i] >= th("kU" + CARD_LINES[i])) { pick = { line: CARD_LINES[i], fav: "Under " + th1(CARD_LINES[i]), p: 1 - P[i], under: true }; break; }
+            }
             if (pick) rows.push({ id: sigId(L.code, f, mk), lg: L, f, mk, k: "k", g3: true, lh: mu / 2, la: mu / 2, tot: mu, draw: 0, ...pick });
           } else if (mk === "gg") {
             if (!G) continue;
@@ -3967,7 +3976,7 @@ function sigCardsHTML(rows, pref, withMatch = true, played = null) {
   const odds = getOdds();
   return `<div class="siglist">${rows.map((r, i) => {
     const o = odds[r.id], q = o && o.fav === r.fav ? o.q : null;
-    const detail = r.mk === "gg" ? `gol previsti ${f2(r.lh)} – ${f2(r.la)}` : r.team ? `${esc(r.team)} ne fa di più · ${f1(r.lh)} – ${f1(r.la)} · pari ${pc(r.draw)}` : `previsti ${r.k === "g" ? f2(r.tot) : f1(r.tot)}`;
+    const detail = r.mk === "gg" ? `gol previsti ${f2(r.lh)} – ${f2(r.la)}` : r.team ? `${esc(r.team)} ne fa di più · ${f1(r.lh)} – ${f1(r.la)} · pari ${pc(r.draw)}` : `previsti ${r.k === "g" ? f2(r.tot) : f1(r.tot)}${r.mk === "k" && !played ? (r.bkl ? " · linea dei book" : " · linea nostra, dei book N.D.") : ""}`;
     return `<div class="sig">
       <button type="button" class="sigopen" data-lg="${r.lg.code}" data-h="${esc(r.f.home)}" data-a="${esc(r.f.away)}" data-d="${isoD(r.f.date)}"${withMatch ? "" : " disabled"}>
         ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}

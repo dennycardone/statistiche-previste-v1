@@ -23,6 +23,7 @@ MK = {"corner 1X2": r"^corners 1x2$", "falli 1X2": r"^fouls\. 1x2$", "falli tota
       "gialli O/U": r"^yellow over/under$", "fuorigioco 1X2": r"^offsides 1x2$", "corner O/U": r"^corners over under$"}
 fx_tot, books = collections.Counter(), collections.defaultdict(collections.Counter); per_lg = collections.defaultdict(lambda: collections.defaultdict(collections.Counter))
 nbets = collections.defaultdict(list)
+cnames = collections.defaultdict(set)   # 8/11/2026: tutti i mercati con "corner" nel nome, per book (cerca combo casa+ospite)
 today = datetime.date.today()
 for k in (0, 1):
     d = str(today + datetime.timedelta(days=k)); page, pages = 1, 1
@@ -35,6 +36,8 @@ for k in (0, 1):
             for b in e.get("bookmakers", []):
                 names = [(bt.get("name") or "").lower() for bt in b.get("bets", [])]
                 books[b["name"]]["partite"] += 1; nbets[b["name"]].append(len(names))
+                for bt in b.get("bets", []):
+                    if re.search(r"corner", bt.get("name") or "", re.I): cnames[bt.get("name")].add(b["name"])
                 for lab, rx in MK.items():
                     if any(re.match(rx, n) for n in names): books[b["name"]][lab] += 1; per_lg[b["name"]][lg][lab] += 1
 N = sum(fx_tot.values())
@@ -45,3 +48,4 @@ for bk in sorted(books, key=lambda b: -books[b]["partite"]):
 for bk in ("Bet365", "1xBet"):
     if bk in per_lg:
         note(f"Diagnosi bookmaker · {bk} per campionato", " ‖ ".join(f"{lg} ({fx_tot[lg]}): " + ", ".join(f"{lab} {n}" for lab, n in per_lg[bk][lg].items()) for lg in sorted(per_lg[bk])))
+note("Diagnosi bookmaker · mercati corner (tutti i nomi)", " ‖ ".join(f"{n}: {len(b)} book ({', '.join(sorted(b))})" for n, b in sorted(cnames.items(), key=lambda x: -len(x[1]))))
