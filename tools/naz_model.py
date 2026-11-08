@@ -191,6 +191,45 @@ def goals(e):
     r = lambda x: round(x, 3)
     top = sorted(((float(M[i, j]), f"{i}-{j}") for i in range(7) for j in range(7)), reverse=True)[:5]
     return {"1": r(p1), "X": r(px), "2": r(1 - p1 - px), "ov": [r(float(M[tot > L].sum())) for L in (1.5, 2.5, 3.5)], "gg": r(float(M[1:, 1:].sum())), "top": [[k, r(q)] for q, k in top]}
+# gironi (8/11/2026, Denny: classifica come i club): squadre collegate dalle partite della stessa competizione e stagione con turno di girone
+# ("League A - 5", "Group B - 3", "Group Stage - 2"…); niente richieste in più. Per la classifica dell'app: elenco delle partite del girone.
+import re as _re
+def _loc(dt):   # data locale italiana (come gli id dell'app)
+    return (datetime.datetime.fromisoformat(dt[:16]).replace(tzinfo=datetime.timezone.utc).astimezone(datetime.timezone(datetime.timedelta(hours=1 if not (3 < int(dt[5:7]) < 10) else 2)))).date().isoformat()
+def _phase(rnd): m = _re.match(r"^(League [A-D]|Group [A-L]|Group Stage|Regular Season|1st Round|2nd Round|3rd Round)", rnd or ""); return m.group(1) if m else None
+GRP, G_OF = [], {}
+byc = collections.defaultdict(list)
+for fid, v in A["partite"].items():
+    ph = _phase(v[10])
+    if ph: byc[(v[1], ph, min(int(v[0][:4]), 9999))].append((fid, v))
+# stessa edizione: partite della stessa competizione e fase entro 400 giorni l'una dall'altra, unite per squadre in comune
+for (lid, ph, _y), L in byc.items(): pass
+byk = collections.defaultdict(list)
+for (lid, ph, y), L in byc.items(): byk[(lid, ph)].extend(L)
+for (lid, ph), L in byk.items():
+    L.sort(key=lambda x: x[1][0]); par = {}
+    def find(x):
+        while par.setdefault(x, x) != x: par[x] = par[par[x]]; x = par[x]
+        return x
+    # edizione = finestra di date (nuova edizione se passano più di 300 giorni dalla partita precedente della stessa competizione)
+    ed, last, eds = 0, None, {}
+    for fid, v in L:
+        t = tday(v[0])
+        if last is not None and t - last > 300: ed += 1
+        last = t; eds[fid] = ed
+        a_, b_ = f"{ed}|{v[2]}", f"{ed}|{v[3]}"; par[find(a_)] = find(b_)
+    comp = collections.defaultdict(list)
+    for fid, v in L: comp[find(f"{eds[fid]}|{v[2]}")].append((fid, v))
+    for root, M_ in comp.items():
+        teams = sorted({v[2] for _, v in M_} | {v[3] for _, v in M_})
+        if len(teams) < 3 or len(teams) > 12: continue
+        gi = len(GRP); GRP.append({"nome": f"{COMP.get(lid, '')} · {ph.replace('League ', 'Lega ').replace('Group Stage', 'Fase a gironi').replace('Group ', 'Girone ').replace('Regular Season', 'Girone unico')}",
+                                   "squadre": teams, "partite": [[_loc(v[0]), v[2], v[3]] for _, v in sorted(M_, key=lambda x: x[1][0])]})
+        for fid, _ in M_: G_OF[fid] = gi
+LOGHI = {}
+for v in A["partite"].values():
+    if v[11]: LOGHI[v[2]] = v[11]
+    if v[12]: LOGHI[v[3]] = v[12]
 OUT = []
 for fid, e in LOG.items():
     dd = tday(e["dt"]) - TNOW
@@ -200,8 +239,11 @@ for fid, e in LOG.items():
     res = {s: (lambda y: [int(y[0]), int(y[1])] if y else None)(val(v, s)) for s in STATS} if v[9] in FIN else None
     pre = min((p[2] for p in e["P"].values() if p), default=0)
     OUT.append({"id": fid, "dt": e["dt"], "h": e["h"], "a": e["a"], "round": f"{COMP.get(v[1], '')} · {v[10]}".strip(" ·"), "comp": COMP.get(v[1], ""),
-                "lh": v[11], "la": v[12], "stato": v[9], "p": {s: block(e, s) for s in STATS}, "gol": goals(e), "ris": res, "fonte": e.get("fonte", ""), "prec": pre})
+                "lh": v[11], "la": v[12], "stato": v[9], "gruppo": G_OF.get(fid), "p": {s: block(e, s) for s in STATS}, "gol": goals(e), "ris": res, "fonte": e.get("fonte", ""), "prec": pre})
 OUT.sort(key=lambda x: (x["dt"], x["h"]))
-json.dump({"updated": NOW.isoformat(timespec="minutes"), "controllo": CHECK, "dispersione": {s: round(a, 4) for s, a in ALPHA.items()}, "partite": OUT},
+_used = sorted({x["gruppo"] for x in OUT if x.get("gruppo") is not None}); _ren = {g: i for i, g in enumerate(_used)}
+for x in OUT: x["gruppo"] = _ren.get(x.get("gruppo"))
+json.dump({"updated": NOW.isoformat(timespec="minutes"), "controllo": CHECK, "dispersione": {s: round(a, 4) for s, a in ALPHA.items()}, "partite": OUT,
+           "gruppi": [GRP[g] for g in _used], "loghi": LOGHI},
           open(os.path.join(DIR, "naz.json"), "w"), ensure_ascii=False, separators=(",", ":"))
 note("Nazionali · uscita", f"naz.json: {len(OUT)} partite ({sum(1 for x in OUT if x['ris'])} giocate, {sum(1 for x in OUT if not x['ris'])} in arrivo) · richieste usate {used}")
