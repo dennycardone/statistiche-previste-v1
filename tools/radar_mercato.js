@@ -70,7 +70,9 @@ for (const [key, v] of Object.entries(OH)) {
         const eo = po * o - 1, eu = (1 - po) * u - 1, side = eo >= eu ? "O" : "U", ev = Math.max(eo, eu);
         const p = side === "O" ? po : 1 - po, odd = side === "O" ? o : u, hit = side === "O" ? real > L : real < L;
         rows.push({ key, d, lg, k, fam: FAM[k], side, p, odd, ev, hit: hit ? 1 : 0, val: ev >= BK_MIN, team: k.length > 1 && k !== "st" });
-        ALL.push({ key, d, lg, k, fam: FAM[k], team: k.length > 1 && k !== "st", L, o, u, po, over: real > L ? 1 : 0 });
+        const MEAN = { c: M && M.tot, hc: M && M.lh, ac: M && M.la, st: MT && MT.tot, hst: MT && MT.lh, ast: MT && MT.la, s: MT && MT.MS && MT.MS.lh + MT.MS.la,
+                       f: MF && MF.tot, hf: MF && MF.lh, af: MF && MF.la, k: x && x[4], hk: x && x[6], ak: x && x[7] };   // 8/11/2026: valore atteso (studio distanza dalla linea)
+        ALL.push({ key, d, lg, k, fam: FAM[k], team: k.length > 1 && k !== "st", L, o, u, po, mu: MEAN[k] != null && isFinite(MEAN[k]) ? Math.round(MEAN[k] * 100) / 100 : null, real, over: real > L ? 1 : 0 });
       }
     });
   } catch (e) { } finally { A.S.cutoff = c0; }

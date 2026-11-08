@@ -1,0 +1,28 @@
+name: Prova · distanza dalla linea (temporaneo, solo numeri aggregati)
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: [tools/p2/test_distanza_linea.py, .github/workflows/prova_distanza.yml]
+permissions:
+  contents: read
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - run: |
+          mkdir -p pub && git fetch -q --depth 1 origin pages
+          for f in bundle extra tiri_area fuorigioco; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+          git show FETCH_HEAD:data/bundle_storico.json > pub/bundle_storico.json 2>/dev/null || rm -f pub/bundle_storico.json
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: pip install -q numpy
+      - run: node tools/radar_mercato.js . > /dev/null
+        env: { RM_DUMP: rm_all.json }
+      - run: python3 tools/p2/test_distanza_linea.py
