@@ -556,7 +556,7 @@ select{pointer-events:none}
 .opx{grid-area:x;display:flex;flex-direction:column;gap:2px;min-width:0}.opmk{font-weight:700;font-size:13.5px}.opx small{font-size:11.5px;line-height:1.35}
 .opw{grid-area:w;display:flex;flex-direction:column;align-items:flex-end;font-variant-numeric:tabular-nums}.opw b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--gold)}.opw small{font-size:11px;color:var(--ink-3)}
 .opw.in{display:inline-flex;flex-direction:row;gap:6px;align-items:baseline;margin-left:6px}
-.qbk{font-size:inherit;color:var(--ink-3);font-weight:400}.ucomp{grid-column:1/-1;font-size:11px;color:var(--ink-3);font-weight:400}.navv{margin:8px 0 0;padding:8px 10px;border-radius:8px;border:1px dashed var(--line);font-size:12px;color:var(--ink-2)}.qbk2{display:block;font-size:11px;line-height:1.25;color:var(--ink-3);font-weight:400}.qr .qbk{display:block;font-size:10.5px;white-space:nowrap;color:var(--ink-3);font-weight:500}.bk-mx{display:block;font-size:10.5px;color:var(--ink-3);font-weight:500}.combo table th small{display:block}.tscroll{overflow-x:auto}.qmin{margin:6px 10px 2px;padding:6px 8px;border:1px dashed var(--line);border-radius:6px}.qmin p{margin:2px 0}
+.qbk{font-size:inherit;color:var(--ink-3);font-weight:400}.ucomp{grid-column:1/-1;font-size:11px;color:var(--ink-3);font-weight:400}.navv{margin:8px 0 0;padding:8px 10px;border-radius:8px;border:1px dashed var(--line);font-size:12px;color:var(--ink-2)}.qbk2{display:block;font-size:11px;line-height:1.25;color:var(--ink-3);font-weight:400}.qr .qbk{display:block;font-size:10.5px;white-space:nowrap;color:var(--ink-3);font-weight:500}.bk-mx{display:block;font-size:10.5px;color:var(--ink-3);font-weight:500}.tscroll{overflow-x:auto}.qmin{margin:6px 10px 2px;padding:6px 8px;border:1px dashed var(--line);border-radius:6px}.qmin p{margin:2px 0}
 .opxi,.opct{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:var(--hot);color:var(--hot-ink)}.opct{background:var(--surface);color:var(--ink-2);border:1px solid var(--line)}
 .opcomb{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 6px;background:var(--surface-2)}.opch{margin:0 0 4px;font-size:13px}.opleg{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:5px 0;border:0;border-top:1px solid var(--line);background:none;color:var(--ink);font:inherit;cursor:pointer}.opleg b{font-size:13px}.opleg span{font-size:12px;color:var(--ink-2)}
 .opdone{cursor:default}.opnuc{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:color-mix(in srgb,var(--good) 22%,transparent);color:var(--good)}.opw .oppos{color:var(--good);font-weight:700}.opw .opneg{color:var(--dot-r);font-weight:700}.opw .mk{margin-top:2px}
@@ -1702,7 +1702,7 @@ const LG = Object.fromEntries(LEAGUES.map(l => [l.code, l]));
 LG.UCL = { code: "UCL", name: "Champions League", country: "Europa", file: "api/UCL.csv", newCountry: "UCL", api: true };
 LG.UEL = { code: "UEL", name: "Europa League", country: "Europa", file: "api/UEL.csv", newCountry: "UEL", api: true };   // 13/10/2026
 // 8/11/2026 (Denny): nazionali (partite ufficiali, amichevoli escluse) come le coppe: solo scheda partita e blocco in Partite; previsioni da
-// data/naz.json (tools/naz_model.py). Fuori da Radar, Operatività, Grado e Segnali (verificate solo contro la media, non contro le quote).
+// data/naz.json (tools/naz_model.py). 8/11/2026 sera (Denny): anche in Radar, Operatività, Grado e Segnali.
 LG.NAZ = { code: "NAZ", name: "Nazionali", country: "Nazionali", file: "api/NAZ.csv", newCountry: "NAZ", api: true, cal: true };
 const CUPS = [{ code: "UCL", file: "ucl.json" }, { code: "UEL", file: "uel.json" }, { code: "NAZ", file: "naz.json" }], CUPD = {}, isCup = c => CUPS.some(x => x.code === c);
 const lgName = l => `${l.country} · ${l.name}`;   // prima la nazione, poi il campionato
@@ -3451,7 +3451,7 @@ function computeSignals(o) {
   const wantGoals = mks.some(k => k in GOAL_LINE || k === "gg");
   const th = k => o.th && o.th[k] != null ? o.th[k] : o.minP;   // soglia per mercato (Segnali) o unica
   // o.ucl (Segnali): anche la Champions League, con le probabilità del suo modello (data/ucl.json)
-  for (const L of o.ucl ? LEAGUES.concat(CUPS.filter(c => CUPD[c.code] && c.code !== "NAZ").map(c => LG[c.code])) : LEAGUES) {   // nazionali fuori dai Segnali
+  for (const L of o.ucl ? LEAGUES.concat(CUPS.filter(c => CUPD[c.code]).map(c => LG[c.code])) : LEAGUES) {
     if (o.lgSel && o.lgSel !== "all" && o.lgSel !== L.code) continue;
     withLeague(L.code, () => {
       const sm = seasonMatches(); if (!sm.length) return;
@@ -4197,6 +4197,7 @@ function renderSched() {
 /* ===== Champions League (13/10/2026): previsioni per squadra da data/ucl.json (tools/ucl_model.py su GitHub: rating comune campionati + coppe,
    ricalcolato a ogni giro con i risultati nuovi; per ogni statistica il modello con l'errore più basso sulle partite già giocate) ===== */
 const uclEntries = () => CUPS.flatMap(c => CUPD[c.code] && CUPD[c.code].partite ? CUPD[c.code].partite.map(x => uclEntry(x, c.code)) : []);
+const nazEntries = () => CUPD.NAZ && CUPD.NAZ.partite ? CUPD.NAZ.partite.map(x => uclEntry(x, "NAZ")) : [];   // 8/11/2026: nazionali in Radar, Operatività e Segnali
 function uclRound(r) {
   const m = /League Stage - (\d+)/.exec(r || ""); if (m) return `Fase campionato · ${m[1]}ª giornata`;
   return { "Knockout Round Play-offs": "Spareggi fase a eliminazione", "Round of 16": "Ottavi di finale", "Quarter-finals": "Quarti di finale", "Semi-finals": "Semifinali", "Final": "Finale" }[r] || r || "";
@@ -4226,7 +4227,7 @@ function uclBlockHTML(list) {   // "Coppe europee": un blocco per coppa (Champio
 function uclEntry(x, comp = "UCL") {
   const k = new Date(x.dt + "Z"), d = localIso(k), date = new Date(d + "T00:00:00Z");
   const m = [...S.matches.values()].find(q => q.div === comp && q.home === x.h && q.away === x.a && isoD(q.date) === d) || null;
-  return { id: `${comp}|${d}|${x.h}|${x.a}`, lg: LG[comp], date, d, time: `${String(k.getHours()).padStart(2, "0")}:${String(k.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a, m, ucl: x };
+  return { id: `${comp}|${d}|${x.h}|${x.a}`, lg: comp === "NAZ" && x.comp ? { ...LG.NAZ, name: x.comp } : LG[comp], date, d,   // nazionali: nome della competizione time: `${String(k.getHours()).padStart(2, "0")}:${String(k.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a, m, ucl: x };
 }
 const entryById = id => allEntries(localIso(), 30).find(x => x.id === id) || uclEntries().find(x => x.id === id) || null;
 /* previsione Champions della partita (quella congelata prima del calcio d'inizio se è già giocata) */
@@ -4252,7 +4253,7 @@ function openEntry(e, fromNav) {
   for (const t of [e.home, e.away]) if (![...$("#home").options].some(o => o.value === t)) { $("#home").add(new Option(t, t)); $("#away").add(new Option(t, t)); }
   $("#home").value = e.home; $("#away").value = e.away;
   S.cutoff = e.m ? e.date : null;
-  const gt = document.querySelector('.mtab[data-mt="sig"]'); if (gt) gt.style.display = isCup(e.lg.code) ? "none" : "";   // Champions: Grado non ancora verificato
+  const gt = document.querySelector('.mtab[data-mt="sig"]'); if (gt) gt.style.display = isCup(e.lg.code) && e.lg.code !== "NAZ" ? "none" : "";   // Champions: Grado non ancora verificato
   const ct = document.querySelector('.mtab[data-mt="tab"]'); if (ct) ct.style.display = e.lg.code === "NAZ" && !nazGroup(e.home, e.away) ? "none" : "";   // nazionali: classifica del girone (se c'è)
   showView("match"); setMTab("prev"); render();
   scrollTo({ top: 0, behavior: "auto" });
@@ -4517,30 +4518,6 @@ function qMinCerca(e, key, p, R) {
   }
   return best;
 }
-/* 8/11/2026 (Denny): combo corner casa + ospite (Over casa e Over ospite insieme). Nessun book la passa via API-Football: la si stima.
-   Probabilità di Prevista = Over casa × Over ospite (corner attesi e dispersione di squadra del modello corner, le due squadre trattate come
-   indipendenti). Linee: la stessa per le due squadre (come le offrono i book), da 1,5 a 6,5, mostrate se la combo è tra l'8% e l'85%. Quota equa dei book = prodotto delle due singole senza
-   margine (solo sulle linee che i book quotano). Quota minima da cercare = 1,08 / probabilità di Prevista. Solo indicazione, in verifica. */
-function comboCornerHTML(e, m, M, LB) {
-  if (!M || !(M.lh > 0) || !(M.la > 0)) return "";
-  const r = M.rTeam != null ? M.rTeam : M.r, pO = (mu, L) => pOver(pmfTotal(mu, r, Math.ceil(L) + 30), L);
-  const hc = LB && LB.hc, ac = LB && LB.ac, Lh = hc ? hc[0] : Math.floor(M.lh) - 0.5, La = ac ? ac[0] : Math.floor(M.la) - 0.5;
-  const nv = c => c && c[1] > 1 && c[2] > 1 ? (1 / c[1]) / (1 / c[1] + 1 / c[2]) : null, bh = nv(hc), ba = nv(ac);
-  const rows = [];
-  // 8/11/2026: i book (es. Zona Gioco) offrono la combo con la stessa linea per le due squadre: Over 2,5 + Over 2,5, Over 3,5 + Over 3,5, …
-  for (const X of [1.5, 2.5, 3.5, 4.5, 5.5, 6.5]) {
-    const A = X, B = X, ph = pO(M.lh, A), pa = pO(M.la, B), p = ph * pa;
-    if (p < 0.08 || p > 0.85) continue;
-    const book = A === Lh && B === La && bh && ba ? 1 / (bh * ba) : null;
-    const real = m && m.hc != null && m.ac != null ? (m.hc > A && m.ac > B) : null;
-    rows.push(`<tr${real === true ? ' class="hit"' : ""}><th>O ${th1(A)} + O ${th1(B)}<small class="muted">${real != null ? `${real ? "✓" : "✗"} reale ${m.hc}-${m.ac}` : `${pc(ph)} · ${pc(pa)}`}</small></th>
-      <td><b>${pc(p)}</b></td><td class="num">${f2(1 / p)}</td><td class="num">${book ? f2(book) : "—"}</td><td class="num"><b>${f2((1 + QMIN_M) / p)}</b></td></tr>`);
-  }
-  if (!rows.length) return "";
-  return `<div class="bk1x2 combo"><p class="bk1x2-h"><b>Combo corner · casa + ospite</b> · ${esc(e.home)} Over e ${esc(e.away)} Over insieme · attesi ${f1(M.lh)} – ${f1(M.la)}</p>
-    <div class="tscroll"><table><thead><tr><th>Casa + ospite</th><th>Prob.</th><th>Equa</th><th>Book</th><th>Minima</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>
-    <p class="bk1x2-n">Nessun book passa la combo via API-Football: confronta la <b>Minima</b> con la quota della combinata sul tuo sito; sotto, lascia stare. Prob. = Over casa × Over ospite di Prevista (squadre indipendenti; sotto la combo le due singole). Equa = 1 / Prob. Book = le due singole dei book senza margine moltiplicate (solo quando la linea principale dei book è la stessa per le due squadre${hc && ac ? `: qui ${th1(Lh)} e ${th1(La)}` : "; qui non quotate"}). Minima = Equa + 8%. In verifica: sulle singole i corner per squadra finora hanno reso in negativo.</p></div>`;
-}
 function stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB) {
   const lab = ["1", "X", "2"], rs = [];
   const add = (name, key, R, hr, ar, indep) => {
@@ -4624,7 +4601,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
     const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0);
     const S1 = NO_1XBET.has(S.league) && !LB ? "" : stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB);
     bkBody = (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
-        : NO_1XBET.has(S.league) ? `<p class="bk-none">${NO_1XBET_TXT}</p>` : `<p class="bk-none">${S1 ? "Linee Over/Under" : "Linea"} non disponibil${S1 ? "i" : "e"} per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + S1 + comboCornerHTML(e, m, M, LB) + RG_LINE
+        : NO_1XBET.has(S.league) ? `<p class="bk-none">${NO_1XBET_TXT}</p>` : `<p class="bk-none">${S1 ? "Linee Over/Under" : "Linea"} non disponibil${S1 ? "i" : "e"} per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + S1 + RG_LINE
       ;
   }
   const nzc = S.league === "NAZ" && e && e.ucl && e.ucl.comp;   // nazionali: nome della competizione come per i campionati
@@ -4666,7 +4643,7 @@ function renderMatchExtras(home, away) {
   const G = home && away && home !== away ? modelGoals(home, away, cfg) : null;
   const dt = e ? `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}` : "Confronto libero";
   $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G); HEROCTX = { home, away, e, cfg, G };
-  if (!isCup(S.league)) renderMatchConf(home, away, e, cfg);
+  if (!isCup(S.league) || S.league === "NAZ") renderMatchConf(home, away, e, cfg);
   $("#mref").hidden = true; REFCTX = { home, away, e };
   { const bx = $("#mxi"); let MFx = null; try { MFx = !m && home && away && home !== away ? model(home, away, cfg, "f") : null; } catch (x) {}   // formazioni ufficiali (fase 1-B)
     bx.hidden = !(MFx && MFx.xiF); bx.innerHTML = MFx && MFx.xiF ? xiBoxHTML(home, away, MFx) : ""; }   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
@@ -5396,7 +5373,7 @@ function selEntries() {   // partite da giocare nelle prossime SEL.h ore (orario
   // 30/10/2026 (Denny): un solo giorno, da 7 giorni fa a fra 7 giorni (Oggi + tendina Data); i giorni passati non hanno partite da giocare
   if (SEL.day < 0) return [];
   const want = addDays(localIso(), SEL.day);
-  return allEntries().filter(e => !e.m && e.d === want && !koStarted(e.d, e.time));   // una partita iniziata esce dal Radar
+  return allEntries().concat(nazEntries()).filter(e => !e.m && e.d === want && !koStarted(e.d, e.time));   // una partita iniziata esce dal Radar · 8/11/2026: anche le nazionali
 }
 /* Radar: giocate con valore sulla linea dei bookmaker (stesse probabilità della scheda match), solo partite con la linea disponibile */
 const BK_C = new Map();
@@ -5829,7 +5806,7 @@ function showView(v) {
   if (v === "rit") renderRit();
   if (v === "sel") renderSel();
 }
-$("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option><option value="UCL">Champions League</option><option value="UEL">Europa League</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
+$("#sigLeague").innerHTML = `<option value="all">Tutti i campionati</option><option value="UCL">Champions League</option><option value="UEL">Europa League</option><option value="NAZ">Nazionali</option>` + LEAGUES.map(l => `<option value="${l.code}">${esc(lgName(l))}</option>`).join("");
 ["#sigLeague", "#sigGames", "#sigC3"].forEach(id => $(id).addEventListener("change", renderSignals));
 $("#sigMode").addEventListener("change", () => { $("#decay").value = $("#sigMode").value; renderSignals(); renderNext(); });
 $("#decay").addEventListener("change", () => { $("#sigMode").value = $("#decay").value; });
