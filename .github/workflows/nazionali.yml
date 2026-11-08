@@ -1,0 +1,45 @@
+name: Nazionali
+# Previsioni delle nazionali (tools/naz_model.py): risultati e statistiche da API-Football (solo le richieste oltre la riserva dell'app),
+# archivio e previsioni sul ramo nazionali; il giro "Aggiorna dati corner" mette naz.json sul sito.
+on:
+  schedule:
+    - cron: "35 5,11,16 * * *"
+    - cron: "25 21,23 * * *"
+  workflow_dispatch: {}
+concurrency:
+  group: nazionali
+  cancel-in-progress: false
+permissions:
+  contents: write
+  actions: write
+jobs:
+  naz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivio (ramo nazionali)
+        run: |
+          mkdir -p nazionali
+          if git ls-remote --exit-code origin nazionali >/dev/null 2>&1; then git fetch -q --depth 1 origin nazionali && git archive FETCH_HEAD | tar -x -C nazionali; fi
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy scipy
+      - run: python tools/naz_model.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Salva (ramo nazionali)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          R="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          cd nazionali && git init -q -b nazionali && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
+            && git add -A && git commit -q -m "Nazionali $(date -u '+%F %H:%M')" \
+            && for t in 1 2 3; do git push -q -f "$R" nazionali && break; sleep 20; done
+      - name: Mette subito le previsioni sul sito
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -s -X POST -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/update.yml/dispatches" -d '{"ref":"main"}'
