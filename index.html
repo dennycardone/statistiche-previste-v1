@@ -4228,7 +4228,7 @@ function uclBlockHTML(list) {   // "Coppe europee": un blocco per coppa (Champio
 function uclEntry(x, comp = "UCL") {
   const k = new Date(x.dt + "Z"), d = localIso(k), date = new Date(d + "T00:00:00Z");
   const m = [...S.matches.values()].find(q => q.div === comp && q.home === x.h && q.away === x.a && isoD(q.date) === d) || null;
-  return { id: `${comp}|${d}|${x.h}|${x.a}`, lg: comp === "NAZ" && x.comp ? { ...LG.NAZ, name: x.comp } : LG[comp], date, d,   // nazionali: nome della competizione time: `${String(k.getHours()).padStart(2, "0")}:${String(k.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a, m, ucl: x };
+  return { id: `${comp}|${d}|${x.h}|${x.a}`, lg: comp === "NAZ" && x.comp ? { ...LG.NAZ, name: x.comp } : LG[comp], date, d, time: `${String(k.getHours()).padStart(2, "0")}:${String(k.getMinutes()).padStart(2, "0")}`, home: x.h, away: x.a, m, ucl: x };   // nazionali: lg con il nome della competizione
 }
 const entryById = id => allEntries(localIso(), 30).find(x => x.id === id) || uclEntries().find(x => x.id === id) || null;
 /* previsione Champions della partita (quella congelata prima del calcio d'inizio se è già giocata) */
