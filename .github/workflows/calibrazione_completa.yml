@@ -1,9 +1,6 @@
 name: Calibrazione completa (audit e ricalibrazione, solo numeri aggregati)
 on:
   workflow_dispatch: {}
-  push:
-    branches: [main]
-    paths: [tools/calib_full.js, tools/calib_full.py, .github/workflows/calibrazione_completa.yml]
 permissions:
   contents: read
 jobs:

@@ -35,3 +35,19 @@ Archivio quote 5/10 → 9/11 (2.072 partite; Pinnacle su corner e cartellini; mu
    (5 giorni) Under cartellini −13,6% su 33, Operatività −9,1% su 61. Under cartellini con il rosso contato 2: −5 punti circa.
 Esito: nessuna regola provata oltre il caso tenendo conto dei 56 test. Candidata più forte: sharp sui cartellini; seguita in avanti dal 10/11
 (sezione 7 dello studio del lunedì); rilettura al 7/12.
+
+## Audit completo di calibrazione (9/11/2026, richiesta di Denny) · tools/calib_full.js + calib_full.py, workflow calibrazione_completa.yml
+36.031 partite dal 1/7/2023, probabilità dell'app con i soli dati precedenti; scelta 2023-24, verifica 2024-25, holdout 2025-26 e ultimi 120 giorni.
+Già calibrati (scarto entro ±1,5 punti in verifica e holdout, ECE ≤ 1,6): 1X2 di corner, falli, fuorigioco, tiri in porta; tutti gli Over/Under di
+corner (totali e squadra, code comprese), fuorigioco, cartellini (solo holdout: previsioni dei cartellini da ottobre 2025); 1X2 gol, doppia chance.
+Scarti: pareggio gol sottostimato +1,5 (12 sovrastimato −1,5) in tutti i periodi; Over gol e Gol/No gol +2,2…+3,5 in holdout e +3,6…+5,3 negli
+ultimi 120 giorni (in verifica a posto); Over tiri totali +3,7 in holdout e +8,5 negli ultimi 120 giorni, tiri squadra +5,2, tiri in porta +3,3,
+falli +1,8 (code: lo scarto cresce sulle linee alte) → livello medio che cresce più in fretta del modello nella stagione in corso, non errore di forma.
+Ricalibrazione Platt walk-forward (con e senza la distanza dalla linea): passa SOLO l'1X2 dei tiri (casa: verifica −0,00061 [−0,00101, −0,00018],
+holdout −0,00001, 66% campionati; ospite: −0,00052, holdout −0,00003, 69%) → applicato (CAL_1X2 nell'app, effetto ±1-2 punti agli estremi).
+Over/Under gol, Gol/No gol, Over tiri: migliorano solo in holdout (verifica non significativa) → non adottati; da riprovare al 7/12 con un
+riallineamento del livello sugli ultimi mesi.
+1° tempo (statistiche per tempo dal 2024-25): corner 1° tempo Over/Under sottostimati (+1,3 verifica, +2,3 holdout), Platt passa (100% campionati)
+ma l'app non mostra probabilità Over/Under del 1° tempo → nulla da applicare ora; cartellini 1° tempo +7,1 (solo holdout, Poisson troppo stretta);
+fuorigioco 1° tempo +2,4/+2,8 con Platt al limite (verifica [−0,00447, +0,00004]) → non adottato; in scheda resta il valore atteso con la quota
+reale del 1° tempo del campionato (pubblicato il 9/11).

@@ -2665,7 +2665,7 @@ function whyHTML(home, away, cfg) {
       if (M.xiF) { drv.push([`i titolari di oggi di ${esc(home)}`, M.xiF.fh], [`i titolari di oggi di ${esc(away)}`, M.xiF.fa]); }
       if (R && R.refF) drv.push(["l'arbitro", R.refF]);
       L.push(whyStat("Falli", home, away, M, ...lgMu(M), drv));
-      const p = X => headToHeadProb(X.lh, X.la, X.r, X.rTeam != null ? X.rTeam : X.r, X.cop || 0);
+      const p = X => calH2H(headToHeadProb(X.lh, X.la, X.r, X.rTeam != null ? X.rTeam : X.r, X.cop || 0), X.cal1x2);
       const P = p(M);
       if (M.xiF && R) { const Q = p(R); W.push(`Senza le formazioni ufficiali: falli attesi ${f1(R.tot)} invece di ${f1(M.tot)}; 1X2 falli ${esc(home)} ${WPP(P.home, Q.home)}, ${esc(away)} ${WPP(P.away, Q.away)}.`); }
       if (R && R.refF && B && Math.abs(Math.log(R.refF)) >= 0.04) {
@@ -2719,8 +2719,19 @@ function formazFor(home, away) {
   const t = goalDate(home, away); if (!t) return null;
   return FORMAZ.partite[`${S.league}|${isoD(new Date(t))}|${home}|${away}`] || null;
 }
+/* 9/11/2026 · audit completo di calibrazione (tools/calib_full.js + .py, 36.000 partite dal 2023): l'unico mercato che passa la regola
+   dell'harness è l'1X2 dei tiri (casa e ospite: Platt a + b·logit p, stimato walk-forward; verifica significativa, holdout nello stesso verso,
+   due terzi dei campionati). Il pareggio è quello che resta. Tutti gli altri mercati restano come sono. */
+const CAL_1X2 = { s: { h: [-0.0136, 1.0715], a: [0.042, 1.0712] } };
+function calH2H(P, c) {
+  if (!c || !P) return P;
+  const f = (p, [a, b]) => { const q = Math.min(Math.max(p, 1e-4), 1 - 1e-4); return 1 / (1 + Math.exp(-(a + b * Math.log(q / (1 - q))))); };
+  let h = f(P.home, c.h), w = f(P.away, c.a);
+  if (h + w > 0.995) { const z = (h + w) / 0.995; h /= z; w /= z; }
+  return { ...P, home: h, away: w, draw: 1 - h - w };
+}
 function model(home, away, cfg, k = "c") {
-  const M = modelRef(home, away, cfg, k);
+  const M0 = modelRef(home, away, cfg, k), M = M0 && k === "s" && !M0.ucl && CAL_1X2.s ? { ...M0, cal1x2: CAL_1X2.s } : M0;
   if (k !== "f" || !M || M.ucl) return M;
   const F = formazFor(home, away); if (!F || !(F.fh > 0) || !(F.fa > 0)) return M;
   const lh = M.lh * F.fh, la = M.la * F.fa;
@@ -3510,7 +3521,7 @@ function computeSignals(o) {
             // corner, falli, tiri, tiri in porta: 1 = la squadra di casa ne fa di più, 2 = l'ospite (il pari fa perdere)
             if (!mkOk(L.code, mk)) continue;   // 1X2 non quotato da 1xBet in questo campionato
             const R = res[mk]; if (!R || !isFinite(R.lh) || !isFinite(R.la)) continue;
-            const P = R.P || headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop), one = P.home >= P.away, p = one ? P.home : P.away;
+            const P = R.P || calH2H(headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop), R.cal1x2), one = P.home >= P.away, p = one ? P.home : P.away;
             if (p >= th(mk)) push(mk, mk, R, { sel: one ? "1" : "2", fav: one ? "1" : "2", team: one ? f.home : f.away, p, draw: P.draw, p1: P.home, px: P.draw, p2: P.away });
           }
         }
@@ -3582,7 +3593,7 @@ function matchPicks(home, away, cfg, m) {
   const T = modelShots(home, away, cfg);
   for (const [k, R] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
     const { h: kh, a: ka } = MET[k]; if (!R || m[kh] == null || m[ka] == null) continue;
-    const P = headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop);
+    const P = calH2H(headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop), R.cal1x2);
     const [pick, p] = [["1", P.home], ["X", P.draw], ["2", P.away]].sort((a, b) => b[1] - a[1])[0];
     const real = m[kh] > m[ka] ? "1" : m[kh] < m[ka] ? "2" : "X";
     out.push({ lab: `1X2 ${SIG_LABEL[k].toLowerCase()}`, pick, p, ok: pick === real, txt: `${m[kh]}-${m[ka]}` });
@@ -3594,7 +3605,7 @@ function matchStats(home, away, cfg) {
   const out = {}, T = modelShots(home, away, cfg);
   for (const [k, M] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
     if (!M || !isFinite(M.lh) || !isFinite(M.la)) continue;
-    const P = headToHeadProb(M.lh, M.la, M.r, M.rTeam, M.cop); out[k] = [M.lh, M.la, P.home, P.draw, P.away];
+    const P = calH2H(headToHeadProb(M.lh, M.la, M.r, M.rTeam, M.cop), M.cal1x2); out[k] = [M.lh, M.la, P.home, P.draw, P.away];
   }
   return out;
 }
@@ -3636,7 +3647,7 @@ function confModes(home, away) {
     const T = modelShots(home, away, cfg);
     for (const [k, M] of [["c", model(home, away, cfg, "c")], ["f", model(home, away, cfg, "f")], ["s", T && T.MS], ["st", T && T.MD]]) {
       if (!M || !isFinite(M.lh) || !isFinite(M.la)) continue;
-      const P = headToHeadProb(M.lh, M.la, M.r, M.rTeam, M.cop); R.st[k] = { p1: P.home, px: P.draw, p2: P.away };
+      const P = calH2H(headToHeadProb(M.lh, M.la, M.r, M.rTeam, M.cop), M.cal1x2); R.st[k] = { p1: P.home, px: P.draw, p2: P.away };
     }
     const O = offModel(home, away);   // 25/10/2026: 1X2 fuorigioco (stesso modello per ogni metodo)
     if (O && !O.nd && isFinite(O.lh) && isFinite(O.la)) { const P = headToHeadProb(O.lh, O.la, Infinity, OFF_R_TEAM); R.st.o = { p1: P.home, px: P.draw, p2: P.away }; }
@@ -4523,7 +4534,7 @@ function stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB) {
   const lab = ["1", "X", "2"], rs = [];
   const add = (name, key, R, hr, ar, indep) => {
     if (!R || !isFinite(R.lh) || !isFinite(R.la)) return;
-    const P = indep ? headToHeadProb(R.lh, R.la, Infinity, indep) : headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop), p = [P.home, P.draw, P.away];
+    const P = indep ? headToHeadProb(R.lh, R.la, Infinity, indep) : calH2H(headToHeadProb(R.lh, R.la, R.r, R.rTeam, R.cop), R.cal1x2), p = [P.home, P.draw, P.away];
     const q = q1x2(e, key, LB), real = hr != null && ar != null ? (hr > ar ? 0 : hr === ar ? 1 : 2) : null;
     const qm = real == null && /^x\.(f1x2|y1x2|off\.)/.test(key) ? qMinCerca(e, key, p, R) : null;
     if (qm) mins.push({ name, ...qm, q });
@@ -5037,7 +5048,7 @@ function ritProb(L, nx, k, fn, lab) {
   let p = 0;
   if (D.mat) { D.mat.forEach((row, x) => row.forEach((q, y) => { const [f, a] = nx.home ? [x, y] : [y, x]; if (fn(f, a)) p += q; })); return p; }
   if (/più .*dell'avversario/.test(lab || "")) {   // stesso 1X2 della Lettura e dei Segnali
-    if (!D.M) return null; const P = headToHeadProb(D.M.lh, D.M.la, D.M.r, D.M.rTeam, D.M.cop); return nx.home ? P.home : P.away;
+    if (!D.M) return null; const P = calH2H(headToHeadProb(D.M.lh, D.M.la, D.M.r, D.M.rTeam, D.M.cop), D.M.cal1x2); return nx.home ? P.home : P.away;
   }
   if (/partita con Over/.test(lab || "")) {   // totale partita: stessa distribuzione del totale della Lettura
     if (!D.pt) return null; D.pt.forEach((q, t) => { if (fn(t, 0)) p += q; }); return p;
@@ -5493,7 +5504,7 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilit�
       for (const [k, name, qk] of OP_K) {
         const Rm = R[k]; if (!Rm || !isFinite(Rm.lh) || !isFinite(Rm.la)) continue;
         const q = q1x2(e, qk, LB);
-        const hp = R_ => k === "o" ? headToHeadProb(R_.lh, R_.la, Infinity, OFF_R_TEAM) : k === "y" ? headToHeadProb(R_.lh, R_.la, Infinity, rk) : headToHeadProb(R_.lh, R_.la, R_.r, R_.rTeam, R_.cop);
+        const hp = R_ => k === "o" ? headToHeadProb(R_.lh, R_.la, Infinity, OFF_R_TEAM) : k === "y" ? headToHeadProb(R_.lh, R_.la, Infinity, rk) : calH2H(headToHeadProb(R_.lh, R_.la, R_.r, R_.rTeam, R_.cop), R_.cal1x2);
         const P = hp(Rm), p = [P.home, P.draw, P.away];
         if (!q || q.stale || !q.every(v => v > 1)) { if (!cut && k !== "c" && typeof document !== "undefined" && typeof qMinCerca === "function") { const m_ = qMinCerca(e, qk, p, k === "f" ? MF : null); if (m_) (out.cerca = out.cerca || []).push({ e, mk: name, ...m_ }); } continue; }
         const P0 = k === "f" && MF.xiF && MF.preXi ? hp({ ...MF, lh: MF.preXi.lh, la: MF.preXi.la }) : null, p0 = P0 ? [P0.home, P0.draw, P0.away] : null;
