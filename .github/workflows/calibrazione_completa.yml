@@ -1,0 +1,49 @@
+name: Calibrazione completa (audit e ricalibrazione, solo numeri aggregati)
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: [tools/calib_full.js, tools/calib_full.py, .github/workflows/calibrazione_completa.yml]
+permissions:
+  contents: read
+jobs:
+  previsioni:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      matrix: { shard: [0, 1, 2, 3, 4, 5, 6, 7] }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dati pubblicati
+        run: |
+          mkdir -p pub && git fetch -q --depth 1 origin pages
+          for f in bundle bundle_storico extra tiri_area fuorigioco tempi; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: node --max-old-space-size=6000 tools/calib_full.js . ${{ matrix.shard }} 8
+      - uses: actions/upload-artifact@v4
+        with: { name: "calib-${{ matrix.shard }}", path: "calib_full_${{ matrix.shard }}.json", retention-days: 1 }
+  analisi:
+    needs: previsioni
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Dati pubblicati e statistiche per tempo
+        run: |
+          mkdir -p pub tempi && git fetch -q --depth 1 origin pages
+          for f in bundle bundle_storico tempi; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+          git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
+      - uses: actions/download-artifact@v4
+        with: { pattern: "calib-*", merge-multiple: true }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy scipy
+      - run: python3 tools/calib_full.py
+      - uses: actions/upload-artifact@v4
+        with: { name: "calib-coef", path: "calib_coef.json", retention-days: 7 }
