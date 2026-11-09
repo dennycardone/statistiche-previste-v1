@@ -3,7 +3,7 @@ on:
   workflow_dispatch: {}
   push:
     branches: [main]
-    paths: [tools/p2/ricerca360.py, .github/workflows/prova_360.yml]
+    paths: [tools/p2/ricerca360b.py, .github/workflows/prova_360.yml]
 permissions:
   contents: read
 jobs:
@@ -36,4 +36,4 @@ jobs:
         run: node tools/radar_mercato.js . > /dev/null
         env: { RM_DUMP: rm_all.json }
       - name: Studio
-        run: python3 tools/p2/ricerca360.py
+        run: python3 tools/p2/ricerca360b.py
