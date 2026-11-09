@@ -3492,7 +3492,7 @@ function computeSignals(o) {
             const P = cardProbs(mu); let pick = null;
             // 8/11/2026 (Denny): se i book propongono una linea cartellini, il segnale è SOLO su quella linea (niente Over 3,5 con la linea a 5,5);
             // soglia della linea più vicina tra 2,5 e 5,5. Senza linea dei book resta la regola di prima, segnata "linea nostra".
-            const LBk = bkLines({ id: `${L.code}|${isoD(f.date)}|${f.home}|${f.away}` }), bl = LBk && LBk.k && LBk.k[0];
+            const LBk = typeof bkLines === "function" ? bkLines({ id: `${L.code}|${isoD(f.date)}|${f.home}|${f.away}` }) : null, bl = LBk && LBk.k && LBk.k[0];   // 9/11: bkLines non c'è negli script del server
             if (bl) {
               const al = EXTRA && EXTRA.alpha, po = pOver(pmfTotal(mu, al > 2e-4 ? 1 / al : Infinity, 30), bl), tl = Math.min(5.5, Math.max(2.5, bl));
               if (po >= th("kO" + tl)) pick = { line: bl, fav: "Over " + th1(bl), p: po, bkl: true };
