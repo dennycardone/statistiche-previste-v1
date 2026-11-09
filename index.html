@@ -4623,11 +4623,12 @@ function matchHeroHTML(home, away, e, cfg, G) {
       ${M ? halves("c", M.lh, M.la) : ""}
       ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot, 1, null, null, m && m.hf, m && m.af)}
       ${row("Fuorigioco", O && !O.nd ? O.lh : null, O && !O.nd ? O.la : null, O && !O.nd ? O.tot : null, 1, null, null, m && offR ? offR.oh : null, m && offR ? offR.oa : null)}
+      ${O && !O.nd ? halves("o", O.lh, O.la) : ""}
       ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
       ${G || se ? `<p class="sx-fb">${G ? `<b>Multigol (MG)</b> · sotto i gol: la fascia più stretta più probabile, poi la fascia più sicura` : ""}${G && se ? "<br>" : ""}${se ? `<b>Forbice</b> · sotto i cartellini: dove cade la media di quella squadra 8 volte su 10` : ""}</p>` : ""}`}
     </div>`;
 }
-/* ===== Valori attesi per tempo di corner, tiri e tiri in porta (15/10/2026), sotto le righe della Lettura =====
+/* ===== Valori attesi per tempo di corner, tiri, tiri in porta e (dal 9/11/2026) fuorigioco, sotto le righe della Lettura =====
    Valori attesi della partita (Media dinamica) × quota del tempo nel campionato, per sede, dai soli dati REALI per tempo di
    API-Football (data/tempi.json, tools/half_shares.py, dalla stagione 2024-25; campionati con almeno 200 partite valide).
    Backtest dell'1X2 per tempo: scelto sul 2024-25, verificato sul 2025-26 e sul 2026-27, migliore delle frequenze di lega e delle

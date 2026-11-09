@@ -14,7 +14,9 @@ if os.path.exists("data/apif.json"):
 for f in glob.glob(os.environ.get("HALF_STORICO", "")):   # solo per le prove in locale (archivio storico)
     for fid, v in json.load(open(f)).get("partite", {}).items():
         if v[6] and v[7]: FULL.setdefault(fid, (v[6], v[7]))
-IDX = {"c": (0, 2), "s": (1, 0), "st": (2, 1)}   # statistica: (posizione nei dati per tempo, posizione nell'archivio)
+IDX = {"c": (0, 2), "s": (1, 0), "st": (2, 1), "o": (4, None)}   # statistica: (posizione nei dati per tempo, posizione nell'archivio)
+# 9/11/2026: fuorigioco (posizione 4 nei dati per tempo; l'archivio non ha il totale a 90': si usa la somma dei due tempi). La prova del 6/11
+# (tools/p2/test_primo_tempo2.py) ha passato la regola: quota reale del 1° tempo del campionato al posto della metà fissa (+5,7%).
 out = {}
 for fn in sorted(glob.glob(os.path.join(TEMPI, "*.json"))):
     lg = os.path.basename(fn)[:-5]
@@ -25,8 +27,12 @@ for fn in sorted(glob.glob(os.path.join(TEMPI, "*.json"))):
         H, A = FULL[fid]
         for k, (i, j) in IDX.items():
             h1, a1, h2, a2 = v[3][i], v[4][i], v[5][i], v[6][i]
-            fh, fa = H[j] if len(H) > j else None, A[j] if len(A) > j else None
-            if None in (h1, a1, h2, a2, fh, fa) or h1 + h2 != fh or a1 + a2 != fa: continue
+            if j is None:
+                if None in (h1, a1, h2, a2): continue
+                fh, fa = h1 + h2, a1 + a2
+            else:
+                fh, fa = H[j] if len(H) > j else None, A[j] if len(A) > j else None
+                if None in (h1, a1, h2, a2, fh, fa) or h1 + h2 != fh or a1 + a2 != fa: continue
             x = acc[k]; x[0] += h1; x[1] += fh; x[2] += a1; x[3] += fa; x[4] += 1
     L = {k: [round(x[0] / x[1], 4), round(x[2] / x[3], 4), x[4]] for k, x in acc.items() if x[4] >= 200 and x[1] and x[3]}
     if L: out[lg] = L
