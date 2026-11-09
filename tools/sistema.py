@@ -254,3 +254,29 @@ if MB:
          f"1xBet: {fmt(stats(a))} ‖ media dei book: {fmt(stats(bm))} ‖ quota media 1xBet {np.mean([o['q'] for o in MB]):.3f} contro media dei book {np.mean([o['qm'] for o in MB]):.3f}")
 else:
     note("6 · media dei book in parallelo", "ancora nessun esito con le quote medie (archivio dal 7/11/2026)")
+
+# ---------------- 7 · regola "sharp" sui cartellini (ricerca 360 del 9/11/2026), in avanti dal 10/11 ----------------
+# 1xBet Over/Under cartellini quando la quota batte di oltre il 3% la quota equa di Pinnacle (senza margine) sulla stessa linea.
+try:
+    OHs = json.load(open("data/odds_hist.json")); REALk = {r["key"]: r.get("real") for r in json.load(open("rm_all.json")) if r["k"] == "k"}
+    SB = []
+    for key, x in OHs.items():
+        d = key.split("|")[1]
+        if d < "2026-11-10" or REALk.get(key) is None: continue
+        q = (x.get("ultima") or {}).get("q") or {}; P, X = {}, {}
+        for kk, v in q.items():
+            for pre, D in (("p.kou:", P), ("x.kou:", X)):
+                if kk.startswith(pre):
+                    s_, ln = kk[len(pre):].split(" "); D.setdefault(float(ln), {})[s_[0]] = v[0] if isinstance(v, list) else v
+        for ln, xo in X.items():
+            po = P.get(ln)
+            if not po or "O" not in po or "U" not in po: continue
+            fo = (1 / po["O"]) / (1 / po["O"] + 1 / po["U"])
+            for s_ in ("O", "U"):
+                if s_ in xo and (fo if s_ == "O" else 1 - fo) * xo[s_] - 1 > 0.03:
+                    r_ = REALk[key]; SB.append(dict(key=key, d=d, q=xo[s_], y=0.5 if r_ == ln else int((r_ > ln) == (s_ == "O"))))
+    if SB:
+        pl = [(b["q"] - 1) if b["y"] == 1 else (0 if b["y"] == 0.5 else -1) for b in SB]
+        note("7 · regola sharp cartellini (dal 10/11)", f"{len(SB)} giocate · presa {100 * np.mean([b['y'] == 1 for b in SB]):.0f}% · quota {np.mean([b['q'] for b in SB]):.2f} · rendimento {100 * np.mean(pl):+.1f}% (studio: +21,5% su 154)")
+    else: note("7 · regola sharp cartellini (dal 10/11)", "ancora nessuna giocata con esito")
+except Exception as e_: note("7 · regola sharp cartellini", f"non calcolata: {e_}")
