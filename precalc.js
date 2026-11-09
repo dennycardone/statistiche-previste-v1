@@ -26,6 +26,8 @@ try { const ta = fs.readFileSync(path.join(DATA, "tiri_area.json"), "utf8"); vm.
 try { const fz = fs.readFileSync(path.join(DATA, "formazioni.json"), "utf8"); vm.runInContext("FORMAZ = " + fz + "; clearCache();", ctx); } catch (e) { console.log("formazioni.json non disponibile"); }
 // 25/10/2026: fuorigioco (1X2 nel Grado e nei Segnali, come nell'app); caricato prima delle partite, che ricevono i fuorigioco reali
 try { const of = fs.readFileSync(path.join(DATA, "fuorigioco.json"), "utf8"); vm.runInContext("OFFS = " + of + "; clearCache();", ctx); } catch (e) { console.log("fuorigioco.json non disponibile"); }
+// 9/11/2026: linee dei book per i segnali dei cartellini (Over/Under sulla linea che i book propongono), come nell'app
+try { const ln = fs.readFileSync(path.join(DATA, "linee.json"), "utf8"); vm.runInContext("var LINEE = " + ln + "; var bkLines = e => { const b = (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null; return b && b.mb ? { ...b, ...b.mb } : b; }; clearCache();", ctx); } catch (e) { console.log("linee.json non disponibile"); }
 A.resetState();
 for (const f of man.files || []) { const p = path.join(DATA, f); if (fs.existsSync(p)) A.addParsed(A.parseCSV(fs.readFileSync(p, "utf8"))); }
 A.S.meta = { fetched: man.updated };
