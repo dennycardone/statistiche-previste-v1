@@ -126,6 +126,15 @@ jobs:
             mkdir -p $d/data && cp $APP $d/ && touch $d/.nojekyll
             for f in $DATA; do if [ -f data/$f ]; then cp data/$f $d/data/; fi; done
           done   # copia identica in docs/: il sito funziona sia con "/ (root)" sia con "/docs" nelle impostazioni di Pages
+          # 10/11/2026: blocco di sicurezza. L'app nuova si avvia in un browser vero con i dati di questo giro (scheda partita, Radar, Segnali);
+          # se non parte o dà errori, online resta l'app della versione precedente (i dati si aggiornano lo stesso)
+          npm i --no-save --silent playwright-core >/dev/null 2>&1 || true
+          if ! CHROME_PATH="$(command -v google-chrome || command -v chromium-browser || command -v chromium || true)" node tools/controllo_app.js _site; then
+            if git fetch -q --depth 1 origin pages && git show FETCH_HEAD:index.html > /tmp/index_prec.html && [ -s /tmp/index_prec.html ]; then
+              cp /tmp/index_prec.html _site/index.html; cp /tmp/index_prec.html _site/docs/index.html
+              echo "::error title=Controllo dell'app::app nuova NON pubblicata: online resta la versione precedente"
+            fi
+          fi
           cd _site
           git init -q -b pages
           git config user.name "corner-bot"

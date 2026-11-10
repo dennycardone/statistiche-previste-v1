@@ -1375,7 +1375,7 @@ if ODDS_FULL or ODDS_NEAR:
         lg = BY_ID[f["league"]["id"]]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
         m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
         if not m: nomatch.append(f"{lg} {f['teams']['home']['name']} - {f['teams']['away']['name']}"); return
-        acc, xacc, macc = {}, {}, {}
+        acc, xacc, macc, sacc = {}, {}, {}, {}
         for b in e.get("bookmakers", []):
             for bet in b.get("bets", []):
                 for v in bet.get("values", []):
@@ -1396,6 +1396,8 @@ if ODDS_FULL or ODDS_NEAR:
                         _v = {"1": "Home", "X": "Draw", "2": "Away"}.get(val, val)
                         _mk = "m.off." + re.sub(r"[^a-z0-9]+", "_", nm.lower()).strip("_") + ":" + _v
                     if _mk and not _mk.endswith(":") and o > 1: macc.setdefault(_mk, {})[b["name"]] = o
+                    # 10/11/2026: cartellini, quota più alta tra i book diversi da Pinnacle ("s.kou"), da confrontare con la quota equa di Pinnacle
+                    if _mk and _mk.startswith("m.kou:") and o > 1 and b["name"] != "Pinnacle": sacc.setdefault("s." + _mk[2:], {})[b["name"]] = o
                     if nm in XBETS: xacc.setdefault(XBETS[nm] + ":" + val, {})[b["name"]] = o   # mercati secondari: solo archivio (mediana, per le analisi)
                     if nm in XBETS and b["name"] == "1xBet": xacc.setdefault("x." + XBETS[nm] + ":" + val, {})[b["name"]] = o   # 1xBet: linee dell'app
                     # 11/10/2026: mercati del primo tempo di 1xBet (corner, tiri, falli, cartellini…): solo archivio, per studiarli (nessuna richiesta in più)
@@ -1423,6 +1425,8 @@ if ODDS_FULL or ODDS_NEAR:
         xq = {kk: [med(list(v.values())), len(v)] for kk, v in xacc.items()}
         xq = {kk: v for kk, v in xq.items() if v[0]}
         xq.update({kk: v for kk, v in mq.items() if v})
+        for kk, v in sacc.items():
+            bx = max(v, key=v.get); xq[kk] = [round(v[bx], 2), len(v), round(v[bx], 2), bx]
         if q or xq: allq[f"{lg}|{m[0]}|{m[1]}|{m[2]}"] = {**q, **xq}
     try:
         # richieste rimaste oggi (la chiamata status non conta); ne lascio 5 di margine
@@ -1626,6 +1630,19 @@ try:
             _o3 = [q.get(pre + "off.offsides_1x2:" + s_, [None])[0] for s_ in ("Home", "Draw", "Away")]
             if all(v_ and v_ > 1 for v_ in _o3): dst["o1x2"] = _o3
         if mb: ent["mb"] = mb
+        # 10/11/2026 (audit, punto 2): cartellini, quota equa di Pinnacle (senza margine) sulle sue linee più equilibrate (al massimo 3) e, sulla
+        # stessa linea, la quota più alta degli altri book: [linea, equa Over, equa Under, max Over, book, max Under, book]
+        pk = []
+        for k2, v in q.items():
+            if k2.startswith("p.kou:Over "):
+                try: ln = float(k2.split(" ")[1])
+                except ValueError: continue
+                if abs(ln - math.floor(ln) - 0.5) > 1e-9: continue   # solo linee x,5
+                u = q.get(f"p.kou:Under {k2.split(' ')[1]}")
+                if not u or not (v[0] > 1 and u[0] > 1): continue
+                po = (1 / v[0]) / (1 / v[0] + 1 / u[0]); so, su = q.get(f"s.kou:Over {k2.split(' ')[1]}"), q.get(f"s.kou:Under {k2.split(' ')[1]}")
+                pk.append((abs(po - 0.5), [ln, round(1 / po, 3), round(1 / (1 - po), 3), so[0] if so else None, so[3] if so else None, su[0] if su else None, su[3] if su else None]))
+        if pk: ent["pk"] = [x[1] for x in sorted(pk, key=lambda x: x[0])[:3]]
         if ent: ent["t"] = x["ultima"].get("ora", ""); LN[kk] = ent
     json.dump({"aggiornate": rome_now.strftime("%d/%m/%Y %H:%M"), "fonte": "1xBet (via API-Football) e, in mb, media dei bookmaker senza le quote fuori linea: ultima quota vista prima del calcio d'inizio", "partite": LN},
               open(os.path.join(OUT, "linee.json"), "w"), separators=(",", ":"), ensure_ascii=False)

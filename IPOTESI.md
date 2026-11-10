@@ -51,3 +51,17 @@ riallineamento del livello sugli ultimi mesi.
 ma l'app non mostra probabilità Over/Under del 1° tempo → nulla da applicare ora; cartellini 1° tempo +7,1 (solo holdout, Poisson troppo stretta);
 fuorigioco 1° tempo +2,4/+2,8 con Platt al limite (verifica [−0,00447, +0,00004]) → non adottato; in scheda resta il valore atteso con la quota
 reale del 1° tempo del campionato (pubblicato il 9/11).
+
+
+## 10/11/2026 · Riallineo del livello (gol, tiri, tiri in porta, falli, corner) — NON adottato
+Prova: fattore reale/atteso sugli ultimi 60/120/240 giorni, globale o per campionato, solo con i giorni precedenti (tools/calib_livello.py, 8 shard).
+Nessuna statistica passa la regola: in verifica il miglioramento non è significativo per nessuna.
+- Tiri: verifica −0,00033 [−0,00138, +0,00062] (non significativo) · holdout −0,00484 [−0,00778, −0,00215] · ultimi 120 giorni −0,01591, scarto Over +9,1 → −1,3 · campionati migliorati 84% · fattore oggi 1,053.
+- Gol: verifica +0,00018 (peggiora) · holdout −0,00133 · 120 giorni −0,00444, scarto Over +4,7 → +1,2 · fattore oggi 1,086.
+- Tiri in porta: verifica +0,00026 · holdout −0,00107 · 120 giorni −0,00360 · fattore oggi 1,043.
+- Falli: verifica −0,00020 (non significativo) · holdout −0,00184 · fattore oggi 1,011. Corner (controllo): nulla, fattore 1,03.
+Lettura: la sottostima degli Over è reale ma recente (holdout e ultimi 120 giorni), nel periodo di verifica non c'era: la regola non la lascia passare. Da rileggere al 7/12 con un mese in più (i Tiri sono il candidato).
+
+## 10/11/2026 · Freno 1X2 corner oltre quota 2,50 e quota equa Pinnacle sui cartellini
+- Operatività: gli 1X2 corner oltre 2,50 restano visibili "in osservazione", senza peso (registro 3–8/11: 34 giocate, 9 prese, −39,8% a puntata fissa). Vengono refertati a parte nel registro.
+- Cartellini: linee Pinnacle (quota senza margine) in linee.json "pk" con il massimo degli altri book; scheda partita e blocco 5 di Operatività. Solo indicazione, in verifica dal 10/11.

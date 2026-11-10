@@ -97,6 +97,9 @@ let nLock = 0;
     const dup = day.singole.concat(neu.filter(n => n[0] === "singole").map(n => n[1])).some(o => o.id === c.e.id && o.k === c.k && o.side === c.side);
     neu.push(["contro", { ...prop(c), f: dup ? 0 : A.opKelly(c.pc, c.q), dup: dup ? 1 : 0 }]);
   }
+  // 10/11/2026: 1X2 corner oltre quota 2,50 in osservazione (senza peso), fissati e valutati come le altre proposte
+  day.oss = day.oss || [];
+  for (const c of X.OSS || []) if (!day.oss.some(o => o.id === c.e.id)) { day.oss.push({ ...prop(c), f: 0, w: 0, oss: 1, t: nowIso }); nLock++; }
   const comb = b => ({ legs: b.legs.map(prop), q: r4(b.q), p: r4(b.p), ev: r4(b.ev), f: A.opKelly(b.p, b.q) });
   if (!day.q2 && X.D2) neu.push(["q2", comb(X.D2)]);
   if (!day.q3 && X.T3) neu.push(["q3", comb(X.T3)]);
@@ -136,7 +139,7 @@ function grade(g) {
 }
 for (const [d, day] of Object.entries(LR)) {
   if (d < A.addDays(t0, -4)) continue;
-  for (const o of [...day.singole, ...day.contro]) grade(o);
+  for (const o of [...day.singole, ...day.contro, ...(day.oss || [])]) grade(o);
   for (const b of [day.q2, day.q3]) if (b) { b.legs.forEach(grade); b.ok = b.legs.some(l => l.ok === 0) ? 0 : b.legs.every(l => l.ok === 1) ? 1 : null; }
 }
 for (const d of Object.keys(LR)) if (d < A.addDays(t0, -60)) delete LR[d];

@@ -1126,6 +1126,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <p><b>Valori per tempo.</b> Sotto tiri, tiri in porta e corner la Lettura mostra i valori attesi del 1° e del 2° tempo: valore atteso della partita × quota del 1° tempo del campionato per sede, calcolata dai soli dati reali per tempo di API-Football (dalla stagione 2024-25, solo partite in cui i due tempi sommati coincidono con il totale; campionati con almeno 200 partite). Falli: API-Football non dà i dati per tempo.</p>
       <p><b>Fonti dei dati.</b> Fonte principale: <b>API-Football</b> (calendario, risultati, statistiche di corner, falli, tiri e tiri in porta, arbitri, cartellini, quote dei bookmaker): quote controllate circa ogni 30 minuti, risultati e statistiche circa ogni ora. football-data.co.uk resta come archivio delle stagioni passate e riserva; ESPN e fixturedownload.com come riserva del calendario. Quando due fonti non coincidono su un risultato recente vale API-Football. In Radar, Segnali e pallini della home gli 1X2 di corner, tiri, tiri in porta, falli e fuorigioco compaiono solo nei campionati dove 1xBet li quota (almeno 5 delle ultime 10 partite, in un giorno qualsiasi degli ultimi 21, calcolato a ogni aggiornamento sull'archivio delle quote); nella scheda partita ci sono sempre. Quote: dal 7/11/2026 l'app mostra e usa nei calcoli la <b>media dei bookmaker</b> che API-Football passa per quel mercato, tolte le quote fuori linea (oltre il 12% dalla mediana: linee ferme o errori), con accanto quanti book e la quota più alta con il suo book, es. 1,92 (media 4 book · max 2,00 Betano); dove c'è un solo book si usa quello (per 1X2 di falli, gialli e fuorigioco di solito solo 1xBet o nessuno). Gli studi già fissati (Grado, Quota 2/3, Controtendenza, sistema) restano misurati su 1xBet; la media dei book è seguita in parallelo. Le quote arrivano solo tramite API-Football: quando una quota non arriva compare <b>N.D.</b> (non significa che i book non offrano il mercato); una quota che la fonte non passa più è indicata con l'ora in cui è stata vista l'ultima volta. Un controllo automatico segnala quando la fonte smette di passare un mercato (dal 24/10/2026 succede per falli, gialli e fuorigioco); una partita spostata di data conserva le quote viste prima dello spostamento. Nel Radar Mercato si vedono di base solo le giocate con riuscita almeno 65% (le altre con "Tutte"); quelle dal 70% sono segnate "70%+". Verifica sull'archivio 1xBet dal 9 al 27/10/2026 (1.207 giocate proposte): senza soglia presa 52% contro 61% dichiarato, rendimento −4%; dal 65% presa 59% e 64% nelle due metà del periodo, rendimento +2% e +11% (margini d'errore ancora ampi). Resta "in verifica": la soglia si giudica solo sulle partite dal 27/10 in avanti (lettura il 7/12, decisione il 18/1). Scegliendo un giorno passato nella tendina Data (fino a 7 giorni fa) il Radar Mercato mostra le giocate di quel giorno con valore reale ed esito (✓/✗), il riepilogo del giorno e degli ultimi 7 giorni (prese, probabilità dichiarata in media, rendimento a puntata fissa): dal 28/10 sono le giocate bloccate al calcio d'inizio, cioè l'ultima versione vista prima del fischio, con la linea e la quota di quel momento; i giorni precedenti sono ricostruiti con i soli dati precedenti alla partita e segnati. Le formazioni ufficiali sono prese da API-Football circa 60-20 minuti prima del fischio (controllo ogni 10 minuti, con un secondo tentativo nello stesso giro); un rapporto giornaliero conta quante sono state prese prima del fischio e quali sono mancate.</p>
       <p><b>Operatività (Radar, in verifica).</b> Per le partite da giocare del giorno scelto: probabilità corretta (Prevista e media dei book senza margine; pesi stimati ogni mattina su tutti i giorni già giocati dell'archivio 1xBet, il più lungo), solo esiti con quote attuali e valore atteso positivo, calcolato sulla quota media. Singole di statistiche (una per partita; dal 3/11 solo 1X2 corner, falli, fuorigioco, gialli, Over/Under cartellini totali e tiri totali: spenti 1X2 tiri, tiri in porta e corner per squadra, niente gol), Quota 2 e Quota 3 del giorno (valore atteso congiunto più alto, astensione se negativo) e Controtendenza (sfavorita dei book a quota 2,30 o più che Prevista dà più probabile della favorita, su corner, fuorigioco, gialli e falli). Peso: Kelly 1/8, al massimo 3% per giocata e 10% al giorno; puntata minima 0,20 €; cassa salvata solo sul telefono. Dal 2/11 ogni proposta è fissata nel registro quando compare (quota, probabilità corretta e peso di quel momento) e non cambia più: lo storico è lo stesso registro con l'esito. Calcoli su modelli ancora in verifica (lettura 7/12, decisione 18/1), non promesse di vincita. Quote da cercare: per 1X2 di falli, gialli e fuorigioco senza quota via API, con un segnale forte (Grado A o A+, spostamento dei falli di almeno 8 punti con le formazioni ufficiali, gialli con Prevista dal 60%), la quota minima sotto cui lasciar stare: 1,08 / probabilità prudente (corretta come se il mercato fosse d'accordo con Prevista). Solo indicazione: non entra in pesi, registro e rendimenti.</p>
+      <p><b>Dal 10/11/2026.</b> 1X2 corner oltre quota 2,50: in osservazione, senza peso (nel registro del 3-8/11: 34 giocate, 9 prese, −40% a puntata fissa). Cartellini contro Pinnacle: quota equa di Pinnacle senza margine e quota minima (equa + 3%) nella scheda partita e nel blocco 5 di Operatività; regola uscita dalla ricerca del 9/11 (154 giocate, +21,5% ±13), in verifica sulle partite nuove, fuori da pesi e registro. 1X2 dei tiri ricalibrato (audit completo di calibrazione del 9/11). Prima di ogni pubblicazione l'app nuova viene avviata in un browser di prova: se non parte o dà errori resta online la versione precedente.</p>
       <p><b>Nazionali</b> (dall'8/11/2026): partite ufficiali (Mondiale, Europeo, Nations League, Copa América, Coppa d'Africa e qualificazioni; amichevoli escluse), dati API-Football dal 2020. Modello per squadra: fatti e subiti con peso che si dimezza ogni 18 mesi, ritirati verso la media (4 partite fittizie). Verifica walk-forward contro la media (scelta, verifica, holdout): chi ne fa di più su corner, tiri, tiri in porta, falli e cartellini migliore in tutti i periodi; totale di tiri, tiri in porta e falli migliore; totale dei corner come la media, totale dei cartellini peggio della media nell'ultimo periodo; fuorigioco non disponibili. Classifica = girone della partita. Grado, Radar, Operatività e Segnali usano le stesse regole dei club, non ancora verificate sulle nazionali.</p>
       <p><b>Media dinamica – tiri e tiri in porta.</b> Anche tiri e tiri in porta usano modelli verificati: regressioni di Poisson che partono dalla media di lega per sede (365 giorni). Tiri: rating tiri fatti × concessi degli ultimi 4 anni (una partita di 6 mesi fa pesa il 37%, prudenza P = 4) con una parte casa/trasferta, tiri delle ultime 10 (fatti dalla squadra, concessi dall'avversario), quota di partite in vantaggio e in svantaggio all'intervallo nelle ultime 38 ed Elo. Tiri in porta: rating tiri in porta (una partita di un anno fa pesa il 37%, prudenza P = 8), rating dei tiri totali (chi tira molto finisce per avere più tiri in porta), tiri delle ultime 8 ed Elo. Coefficienti stimati su 8 campionati, solo stagioni in cui football-data misura i tiri nello stesso modo (quota in porta fino al 40%); nel test walk-forward migliori della versione precedente in tutti gli 8 campionati e, per squadra, in ogni stagione. Totale: Binomiale Negativa r = 150 per i tiri e r = 100 per i tiri in porta; per squadra r = 25 e r = 40.</p>
       <p><b>Media dinamica – gol.</b> Per i gol (e quindi Over/Under, Gol/No gol, 1X2 e risultati) la Media dinamica usa un modello verificato sui dati: una regressione di Poisson con 4 ingredienti. (1) Gol medi del campionato per quella sede negli ultimi 365 giorni. (2) Fattore campo. (3) Gol attesi da un rating attacco × difesa sui tiri in porta, calcolato sulle partite del campionato degli ultimi 4 anni (anche le stagioni passate), con le partite più vecchie che pesano meno (una partita di un anno fa pesa il 37%) e prudenza P = 4. (4) Differenza di Elo tra le due squadre, calcolato dall'app dai risultati delle partite dei giorni precedenti (le stesse stagioni caricate): nel test rende quasi quanto l'Elo ufficiale di ClubElo. Coefficienti stimati su 8 campionati, solo stagioni con dati completi 2007/08–2024/25. Nel test walk-forward è risultato migliore della versione precedente in tutti gli 8 campionati e in ogni stagione, soprattutto nelle prime giornate. Se l'Elo di una squadra non c'è ancora, usa la stessa regressione stimata senza Elo, anch'essa migliore della precedente. Senza abbastanza partite con i tiri in porta torna alla versione precedente (voti sugli xG). Dal 18/10/2026 i gol attesi tengono conto anche della qualità dei tiri: a parità di tiri in porta, chi arriva più spesso al tiro dentro l'area (e l'avversario che lo concede) segna di più (tiri in area di API-Football, 365 giorni; nel test walk-forward con il codice dell'app su 17.119 partite da luglio 2025 le previsioni dei gol sono migliorate in entrambe le stagioni).</p>
@@ -4530,6 +4531,21 @@ function qMinCerca(e, key, p, R) {
   }
   return best;
 }
+/* 10/11/2026 (audit, punto 2): cartellini contro Pinnacle. linee.json "pk" = quota equa di Pinnacle (senza margine) sulle sue linee x,5 più
+   equilibrate e la quota più alta degli altri book sulla stessa linea. Regola della ricerca del 9/11 (154 giocate, +21,5% ±13, da confermare
+   in avanti): giocare solo se il book paga almeno la quota equa × 1,03. Informativo: fuori da pesi e registro. */
+const PK_M = 0.03;
+function pkRows(e) {
+  const LB = bkLines(e), P = LB && LB.pk; if (!P) return [];
+  return P.flatMap(([L, fo, fu, mo, bo, mu, bu]) => [{ L, side: "Over", fair: fo, best: mo, book: bo }, { L, side: "Under", fair: fu, best: mu, book: bu }])
+    .map(r => ({ ...r, min: r.fair * (1 + PK_M), edge: r.best ? r.best / r.fair - 1 : null }));
+}
+function pkHTML(e, m) {
+  if (m) return ""; const R = pkRows(e); if (!R.length) return "";
+  return `<div class="bk1x2 pkbox"><p class="bk1x2-h"><b>Cartellini · quota equa di Pinnacle</b> · quota minima da accettare</p>
+    <table><thead><tr><th></th><th>Equa</th><th>Minima</th><th>Miglior book</th></tr></thead><tbody>${R.map(r => `<tr><th>${r.side} ${th1(r.L)}</th><td class="num">${f2(r.fair)}</td><td class="num"><b>${f2(r.min)}</b></td><td class="num">${r.best ? `${f2(r.best)} <small class="muted">${esc(r.book || "")}</small>${r.best >= r.min ? " ✓" : ""}` : "N.D."}</td></tr>`).join("")}</tbody></table>
+    <p class="bk1x2-n">Equa = quota di Pinnacle senza margine (il book più preciso sui cartellini). Minima = equa + 3%: sul tuo book gioca solo da lì in su, sulla stessa linea. ✓ = un book passato da API-Football la paga già. Regola in verifica dal 10/11 (nello studio: 154 giocate, +21,5%).</p></div>`;
+}
 function stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB) {
   const lab = ["1", "X", "2"], rs = [];
   const add = (name, key, R, hr, ar, indep) => {
@@ -4613,7 +4629,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
     const nVal = R.reduce((a, r) => a + [r.h, r.t, r.a] .filter(isVal).length, 0);
     const S1 = NO_1XBET.has(S.league) && !LB ? "" : stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB);
     bkBody = (LB ? R.map(r => `<div class="sx-r">${bkCellHTML(r.h, false)}${bkCellHTML(r.t, true, r.lab)}${bkCellHTML(r.a, false)}</div>`).join("")
-        : NO_1XBET.has(S.league) ? `<p class="bk-none">${NO_1XBET_TXT}</p>` : `<p class="bk-none">${S1 ? "Linee Over/Under" : "Linea"} non disponibil${S1 ? "i" : "e"} per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + S1 + RG_LINE
+        : NO_1XBET.has(S.league) ? `<p class="bk-none">${NO_1XBET_TXT}</p>` : `<p class="bk-none">${S1 ? "Linee Over/Under" : "Linea"} non disponibil${S1 ? "i" : "e"} per questa partita${m ? " (archivio delle quote attivo dal 4 ottobre 2026)" : " (di solito arriva 1-7 giorni prima)"}.</p>`) + S1 + pkHTML(e, m) + RG_LINE
       ;
   }
   const nzc = S.league === "NAZ" && e && e.ucl && e.ucl.comp;   // nazionali: nome della competizione come per i campionati
@@ -5551,8 +5567,15 @@ function opBest(L, nLeg, lo, hi) {   // combinazione di partite diverse con quot
   };
   rec(0, []); return best;
 }
+const OP_OSS_Q = 2.50;
 function opSelect(A, minW = 0) {   // regole della vista (le stesse per lo storico); minW = puntata minima come frazione della cassa (0,20 € / cassa)
   const okHi = c => !((c.k === "s" || c.k === "st") && c.q >= 2.30);
+  // 10/11/2026 (audit, Denny): 1X2 corner oltre quota 2,50 in osservazione, senza peso. Nel registro del 3-8/11: 34 giocate, 9 prese, quota
+  // media 3,13, −40% a puntata fissa: tutta la perdita del periodo. Restano visibili (OSS) e seguiti nel registro, fuori da pesi e combinate.
+  const oss = c => c.k === "c" && c.q > OP_OSS_Q;
+  const byO = new Map(); for (const c of A) if (oss(c) && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW) { const b = byO.get(c.e.id); if (!b || c.ev > b.ev) byO.set(c.e.id, c); }
+  const OSS = [...byO.values()].sort((a, b) => b.ev - a.ev);
+  A = A.filter(c => !oss(c));
   // 1 · singole: una per partita (valore atteso corretto più alto)
   const byE = new Map(); for (const c of A) if (c.ev > 0 && okHi(c) && opKelly(c.pc, c.q) >= OP_MINW) { const b = byE.get(c.e.id); if (!b || c.ev > b.ev) byE.set(c.e.id, c); }
   let S1 = [...byE.values()].sort((a, b) => b.ev - a.ev);
@@ -5575,7 +5598,7 @@ function opSelect(A, minW = 0) {   // regole della vista (le stesse per lo stori
     for (const o of low) W.delete(o); cut += low.length;
     S1 = S1.filter(o => W.has(o)); S3 = S3.filter(o => W.has(o) || S1.includes(o)); if (D2 && !W.has(D2)) D2 = null; if (T3 && !W.has(T3)) T3 = null;
   }
-  return { S1, D2, T3, S3, W, tot, sc, cut };
+  return { S1, D2, T3, S3, W, tot, sc, cut, OSS };
 }
 /* 2/11/2026: registro delle proposte (tools/operativita_ieri.js). Ogni proposta è fissata al primo giro in cui compare (quota, probabilità
    corretta e peso di quel momento) e non cambia più: quello che l'app mostra oggi è esattamente quello che finisce nello storico. */
@@ -5591,7 +5614,7 @@ function renderOpLedger(box, head, day, dkey) {
     const e = o.legs ? null : ent(o.id); if (e && koStarted(e.d, e.time)) return `<small class="muted">in corso</small>`; return isToday ? `<small class="muted">da giocare</small>` : `<small class="muted">in attesa</small>`; };
   const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" || c.k === "sou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
   const eur = v => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2).replace(".", ",")} €`;
-  const wT = o => { if (o.dup) return `<small class="num">già tra le singole</small>`; const v = (o.w || 0) * 100, r = opRes(o);
+  const wT = o => { if (o.oss) return `<small class="num">senza peso</small>`; if (o.dup) return `<small class="num">già tra le singole</small>`; const v = (o.w || 0) * 100, r = opRes(o);
     return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${cassa ? ` · ${(o.w * cassa).toFixed(2).replace(".", ",")} €` : ""}</small>${cassa && r != null ? `<small class="num ${r ? "oppos" : "opneg"}">${eur(o.w * cassa * (r ? o.q - 1 : -1))}</small>` : ""}`; };
   const row = (c, extra = "") => `<button type="button" class="oprow" data-id="${esc(c.id)}"><span class="opm"><b>${esc(c.h)} – ${esc(c.a)}</b><small class="muted">${esc(c.lgn)} · ${esc(c.ora || "")}${c.ris ? " · finita " + esc(c.ris) : ""} · proposta alle ${hm(c.t)}</small></span>
       <span class="opx">${opTag(c)}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${opQ(c)} · quota minima di equilibrio ${f2(1 / c.pc)}${c.r != null ? ` · reale ${esc(String(c.r))}` : ""}</small></span>
@@ -5608,7 +5631,8 @@ function renderOpLedger(box, head, day, dkey) {
     <h3 class="oph">1 · Singole di valore (statistiche) <small>${S1.length}</small></h3>${S1.length ? `<div class="oplist">${S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola (astensione)</p>`}
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(day.q2, "Quota 2 · doppia")}${comb(day.q3, "Quota 3 · tripla")}
     <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita dei book</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}`
-    + (isToday ? opCercaHTML(selEntries(), MODES.dyn, e => e.time || "") : "") + RG_LINE;
+    + ((day.oss || []).length ? `<h3 class="oph">In osservazione · 1X2 corner oltre quota ${f2(OP_OSS_Q)} <small>${day.oss.length}</small></h3><div class="oplist">${day.oss.map(c => row(c)).join("")}</div><p class="opnone">Senza peso dal 10/11: nel registro del 3-8/11 hanno preso 9 volte su 34 (−40% a puntata fissa). Restano seguite; tornano tra le singole solo se il registro cambia.</p>` : "")
+    + (isToday ? opCercaHTML(selEntries(), MODES.dyn, e => e.time || "") + opPkHTML(selEntries(), e => e.time || "") : "") + RG_LINE;
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ent(b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   const inp = box.querySelector("#opCassa"); if (inp) inp.addEventListener("change", () => { const v = parseFloat(inp.value.replace(",", ".")); lsSet("statPreviste.cassa", v > 0 ? String(v) : ""); renderSelOp(selEntries(), MODES[$("#decay").value] || MODES.dyn, e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`); });
 }
@@ -5664,6 +5688,16 @@ function renderOpPast(box, head, cfg, when) {
 const opQ = c => qBk(c.q, c.nb, c.qmax, c.bk);
 /* 6/11/2026: 4 · Quote da cercare. 1X2 falli, gialli e fuorigioco senza quota via API ma con un segnale forte (qMinCerca): solo indicazione,
    non entra nel registro, nei pesi né nei rendimenti. */
+function opPkHTML(ents, when) {   // 5 · cartellini con un book sopra la quota minima di Pinnacle (solo indicazione)
+  const L = [];
+  for (const e of ents) { if (e.m || koStarted(e.d, e.time)) continue; for (const r of pkRows(e)) if (r.best && r.best >= r.min) L.push({ e, ...r }); }
+  L.sort((a, b) => b.edge - a.edge);
+  const tot = ents.filter(e => !e.m && pkRows(e).length).length;
+  return `<h3 class="oph">5 · Cartellini sopra la quota equa di Pinnacle <small>${L.length}</small></h3>${L.length ? `<div class="oplist">${L.slice(0, 15).map(c => `<button type="button" class="oprow" data-id="${esc(c.e.id)}"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(lgName(c.e.lg))} · ${when(c.e)}</small></span>
+      <span class="opx"><span class="opmk">Cartellini · ${c.side} ${th1(c.L)}</span><small class="muted">equa Pinnacle ${f2(c.fair)} · minima ${f2(c.min)} · ${esc(c.book || "")} paga ${f2(c.best)}</small></span>
+      <span class="opw"><b class="num">+${(c.edge * 100).toFixed(1).replace(".", ",")}%</b><small>sulla equa</small></span></button>`).join("")}</div>` : `<p class="opnone">Nessun book sopra la minima${tot ? ` (${tot} partite con la linea di Pinnacle)` : ": Pinnacle non ha ancora le linee"}</p>`}
+    <p class="opnone">Solo indicazione, fuori da pesi e registro: regola in verifica dal 10/11. Sul tuo book vale la stessa quota minima (nella scheda partita).</p>`;
+}
 function opCercaHTML(ents, cfg, when) {
   if (!CORR || !CORR.gruppi || !CORR.gruppi.statistiche) return "";
   const t0 = performance.now(), L = [];
@@ -5701,9 +5735,9 @@ function renderSelOp(ents, cfg, when) {
   const t0 = performance.now(), todo = [];
   for (const e of ents) { const k = e.id + "|" + cfg.key + "|" + (CORR.agg || ""); if (!OP_C.has(k)) { if (performance.now() - t0 < 200) { try { opEntry(e, cfg); } catch (x) { OP_C.set(k, []); } } else todo.push(e); } }
   const A = ents.flatMap(e => OP_C.get(e.id + "|" + cfg.key + "|" + (CORR.agg || "")) || []);
-  const OPMIN = 0.20, cassa0 = opCassa(), { S1, D2, T3, S3, W, tot, sc, cut } = opSelect(A, cassa0 ? OPMIN / cassa0 : 0), wOf = o => W.get(o) || 0;
+  const OPMIN = 0.20, cassa0 = opCassa(), { S1, D2, T3, S3, W, tot, sc, cut, OSS } = opSelect(A, cassa0 ? OPMIN / cassa0 : 0), wOf = o => W.get(o) || 0;
   const cassa = opCassa(), money = f => cassa ? ` · ${(f * sc * cassa).toFixed(2).replace(".", ",")} €` : "";
-  const wTxt = o => { const f = wOf(o), v = f * sc * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${money(f)}</small>`; };
+  const wTxt = o => { if (OSS.includes(o)) return `<small class="num">senza peso</small>`; const f = wOf(o), v = f * sc * 100; return `<b class="num">${v.toFixed(v < 1 ? 2 : 1).replace(".", ",")}%</b><small class="num">peso${money(f)}</small>`; };
   const legTxt = c => `${esc(c.mk)} · ${c.k === "kou" || c.k === "sou" ? esc(c.side) : `${c.side} ${c.side === "X" ? "(pari)" : esc(c.who)}`}`;
   const row = (c, extra = "") => `<button type="button" class="oprow" data-id="${esc(c.e.id)}"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(lgName(c.e.lg))} · ${when(c.e)}</small></span>
       <span class="opx">${opTag(c)}${extra}<span class="opmk">${legTxt(c)}</span><small class="muted">corretta <b>${pc(c.pc)}</b> (Prevista ${pc(c.p)}) · @${opQ(c)} · quota minima di equilibrio ${f2(1 / c.pc)}</small></span>
@@ -5723,7 +5757,9 @@ function renderSelOp(ents, cfg, when) {
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(D2, "Quota 2 · doppia")}${comb(T3, "Quota 3 · tripla")}
     <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>
     ${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita dei book</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione a valore (astensione)</p>`}
+    ${OSS.length ? `<h3 class="oph">In osservazione · 1X2 corner oltre quota ${f2(OP_OSS_Q)} <small>${OSS.length}</small></h3><div class="oplist">${OSS.map(c => row(c)).join("")}</div><p class="opnone">Senza peso dal 10/11: nel registro del 3-8/11 hanno preso 9 volte su 34 (−40% a puntata fissa). Restano seguite.</p>` : ""}
     ${opCercaHTML(ents, cfg, when)}
+    ${opPkHTML(ents, when)}
     <p class="opfoot">Peso = Kelly 1/8 sulla probabilità corretta (al massimo 3% per giocata; sotto lo 0,1% la giocata non si mostra${cassa0 ? `; puntata minima 0,20 €${cut ? `: tolte ${cut} giocate sotto il minimo e pesi ricalcolati sulle altre` : ""}` : "; imposta la cassa per applicare la puntata minima di 0,20 €"}${sc < 1 ? `; oggi ridotti in proporzione per stare nel 10% della cassa, totale ${Math.round(tot * 100)}% → 10%` : "; totale del giorno al massimo 10%"}). Quota minima di equilibrio = 1 / probabilità corretta. Coefficienti del ${esc((CORR.agg || "").slice(8, 10) + "/" + (CORR.agg || "").slice(5, 7))} su ${cfgC.esiti} esiti in ${cfgC.giorni} giorni${fc.esiti ? ` (fuori campione log-loss: Prevista ${fc.logloss_prevista}, 1xBet ${fc.logloss_1xbet}, corretta ${fc.logloss_corretta})` : ""}. Esclusi gol, tiri e tiri in porta a quota alta e le forbici sulle strasfavorite.</p>` + RG_LINE;
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   const inp = box.querySelector("#opCassa"); if (inp) inp.addEventListener("change", () => { const v = parseFloat(inp.value.replace(",", ".")); lsSet("statPreviste.cassa", v > 0 ? String(v) : ""); renderSelOp(selEntries(), cfg, when); });
