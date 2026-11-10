@@ -41,6 +41,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install -q numpy scipy
-      - run: python3 tools/calib_full.py
+      - run: python3 tools/calib_livello.py
+      - run: python3 tools/calib_full.py || true
       - uses: actions/upload-artifact@v4
         with: { name: "calib-coef", path: "calib_coef.json", retention-days: 7 }

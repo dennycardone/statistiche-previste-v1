@@ -39,12 +39,12 @@ for (const m of ms) {
         add("Gol DC · 1X", G.p1 + G.px, r !== 2); add("Gol DC · X2", G.px + G.p2, r !== 0); add("Gol DC · 12", G.p1 + G.p2, r !== 1);
         [1.5, 2.5, 3.5].forEach((L, j) => add("Gol Over " + L, G.over[j], m.hg + m.ag > L, L - G.tot));
         add("Gol Gol/NoGol · Gol", G.btts, m.hg > 0 && m.ag > 0);
-        xs.g = [G.lh, G.la];
+        xs.g = [G.lh, G.la, m.hg, m.ag, 0];
       }
       const pO = (mu, r, L) => A.pOver(A.pmfTotal(mu, r, Math.ceil(L) + 30), L);
       const stat = (k, R, xh, xa, rTot, rTeam, cop, indep) => {
         if (!R || !isFinite(R.lh) || !isFinite(R.la) || !(R.lh > 0) || !(R.la > 0)) return;
-        xs[k] = [R.lh, R.la];
+        xs[k] = [R.lh, R.la, xh == null ? -1 : xh, xa == null ? -1 : xa, isFinite(rTot) ? rTot : 0];   // 10/11: reali e dispersione (studio del livello)
         if (xh == null || xa == null) return;
         const P = indep ? A.headToHeadProb(R.lh, R.la, Infinity, indep) : A.headToHeadProb(R.lh, R.la, rTot, rTeam, cop);
         const r = xh > xa ? 0 : xh === xa ? 1 : 2;
