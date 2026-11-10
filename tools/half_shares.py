@@ -26,6 +26,7 @@ for fn in sorted(glob.glob(os.path.join(TEMPI, "*.json"))):
         if not (v[3] and v[4] and v[5] and v[6]) or fid not in FULL: continue
         H, A = FULL[fid]
         for k, (i, j) in IDX.items():
+            if min(len(v[3]), len(v[4]), len(v[5]), len(v[6])) <= i: continue   # 10/11/2026: partite senza quella statistica per tempo
             h1, a1, h2, a2 = v[3][i], v[4][i], v[5][i], v[6][i]
             if j is None:
                 if None in (h1, a1, h2, a2): continue
