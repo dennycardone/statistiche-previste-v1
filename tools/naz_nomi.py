@@ -10,7 +10,7 @@ IT = {
     "Cambodia": "Cambogia", "Cameroon": "Camerun", "Canada": "Canada", "Cape Verde Islands": "Capo Verde", "Cayman Islands": "Isole Cayman",
     "Central African Republic": "Rep. Centrafricana", "Chad": "Ciad", "Chile": "Cile", "China": "Cina", "Chinese Taipei": "Taipei Cinese",
     "Colombia": "Colombia", "Comoros": "Comore", "Congo": "Congo", "Congo DR": "RD Congo", "Costa Rica": "Costa Rica", "Croatia": "Croazia", "Cuba": "Cuba",
-    "Curaçao": "Curaçao", "Cyprus": "Cipro", "Czechia": "Repubblica Ceca", "Denmark": "Danimarca", "Djibouti": "Gibuti", "Dominica": "Dominica",
+    "Curaçao": "Curaçao", "Cyprus": "Cipro", "Czechia": "Repubblica Ceca", "Czech Republic": "Repubblica Ceca", "Denmark": "Danimarca", "Djibouti": "Gibuti", "Dominica": "Dominica",
     "Dominican Republic": "Rep. Dominicana", "Ecuador": "Ecuador", "Egypt": "Egitto", "El Salvador": "El Salvador", "England": "Inghilterra",
     "Equatorial Guinea": "Guinea Equatoriale", "Eritrea": "Eritrea", "Estonia": "Estonia", "Eswatini": "Eswatini", "Ethiopia": "Etiopia",
     "FYR Macedonia": "Macedonia del Nord", "North Macedonia": "Macedonia del Nord", "Faroe Islands": "Isole Fær Øer", "Finland": "Finlandia", "France": "Francia",

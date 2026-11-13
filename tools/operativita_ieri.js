@@ -80,6 +80,16 @@ A.setCorr(CORR); A.setOdds(QMOV, LINEE);
    nuove si riducono se il budget rimasto non basta, a budget finito non si fissano più proposte). */
 const LP = path.join(DATA, "operativita_registro.json");
 let LR = {}; try { LR = JSON.parse(fs.readFileSync(LP, "utf8")); } catch (e) { LR = {}; }
+// 13/11/2026: API-Football ha cambiato "Czechia" in "Czech Republic" e la stessa partita era finita due volte nel registro (una senza esito).
+// Nomi riportati all'italiano e doppioni tolti (resta la prima proposta fissata).
+{
+  const FIX = { "Czech Republic": "Repubblica Ceca", "Czechia": "Repubblica Ceca" };
+  const fx = o => { if (!o) return; for (const [a, b] of Object.entries(FIX)) { if (o.h === a) o.h = b; if (o.a === a) o.a = b; if (o.id) o.id = o.id.split("|" + a).join("|" + b); } };
+  for (const day of Object.values(LR)) {
+    for (const kk of ["singole", "contro", "oss"]) if (Array.isArray(day[kk])) { const seen = new Set(); day[kk] = day[kk].filter(o => { fx(o); const key = o.id + "|" + o.k + "|" + o.side; if (seen.has(key)) return false; seen.add(key); return true; }); }
+    for (const b of [day.q2, day.q3]) if (b && b.legs) b.legs.forEach(fx);
+  }
+}
 const romeDate = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date());
 const nowIso = new Date().toISOString().slice(0, 16);
 const base = e => ({ id: e.id, lg: e.lg.code, lgn: e.lg.name, ora: e.time, h: e.home, a: e.away });
