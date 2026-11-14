@@ -71,3 +71,24 @@ Lettura: la sottostima degli Over è reale ma recente (holdout e ultimi 120 gior
 Audit del 13/11: sui cartellini il modello delle nazionali sbaglia più della media semplice (errore totale 1,779 contro 1,705, α 0,005).
 Registro 12-13/11: 11 giocate, 3 prese contro 6,0 attese, −50,6% a puntata fissa, −2,91% della cassa (club nello stesso periodo +0,41%).
 Da Denny (14/11): restano visibili e refertati in "In osservazione", fuori da singole, pesi e combinate. Tornano solo se il modello batte la media.
+
+## 14/11/2026 · Player props (giocatore singolo, solo titolari, Top 5) — ricognizione e primo test
+Script: tools/props/copertura.py, tools/props/sonda_quote.py (workflow diagnosi, input "giocatori"), tools/props/test_props.py, tools/props/test_props_cal.py.
+**Dati (archivio formazioni, nessuna chiamata nuova).** Top 5: 7.370 partite, 100% con statistiche dei giocatori, 99,6% con 11 titolari. Per giocatore e partita:
+minuti, ruolo, titolare/subentrato, gol, assist, gialli, rossi, falli fatti e subiti, tiri, tiri in porta, fuorigioco, contrasti, intercetti, duelli, dribbling, passaggi, voto.
+Somma dei giocatori contro squadra: tiri in porta 100% identici, falli 99,9%; tiri −26,6% nei Top 5 e −26,2% nel resto, perché i "tiri" del giocatore
+di API-Football NON contano i tiri respinti (somma = tiri − respinti nel 99,6% delle squadre). Non è un problema di qualità dei Top 5: è la definizione.
+**Quote.** Mercati giocatore solo su Bet365 (partite del 20-24/11): Player Shots, Player Shots On Target, marcatori. Falli commessi (266/271/277)
+e Ammonito (102/251) esistono nel catalogo ma non erano quotati sulle partite controllate (6 giorni prima): da ricontrollare il giorno della partita.
+Champions (Bodø/Glimt–LASK, 24/11): nessun mercato giocatore per ora.
+**Test (121.614 titolari, scelta fino a 6/2024, verifica 2024-25, holdout da 7/2025).** Parametri scelti nel periodo scelta: DP 0,97 e K 5 (tiri, tiri in porta,
+falli), DP 0,99 e K 20 (cartellini); α 0,1 / 0,2 / 0,1 / 0.
+- A contro riferimento di ruolo: passa su tutti e 7 i mercati, 5/5 campionati (log-loss da −0,005 sull'ammonito a −0,029 su tiri Over 1,5 e falli Over 1,5).
+- B contro A: passa su tutti e 7 (verifica / holdout): TP 0,5 −0,0032/−0,0034 · TP 1,5 −0,0019/−0,0013 · Tiri 1,5 −0,0050/−0,0041 · Tiri 2,5 −0,0031/−0,0024 ·
+  Falli 0,5 −0,0011/−0,0023 · Falli 1,5 −0,0012/−0,0025 · Ammonito −0,0007/−0,0006 (verifica 3/5 campionati, il più debole).
+- Calibrazione: B sovrastima del 5-15% (gli ingressi dalla panchina gonfiano i valori ogni 90'). Scala per statistica stimata nel periodo scelta: tiri ×0,93,
+  tiri in porta ×0,94, falli ×0,97 → passa su tiri 1,5/2,5, tiri in porta 0,5/1,5, falli 1,5; neutro su falli 0,5; cartellini ×1,01 non passa
+  (holdout prevista 16,1% contro 14,8% reale: i cartellini sono calati nelle ultime stagioni).
+- Bonus assenze: senza il tiratore principale, gli altri centrocampisti e attaccanti titolari tirano +1,5% rispetto all'atteso (IC −0,1% / +3,2%), tiri in porta
+  +1,6% (IC −1,1% / +4,0%): non misurabile, non si usa.
+Esito: modello da usare = B con la scala (tiri, tiri in porta, falli); ammonito = B senza scala, con la nota della sovrastima recente. Interfaccia: non ancora toccata.
