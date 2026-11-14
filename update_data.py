@@ -972,6 +972,20 @@ try:
             INJ["partite"] = {k: v for k, v in INJ["partite"].items() if (v.get("ko") or "9")[:10] >= _lim2}
             jdump(INJ, _IP)
             print("::notice title=Infortunati e squalificati::" + f"{_nr2} richieste · {_np2} segnalazioni nei nostri campionati (nuove {_ng2}) · archivio {len(INJ['partite'])} partite")
+        # 14/11/2026 (Denny, tab Giocatori): per le partite NON iniziate di oggi e domani, gli id dei giocatori fuori ("Missing Fixture") e in dubbio
+        # ("Questionable") nell'ultima lettura, con i nomi dell'app. Solo l'elenco del momento (nessuno storico): data/assenze.json.
+        _ASS, _nowk = {}, _nowu2.strftime("%Y-%m-%dT%H:%M")
+        for fx_, P_ in INJ["partite"].items():
+            v = AP["partite"].get(fx_)
+            if not v or v[0] < _nowk or v[9] not in ("NS", "TBD"): continue
+            h, a = MAPS.get(v[1], {}).get(v[2]), MAPS.get(v[1], {}).get(v[3])
+            if not h or not a: continue
+            d_ = datetime.datetime.fromisoformat(v[0] + ":00+00:00").astimezone(ROME).date().isoformat()
+            last = max((g_["ultima"] for g_ in P_["g"].values()), default="")
+            fuori = sorted(int(k) for k, g_ in P_["g"].items() if g_["ultima"] == last and g_.get("tipo") == "Missing Fixture")
+            dubbi = sorted(int(k) for k, g_ in P_["g"].items() if g_["ultima"] == last and g_.get("tipo") == "Questionable")
+            if fuori or dubbi: _ASS[f"{v[1]}|{d_}|{h}|{a}"] = {"fuori": fuori, "dubbi": dubbi, "ora": last}
+        jdump({"agg": INJ.get("agg", ""), "partite": _ASS}, os.path.join(OUT, "assenze.json"))
     except Exception as e_: print("::warning title=Infortunati e squalificati::" + str(e_)[:200])
     try:   # 26/10/2026 (fase 0): fiducia degli abbinamenti dei nomi API-Football → nostri
         _low = [f"{lg_} {k}→{x['nostro']} ({x['voti']} voti)" for lg_, D_ in apif_extra.CONF.items() for k, x in D_["abbinati"].items() if x["fiducia"] == "bassa"]

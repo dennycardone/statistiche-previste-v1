@@ -103,7 +103,8 @@ for (lg, tid), nm in NAME.items():
     stt = team_starts.get(tid, {})
     rosa = [p for p, w in sorted(stt.items(), key=lambda z: -z[1]) if team_of.get(p) == tid and last_seen.get(p, "") >= cut]
     gk = [p for p in rosa if role.get(p) == "G"][:1]; out = [p for p in rosa if role.get(p) != "G"][:10]
-    SQ[nm] = {"lg": lg, "id": tid, "ab": [round(float(z), 3) for z in h[:3] / h[3]], "xi": gk + out}
+    SQ[nm] = {"lg": lg, "id": tid, "ab": [round(float(z), 3) for z in h[:3] / h[3]], "xi": gk + out,
+              "rosa": [p for p in rosa if role.get(p) == "G"][:3] + [p for p in rosa if role.get(p) != "G"][:20]}   # 14/11: riserve per sostituire gli assenti
     for p in rosa[:30]:
         m, mins = mu(p); GI[str(p)] = [NOMI.get(str(p), ""), role.get(p, "M"), round(float(mins)), *[round(float(z), 4) for z in m]]
 RUOLO = {k: [round(float(z), 4) for z in mu(None, i)[0]] for k, i in POS.items()}
