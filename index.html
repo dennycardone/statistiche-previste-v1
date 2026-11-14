@@ -5575,7 +5575,7 @@ function opSelect(A, minW = 0) {   // regole della vista (le stesse per lo stori
   // 14/11/2026 (audit, Denny): cartellini delle nazionali in osservazione, senza peso. Il modello delle nazionali sui cartellini sbaglia più
   // della media semplice (errore 1,78 contro 1,71) e nel registro del 12-13/11 ha preso 3 volte su 11 (attese 6): −2,9% della cassa.
   const oss = c => (c.k === "c" && c.q > OP_OSS_Q) || (c.k === "kou" && c.e && c.e.lg && c.e.lg.code === "NAZ");
-  const byO = new Map(); for (const c of A) if (oss(c) && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW) { const b = byO.get(c.e.id); if (!b || c.ev > b.ev) byO.set(c.e.id, c); }
+  const byO = new Map(); for (const c of A) if (oss(c) && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW) { const kk = c.e.id + "|" + c.k, b = byO.get(kk); if (!b || c.ev > b.ev) byO.set(kk, c); }
   const OSS = [...byO.values()].sort((a, b) => b.ev - a.ev);
   A = A.filter(c => !oss(c));
   // 1 · singole: una per partita (valore atteso corretto più alto)
