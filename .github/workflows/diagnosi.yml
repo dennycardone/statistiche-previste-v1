@@ -6,6 +6,7 @@ on:
       match: { description: "testo da cercare nelle partite (separati da virgola)", required: false, default: "" }
       api: { description: "anche i mercati che API-Football passa oggi (poche richieste dalla riserva per le prove)", required: false, default: "no" }
       tempi: { description: "cosa dà API-Football sul 1° tempo (3 richieste dalla riserva)", required: false, default: "no" }
+      giocatori: { description: "mercati sui giocatori che API-Football passa (Top 5 + Champions; ~16 richieste dalla riserva)", required: false, default: "no" }
       book: { description: "confronto dei bookmaker (mercati delle statistiche, oggi e domani; fino a 40 richieste dalla riserva)", required: false, default: "no" }
 permissions:
   contents: read
@@ -38,5 +39,10 @@ jobs:
       - name: Dati del 1° tempo su API-Football (nomi e conteggi)
         if: inputs.tempi == 'si'
         run: python3 tools/diagnosi_tempi.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Mercati sui giocatori (nomi, mai quote)
+        if: inputs.giocatori == 'si'
+        run: python3 tools/props/sonda_quote.py
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
