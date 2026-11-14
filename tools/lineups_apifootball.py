@@ -45,14 +45,17 @@ try:
             if len(v) > 9 and v[9] in ("FT", "AET", "PEN") and v[0] >= "2026-01-01": cur.setdefault(v[1], []).append(fid)
         except Exception: pass
     for lg, ids in cur.items():
-        known = {i for (l, s), L in todo_sets.items() if l == lg for i in L}
-        todo_sets[(lg, 2026)] = [i for i in ids if i not in known]
+        # 14/11/2026: tolte solo le partite delle stagioni PRECEDENTI. Prima venivano escluse anche quelle della stagione in corso già nel ramo
+        # storico, e la stagione 2026 restava ferma (Serie A 55 partite su 110 al 14/11, Champions 0 su 162).
+        known = {i for (l, s), L in todo_sets.items() if l == lg and s != 2026 for i in L}
+        todo_sets[(lg, 2026)] = sorted(set(todo_sets.get((lg, 2026), [])) | {i for i in ids if i not in known})
     print("::notice title=Formazioni::stagione in corso da apif.json: " + str(sum(len(v) for v in todo_sets.values() if v)) + " partite in elenco, nuove " + str(sum(len(todo_sets.get((lg, 2026), [])) for lg in cur)))
 except Exception as e: print("::warning title=Formazioni::apif.json non disponibile: " + str(e))
 def num(x):
     try: return int(x) if x is not None else 0
     except Exception: return 0
-order = sorted(todo_sets, key=lambda k: ({2025: 0, 2024: 1, 2023: 2, 2026: 3, 2022: 4}.get(k[1], 5), k[0]))
+TOPP = {"I1", "E0", "SP1", "D1", "F1", "UCL"}   # 14/11/2026 (player props): stagione in corso dei Top 5 e della Champions per prima, con i nomi
+order = sorted(todo_sets, key=lambda k: (0 if (k[0] in TOPP and k[1] == 2026) else 1, {2025: 0, 2024: 1, 2023: 2, 2026: 3, 2022: 4}.get(k[1], 5), k[0]))
 for lg, s in order:
     fn = f"formazioni/{lg}_{s}.json"
     D = json.load(open(fn)) if os.path.exists(fn) else {"lega": lg, "stagione": s, "partite": {}, "infortuni": None}
@@ -67,7 +70,8 @@ for lg, s in order:
             break   # l'endpoint injuries non è paginato
         D["infortuni"] = inj
     v2 = set(D.get("v2", []))
-    todo = [i for i in D["ids"] if i not in D["partite"] or i not in v2]
+    nomi = D.setdefault("nomi", {}); nok = set(D.get("nomi_ok", []))   # 14/11/2026: nomi dei giocatori (id → nome), Top 5 e Champions
+    todo = [i for i in D["ids"] if i not in D["partite"] or i not in v2 or (lg in TOPP and s >= 2025 and i not in nok)]
     for k in range(0, len(todo), 20):
         if budget < 5: break
         R = get("fixtures", ids="-".join(todo[k:k + 20])); budget -= 1
@@ -78,6 +82,7 @@ for lg, s in order:
             for t in f.get("players", []):
                 side = 0 if t["team"]["id"] == hid else 1
                 for p in t.get("players", []):
+                    if lg in TOPP and p["player"].get("name"): nomi[str(p["player"]["id"])] = p["player"]["name"]
                     st = (p.get("statistics") or [{}])[0]; g = st.get("games", {}) or {}
                     if not g.get("minutes"): continue
                     P.append([p["player"]["id"], side, num(g.get("minutes")), num((st.get("goals") or {}).get("total")), num((st.get("goals") or {}).get("assists")),
@@ -90,7 +95,8 @@ for lg, s in order:
             D["partite"][str(f["fixture"]["id"])] = [f["fixture"]["date"][:16], hid, aid, f["teams"]["home"]["name"], f["teams"]["away"]["name"],
                                                      f["goals"]["home"], f["goals"]["away"], xi.get(hid, []), xi.get(aid, []), P]
             v2.add(str(f["fixture"]["id"]))   # scaricata col formato nuovo (anche se API-Football non ha i giocatori)
-        D["v2"] = sorted(v2)
+            if lg in TOPP: nok.add(str(f["fixture"]["id"]))
+        D["v2"] = sorted(v2); D["nomi_ok"] = sorted(nok)
     json.dump(D, open(fn, "w"), ensure_ascii=False, separators=(",", ":"))
     print(lg, s, len(D["partite"]), "/", len(D["ids"]), "infortuni", len(D["infortuni"] or []), "budget", budget)
     if budget < 5: break
