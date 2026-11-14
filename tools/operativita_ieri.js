@@ -100,6 +100,12 @@ let nLock = 0;
   const Ad = todayE.flatMap(e => A.opEntry(e, cfg));
   const X = A.opSelect(Ad, 0);
   const day = LR[romeDate] || (LR[romeDate] = { singole: [], contro: [], q2: null, q3: null });
+  // 14/11/2026 (Denny): cartellini delle nazionali senza peso. Le proposte di oggi già fissate e non ancora iniziate passano in osservazione.
+  day.oss = day.oss || [];
+  for (const o of [...day.singole]) if (o.lg === "NAZ" && o.k === "kou" && todayE.some(e => e.id === o.id)) {
+    day.singole = day.singole.filter(x => x !== o);
+    if (!day.oss.some(x => x.id === o.id && x.k === o.k)) day.oss.push({ ...o, f: 0, w: 0, oss: 1, t: nowIso });
+  }
   const used = () => [...day.singole, ...day.contro, day.q2, day.q3].filter(Boolean).reduce((a, o) => a + (o.w || 0), 0);
   const neu = [];
   for (const c of X.S1) if (!day.singole.some(o => o.id === c.e.id)) neu.push(["singole", { ...prop(c), f: A.opKelly(c.pc, c.q) }]);
@@ -109,7 +115,7 @@ let nLock = 0;
   }
   // 10/11/2026: 1X2 corner oltre quota 2,50 in osservazione (senza peso), fissati e valutati come le altre proposte
   day.oss = day.oss || [];
-  for (const c of X.OSS || []) if (!day.oss.some(o => o.id === c.e.id)) { day.oss.push({ ...prop(c), f: 0, w: 0, oss: 1, t: nowIso }); nLock++; }
+  for (const c of X.OSS || []) if (!day.oss.some(o => o.id === c.e.id && o.k === c.k)) { day.oss.push({ ...prop(c), f: 0, w: 0, oss: 1, t: nowIso }); nLock++; }
   const comb = b => ({ legs: b.legs.map(prop), q: r4(b.q), p: r4(b.p), ev: r4(b.ev), f: A.opKelly(b.p, b.q) });
   if (!day.q2 && X.D2) neu.push(["q2", comb(X.D2)]);
   if (!day.q3 && X.T3) neu.push(["q3", comb(X.T3)]);

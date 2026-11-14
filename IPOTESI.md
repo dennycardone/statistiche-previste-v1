@@ -65,3 +65,9 @@ Lettura: la sottostima degli Over è reale ma recente (holdout e ultimi 120 gior
 ## 10/11/2026 · Freno 1X2 corner oltre quota 2,50 e quota equa Pinnacle sui cartellini
 - Operatività: gli 1X2 corner oltre 2,50 restano visibili "in osservazione", senza peso (registro 3–8/11: 34 giocate, 9 prese, −39,8% a puntata fissa). Vengono refertati a parte nel registro.
 - Cartellini: linee Pinnacle (quota senza margine) in linee.json "pk" con il massimo degli altri book; scheda partita e blocco 5 di Operatività. Solo indicazione, in verifica dal 10/11.
+
+
+## 14/11/2026 · Cartellini delle nazionali in osservazione (senza peso)
+Audit del 13/11: sui cartellini il modello delle nazionali sbaglia più della media semplice (errore totale 1,779 contro 1,705, α 0,005).
+Registro 12-13/11: 11 giocate, 3 prese contro 6,0 attese, −50,6% a puntata fissa, −2,91% della cassa (club nello stesso periodo +0,41%).
+Da Denny (14/11): restano visibili e refertati in "In osservazione", fuori da singole, pesi e combinate. Tornano solo se il modello batte la media.

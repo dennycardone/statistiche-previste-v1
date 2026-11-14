@@ -5572,7 +5572,9 @@ function opSelect(A, minW = 0) {   // regole della vista (le stesse per lo stori
   const okHi = c => !((c.k === "s" || c.k === "st") && c.q >= 2.30);
   // 10/11/2026 (audit, Denny): 1X2 corner oltre quota 2,50 in osservazione, senza peso. Nel registro del 3-8/11: 34 giocate, 9 prese, quota
   // media 3,13, −40% a puntata fissa: tutta la perdita del periodo. Restano visibili (OSS) e seguiti nel registro, fuori da pesi e combinate.
-  const oss = c => c.k === "c" && c.q > OP_OSS_Q;
+  // 14/11/2026 (audit, Denny): cartellini delle nazionali in osservazione, senza peso. Il modello delle nazionali sui cartellini sbaglia più
+  // della media semplice (errore 1,78 contro 1,71) e nel registro del 12-13/11 ha preso 3 volte su 11 (attese 6): −2,9% della cassa.
+  const oss = c => (c.k === "c" && c.q > OP_OSS_Q) || (c.k === "kou" && c.e && c.e.lg && c.e.lg.code === "NAZ");
   const byO = new Map(); for (const c of A) if (oss(c) && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW) { const b = byO.get(c.e.id); if (!b || c.ev > b.ev) byO.set(c.e.id, c); }
   const OSS = [...byO.values()].sort((a, b) => b.ev - a.ev);
   A = A.filter(c => !oss(c));
@@ -5631,7 +5633,7 @@ function renderOpLedger(box, head, day, dkey) {
     <h3 class="oph">1 · Singole di valore (statistiche) <small>${S1.length}</small></h3>${S1.length ? `<div class="oplist">${S1.map(c => row(c)).join("")}</div>` : `<p class="opnone">Nessuna singola (astensione)</p>`}
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(day.q2, "Quota 2 · doppia")}${comb(day.q3, "Quota 3 · tripla")}
     <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita dei book</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione (astensione)</p>`}`
-    + ((day.oss || []).length ? `<h3 class="oph">In osservazione · 1X2 corner oltre quota ${f2(OP_OSS_Q)} <small>${day.oss.length}</small></h3><div class="oplist">${day.oss.map(c => row(c)).join("")}</div><p class="opnone">Senza peso dal 10/11: nel registro del 3-8/11 hanno preso 9 volte su 34 (−40% a puntata fissa). Restano seguite; tornano tra le singole solo se il registro cambia.</p>` : "")
+    + ((day.oss || []).length ? `<h3 class="oph">In osservazione · senza peso <small>${day.oss.length}</small></h3><div class="oplist">${day.oss.map(c => row(c)).join("")}</div><p class="opnone">1X2 corner oltre quota ${f2(OP_OSS_Q)} (dal 10/11: nel registro del 3-8/11 presi 9 su 34, −40% a puntata fissa) e cartellini delle nazionali (dal 14/11: il modello sbaglia più della media, nel registro del 12-13/11 presi 3 su 11). Restano seguite e refertate; tornano tra le singole solo se il registro cambia.</p>` : "")
     + (isToday ? opCercaHTML(selEntries(), MODES.dyn, e => e.time || "") + opPkHTML(selEntries(), e => e.time || "") : "") + RG_LINE;
   box.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const e = ent(b.dataset.id); if (e) { MV.hero = "bk"; openEntry(e); } }));
   const inp = box.querySelector("#opCassa"); if (inp) inp.addEventListener("change", () => { const v = parseFloat(inp.value.replace(",", ".")); lsSet("statPreviste.cassa", v > 0 ? String(v) : ""); renderSelOp(selEntries(), MODES[$("#decay").value] || MODES.dyn, e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`); });
@@ -5757,7 +5759,7 @@ function renderSelOp(ents, cfg, when) {
     <h3 class="oph">2 · Quota 2 / Quota 3 del giorno</h3>${comb(D2, "Quota 2 · doppia")}${comb(T3, "Quota 3 · tripla")}
     <h3 class="oph">3 · Controtendenza (inversione di favorita) <small>${S3.length}</small></h3>
     ${S3.length ? `<div class="oplist">${S3.map(c => row(c, `<i class="opct">sfavorita dei book</i>`)).join("")}</div>` : `<p class="opnone">Nessuna inversione a valore (astensione)</p>`}
-    ${OSS.length ? `<h3 class="oph">In osservazione · 1X2 corner oltre quota ${f2(OP_OSS_Q)} <small>${OSS.length}</small></h3><div class="oplist">${OSS.map(c => row(c)).join("")}</div><p class="opnone">Senza peso dal 10/11: nel registro del 3-8/11 hanno preso 9 volte su 34 (−40% a puntata fissa). Restano seguite.</p>` : ""}
+    ${OSS.length ? `<h3 class="oph">In osservazione · senza peso <small>${OSS.length}</small></h3><div class="oplist">${OSS.map(c => row(c)).join("")}</div><p class="opnone">1X2 corner oltre quota ${f2(OP_OSS_Q)} (dal 10/11: nel registro del 3-8/11 presi 9 su 34, −40% a puntata fissa) e cartellini delle nazionali (dal 14/11: il modello sbaglia più della media, nel registro del 12-13/11 presi 3 su 11). Restano seguite e refertate; tornano tra le singole solo se il registro cambia.</p>` : ""}
     ${opCercaHTML(ents, cfg, when)}
     ${opPkHTML(ents, when)}
     <p class="opfoot">Peso = Kelly 1/8 sulla probabilità corretta (al massimo 3% per giocata; sotto lo 0,1% la giocata non si mostra${cassa0 ? `; puntata minima 0,20 €${cut ? `: tolte ${cut} giocate sotto il minimo e pesi ricalcolati sulle altre` : ""}` : "; imposta la cassa per applicare la puntata minima di 0,20 €"}${sc < 1 ? `; oggi ridotti in proporzione per stare nel 10% della cassa, totale ${Math.round(tot * 100)}% → 10%` : "; totale del giorno al massimo 10%"}). Quota minima di equilibrio = 1 / probabilità corretta. Coefficienti del ${esc((CORR.agg || "").slice(8, 10) + "/" + (CORR.agg || "").slice(5, 7))} su ${cfgC.esiti} esiti in ${cfgC.giorni} giorni${fc.esiti ? ` (fuori campione log-loss: Prevista ${fc.logloss_prevista}, 1xBet ${fc.logloss_1xbet}, corretta ${fc.logloss_corretta})` : ""}. Esclusi gol, tiri e tiri in porta a quota alta e le forbici sulle strasfavorite.</p>` + RG_LINE;
