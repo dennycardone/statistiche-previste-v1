@@ -3783,9 +3783,17 @@ function confScore(F, base) {   // pesi stimati separatamente per metodo (la Din
 function confCards(home, away, date) {
   const x = EXTRA && EXTRA.partite && EXTRA.partite[`${S.league}|${isoD(date)}|${home}|${away}`], mu = x && x[4];
   if (!mu) return null;
-  const P = cardProbs(mu); let side = null, p = null;
-  for (let i = CARD_LINES.length - 1; i >= 0; i--) if (P[i] >= 0.6) { side = "O" + CARD_LINES[i]; p = P[i]; break; }
-  if (!side) for (let i = 0; i < CARD_LINES.length; i++) if (1 - P[i] >= 0.6) { side = "U" + CARD_LINES[i]; p = 1 - P[i]; break; }
+  // 14/11/2026 (Denny): solo linee che i bookmaker propongono. Con le linee della partita (1xBet, media dei book, Pinnacle) la previsione si sceglie
+  // fra quelle; senza linee si tiene la regola di sempre ma senza Over 2,5 ("almeno 3 cartellini"), che i book non propongono quasi mai.
+  let lines = CARD_LINES.filter(L => L !== 2.5);
+  try {
+    const LB = typeof bkLines === "function" ? bkLines({ id: `${S.league}|${isoD(date)}|${home}|${away}` }) : null;
+    const bl = new Set(); if (LB && LB.k && isFinite(LB.k[0])) bl.add(LB.k[0]); if (LB && LB.pk) for (const r of LB.pk) if (isFinite(r[0])) bl.add(r[0]);
+    if (bl.size) lines = [...bl].sort((u, v) => u - v);
+  } catch (err) {}
+  const al = EXTRA && EXTRA.alpha, pmf = pmfTotal(mu, al > 2e-4 ? 1 / al : Infinity, 30), P = lines.map(L => pOver(pmf, L)); let side = null, p = null;
+  for (let i = lines.length - 1; i >= 0; i--) if (P[i] >= 0.6) { side = "O" + lines[i]; p = P[i]; break; }
+  if (!side) for (let i = 0; i < lines.length; i++) if (1 - P[i] >= 0.6) { side = "U" + lines[i]; p = 1 - P[i]; break; }
   if (!side) return null;
   const sm = seasonMatches().filter(m => m.hk != null && m.ak != null && (!S.cutoff || m.date < S.cutoff));
   const nH = sm.filter(m => m.home === home || m.away === home).length, nA = sm.filter(m => m.home === away || m.away === away).length;
