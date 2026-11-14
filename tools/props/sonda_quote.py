@@ -13,7 +13,7 @@ print(f"::notice title=Props · budget::richieste per le prove adesso: {B}")
 if B < 16: print("::warning title=Props::budget insufficiente, riprovare più tardi"); sys.exit(0)
 PL = re.compile(r"player|scorer|booked|card.*player|shots.*player|anytime|first goal|last goal|assist", re.I)
 cat = get("odds/bets").get("response") or []
-pm = [b for b in cat if PL.search(b.get("name", ""))]
+pm = [b for b in cat if PL.search(b.get("name") or "")]
 print(f"::notice title=Props · catalogo::{len(cat)} mercati nel catalogo; sui giocatori {len(pm)}: " + " | ".join(f"{b['id']} {b['name']}" for b in pm)[:3500])
 LG = {"Serie A": 135, "Premier League": 39, "La Liga": 140, "Bundesliga": 78, "Ligue 1": 61, "Champions League": 2}
 tot = collections.defaultdict(set); nfx = 0
@@ -27,7 +27,7 @@ for name, lid in LG.items():
             for r in d.get("response") or []:
                 for bk in r.get("bookmakers") or []:
                     for bet in bk.get("bets") or []:
-                        if PL.search(bet.get("name", "")):
+                        if PL.search(bet.get("name") or ""):
                             for v in bet.get("values") or []: seen[bet["name"]][bk["name"]].add(str(v.get("value"))[:40])
             pg = d.get("paging") or {}
             if page >= int(pg.get("total") or 1) or page >= 3: break
