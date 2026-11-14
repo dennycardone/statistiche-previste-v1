@@ -582,6 +582,15 @@ select{pointer-events:none}
 .mhead .bk1x2 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
 .mhead .bk1x2 th{font-weight:600;text-align:left;color:var(--ink-2);padding:5px 4px;font-size:12px}.mhead .bk1x2 thead th{text-align:center;color:var(--ink-3)}
 .mhead .bk1x2 td{text-align:center;padding:5px 4px;border-top:1px solid var(--line)}.mhead .bk1x2 tbody th{border-top:1px solid var(--line)}
+.gpx{padding:10px 12px 8px;border-top:1px solid var(--line)}.gpx>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:13px}
+.gpx>summary::-webkit-details-marker{display:none}.gpx>summary b{font-size:14px}.gpx>summary small{color:var(--ink-2);font-size:12px}.gpx>summary:after{content:"▾";margin-left:auto;color:var(--ink-3)}.gpx[open]>summary:after{content:"▴"}
+.gpx .gpm{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 8px}.gpx .gpm button{font:inherit;font-size:12.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer}
+.gpx .gpm button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.gpx .gpt{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}.gpx .gpt[hidden]{display:none}
+.gpx table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12.5px}.gpx caption{text-align:left;font-weight:600;font-size:12.5px;padding:2px 0 4px}
+.gpx th,.gpx td{padding:4px 3px;border-top:1px solid var(--line)}.gpx thead th{border-top:0;color:var(--ink-3);font-weight:600;font-size:11.5px;text-align:center}
+.gpx tbody th{text-align:left;font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gpx tbody th small{color:var(--ink-3);font-weight:600;margin-right:4px;font-size:10.5px}
+.gpx td{text-align:center;white-space:nowrap}.gpx td small{display:block;color:var(--ink-2);font-size:11px}.gpx td.lo{color:var(--ink-3)}.gpx .gpn{margin:8px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.45}
 .mhead .bk1x2 td small,.mhead .bk1x2 th small{display:block;font-size:11px;font-weight:400}.mhead .bk1x2 td.hit{color:var(--good);font-weight:700}
 .mhead .bk1x2-n{margin:6px 0 0;font-size:11px;color:var(--ink-3)}
 .mhead .sx-fb{margin:0;padding:9px 12px;font-size:11.5px;color:var(--ink-3);text-align:center;border-top:1px solid var(--line)}.mhead .sx-fb b{color:var(--ink-2)}
@@ -3920,7 +3929,7 @@ async function tryHosted(ST0) {
     }).catch(() => null);
     const P = { bundle: getBundle("bundle.json"), storico: ST && ST.v && ST.v.bundle_storico ? getBundle("bundle_storico.json") : Promise.resolve(null),
                 crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
-                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json"), fz: get("formazioni.json") };
+                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json"), fz: get("formazioni.json"), gi: get("giocatori.json") };
     let man = null, texts = null;
     const [b, bs] = await Promise.all([P.bundle, P.storico]);
     if (ST && ST.v && ST.v.bundle_storico && !(bs && bs.files)) return false;   // stagioni chiuse non arrivate: meglio non mostrare dati a metà
@@ -3932,7 +3941,8 @@ async function tryHosted(ST0) {
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
-    const [cr, lo, od, li, ex, qu, pr, hf, qa, me, fz] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer, P.fz]);
+    const [cr, lo, od, li, ex, qu, pr, hf, qa, me, fz, gi] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer, P.fz, P.gi]);
+    if (gi && gi.squadre) GIOC = gi;
     if (me && me.giocabili) MERCATI = me;
     if (fz && fz.partite) { FORMAZ = fz; clearCache(); }
     if (qa && qa.campionati) { TAREA = qa; clearCache(); }
@@ -4554,6 +4564,54 @@ function pkHTML(e, m) {
     <table><thead><tr><th></th><th>Equa</th><th>Minima</th><th>Miglior book</th></tr></thead><tbody>${R.map(r => `<tr><th>${r.side} ${th1(r.L)}</th><td class="num">${f2(r.fair)}</td><td class="num"><b>${f2(r.min)}</b></td><td class="num">${r.best ? `${f2(r.best)} <small class="muted">${esc(r.book || "")}</small>${r.best >= r.min ? " ✓" : ""}` : "N.D."}</td></tr>`).join("")}</tbody></table>
     <p class="bk1x2-n">Equa = quota di Pinnacle senza margine (il book più preciso sui cartellini). Minima = equa + 3%: sul tuo book gioca solo da lì in su, sulla stessa linea. ✓ = un book passato da API-Football la paga già. Regola in verifica dal 10/11 (nello studio: 154 giocate, +21,5%).</p></div>`;
 }
+/* 14/11/2026 · Giocatori (player props), solo titolari, Serie A, Premier, Liga, Bundesliga, Ligue 1 e Champions (stesse squadre).
+   Test walk-forward su 121.614 titolari dei Top 5 (tools/props/test_props.py, IPOTESI.md 14/11/2026): il valore del giocatore ogni 90'
+   ristretto verso il ruolo × minuti attesi × scala (Modello A), moltiplicato per attesi di oggi della squadra da Prevista / media abituale
+   (Modello B), batte il solo valore del giocatore su tutti i mercati, nella verifica e nell'holdout. Falli subiti = falli attesi dell'AVVERSARIA;
+   cartellini = falli × severità dell'arbitro. Tiri totali esclusi: API-Football non conta i tiri respinti del giocatore, i book sì.
+   Dati: data/giocatori.json (tools/props/giocatori.py). Con le formazioni ufficiali i titolari sono quelli veri e i falli attesi già corretti. */
+let GIOC = null, GPM = "sot";
+const PROP_LG = new Set(["I1", "E0", "SP1", "D1", "F1", "UCL"]);
+const PROP_MK = [["sot", "Tiri in porta", [0.5, 1.5]], ["fc", "Falli commessi", [0.5, 1.5]], ["fd", "Falli subiti", [0.5, 1.5, 2.5]], ["yc", "Ammonito", [0.5]]];
+function propsHTML(e, m, home, away, MT, MF, x) {
+  if (m || !e || !GIOC || !GIOC.squadre || !PROP_LG.has(S.league)) return "";
+  const sq = n => GIOC.squadre[n] || (GIOC.api && GIOC.squadre[GIOC.api[n]]);
+  const H = sq(home), A = sq(away); if (!H || !A) return "";
+  let F = null; try { F = formazFor(home, away); } catch (err) {}
+  const rt = (v, ab) => v > 0 && ab > 0 && isFinite(v) ? v / ab : 1;
+  const refF = (x && x[0] && GIOC.arbitri && GIOC.arbitri[x[0]]) || 1;
+  const tsh = MT && MT.MD ? MT.MD : MT, fh = MF && MF.lh, fa = MF && MF.la;
+  const R = { h: { sot: rt(tsh && tsh.lh, H.ab[0]), fc: rt(fh, H.ab[1]), fd: rt(fa, H.ab[2]) }, a: { sot: rt(tsh && tsh.la, A.ab[0]), fc: rt(fa, A.ab[1]), fd: rt(fh, A.ab[2]) } };
+  R.h.yc = R.h.fc * refF; R.a.yc = R.a.fc * refF;
+  const MI = { sot: 3, fc: 4, fd: 5, yc: 6 }, RI = { sot: 0, fc: 1, fd: 2, yc: 3 };
+  const xiOf = (side, T) => {
+    const off = F && F.xi && F.xi[side];
+    if (off && off.length >= 10 && off.every(p => p.length > 3)) return { uff: true, L: off.map(p => ({ id: String(p[3]), nome: p[0], ruolo: p[2] || "M" })) };
+    return { uff: false, L: T.xi.map(id => { const g = GIOC.giocatori[id] || []; return { id: String(id), nome: g[0] || "—", ruolo: g[1] || "M" }; }) };
+  };
+  const XH = xiOf("h", H), XA = xiOf("a", A), uff = XH.uff && XA.uff;
+  const prob = (mu, L, k) => { const al = GIOC.alpha[k], pmf = pmfTotal(mu, al > 1e-6 ? 1 / al : Infinity, 14); return pOver(pmf, L); };
+  const RL = { G: "P", D: "D", M: "C", F: "A" };
+  const table = (team, X, side, k, lines) => {
+    const rows = X.L.map(p => { const g = GIOC.giocatori[p.id], base = g ? g[MI[k]] : (GIOC.ruolo[p.ruolo] || GIOC.ruolo.M)[RI[k]], mu = base * R[side][k];
+      return { ...p, nome: p.nome !== "—" ? p.nome : (g && g[0]) || "—", P: lines.map(L => prob(mu, L, k)) }; }).sort((u, v) => v.P[0] - u.P[0]);
+    const cell = q => q < 0.03 ? `<td class="lo">${pc(q)}</td>` : `<td><b>${pc(q)}</b><small>${f2(1 / q)}</small></td>`;
+    return `<table><caption>${esc(team)}</caption><thead><tr><th></th>${lines.map(L => `<th>${k === "yc" ? "Sì" : "Over " + th1(L)}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr><th title="${esc(r.nome)}"><small>${RL[r.ruolo] || ""}</small>${esc(r.nome)}</th>${r.P.map(cell).join("")}</tr>`).join("")}</tbody></table>`;
+  };
+  const cur = PROP_MK.some(z => z[0] === GPM) ? GPM : "sot";
+  return `<details class="gpx"><summary><b>Giocatori</b><small>${uff ? "formazioni ufficiali" : "probabili titolari (dalle ultime partite)"} · tiri in porta, falli, ammonito</small></summary>
+    <div class="gpm" role="group" aria-label="Mercato giocatore">${PROP_MK.map(([k, lab]) => `<button type="button" data-gpm="${k}" aria-pressed="${k === cur}">${lab}</button>`).join("")}</div>
+    ${PROP_MK.map(([k, , lines]) => `<div class="gpt" data-gpt="${k}"${k === cur ? "" : " hidden"}>${table(home, XH, "h", k, lines)}${table(away, XA, "a", k, lines)}</div>`).join("")}
+    <p class="gpn">Probabilità per i titolari; sotto, la quota minima giusta (100 / probabilità): sul book conviene solo da lì in su. Il mercato vale se il giocatore parte dal 1′.
+    ${uff ? "Titolari ufficiali; falli attesi già corretti con le formazioni." : "Titolari probabili: i più presenti nelle ultime partite, senza le assenze note; con le formazioni ufficiali (circa un'ora prima) la tabella si aggiorna da sola."}
+    Ammonito: severità dell'arbitro ${refF === 1 ? "non nota" : (refF > 1 ? "+" : "−") + Math.round(Math.abs(refF - 1) * 100) + "%"}. Test su 121.614 titolari dal 2023 (in verifica dal 14/11/2026).</p></details>`;
+}
+document.addEventListener("click", ev => {
+  const b = ev.target.closest && ev.target.closest("[data-gpm]"); if (!b) return;
+  const box = b.closest(".gpx"); GPM = b.dataset.gpm;
+  box.querySelectorAll("[data-gpm]").forEach(z => z.setAttribute("aria-pressed", String(z === b)));
+  box.querySelectorAll("[data-gpt]").forEach(t => { t.hidden = t.dataset.gpt !== GPM; });
+});
 function stat1x2HTML(e, m, { M, MT, MF, O, offR, x }, LB) {
   const lab = ["1", "X", "2"], rs = [];
   const add = (name, key, R, hr, ar, indep) => {
@@ -4661,7 +4719,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
       ${O && !O.nd ? halves("o", O.lh, O.la) : ""}
       ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
       ${G || se ? `<p class="sx-fb">${G ? `<b>Multigol (MG)</b> · sotto i gol: la fascia più stretta più probabile, poi la fascia più sicura` : ""}${G && se ? "<br>" : ""}${se ? `<b>Forbice</b> · sotto i cartellini: dove cade la media di quella squadra 8 volte su 10` : ""}</p>` : ""}`}
-    </div>`;
+    </div>${(() => { try { return propsHTML(e, m, home, away, MT, MF, x); } catch (err) { return ""; } })()}`;
 }
 /* ===== Valori attesi per tempo di corner, tiri, tiri in porta e (dal 9/11/2026) fuorigioco, sotto le righe della Lettura =====
    Valori attesi della partita (Media dinamica) × quota del tempo nel campionato, per sede, dai soli dati REALI per tempo di
