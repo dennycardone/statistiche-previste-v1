@@ -12,7 +12,7 @@ def _hook(t, v, tb):   # 25/10/2026: l'errore compare tra le annotazioni del gir
 sys.excepthook = _hook
 KEY = os.environ["APIFOOTBALL_KEY"].strip()
 AFL = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "EC": 43, "SP1": 140, "SP2": 141, "F1": 61, "F2": 62, "D1": 78, "D2": 79,
-       "N1": 88, "P1": 94, "SC0": 179, "SC1": 180, "SC2": 183, "SC3": 184, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71,
+       "N1": 88, "P1": 94, "SC0": 179, "SC1": 180, "SC2": 183, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71,
        "CHN": 169, "DNK": 119, "FIN": 244, "IRL": 357, "JPN": 98, "MEX": 262, "NOR": 103, "POL": 106, "ROU": 283, "RUS": 235, "SWE": 113, "SWZ": 207, "USA": 253}
 os.makedirs("formazioni", exist_ok=True)
 used = 0

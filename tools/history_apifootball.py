@@ -4,7 +4,7 @@ Riprende da storico/*.json (ramo storico); lascia 500 richieste al giorno per le
 import json, os, time, urllib.request, urllib.parse, glob
 KEY = os.environ["APIFOOTBALL_KEY"].strip()
 LEAGUES = [("I1", 135), ("E0", 39), ("SP1", 140), ("D1", 78), ("F1", 61), ("I2", 136), ("E1", 40), ("N1", 88), ("P1", 94), ("B1", 144), ("T1", 203),
-           ("G1", 197), ("SC0", 179), ("SP2", 141), ("F2", 62), ("D2", 79), ("E2", 41), ("E3", 42), ("SC1", 180), ("SC2", 183), ("SC3", 184),
+           ("G1", 197), ("SC0", 179), ("SP2", 141), ("F2", 62), ("D2", 79), ("E2", 41), ("E3", 42), ("SC1", 180), ("SC2", 183),
            ("BRA", 71), ("ARG", 128), ("USA", 253), ("MEX", 262), ("CHN", 169), ("JPN", 98), ("AUT", 218), ("DNK", 119), ("NOR", 103), ("SWE", 113),
            ("RUS", 235), ("POL", 106), ("ROU", 283), ("SWZ", 207), ("FIN", 244), ("IRL", 357), ("EC", 43),
            # ottobre 2026: campionati delle squadre delle coppe europee (solo API-Football) e le tre coppe

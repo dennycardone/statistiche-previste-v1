@@ -3,7 +3,7 @@ Riprende da referees/referees.json (ramo arbitri); si ferma quando finiscono le 
 import json, os, time, urllib.request, urllib.parse
 KEY = os.environ["APIFOOTBALL_KEY"].strip()
 LEAGUES = [("I1", 135), ("E0", 39), ("SP1", 140), ("D1", 78), ("F1", 61), ("I2", 136), ("E1", 40), ("N1", 88), ("P1", 94), ("B1", 144), ("T1", 203),
-           ("G1", 197), ("SC0", 179), ("SP2", 141), ("F2", 62), ("D2", 79), ("E2", 41), ("E3", 42), ("SC1", 180), ("SC2", 183), ("SC3", 184),
+           ("G1", 197), ("SC0", 179), ("SP2", 141), ("F2", 62), ("D2", 79), ("E2", 41), ("E3", 42), ("SC1", 180), ("SC2", 183),
            ("BRA", 71), ("ARG", 128), ("USA", 253), ("MEX", 262), ("CHN", 169)]
 SEASONS = [2024, 2023, 2022]
 path = "referees/referees.json"
