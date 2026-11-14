@@ -1,0 +1,91 @@
+{
+ "stat_extra": {
+  "partite": 1386,
+  "fuorigioco": 1265,
+  "archivio": "2026-11-14 21:35"
+ },
+ "formazioni": {
+  "partite_24h": 20,
+  "prese_prima": 20,
+  "anticipo_medio_min": 29,
+  "mancate": []
+ },
+ "nomi": {
+  "fiducia_bassa": [],
+  "non_abbinati": [
+   "F2 Rouen (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "P1 Torreense (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "SC0 Partick (18 partite): senza corrispondenza nei nostri dati",
+   "SC0 Dunfermline (4 partite): senza corrispondenza nei nostri dati",
+   "SC0 Arbroath (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "B1 Patro Eisden (4 partite): senza corrispondenza nei nostri dati",
+   "B1 Liège (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "D2 Rot-Weiß Essen (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "RUS Rotor Volgograd (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "SWZ FC Aarau (4 partite): senza corrispondenza nei nostri dati",
+   "UCL Inter Club d'Escaldes (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Vikingur Reykjavik (10 partite): senza corrispondenza nei nostri dati",
+   "UCL Sutjeska (4 partite): senza corrispondenza nei nostri dati",
+   "UCL The New Saints (12 partite): senza corrispondenza nei nostri dati",
+   "UCL Lech Poznan (8 partite): senza corrispondenza nei nostri dati",
+   "UCL Shamrock Rovers (14 partite): senza corrispondenza nei nostri dati",
+   "UCL Lincoln Red Imps FC (16 partite): senza corrispondenza nei nostri dati",
+   "UCL KI Klaksvik (16 partite): senza corrispondenza nei nostri dati",
+   "UCL Flora Tallinn (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Larne (8 partite): senza corrispondenza nei nostri dati",
+   "UCL Petrocub (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Celje (10 partite): senza corrispondenza nei nostri dati",
+   "UCL Borac Banja Luka (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Egnatia Rrogozhinë (8 partite): senza corrispondenza nei nostri dati",
+   "UCL KuPS (8 partite): senza corrispondenza nei nostri dati",
+   "UCL FC Iberia 1999 (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Drita (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Ararat-Armenia (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Riga (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Kauno Žalgiris (6 partite): senza corrispondenza nei nostri dati",
+   "UCL Vardar Skopje (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Floriana (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Levski Sofia (8 partite): senza corrispondenza nei nostri dati",
+   "UCL Tre Fiori (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Atert Bissen (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Gyori ETO FC (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL ML Vitebsk (2 partite): squadra di passaggio (playoff o spareggio con un'altra serie)",
+   "UCL Universitatea Craiova (4 partite): senza corrispondenza nei nostri dati",
+   "UCL Mjallby AIF (4 partite): senza corrispondenza nei nostri dati",
+   "UCL Aarhus (4 partite): senza corrispondenza nei nostri dati"
+  ],
+  "abbinati": 1044
+ },
+ "fuorigioco": {
+  "campionati": 31,
+  "partite": 35039,
+  "da_doppio_null": 2193
+ },
+ "risultati_corretti": [
+  "IRL 07/11/2026 UC Dublin-Drogheda: 1-2"
+ ],
+ "partite_non_api": [],
+ "giocate_mancanti": [],
+ "squadre_non_riconosciute": [
+  "Ostersunds FK"
+ ],
+ "partite_scadute": [
+  "SC0 31/10 Rangers - Aberdeen"
+ ],
+ "statistiche_scartate": [],
+ "calendario_da_espn": [],
+ "quote": {
+  "aggiornate": "14/11/2026 21:55",
+  "abbinate": 109,
+  "non_abbinate": 0,
+  "esempi_non_abbinate": []
+ },
+ "api_aggiornata": "2026-11-14 21:35",
+ "quote_fonte_ridotta": {},
+ "avvisi": [
+  "1 squadre di API-Football non riconosciute",
+  "1 partite non giocate con data passata (rinviate o calendario non aggiornato)"
+ ],
+ "stato": "da controllare",
+ "giro": "14/11/2026 21:56"
+}
