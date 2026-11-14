@@ -92,3 +92,15 @@ falli), DP 0,99 e K 20 (cartellini); α 0,1 / 0,2 / 0,1 / 0.
 - Bonus assenze: senza il tiratore principale, gli altri centrocampisti e attaccanti titolari tirano +1,5% rispetto all'atteso (IC −0,1% / +3,2%), tiri in porta
   +1,6% (IC −1,1% / +4,0%): non misurabile, non si usa.
 Esito: modello da usare = B con la scala (tiri, tiri in porta, falli); ammonito = B senza scala, con la nota della sovrastima recente. Interfaccia: non ancora toccata.
+
+## 14/11/2026 (sera) · Player props: falli subiti e anteprima della tab Giocatori
+Falli subiti dei giocatori contro falli commessi dall'avversaria (Top 5): −4,9% in totale, identici nel 57% delle squadre, entro 1 fallo nell'88%
+(non allineati al 100% come tiri in porta e falli commessi: API-Football non attribuisce a un giocatore circa 1 fallo subito su 20).
+Harness (Modello B = A × falli attesi dell'AVVERSARIA da Prevista / media abituale dei falli attesi degli avversari della squadra):
+- A contro riferimento di ruolo: Over 0,5 −0,0419/−0,0444 · Over 1,5 −0,0426/−0,0431 · Over 2,5 −0,0287/−0,0267 (verifica/holdout, 5/5 campionati).
+- B contro A: Over 0,5 −0,0019/−0,0020 (5/5) · Over 1,5 −0,0023/−0,0029 (5/5) · Over 2,5 −0,0014/−0,0020 (4/5). Passa.
+- Scala 0,96 (scelta): passa su tutte e tre le linee; holdout dopo la scala: 53,2% previsto contro 52,8% reale (Over 0,5), 8,8% contro 8,4% (Over 2,5).
+Tab Giocatori (anteprima, ramo anteprima-giocatori): tiri in porta 0,5/1,5, falli commessi 0,5/1,5, falli subiti 0,5/1,5/2,5, ammonito Sì
+(tiri totali esclusi: API-Football senza i tiri respinti, i book li contano). Dati: tools/props/giocatori.py ogni sera (lineups.yml → ramo valori → data/giocatori.json).
+Archivio formazioni: la stagione in corso restava indietro (le partite già nel ramo storico non entravano nell'elenco): corretto il 14/11, Top 5 e Champions
+completi con i nomi dei giocatori (235 richieste fuori dalla riserva dell'app).

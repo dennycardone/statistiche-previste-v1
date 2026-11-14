@@ -930,6 +930,12 @@ try:
         jdump(sorted(_NEXT, key=lambda r: r["ko"]), os.path.join(OUT, "prossime.json"))
         jdump(XI, _XP)
         jdump({"pesi": W_XI, "partite": FORMZ}, os.path.join(OUT, "formazioni.json"))
+        # 14/11/2026 · tab Giocatori (player props): valori per giocatore dei Top 5 (tools/props/giocatori.py, ogni sera in lineups.yml, ramo valori)
+        try:
+            import shutil as _sh
+            _GP = os.path.join(os.path.dirname(OUT), "valori", "giocatori.json")
+            if os.path.exists(_GP): _sh.copyfile(_GP, os.path.join(OUT, "giocatori.json"))
+        except Exception as e_: print("::warning title=Giocatori::" + str(e_)[:150])
         # archivio privato delle correzioni (mai pubblicato, mai sfoltito): serve allo studio Quota 2 / Quota 3 "statistiche + formazioni"
         _HP = os.path.join(OUT, "formazioni_hist.json"); _FH = json.load(open(_HP)) if os.path.exists(_HP) else {}
         for k_, x in FORMZ.items():   # solo formazioni prese prima del fischio (dati noti prima della partita)

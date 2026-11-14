@@ -1,5 +1,5 @@
 """Player props · punto 3 (14/11/2026, Denny): previsione diretta dei mercati sul SINGOLO giocatore, solo titolari, Top 5 campionati.
-Mercati: tiri in porta Over 0,5 / 1,5 · tiri Over 1,5 / 2,5 · falli commessi Over 0,5 / 1,5 · ammonito Sì.
+Mercati: tiri in porta Over 0,5 / 1,5 · tiri Over 1,5 / 2,5 · falli commessi Over 0,5 / 1,5 · ammonito Sì · falli subiti Over 0,5 / 1,5 / 2,5 (dal 14/11).
 
 Tutto point-in-time (per ogni partita solo le partite precedenti), periodi dell'harness (scelta fino al 30/6/2024, verifica 2024-25, holdout
 da luglio 2025). Storia dei giocatori da TUTTE le competizioni dell'archivio formazioni (chi cambia campionato si porta i suoi numeri),
@@ -26,11 +26,12 @@ import harness as H
 R = sys.argv[1] if len(sys.argv) > 1 else "ricerca"
 TOP = ["I1", "E0", "SP1", "D1", "F1"]
 POS = {"G": 0, "D": 1, "M": 2, "F": 3}
-STATS = ["sh", "sot", "fc", "yc"]                       # tiri (API: senza i respinti), tiri in porta, falli commessi, cartellini (gialli + rossi)
+STATS = ["sh", "sot", "fc", "yc", "fd"]                 # tiri (API: senza i respinti), tiri in porta, falli commessi, cartellini (gialli + rossi), falli subiti
 COL = {"sh": 9, "sot": 10, "fc": 7}
-MARKETS = [("sot", 0.5), ("sot", 1.5), ("sh", 1.5), ("sh", 2.5), ("fc", 0.5), ("fc", 1.5), ("yc", 0.5)]
+MARKETS = [("sot", 0.5), ("sot", 1.5), ("sh", 1.5), ("sh", 2.5), ("fc", 0.5), ("fc", 1.5), ("yc", 0.5), ("fd", 0.5), ("fd", 1.5), ("fd", 2.5)]
 LAB = {("sot", 0.5): "Tiri in porta Over 0,5", ("sot", 1.5): "Tiri in porta Over 1,5", ("sh", 1.5): "Tiri Over 1,5", ("sh", 2.5): "Tiri Over 2,5",
-       ("fc", 0.5): "Falli Over 0,5", ("fc", 1.5): "Falli Over 1,5", ("yc", 0.5): "Ammonito Sì"}
+       ("fc", 0.5): "Falli Over 0,5", ("fc", 1.5): "Falli Over 1,5", ("yc", 0.5): "Ammonito Sì",
+       ("fd", 0.5): "Falli subiti Over 0,5", ("fd", 1.5): "Falli subiti Over 1,5", ("fd", 2.5): "Falli subiti Over 2,5"}
 DPS = [0.95, 0.97, 0.99]; KS = [2.0, 5.0, 10.0, 20.0]
 log = lambda *a: print(*a, flush=True)
 
@@ -88,7 +89,7 @@ DT = 0.90
 rows_out = []
 abs_out = []
 def vec(r):
-    return np.array([r[9] or 0, r[10] or 0, r[7] or 0, (r[5] or 0) + (r[6] or 0)], float)
+    return np.array([r[9] or 0, r[10] or 0, r[7] or 0, (r[5] or 0) + (r[6] or 0), r[8] or 0], float)
 
 for d, lg, fid, v in FX:
     _, hid, aid, hn, an, hg, ag, xh, xa, P = v
@@ -104,6 +105,9 @@ for d, lg, fid, v in FX:
                 e = (b.get(bk) or [None, None])[sk]; T = team_exp.get((lg, tname, st))
                 ratio[st] = e / (T[0] / T[1]) if e and T and T[1] >= 3 else None
             ratio["yc"] = ratio["fc"] * reff if ratio["fc"] is not None else None
+            # 14/11/2026: falli subiti = falli che commette l'AVVERSARIA: attesi oggi dell'avversaria / media dei falli attesi degli avversari della squadra
+            e = (b.get("f") or [None, None])[1 - sk]; T = team_exp.get((lg, tname, "fd"))
+            ratio["fd"] = e / (T[0] / T[1]) if e and T and T[1] >= 3 else None
             # tiratore principale abituale (bonus assenze)
             stt = team_starts[(lg, tid)]; habit = [p for p, _ in sorted(stt.items(), key=lambda z: -z[1])][:11]
             def expA(p, j=1, K=5.0):
@@ -139,6 +143,10 @@ for d, lg, fid, v in FX:
                 e = (b.get(bk) or [None, None])[sk]
                 if e:
                     T = team_exp.setdefault((lg, tname, st), [0.0, 0.0]); T[0] = T[0] * DT + e; T[1] = T[1] * DT + 1
+        for tname, sk in ((b["h"], 0), (b["a"], 1)):
+            e = (b.get("f") or [None, None])[1 - sk]
+            if e:
+                T = team_exp.setdefault((lg, tname, "fd"), [0.0, 0.0]); T[0] = T[0] * DT + e; T[1] = T[1] * DT + 1
     tc = sum((r[5] or 0) + (r[6] or 0) for r in P)
     ref = REF.get(fid)
     if ref:

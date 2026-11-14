@@ -30,5 +30,5 @@ def parse_lineups(resp, home_api, away_api):
     return (T[hk][0], T[ak][0], T[hk][1], T[ak][1]), None
 
 def entry(x):
-    """voce pubblicata in formazioni.json (senza id dei giocatori)"""
-    return {"h": [[p[1], p[2], p[3]] for p in x["h"]], "a": [[p[1], p[2], p[3]] for p in x["a"]]}
+    """voce pubblicata in formazioni.json: nome, numero, ruolo e (dal 14/11/2026, tab Giocatori) id API-Football del giocatore"""
+    return {"h": [[p[1], p[2], p[3], p[0]] for p in x["h"]], "a": [[p[1], p[2], p[3], p[0]] for p in x["a"]]}

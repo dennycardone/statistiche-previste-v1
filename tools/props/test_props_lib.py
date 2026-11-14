@@ -1,10 +1,11 @@
 """Funzioni comuni del test player props (estratte da test_props.py)."""
 import numpy as np
 from scipy.special import gammaln
-STATS = ["sh", "sot", "fc", "yc"]                       # tiri (API: senza i respinti), tiri in porta, falli commessi, cartellini (gialli + rossi)
-MARKETS = [("sot", 0.5), ("sot", 1.5), ("sh", 1.5), ("sh", 2.5), ("fc", 0.5), ("fc", 1.5), ("yc", 0.5)]
+STATS = ["sh", "sot", "fc", "yc", "fd"]                 # tiri (API: senza i respinti), tiri in porta, falli commessi, cartellini (gialli + rossi), falli subiti
+MARKETS = [("sot", 0.5), ("sot", 1.5), ("sh", 1.5), ("sh", 2.5), ("fc", 0.5), ("fc", 1.5), ("yc", 0.5), ("fd", 0.5), ("fd", 1.5), ("fd", 2.5)]
 LAB = {("sot", 0.5): "Tiri in porta Over 0,5", ("sot", 1.5): "Tiri in porta Over 1,5", ("sh", 1.5): "Tiri Over 1,5", ("sh", 2.5): "Tiri Over 2,5",
-       ("fc", 0.5): "Falli Over 0,5", ("fc", 1.5): "Falli Over 1,5", ("yc", 0.5): "Ammonito Sì"}
+       ("fc", 0.5): "Falli Over 0,5", ("fc", 1.5): "Falli Over 1,5", ("yc", 0.5): "Ammonito Sì",
+       ("fd", 0.5): "Falli subiti Over 0,5", ("fd", 1.5): "Falli subiti Over 1,5", ("fd", 2.5): "Falli subiti Over 2,5"}
 DPS = [0.95, 0.97, 0.99]; KS = [2.0, 5.0, 10.0, 20.0]
 def p_over(mu, L, alpha):
     """P(X > L) con X Binomiale Negativa (media mu, varianza mu + alpha·mu²); alpha 0 = Poisson."""
