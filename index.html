@@ -3313,6 +3313,12 @@ const SIG_TH = { o: 0.65, g15: 0.80, g25: 0.60, g35: 0.50,   /* g35: 15/11/2026 
   "kO2.5": 0.90, "kO3.5": 0.75, "kO4.5": 0.70, "kO5.5": 2, "kU2.5": 2, "kU3.5": 0.70, "kU4.5": 0.80, "kU5.5": 0.90 };
 function sigPickDays(code) {
   const t0 = localIso(), want = new Set([...SIGW.days].filter(c => c !== "r").map(c => addDays(t0, +c)));
+  // 15/11/2026: le nazionali non hanno il calendario nel file della lega (solo partite giocate): le partite in programma vengono da naz.json
+  if (code === "NAZ" && typeof nazEntries === "function") {
+    const up = nazEntries().filter(e => !e.m && e.d >= t0 && !koStarted(e.d, e.time)).sort((a, b) => a.d.localeCompare(b.d) || (a.time || "").localeCompare(b.time || ""));
+    const lim = up.length ? addDays(up[0].d, 4) : t0;
+    return up.filter(e => want.has(e.d) || (SIGW.days.has("r") && e.d <= lim)).map(e => ({ div: "NAZ", date: e.date, time: e.time, home: e.home, away: e.away }));
+  }
   const rnd = SIGW.days.has("r") ? nextRound() : [];
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const t = new Set(teams()), played = seasonMatches().map(m => [m.home + "|" + m.away, +m.date]);
