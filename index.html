@@ -4574,14 +4574,21 @@ function qMinCerca(e, key, p, R) {
 const PK_M = 0.03;
 function pkRows(e) {
   const LB = bkLines(e), P = LB && LB.pk; if (!P) return [];
-  return P.flatMap(([L, fo, fu, mo, bo, mu, bu]) => [{ L, side: "Over", fair: fo, best: mo, book: bo }, { L, side: "Under", fair: fu, best: mu, book: bu }])
-    .map(r => ({ ...r, min: r.fair * (1 + PK_M), edge: r.best ? r.best / r.fair - 1 : null }));
+  // 15/11/2026 (Denny): solo il lato della LETTURA di Prevista (cartellini attesi del modello): se Prevista legge 6,5 cartellini niente Under 4,5,
+  // anche se un book lo paga più della quota equa di Pinnacle. Senza cartellini attesi non si mostra nulla.
+  let mu = null; try { withLeague(e.lg.code, () => { const x = extraFor(e.home, e.away); mu = x && x[4] > 0 ? x[4] : null; }); } catch (err) { mu = null; }
+  if (!mu) return [];
+  const al = EXTRA && EXTRA.alpha, rk = al > 2e-4 ? 1 / al : Infinity;
+  return P.flatMap(([L, fo, fu, mo, bo, mU, bu]) => { const po = pOver(pmfTotal(mu, rk, Math.ceil(L) + 2), L);
+      return [{ L, side: "Over", fair: fo, best: mo, book: bo, p: po }, { L, side: "Under", fair: fu, best: mU, book: bu, p: 1 - po }]; })
+    .filter(r => r.p > 0.5)
+    .map(r => ({ ...r, mu, min: r.fair * (1 + PK_M), edge: r.best ? r.best / r.fair - 1 : null }));
 }
 function pkHTML(e, m) {
   if (m) return ""; const R = pkRows(e); if (!R.length) return "";
-  return `<div class="bk1x2 pkbox"><p class="bk1x2-h"><b>Cartellini · quota equa di Pinnacle</b> · quota minima da accettare</p>
-    <table><thead><tr><th></th><th>Equa</th><th>Minima</th><th>Miglior book</th></tr></thead><tbody>${R.map(r => `<tr><th>${r.side} ${th1(r.L)}</th><td class="num">${f2(r.fair)}</td><td class="num"><b>${f2(r.min)}</b></td><td class="num">${r.best ? `${f2(r.best)} <small class="muted">${esc(r.book || "")}</small>${r.best >= r.min ? " ✓" : ""}` : "N.D."}</td></tr>`).join("")}</tbody></table>
-    <p class="bk1x2-n">Equa = quota di Pinnacle senza margine (il book più preciso sui cartellini). Minima = equa + 3%: sul tuo book gioca solo da lì in su, sulla stessa linea. ✓ = un book passato da API-Football la paga già. Regola in verifica dal 10/11 (nello studio: 154 giocate, +21,5%).</p></div>`;
+  return `<div class="bk1x2 pkbox"><p class="bk1x2-h"><b>Cartellini · quota equa di Pinnacle</b> · lettura di Prevista ${f2(R[0].mu)} cartellini · quota minima da accettare</p>
+    <table><thead><tr><th></th><th>Prevista</th><th>Equa</th><th>Minima</th><th>Miglior book</th></tr></thead><tbody>${R.map(r => `<tr><th>${r.side} ${th1(r.L)}</th><td class="num">${pc(r.p)}</td><td class="num">${f2(r.fair)}</td><td class="num"><b>${f2(r.min)}</b></td><td class="num">${r.best ? `${f2(r.best)} <small class="muted">${esc(r.book || "")}</small>${r.best >= r.min ? " ✓" : ""}` : "N.D."}</td></tr>`).join("")}</tbody></table>
+    <p class="bk1x2-n">Solo le linee dalla parte della lettura di Prevista (probabilità sopra il 50%). Equa = quota di Pinnacle senza margine (il book più preciso sui cartellini). Minima = equa + 3%: sul tuo book gioca solo da lì in su, sulla stessa linea. ✓ = un book passato da API-Football la paga già. Regola in verifica dal 10/11 (nello studio: 154 giocate, +21,5%).</p></div>`;
 }
 /* 14/11/2026 · Giocatori (player props), solo titolari, Serie A, Premier, Liga, Bundesliga, Ligue 1 e Champions (stesse squadre).
    Test walk-forward su 121.614 titolari dei Top 5 (tools/props/test_props.py, IPOTESI.md 14/11/2026): il valore del giocatore ogni 90'
@@ -5803,9 +5810,9 @@ function opPkHTML(ents, when) {   // 5 · cartellini con un book sopra la quota 
   L.sort((a, b) => b.edge - a.edge);
   const tot = ents.filter(e => !e.m && pkRows(e).length).length;
   return `<h3 class="oph">5 · Cartellini sopra la quota equa di Pinnacle <small>${L.length}</small></h3>${L.length ? `<div class="oplist">${L.slice(0, 15).map(c => `<button type="button" class="oprow" data-id="${esc(c.e.id)}"><span class="opm"><b>${esc(c.e.home)} – ${esc(c.e.away)}</b><small class="muted">${esc(lgName(c.e.lg))} · ${when(c.e)}</small></span>
-      <span class="opx"><span class="opmk">Cartellini · ${c.side} ${th1(c.L)}</span><small class="muted">equa Pinnacle ${f2(c.fair)} · minima ${f2(c.min)} · ${esc(c.book || "")} paga ${f2(c.best)}</small></span>
+      <span class="opx"><span class="opmk">Cartellini · ${c.side} ${th1(c.L)}</span><small class="muted">Prevista ${pc(c.p)} (attesi ${f2(c.mu)}) · equa Pinnacle ${f2(c.fair)} · minima ${f2(c.min)} · ${esc(c.book || "")} paga ${f2(c.best)}</small></span>
       <span class="opw"><b class="num">+${(c.edge * 100).toFixed(1).replace(".", ",")}%</b><small>sulla equa</small></span></button>`).join("")}</div>` : `<p class="opnone">Nessun book sopra la minima${tot ? ` (${tot} partite con la linea di Pinnacle)` : ": Pinnacle non ha ancora le linee"}</p>`}
-    <p class="opnone">Solo indicazione, fuori da pesi e registro: regola in verifica dal 10/11. Sul tuo book vale la stessa quota minima (nella scheda partita).</p>`;
+    <p class="opnone">Solo le linee dalla parte della lettura di Prevista. Solo indicazione, fuori da pesi e registro: regola in verifica dal 10/11. Sul tuo book vale la stessa quota minima (nella scheda partita).</p>`;
 }
 function opCercaHTML(ents, cfg, when) {
   if (!CORR || !CORR.gruppi || !CORR.gruppi.statistiche) return "";

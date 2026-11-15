@@ -111,3 +111,6 @@ segno che Prevista dà più probabile (1X2) o il lato sopra il 50% (Over/Under);
 Prevista che legge la partita al contrario del book). Caso: Finlandia–San Marino, corner 2 a 20,25 (Prevista 1 al 77%) in osservazione.
 Ultimi 7 giorni: le singole erano già dalla parte della lettura 65 volte su 66 (l'unica contro: cartellini, persa); le giocate contro la lettura
 stavano quasi tutte in osservazione (1X2 corner a quota lunga). Non è un test dell'harness: è una regola di coerenza decisa da Denny.
+- 15/11 (Denny): anche il blocco 5 (cartellini sopra la quota equa di Pinnacle) e il riquadro Pinnacle della scheda partita seguono la lettura:
+  solo le linee che Prevista dà sopra il 50% (es. Tenerife–Ceuta, attesi 6,52: niente più Under 4,5/5,5). Lo studio "sharp" in sistema.py
+  (sezione 7) resta com'è, solo prezzo, come confronto.
