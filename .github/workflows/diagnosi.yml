@@ -8,6 +8,7 @@ on:
       tempi: { description: "cosa dà API-Football sul 1° tempo (3 richieste dalla riserva)", required: false, default: "no" }
       basket: { description: "sonda API-Basketball (servizio separato, ~10 richieste sul limite del basket)", required: false, default: "no" }
       basket_props: { description: "basket: voci giocatori/squadre e mercati passati (~12 richieste sul limite del basket)", required: false, default: "no" }
+      falli_basket: { description: "basket: falli di squadra da fonti gratuite (ESPN NBA, Euroleague), nessuna richiesta API a pagamento", required: false, default: "no" }
       loghi: { description: "controllo che i loghi pubblicati si scarichino (nessuna richiesta API)", required: false, default: "no" }
       giocatori: { description: "mercati sui giocatori che API-Football passa (Top 5 + Champions; ~16 richieste dalla riserva)", required: false, default: "no" }
       book: { description: "confronto dei bookmaker (mercati delle statistiche, oggi e domani; fino a 40 richieste dalla riserva)", required: false, default: "no" }
@@ -64,3 +65,6 @@ jobs:
         run: python3 tools/basket/sonda_props.py
         env:
           APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Sonda falli di squadra basket (ESPN, Euroleague)
+        if: inputs.falli_basket == 'si'
+        run: python3 tools/basket/sonda_falli.py
