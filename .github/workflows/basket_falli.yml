@@ -1,0 +1,32 @@
+name: Basket · falli di squadra (ESPN NBA, Eurolega/Eurocup)
+on:
+  schedule:
+    - cron: "25 6 * * *"   # dopo l'archivio basket (05:40)
+  workflow_dispatch:
+    inputs:
+      max: { description: "tetto di richieste (1 al secondo)", required: false, default: "2500" }
+concurrency:
+  group: basket-falli
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  falli:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archivio basket e falli già presi
+        run: |
+          mkdir -p _arch _f
+          git fetch -q --depth 1 origin basket && git archive FETCH_HEAD | tar -x -C _arch
+          if git ls-remote --exit-code origin basket-falli >/dev/null 2>&1; then git fetch -q --depth 1 origin basket-falli && git archive FETCH_HEAD | tar -x -C _f; fi
+      - name: Falli e rimbalzi offensivi
+        run: python3 tools/basket/falli.py _arch _f ${{ inputs.max || '2500' }}
+      - name: Salva sul ramo basket-falli
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd _f && rm -rf .git && git init -q -b basket-falli && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com" \
+            && git add -A && git commit -q -m "Falli basket $(date -u '+%F %H:%M')" \
+            && for t in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" basket-falli && break; sleep 20; done
