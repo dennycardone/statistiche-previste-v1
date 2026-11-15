@@ -13,7 +13,7 @@ permissions:
 jobs:
   falli:
     runs-on: ubuntu-latest
-    timeout-minutes: 200
+    timeout-minutes: 140
     steps:
       - uses: actions/checkout@v4
       - name: Archivio basket e falli già presi
@@ -23,6 +23,8 @@ jobs:
           if git ls-remote --exit-code origin basket-falli >/dev/null 2>&1; then git fetch -q --depth 1 origin basket-falli && git archive FETCH_HEAD | tar -x -C _f; fi
       - name: Falli e rimbalzi offensivi
         run: python3 tools/basket/falli.py _arch _f ${{ inputs.max || '2500' }}
+        env:
+          FALLI_MINUTI: "100"
       - name: Salva sul ramo basket-falli
         env:
           GH_TOKEN: ${{ github.token }}

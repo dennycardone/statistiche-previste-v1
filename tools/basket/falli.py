@@ -25,7 +25,8 @@ def get(url):
         except Exception:
             time.sleep(5 * (t + 1))
     return None
-def can(): return used < MAXR
+T0 = time.time(); TMAX = float(os.environ.get("FALLI_MINUTI", "100")) * 60   # 15/11: tetto di tempo, così il giro finisce e salva prima del limite di GitHub
+def can(): return used < MAXR and time.time() - T0 < TMAX
 def asc(s): return unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
 def tok(s): return {t for t in re.sub(r"[^a-z ]", " ", asc(s)).split() if len(t) >= 4}
 def load_out(fn):
