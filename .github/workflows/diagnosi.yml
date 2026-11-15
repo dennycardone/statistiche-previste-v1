@@ -6,6 +6,7 @@ on:
       match: { description: "testo da cercare nelle partite (separati da virgola)", required: false, default: "" }
       api: { description: "anche i mercati che API-Football passa oggi (poche richieste dalla riserva per le prove)", required: false, default: "no" }
       tempi: { description: "cosa dà API-Football sul 1° tempo (3 richieste dalla riserva)", required: false, default: "no" }
+      basket: { description: "sonda API-Basketball (servizio separato, ~10 richieste sul limite del basket)", required: false, default: "no" }
       loghi: { description: "controllo che i loghi pubblicati si scarichino (nessuna richiesta API)", required: false, default: "no" }
       giocatori: { description: "mercati sui giocatori che API-Football passa (Top 5 + Champions; ~16 richieste dalla riserva)", required: false, default: "no" }
       book: { description: "confronto dei bookmaker (mercati delle statistiche, oggi e domani; fino a 40 richieste dalla riserva)", required: false, default: "no" }
@@ -52,3 +53,8 @@ jobs:
         run: |
           mkdir -p _d && git fetch -q --depth 1 origin pages && git archive FETCH_HEAD data | tar -x -C _d
           python3 tools/controllo_loghi.py _d/data
+      - name: Sonda basket
+        if: inputs.basket == 'si'
+        run: python3 tools/sonda_basket.py
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
