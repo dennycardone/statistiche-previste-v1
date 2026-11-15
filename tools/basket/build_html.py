@@ -38,6 +38,13 @@ CSS = """<style>
 .tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.tgrid div{background:var(--surface-2);border-radius:10px;padding:10px}.tgrid b{font-size:20px;display:block}.tgrid small{color:var(--ink-2);font-size:12px}
 .formrow{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 8px}.fpill{display:inline-flex;width:22px;height:22px;border-radius:6px;align-items:center;justify-content:center;font-size:11px;font-weight:800}
 .fpill.w{background:#2e8b57;color:#fff}.fpill.l{background:#7a2e3a;color:#fff}
+.gteam{margin-top:10px}.gteam h3{margin-bottom:4px}.gnote{font-size:12.5px;color:var(--ink-2);margin:0 0 6px;white-space:normal;overflow-wrap:anywhere}
+.gpl{border-top:1px solid var(--line);padding:0}.gpl>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) repeat(5,40px);gap:4px;align-items:center;padding:8px 0;font-variant-numeric:tabular-nums}
+.gpl>summary::-webkit-details-marker{display:none}.gpl>summary b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gpl>summary small{display:block;color:var(--ink-3);font-size:11px}
+.gpl>summary span{text-align:right;font-size:13.5px}.ghd{display:grid;grid-template-columns:minmax(0,1fr) repeat(5,40px);gap:4px;font-size:11px;color:var(--ink-3);padding:4px 0}.ghd span{text-align:right}
+.gpl.out>summary{opacity:.45}.gtag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--surface-2);color:var(--ink-2);margin-left:4px;vertical-align:1px}
+.gdet{padding:2px 0 10px}.gdet table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}.gdet td,.gdet th{padding:4px 2px;text-align:right;border-top:1px solid var(--line)}.gdet th{text-align:left;font-weight:600}
+.gdet tr.hi td,.gdet tr.hi th{color:var(--accent)}
 .bkstamp{color:var(--ink-3);font-size:11.5px;text-align:center;margin:14px 0}
 </style>"""
 SPORT = """<details class="sportpick" id="sport"><summary aria-label="Sport">🏀 Basket</summary><div class="sportmenu"><a href="./">⚽ Calcio</a><a href="basket.html" aria-current="page">🏀 Basket</a></div></details>"""
@@ -68,12 +75,14 @@ BODY = f"""<body>
     <div class="mtabs" role="tablist" aria-label="Sezioni della partita">
       <button type="button" class="mtab" data-mt="prev" aria-pressed="true">Lettura</button>
       <button type="button" class="mtab" data-mt="sig" aria-pressed="false">Grado</button>
+      <button type="button" class="mtab" data-mt="gio" aria-pressed="false">Giocatori</button>
       <button type="button" class="mtab" data-mt="h2h" aria-pressed="false">Precedenti</button>
       <button type="button" class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
       <button type="button" class="mtab" data-mt="rend" aria-pressed="false">Rendimento</button>
     </div>
     <div class="mpane" data-mp="prev"><section class="card mhead" id="mhead" aria-label="Lettura della partita"></section></div>
     <div class="mpane" data-mp="sig" hidden><section class="card" id="mgrado"></section></div>
+    <div class="mpane" data-mp="gio" hidden><div id="mgio"></div></div>
     <div class="mpane" data-mp="h2h" hidden><section class="card" id="mh2h"></section></div>
     <div class="mpane" data-mp="tab" hidden><section class="card" id="mtab"></section></div>
     <div class="mpane" data-mp="rend" hidden><div id="mrend"></div></div>
@@ -89,9 +98,10 @@ BODY = f"""<body>
   </div>
   <div class="view" id="viewSig" hidden>
     <section class="card" aria-label="Filtri segnali"><div class="selhead"><h2>Segnali</h2></div>
+      <div class="seg" id="sigView" role="tablist" aria-label="Squadre o giocatori"><button type="button" class="segb" data-sv="sq" aria-pressed="true">Squadre</button><button type="button" class="segb" data-sv="gi" aria-pressed="false">Giocatori</button></div>
       <div class="row"><label for="sigLeague">Campionato<select id="sigLeague"></select></label></div>
       <div class="self" id="sigWhen" role="group" aria-label="Quando"><button type="button" class="chip" data-sw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-sw="1" aria-pressed="true">Domani</button><button type="button" class="chip" data-sw="r" aria-pressed="false">Giornata</button></div>
-      <p class="small muted" style="margin:0">Previsioni dalla parte della lettura che, nelle stagioni passate, sono uscite almeno 72 volte su 100 (grado A o A+). Totale e handicap sulla linea del book quando c'è.</p></section>
+      <p class="small muted" style="margin:0" id="sigNote">Previsioni dalla parte della lettura che, nelle stagioni passate, sono uscite almeno 72 volte su 100 (grado A o A+). Totale e handicap sulla linea del book quando c'è.</p></section>
     <section class="card" id="sigOut"></section>
   </div>
   <div class="view" id="viewGen" hidden><section class="card" id="genOut"></section></div>

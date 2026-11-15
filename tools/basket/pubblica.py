@@ -66,7 +66,7 @@ def poss_game(g):
 # rimbalzi attesi (informativi, Lettura): rimbalzi presi e concessi ogni 100 possessi (media mobile DP, ristretti con K partite verso il campionato)
 RB = collections.defaultdict(lambda: [0.0, 0.0, 0.0]); LRB = collections.defaultdict(lambda: [0.0, 0.0])
 
-T = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "off": 0.0, "dfn": 0.0, "g": 0})
+T = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "off": 0.0, "dfn": 0.0, "pts": 0.0, "g": 0})
 L = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "rtg": 0.0, "hca": 0.0, "h1": 0.0, "h1n": 0.0})
 def predict(lg, h, a):
     Lg = L[lg]
@@ -78,7 +78,8 @@ def predict(lg, h, a):
     eh = pace * sh(th, "off", lr) * sh(ta, "dfn", lr) / lr / 100 + hca / 2
     ea = pace * sh(ta, "off", lr) * sh(th, "dfn", lr) / lr / 100 - hca / 2
     h1 = Lg["h1"] / Lg["h1n"] if Lg["h1n"] else 0.5
-    out = {"eh": round(eh, 2), "ea": round(ea, 2), "pace": round(pace, 1), "h1": round(h1, 4), "nh": th["g"], "na": ta["g"]}
+    out = {"eh": round(eh, 2), "ea": round(ea, 2), "pace": round(pace, 1), "h1": round(h1, 4), "nh": th["g"], "na": ta["g"],
+           "habh": round(sh(th, "pts", lp * lr / 100), 2), "haba": round(sh(ta, "pts", lp * lr / 100), 2), "pch": round(sh(th, "pace", lp), 2), "pca": round(sh(ta, "pace", lp), 2)}
     lr_ = LRB[lg]
     if lr_[0] > 30:
         lrate = lr_[1] / lr_[0]
@@ -103,8 +104,8 @@ for g in G:
             x = RB[(lg, t)]; x[0] = x[0] * DP + 1; x[1] = x[1] * DP + 100 * f_ / P; x[2] = x[2] * DP + 100 * a_ / P
         x = LRB[lg]; x[0] = x[0] * 0.998 + 2; x[1] = x[1] * 0.998 + 100 * (S["h"][6] + S["a"][6]) / P
     for t, pf, pa_ in ((T[(lg, g["h"])], ph, pa), (T[(lg, g["a"])], pa, ph)):
-        for k in ("n", "pace", "off", "dfn"): t[k] *= DP
-        t["n"] += 1; t["pace"] += P; t["off"] += 100 * pf / P; t["dfn"] += 100 * pa_ / P; t["g"] += 1
+        for k in ("n", "pace", "off", "dfn", "pts"): t[k] *= DP
+        t["n"] += 1; t["pace"] += P; t["off"] += 100 * pf / P; t["dfn"] += 100 * pa_ / P; t["pts"] += pf; t["g"] += 1
     for k in ("n", "pace", "rtg", "hca", "h1", "h1n"): Lg[k] *= 0.998
     Lg["n"] += 1; Lg["pace"] += P; Lg["rtg"] += 100 * (ph + pa) / 2 / P; Lg["hca"] += ph - pa
     if g["sh"][1] is not None and g["sa"][1] is not None:
@@ -205,9 +206,14 @@ for g in PART:
     pr = [[x["d"][:10], x["h"], x["a"], x["sh"][5], x["sa"][5]] for x in G if valid(x) and x["lg"] == g["lg"] and {x["h"], x["a"]} == {g["h"], g["a"]}]
     PREC[g["id"]] = pr[-8:]
 RITMO = {lg: round(L[lg]["pace"] / L[lg]["n"], 1) for lg in NOMI if L[lg]["n"]}
+# 15/11/2026: giocatori (punti, rimbalzi, assist, punti+assist, doppia/tripla doppia) per le partite dei prossimi 3 giorni
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import giocatori_pub
+hi3 = (now + datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+GIOC = giocatori_pub.build(files, [g for g in PART if g["sh"] is None and g["d"][:10] <= hi3 and g["st"] == "NS"], PRE, QA, valid, today)
 J = {"agg": now.strftime("%Y-%m-%d %H:%M"), "ritmo": RITMO, "leghe": {k: list(v) for k, v in NOMI.items()}, "stagioni": cur, "sigma": SIG, "grado": GRADO,
      "squadre": {lg: {k: [v, loghi[lg].get(k, "")] for k, v in d.items()} for lg, d in squadre.items()},
-     "partite": PART, "linee": LINEE, "classifica": CLA, "ultime": ULTP, "precedenti": PREC, "tendenze": TEN, "serie": SER}
+     "partite": PART, "linee": LINEE, "classifica": CLA, "ultime": ULTP, "precedenti": PREC, "tendenze": TEN, "serie": SER, "giocatori": GIOC}
 json.dump(J, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))
 fut = [g for g in PART if g["sh"] is None]
 chk = []
