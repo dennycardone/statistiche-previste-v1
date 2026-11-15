@@ -25,7 +25,7 @@ def boot(dl, wk, n=1500):
     bs = [(lambda i: s[i].sum() / c[i].sum())(rng.integers(0, len(ks), len(ks))) for _ in range(n)]
     return s.sum() / c.sum(), np.percentile(bs, 2.5), np.percentile(bs, 97.5)
 OUT = {}
-for st, nm in (("g", "Gol"), ("Tiri", "Tiri"), ("Tiri in porta", "Tiri in porta"), ("Falli", "Falli"), ("Corner", "Corner (controllo)")):
+for st, nm in (("g", "Gol"), ("Tiri", "Tiri"), ("Tiri in porta", "Tiri in porta"), ("Falli", "Falli"), ("Cartellini", "Cartellini"), ("Corner", "Corner (controllo)")):   # 15/11: + cartellini (audit: Under 10 prese su 16,6 attese)
     R = sorted([(dn(x[1]), x[1], x[0], x[4][st]) for x in X if st in x[4] and len(x[4][st]) >= 5 and x[4][st][2] >= 0 and x[4][st][3] >= 0], key=lambda r: r[0])
     if len(R) < 5000: continue
     days = np.array([r[0] for r in R]); ex = np.array([r[3][0] + r[3][1] for r in R]); re_ = np.array([r[3][2] + r[3][3] for r in R]); lgs = [r[2] for r in R]
