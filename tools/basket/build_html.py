@@ -17,7 +17,7 @@ CSS = """<style>
 .bkt{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}.bkt b{font-size:14px;line-height:1.2}.bkt small{color:var(--ink-2);font-size:12px}
 .bkt .tlogo.big{width:54px;height:54px;object-fit:contain}
 .bkc{display:flex;flex-direction:column;gap:3px;align-items:center}.bkc small{color:var(--ink-2);font-size:12px}.bksc{font-size:30px;font-variant-numeric:tabular-nums;color:var(--accent)}
-.bkl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.bkl th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);text-align:center;padding:9px 4px 2px}
+.bkl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;table-layout:fixed}.bkl td.num{width:30%}.bkl th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);text-align:center;padding:9px 4px 2px}
 .bkl td,.bkl th{padding:6px 8px;text-align:center;border-top:1px solid var(--line)}.bkl td small{color:var(--ink-2);display:block;font-size:12px}.bkl td b{font-size:18px}
 .bkl tr.sub td{border-top:0;padding-top:0;color:var(--ink-2);font-size:12.5px}
 .bkq{margin-top:12px}.bkq h3,.card h3{font-size:14px;margin:0 0 8px;display:flex;align-items:center;gap:6px}.bkq h3 small,.card h3 small{color:var(--ink-3);font-weight:500}

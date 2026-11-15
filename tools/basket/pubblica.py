@@ -39,7 +39,32 @@ THR = {k: min(15, max(2, sorted(v)[len(v) // 2] / 2)) for k, v in _med.items()}
 def valid(g):   # come nel test: fuori All-Star, interrotte, a tavolino
     t = THR.get((g["lg"], g["s"]), 15)
     return fin(g) and g["sh"][5] + g["sa"][5] >= 100 and g["sh"][0] is not None and cnt[(g["lg"], g["s"], g["h"])] >= t and cnt[(g["lg"], g["s"], g["a"])] >= t
-def poss(x): return None if not x or None in (x[1], x[7], x[12], x[5]) else x[1] - x[7] + x[12] + 0.44 * x[5]
+# 15/11/2026 (Denny, harness tools/basket/test_possessi.py): possessi = FGA − OREB + TOV + 0,44·FTA con
+#  - formato nuovo di API-Basketball (dall'8/1/2026): FGA = tiri da 2 + tiri da 3; rimbalzi offensivi assenti → rimbalzi totali × quota offensiva
+#    del campionato (media mobile delle partite che li avevano);
+#  - statistiche rotte scartate (punti ogni 100 possessi fuori da 70-160 o possessi delle due squadre diversi oltre il 12%) → calcolo di riserva.
+#  Errore medio sul totale in verifica da 15,03 a 14,41 punti (Serie A ed Eurocup soprattutto). La preseason NBA resta: toglierla peggiora.
+NUOVO_FORMATO = "2026-01-05"
+QOR = collections.defaultdict(lambda: [0.0, 0.0])
+def poss_game(g):
+    S = g["stat"] or {}; q = QOR[g["lg"]]; out = []
+    for x, pts in ((S.get("h"), g["sh"][5]), (S.get("a"), g["sa"][5])):
+        v = None
+        if x and None not in (x[1], x[12], x[5]):
+            if x[7] is not None:
+                v = x[1] - x[7] + x[12] + 0.44 * x[5]
+                if x[6]: q[0] = q[0] * 0.998 + 1; q[1] = q[1] * 0.998 + x[7] / x[6]
+            elif x[6] and q[0] > 20:
+                fga = x[1] + (x[3] or 0) if g["d"][:10] >= NUOVO_FORMATO else x[1]
+                v = fga - q[1] / q[0] * x[6] + x[12] + 0.44 * x[5]
+        out.append(v)
+    qh, qa = out
+    if qh and qa:
+        m_ = (qh + qa) / 2
+        if not (70 < 100 * g["sh"][5] / qh < 160 and 70 < 100 * g["sa"][5] / qa < 160) or abs(qh - qa) / m_ > 0.12: return None, None
+    return qh, qa
+# rimbalzi attesi (informativi, Lettura): rimbalzi presi e concessi ogni 100 possessi (media mobile DP, ristretti con K partite verso il campionato)
+RB = collections.defaultdict(lambda: [0.0, 0.0, 0.0]); LRB = collections.defaultdict(lambda: [0.0, 0.0])
 
 T = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "off": 0.0, "dfn": 0.0, "g": 0})
 L = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "rtg": 0.0, "hca": 0.0, "h1": 0.0, "h1n": 0.0})
@@ -53,7 +78,13 @@ def predict(lg, h, a):
     eh = pace * sh(th, "off", lr) * sh(ta, "dfn", lr) / lr / 100 + hca / 2
     ea = pace * sh(ta, "off", lr) * sh(th, "dfn", lr) / lr / 100 - hca / 2
     h1 = Lg["h1"] / Lg["h1n"] if Lg["h1n"] else 0.5
-    return {"eh": round(eh, 2), "ea": round(ea, 2), "pace": round(pace, 1), "h1": round(h1, 4), "nh": th["g"], "na": ta["g"]}
+    out = {"eh": round(eh, 2), "ea": round(ea, 2), "pace": round(pace, 1), "h1": round(h1, 4), "nh": th["g"], "na": ta["g"]}
+    lr_ = LRB[lg]
+    if lr_[0] > 30:
+        lrate = lr_[1] / lr_[0]
+        def g_(t, i): x = RB[(lg, t)]; return (x[i] + K * lrate) / (x[0] + K)
+        out["rh"] = round(pace * (g_(h, 1) + g_(a, 2)) / 2 / 100, 1); out["ra"] = round(pace * (g_(a, 1) + g_(h, 2)) / 2 / 100, 1)
+    return out
 hist = []   # (lega, data, previsione, punti casa, punti ospite) per σ e Grado
 PRE = {}
 for g in G:
@@ -65,8 +96,12 @@ for g in G:
     p = predict(lg, g["h"], g["a"])
     ph, pa = g["sh"][5], g["sa"][5]
     if p and p["nh"] >= 5 and p["na"] >= 5: hist.append((lg, g["d"][:10], p, ph, pa))
-    S = g["stat"] or {}; qh, qa = poss(S.get("h")), poss(S.get("a")); Lg = L[lg]
+    S = g["stat"] or {}; qh, qa = poss_game(g); Lg = L[lg]
     P = (qh + qa) / 2 if qh and qa else ((ph + pa) / 2 / (Lg["rtg"] / Lg["n"] / 100) if Lg["n"] > 0 else (ph + pa) / 2 / 1.1)
+    if S.get("h") and S.get("a") and S["h"][6] and S["a"][6]:
+        for t, f_, a_ in ((g["h"], S["h"][6], S["a"][6]), (g["a"], S["a"][6], S["h"][6])):
+            x = RB[(lg, t)]; x[0] = x[0] * DP + 1; x[1] = x[1] * DP + 100 * f_ / P; x[2] = x[2] * DP + 100 * a_ / P
+        x = LRB[lg]; x[0] = x[0] * 0.998 + 2; x[1] = x[1] * 0.998 + 100 * (S["h"][6] + S["a"][6]) / P
     for t, pf, pa_ in ((T[(lg, g["h"])], ph, pa), (T[(lg, g["a"])], pa, ph)):
         for k in ("n", "pace", "off", "dfn"): t[k] *= DP
         t["n"] += 1; t["pace"] += P; t["off"] += 100 * pf / P; t["dfn"] += 100 * pa_ / P; t["g"] += 1
@@ -169,7 +204,8 @@ for g in PART:
     if g["sh"] is not None: continue
     pr = [[x["d"][:10], x["h"], x["a"], x["sh"][5], x["sa"][5]] for x in G if valid(x) and x["lg"] == g["lg"] and {x["h"], x["a"]} == {g["h"], g["a"]}]
     PREC[g["id"]] = pr[-8:]
-J = {"agg": now.strftime("%Y-%m-%d %H:%M"), "leghe": {k: list(v) for k, v in NOMI.items()}, "stagioni": cur, "sigma": SIG, "grado": GRADO,
+RITMO = {lg: round(L[lg]["pace"] / L[lg]["n"], 1) for lg in NOMI if L[lg]["n"]}
+J = {"agg": now.strftime("%Y-%m-%d %H:%M"), "ritmo": RITMO, "leghe": {k: list(v) for k, v in NOMI.items()}, "stagioni": cur, "sigma": SIG, "grado": GRADO,
      "squadre": {lg: {k: [v, loghi[lg].get(k, "")] for k, v in d.items()} for lg, d in squadre.items()},
      "partite": PART, "linee": LINEE, "classifica": CLA, "ultime": ULTP, "precedenti": PREC, "tendenze": TEN, "serie": SER}
 json.dump(J, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))

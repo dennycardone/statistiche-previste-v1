@@ -891,7 +891,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 .bkt{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}.bkt b{font-size:14px;line-height:1.2}.bkt small{color:var(--ink-2);font-size:12px}
 .bkt .tlogo.big{width:54px;height:54px;object-fit:contain}
 .bkc{display:flex;flex-direction:column;gap:3px;align-items:center}.bkc small{color:var(--ink-2);font-size:12px}.bksc{font-size:30px;font-variant-numeric:tabular-nums;color:var(--accent)}
-.bkl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.bkl th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);text-align:center;padding:9px 4px 2px}
+.bkl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;table-layout:fixed}.bkl td.num{width:30%}.bkl th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);text-align:center;padding:9px 4px 2px}
 .bkl td,.bkl th{padding:6px 8px;text-align:center;border-top:1px solid var(--line)}.bkl td small{color:var(--ink-2);display:block;font-size:12px}.bkl td b{font-size:18px}
 .bkl tr.sub td{border-top:0;padding-top:0;color:var(--ink-2);font-size:12.5px}
 .bkq{margin-top:12px}.bkq h3,.card h3{font-size:14px;margin:0 0 8px;display:flex;align-items:center;gap:6px}.bkq h3 small,.card h3 small{color:var(--ink-3);font-weight:500}
@@ -1102,14 +1102,15 @@ function renderMatch() {
   // Lettura
   let lett = "";
   if (p && R) {
-    const row = (lab, h, c, a) => `<tr><td class="num">${h}</td><th>${lab}</th><td class="num">${a}</td></tr>${c != null ? `<tr class="sub"><td></td><td>${c}</td><td></td></tr>` : ""}`;
+    const row = (lab, h, c, a) => `<tr><td class="num">${h}</td><th>${lab}</th><td class="num">${a}</td></tr>${c != null ? `<tr class="sub"><td colspan="3">${c}</td></tr>` : ""}`;
     const real = fin(g), h1 = p.h1 || 0.5;
     lett = `<table class="bkl"><tbody>
       ${row("Punti", `<b>${real ? g.sh[5] : ""}</b> <small>prev. ${f1(p.eh)}</small>`, `Totale ${real ? `<b>${g.sh[5] + g.sa[5]}</b> · ` : ""}prev. ${f1(R.mt)}`, `<b>${real ? g.sa[5] : ""}</b> <small>prev. ${f1(p.ea)}</small>`)}
       ${row("1° tempo", real && g.sh[1] != null ? `<b>${g.sh[0] + g.sh[1]}</b> <small>prev. ${f1(p.eh * h1)}</small>` : `<small>prev. ${f1(p.eh * h1)}</small>`, null, real && g.sa[1] != null ? `<b>${g.sa[0] + g.sa[1]}</b> <small>prev. ${f1(p.ea * h1)}</small>` : `<small>prev. ${f1(p.ea * h1)}</small>`)}
       ${row("Vittoria", `<b>${pc(R.pw)}</b>`, `Scarto previsto ${sg(R.ms)} per ${team(g.lg, R.ms >= 0 ? g.h : g.a)[0]}`, `<b>${pc(1 - R.pw)}</b>`)}
-      ${row("Possessi", "", `${f1(p.pace)} a squadra (ritmo previsto)`, "")}
-      ${real && g.stat && g.stat.h && g.stat.a ? row("Rimbalzi", g.stat.h[6] ?? "—", null, g.stat.a[6] ?? "—") + row("Assist", g.stat.h[9] ?? "—", null, g.stat.a[9] ?? "—") + row("Triple", `${g.stat.h[2] ?? "—"}/${g.stat.h[3] ?? "—"}`, null, `${g.stat.a[2] ?? "—"}/${g.stat.a[3] ?? "—"}`) + row("Palle perse", g.stat.h[12] ?? "—", null, g.stat.a[12] ?? "—") : ""}
+      ${row("Ritmo", "", `<b>${f1(p.pace)}</b> possessi a squadra${B.ritmo && B.ritmo[g.lg] ? ` · media del campionato ${f1(B.ritmo[g.lg])} (${p.pace >= B.ritmo[g.lg] + 1.5 ? "partita veloce" : p.pace <= B.ritmo[g.lg] - 1.5 ? "partita lenta" : "nella media"})` : ""}`, "")}
+      ${p.rh != null ? row("Rimbalzi", `${real && g.stat && g.stat.h && g.stat.h[6] != null ? `<b>${g.stat.h[6]}</b> ` : ""}<small>prev. ${f1(p.rh)}</small>`, `Totale ${real && g.stat && g.stat.h && g.stat.a && g.stat.h[6] != null && g.stat.a[6] != null ? `<b>${g.stat.h[6] + g.stat.a[6]}</b> · ` : ""}prev. ${f1(p.rh + p.ra)} · ${Math.abs(p.rh - p.ra) < 1 ? "equilibrio a rimbalzo" : `più rimbalzi per ${team(g.lg, p.rh > p.ra ? g.h : g.a)[0]}`}`, `${real && g.stat && g.stat.a && g.stat.a[6] != null ? `<b>${g.stat.a[6]}</b> ` : ""}<small>prev. ${f1(p.ra)}</small>`) : ""}
+      ${real && g.stat && g.stat.h && g.stat.a ? row("Assist", g.stat.h[9] ?? "—", null, g.stat.a[9] ?? "—") + row("Triple", `${g.stat.h[2] ?? "—"}/${g.stat.h[3] ?? "—"}`, null, `${g.stat.a[2] ?? "—"}/${g.stat.a[3] ?? "—"}`) + row("Palle perse", g.stat.h[12] ?? "—", null, g.stat.a[12] ?? "—") : ""}
     </tbody></table>`;
     const LN = R.LN, lines = R.R.filter(r => r.q);
     lett += lines.length ? `<div class="card bkq"><h3>Linee dei book · lato della lettura</h3><table class="bkt2"><thead><tr><th></th><th>Prevista</th><th>Quota</th><th>Equa</th><th>Valore</th></tr></thead><tbody>${lines.map(r => `<tr><th>${esc(r.lab)}${r.hit != null ? ` <span class="${r.hit ? "okc" : "koc"}">${r.hit ? "✓" : "✗"}</span>` : ""}</th><td class="num">${pc(r.p)}</td><td class="num"><b>${f2(r.q)}</b><small>${esc(r.bk || "")}</small></td><td class="num">${f2(r.fair)}</td><td class="num ${r.ev >= VAL_MIN ? "vgood" : ""}">${r.ev == null ? "—" : (r.ev >= 0 ? "+" : "−") + Math.round(Math.abs(r.ev) * 100) + "%"}</td></tr>`).join("")}</tbody></table>
