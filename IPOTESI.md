@@ -104,3 +104,10 @@ Tab Giocatori (anteprima, ramo anteprima-giocatori): tiri in porta 0,5/1,5, fall
 (tiri totali esclusi: API-Football senza i tiri respinti, i book li contano). Dati: tools/props/giocatori.py ogni sera (lineups.yml → ramo valori → data/giocatori.json).
 Archivio formazioni: la stagione in corso restava indietro (le partite già nel ramo storico non entravano nell'elenco): corretto il 14/11, Top 5 e Champions
 completi con i nomi dei giocatori (235 richieste fuori dalla riserva dell'app).
+
+## 15/11/2026 · Regola della lettura (Denny)
+"Tutto deve basarsi sulla lettura della partita": in Operatività (singole, Quota 2/3, osservazione) e nel Mercato del Radar si propone solo il
+segno che Prevista dà più probabile (1X2) o il lato sopra il 50% (Over/Under); la quota decide solo se conviene. La controtendenza resta (è
+Prevista che legge la partita al contrario del book). Caso: Finlandia–San Marino, corner 2 a 20,25 (Prevista 1 al 77%) in osservazione.
+Ultimi 7 giorni: le singole erano già dalla parte della lettura 65 volte su 66 (l'unica contro: cartellini, persa); le giocate contro la lettura
+stavano quasi tutte in osservazione (1X2 corner a quota lunga). Non è un test dell'harness: è una regola di coerenza decisa da Denny.

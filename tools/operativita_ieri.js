@@ -115,6 +115,17 @@ let nLock = 0;
   }
   // 10/11/2026: 1X2 corner oltre quota 2,50 in osservazione (senza peso), fissati e valutati come le altre proposte
   day.oss = day.oss || [];
+  // 15/11/2026 (Denny): solo giocate dalla parte della lettura. Le proposte di oggi non ancora iniziate che la regola non darebbe più
+  // (es. San Marino più corner della Finlandia) escono: in osservazione non contano; tra le singole e la controtendenza si tolgono solo se
+  // il segno non è quello che Prevista dà più probabile.
+  {
+    const lead = new Map(Ad.map(c => [c.e.id + "|" + c.k + "|" + c.side, c.lead !== false]));
+    const keep = o => !todayE.some(e => e.id === o.id) || lead.get(o.id + "|" + o.k + "|" + o.side) !== false;
+    const before = day.oss.length + day.singole.length + day.contro.length;
+    day.oss = day.oss.filter(o => !todayE.some(e => e.id === o.id) || (X.OSS || []).some(c => c.e.id === o.id && c.k === o.k && c.side === o.side));
+    day.singole = day.singole.filter(keep); day.contro = day.contro.filter(keep);
+    const n = before - day.oss.length - day.singole.length - day.contro.length; if (n) console.log("contro la lettura, tolte da oggi:", n);
+  }
   for (const c of X.OSS || []) if (!day.oss.some(o => o.id === c.e.id && o.k === c.k)) { day.oss.push({ ...prop(c), f: 0, w: 0, oss: 1, t: nowIso }); nLock++; }
   const comb = b => ({ legs: b.legs.map(prop), q: r4(b.q), p: r4(b.p), ev: r4(b.ev), f: A.opKelly(b.p, b.q) });
   if (!day.q2 && X.D2) neu.push(["q2", comb(X.D2)]);

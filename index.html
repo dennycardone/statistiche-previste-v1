@@ -4504,8 +4504,9 @@ function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u,
     const [L, o, u, n, oM, oB, uM, uB] = c, po = D[k](L);
     const R = REAL[base], real = R && R[0] != null && R[1] != null ? (i === 0 ? R[0] : i === 2 ? R[1] : R[0] + R[1]) : null;
     if (po == null || !isFinite(po)) return { L, o, u, n, po: null, real, gol: base === "g" || base === "o" };
-    const eo = po * o - 1, eu = (1 - po) * u - 1, side = eo >= eu ? "O" : "U";
-    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, mx: side === "O" ? oM : uM, bk: side === "O" ? oB : uB, ev: Math.max(eo, eu), real, gol: base === "g" || base === "o", hit: real == null ? null : side === "O" ? real > L : real < L };
+    // 15/11/2026 (Denny): il lato è quello della lettura (sopra il 50%), non quello col valore più alto: niente Under se Prevista legge l'Over
+    const eo = po * o - 1, eu = (1 - po) * u - 1, side = po >= 0.5 ? "O" : "U";
+    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, mx: side === "O" ? oM : uM, bk: side === "O" ? oB : uB, ev: side === "O" ? eo : eu, real, gol: base === "g" || base === "o", hit: real == null ? null : side === "O" ? real > L : real < L };
   };
   return ("O" in Mods ? BK_ROWS.concat([["Fuorigioco", "o", "ho", "ao"]]) : BK_ROWS).map(([lab, t, h, a]) => ({ lab, t: cell(t, t, 1), h: cell(h, t, 0), a: cell(a, t, 2), mk: t }));
 }
@@ -5624,7 +5625,7 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilit�
           out.push({ e, k, mk: name, side: lab[i], who: i === 0 ? e.home : i === 2 ? e.away : "pari", p: p[i], m: mm[i], pc, q: q[i], ev,
             nb: q.n ? q.n[i] : 1, qmax: q.max ? q.max[i] : q[i], bk: q.book ? q.book[i] : "1xBet",
             xi: ev0 != null && ev > 0 && (ev0 <= 0 ? "sbloccata" : ev > ev0 + 1e-9 ? "rafforzata" : null), hasXi: !!p0,
-            und: i === und, invA: i === und && p[und] > p[fav] });
+            und: i === und, invA: i === und && p[und] > p[fav], lead: p[i] >= Math.max(...p) });   // lead: il segno della lettura (15/11)
         }
       }
       // Over/Under cartellini: linea 1xBet più equilibrata (data/linee.json) e cartellini attesi del modello v2
@@ -5633,7 +5634,7 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilit�
         const [L, o, u] = kL, po = pOver(pmfTotal(x[4], rk, Math.ceil(L) + 2), L), mo = (1 / o) / (1 / o + 1 / u);
         for (const [side, pp, qq, mmm] of [["Over", po, o, mo], ["Under", 1 - po, u, 1 - mo]]) {
           const pc = opCorr(pp, mmm); if (pc == null) continue;
-          out.push({ e, k: "kou", mk: "Cartellini", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1,
+          out.push({ e, k: "kou", mk: "Cartellini", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1, lead: pp > 0.5,
             nb: kL[3] || 1, qmax: (side === "Over" ? kL[4] : kL[6]) || qq, bk: (side === "Over" ? kL[5] : kL[7]) || "1xBet" });
         }
       }
@@ -5643,7 +5644,7 @@ function opEntry(e, cfg, cut) {   // esiti con quota 1xBet attuale e probabilit�
         const [L, o, u] = sL, po = pOver(pmfTotal(MS.lh + MS.la, MS.r, Math.ceil(L) + 2), L), mo = (1 / o) / (1 / o + 1 / u);
         for (const [side, pp, qq, mmm] of [["Over", po, o, mo], ["Under", 1 - po, u, 1 - mo]]) {
           const pc = opCorr(pp, mmm); if (pc == null) continue;
-          out.push({ e, k: "sou", mk: "Tiri", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1,
+          out.push({ e, k: "sou", mk: "Tiri", side: `${side} ${th1(L)}`, who: "totali", p: pp, m: mmm, pc, q: qq, ev: pc * qq - 1, lead: pp > 0.5,
             nb: sL[3] || 1, qmax: (side === "Over" ? sL[4] : sL[6]) || qq, bk: (side === "Over" ? sL[5] : sL[7]) || "1xBet" });
         }
       }
@@ -5666,6 +5667,10 @@ function opSelect(A, minW = 0) {   // regole della vista (le stesse per lo stori
   // media 3,13, −40% a puntata fissa: tutta la perdita del periodo. Restano visibili (OSS) e seguiti nel registro, fuori da pesi e combinate.
   // 14/11/2026 (audit, Denny): cartellini delle nazionali in osservazione, senza peso. Il modello delle nazionali sui cartellini sbaglia più
   // della media semplice (errore 1,78 contro 1,71) e nel registro del 12-13/11 ha preso 3 volte su 11 (attese 6): −2,9% della cassa.
+  // 15/11/2026 (Denny): tutto parte dalla LETTURA della partita. Si gioca solo il segno che Prevista dà più probabile (1X2) o il lato sopra
+  // il 50% (Over/Under): la quota decide solo se conviene. Niente valore "contro la lettura" (es. San Marino più corner della Finlandia a 20).
+  // La controtendenza resta: è la lettura di Prevista che va contro il book (sfavorita del book che Prevista dà più probabile).
+  A = A.filter(c => c.lead !== false);
   const oss = c => (c.k === "c" && c.q > OP_OSS_Q) || (c.k === "kou" && c.e && c.e.lg && c.e.lg.code === "NAZ");
   const byO = new Map(); for (const c of A) if (oss(c) && c.ev > 0 && opKelly(c.pc, c.q) >= OP_MINW) { const kk = c.e.id + "|" + c.k, b = byO.get(kk); if (!b || c.ev > b.ev) byO.set(kk, c); }
   const OSS = [...byO.values()].sort((a, b) => b.ev - a.ev);
