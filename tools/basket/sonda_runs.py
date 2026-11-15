@@ -3,17 +3,18 @@
 Come controllo, lo stesso su "Player Points and Assists" (deve corrispondere a punti + assist). Solo numeri aggregati, nessuna quota.
 Uso: python tools/basket/sonda_runs.py CARTELLA_ARCHIVIO QUOTE.json"""
 import json, glob, os, sys, re, collections, unicodedata
-import numpy as np
+import statistics
 DIR, QF = sys.argv[1], sys.argv[2]
 def norm(s): return frozenset(re.sub(r"[^a-z ]", " ", unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower()).split())
-NAME, ST = {}, collections.defaultdict(lambda: np.zeros(6))
+NAME, ST = {}, collections.defaultdict(lambda: [0.0] * 6)
 for fn in sorted(glob.glob(os.path.join(DIR, "NBA_*.json")))[-2:]:
     D = json.load(open(fn))
     for k, v in (D.get("nomi") or {}).items(): NAME[norm(v)] = k
     for gid, ps in (D.get("gioc") or {}).items():
         for p in ps:
             if not p[3] or None in (p[4], p[11], p[12]): continue
-            ST[str(p[0])] += [1, p[4], p[11], p[12], p[7] or 0, p[3]]
+            t = ST[str(p[0])]
+            for i, v in enumerate((1, p[4], p[11], p[12], p[7] or 0, p[3])): t[i] += v
 Q = json.load(open(QF)).get("partite", {})
 lines = collections.defaultdict(lambda: collections.defaultdict(list))
 for e in Q.values():
@@ -30,11 +31,12 @@ for m, pl in lines.items():
         pid = NAME.get(norm(nm))
         if not pid or ST[pid][0] < 5: nomatch += 1; continue
         s = ST[pid]; n = s[0]
-        X.append((float(np.median(ls)), s[1] / n, s[2] / n, s[3] / n, s[4] / n, (s[1] + s[3]) / n, (s[2] + s[3]) / n))
+        X.append((float(statistics.median(ls)), s[1] / n, s[2] / n, s[3] / n, s[4] / n, (s[1] + s[3]) / n, (s[2] + s[3]) / n))
     if len(X) < 5: out.append(f"{m}: {len(X)} giocatori abbinati (pochi), non abbinati {nomatch}"); continue
-    X = np.array(X); res = []
+    res = []
     for i, lab in ((1, "punti"), (2, "rimbalzi"), (3, "assist"), (4, "triple"), (5, "punti+assist"), (6, "rimbalzi+assist")):
-        res.append((float(np.corrcoef(X[:, 0], X[:, i])[0, 1]), float(np.mean(np.abs(X[:, 0] - X[:, i]))), lab))
+        a_, b_ = [x[0] for x in X], [x[i] for x in X]
+        res.append((statistics.correlation(a_, b_), statistics.mean(abs(u - v) for u, v in zip(a_, b_)), lab))
     res.sort(reverse=True)
     out.append(f"{m} ({len(X)} giocatori, non abbinati {nomatch}): " + " · ".join(f"{lab} corr {c:.2f} scarto {d:.1f}" for c, d, lab in res))
 print("::notice title=Basket · che cosa sono i mercati giocatori::" + " | ".join(out)[:3800])
