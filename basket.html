@@ -938,7 +938,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 <header class="appbar">
   <div class="appbar-in">
     <h1 class="brand"><svg class="pmark" viewBox="0 0 100 100" aria-hidden="true"><rect x="27" y="14" width="15" height="72" rx="4" fill="currentColor"/><circle cx="52" cy="40" r="19" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="52" cy="40" r="6.5" fill="#D4FF3F"/></svg><span class="bname">Prevista</span></h1>
-    <label class="sportpick"><span class="sr">Sport</span><select id="sport"><option value="calcio">⚽ Calcio</option><option value="basket" selected>🏀 Basket</option></select></label>
+    <label class="sportpick"><span class="sr">Sport</span><select id="sport" autocomplete="off" onchange="if(this.value!=='basket'){try{localStorage.setItem('prevista.sport',this.value)}catch(e){}location.assign(new window.URL('./?s='+Date.now(),location.href).href)}"><option value="calcio">⚽ Calcio</option><option value="basket" selected>🏀 Basket</option></select></label><script>addEventListener("pageshow",function(){var s=document.getElementById("sport");if(s)s.value="basket"});</script>
     <p class="bslog">Guarda la partita <b>prima</b> che si giochi</p>
   </div>
   <nav class="tabbar" aria-label="Sezioni">
@@ -1204,7 +1204,7 @@ function wire() {
   document.querySelectorAll("#viewMatch .mtab").forEach(b => b.addEventListener("click", () => { S.mt = b.dataset.mt; renderMatch(); }));
   document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { S.rt = b.dataset.rt; renderRadar(); }));
   document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.addEventListener("click", () => { const k = b.dataset.sw; if (S.sw.has(k)) S.sw.delete(k); else S.sw.add(k); renderSeg(); }));
-  const sp = $("#sport"); if (sp) { sp.value = "basket"; sp.addEventListener("change", () => { if (sp.value === "calcio") { try { localStorage.setItem("prevista.sport", "calcio"); } catch (e) {} location.assign(new URL("./?s=" + Date.now(), location.href).href); } }); }
+  const sp = $("#sport"); if (sp) { sp.value = "basket"; }
 }
 (async () => {
   wire();

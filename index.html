@@ -907,7 +907,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 <header class="appbar">
   <div class="appbar-in">
     <h1 class="brand"><svg class="pmark" viewBox="0 0 100 100" aria-hidden="true"><rect x="27" y="14" width="15" height="72" rx="4" fill="currentColor"/><circle cx="52" cy="40" r="19" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="52" cy="40" r="6.5" fill="#D4FF3F"/></svg><span class="bname">Prevista</span></h1>
-    <label class="sportpick"><span class="sr">Sport</span><select id="sport"><option value="calcio" selected>⚽ Calcio</option><option value="basket">🏀 Basket</option></select></label>
+    <label class="sportpick"><span class="sr">Sport</span><select id="sport" autocomplete="off" onchange="if(this.value!=='calcio'){try{localStorage.setItem('prevista.sport',this.value)}catch(e){}location.assign(new window.URL('basket.html?s='+Date.now(),location.href).href)}"><option value="calcio" selected>⚽ Calcio</option><option value="basket">🏀 Basket</option></select></label><script>addEventListener("pageshow",function(){var s=document.getElementById("sport");if(s)s.value="calcio"});</script>
     <p class="bslog">Guarda la partita <b>prima</b> che si giochi</p>
     <label for="decay" class="modepick" hidden><span class="sr">Statistica richiesta</span>
       <select id="decay">
@@ -5284,7 +5284,7 @@ $("#ritLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAG
 document.querySelectorAll(".rtf [data-rw]").forEach(b => b.addEventListener("click", () => { RIT.when = b.dataset.rw; document.querySelectorAll(".rtf [data-rw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.addEventListener("click", () => { const k = b.dataset.sw; if (SIGW.days.has(k)) SIGW.days.delete(k); else SIGW.days.add(k); b.setAttribute("aria-pressed", String(SIGW.days.has(k))); if (SIGV === "gi") renderSigGi(); else renderSignals(); }));
 document.querySelectorAll("#sigView [data-sv]").forEach(b => b.addEventListener("click", () => { SIGV = b.dataset.sv; sigViewApply(); }));
-{ const sp = document.getElementById("sport"); if (sp) sp.addEventListener("change", () => { if (sp.value === "basket") { try { localStorage.setItem("prevista.sport", "basket"); } catch (e) {} location.assign(new URL("basket.html?s=" + Date.now(), location.href).href); } }); }   // 15/11/2026: tendina Calcio / Basket
+// 15/11/2026: tendina Calcio / Basket gestita direttamente sul <select id="sport"> (funziona anche prima che l'app finisca di caricare)
 $("#ritDot").addEventListener("click", () => { RIT.dot = !RIT.dot; $("#ritDot").setAttribute("aria-pressed", String(RIT.dot)); renderRit(); });
 $("#ritGrd").addEventListener("click", () => { RIT.grd = !RIT.grd; $("#ritGrd").setAttribute("aria-pressed", String(RIT.grd)); renderRit(); });
 document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
