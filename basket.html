@@ -901,7 +901,6 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 .vgood{color:var(--gold);font-weight:700}.okc{color:#47d18c}.koc{color:#ff6b6b}
 .gbadge{display:inline-flex;align-items:center;justify-content:center;min-width:30px;padding:2px 7px;border-radius:8px;font-weight:800;font-size:13px}
 .gbadge.ap{background:#d4ff3f;color:#111}.gbadge.a{background:#5fe0a0;color:#062014}.gbadge.b{background:#3b6fb6;color:#fff}.gbadge.c{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
-.grow{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.grow small{display:block;color:var(--ink-3);font-size:12px}.grow .num{text-align:right}.grow .num b{font-size:20px}
 .glegend{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:12.5px;color:var(--ink-2)}
 .selrow,.sigrow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;width:100%;text-align:left;padding:10px 2px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer}
 .selt b{display:block;font-size:14px}.selt small{color:var(--ink-3);font-size:12px}.selp{grid-column:1;display:flex;gap:8px;align-items:center;font-size:13.5px}.selp small{color:var(--ink-2)}
@@ -1001,8 +1000,30 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </section>
     <section class="card" id="sigOut" aria-label="Elenco segnali"></section>
   </div>
-  <div class="view" id="viewGen" hidden><section class="card" id="genOut"></section></div>
-  <div class="view" id="viewRit" hidden><section class="card" id="ritOut"></section></div>
+  <div class="view" id="viewGen" hidden>
+    <section class="card genf" aria-label="Filtri classifiche">
+      <div class="genrow">
+        <label for="genLg" class="fl">Campionato<select id="genLg"></select></label>
+        <label for="genMk" class="fl">Mercato<select id="genMk"></select></label>
+      </div>
+      <div class="seg" role="group" aria-label="Sede" id="genVenue"><button type="button" class="segb" data-gv="tot" aria-pressed="true">Totale</button><button type="button" class="segb" data-gv="home" aria-pressed="false">In casa</button><button type="button" class="segb" data-gv="away" aria-pressed="false">In trasferta</button></div>
+      <div class="seg" role="group" aria-label="Periodo" id="genPer"><button type="button" class="segb" data-gp="s" aria-pressed="true">Stagione</button><button type="button" class="segb" data-gp="10" aria-pressed="false">Ultime 10</button><button type="button" class="segb" data-gp="5" aria-pressed="false">Ultime 5</button></div>
+      <div class="seg" role="group" aria-label="Quando giocano" id="genWhen"><button type="button" class="segb" data-gw="all" aria-pressed="true">Tutte</button><button type="button" class="segb" data-gw="0" aria-pressed="false">Giocano oggi</button><button type="button" class="segb" data-gw="1" aria-pressed="false">Giocano domani</button></div>
+    </section>
+    <div id="genOut" class="genlist"></div>
+  </div>
+  <div class="view" id="viewRit" hidden>
+    <section class="card genf3" aria-label="Filtri digiuni">
+      <div class="genrow">
+        <label for="ritLg" class="fl"><span class="sr">Campionato</span><select id="ritLg"></select></label>
+        <label for="ritTeam" class="fl"><span class="sr">Squadra</span><select id="ritTeam"></select></label>
+      </div>
+      <label for="ritGr" class="fl"><span class="sr">Statistica</span><select id="ritGr"></select></label>
+      <div class="seg" role="group" aria-label="Sede" id="ritVen"><button type="button" class="segb" data-v="all" aria-pressed="true">Tutte</button><button type="button" class="segb" data-v="home" aria-pressed="false">Casa</button><button type="button" class="segb" data-v="away" aria-pressed="false">Trasferta</button></div>
+      <div class="rtf" role="group" aria-label="Quando giocano e Lettura" id="ritWhen"></div>
+    </section>
+    <div id="ritOut"></div>
+  </div>
   <p class="bkstamp" id="stamp"></p>
 </div>
 <script>
@@ -1169,7 +1190,7 @@ function renderMatch() {
     <h3 class="gh">Tutte le previsioni della partita</h3>
     <div class="glist">${GR.map(r => `<details class="gitem"><summary><span class="gil"><b>${esc(gTitle(r))}</b><small class="muted">${esc(gSub(r))}</small></span><span class="gir"><span class="ccls ${GC[r.g]}">${r.g}</span><span class="gin"><b class="num">${Math.round(r.uscite * 100)}</b> su 100</span></span></summary>${gWhy(r)}</details>`).join("")}</div>
     <p class="small muted" style="margin:0">Tocca una previsione per vedere perché ha quel grado.</p>`; }
-  const U = id => (B.ultime[`${g.lg}|${id}`] || []).slice().reverse();
+  const U = id => (B.ultime[`${g.lg}|${id}`] || []).slice().reverse().slice(0, 10);
   const swapSt = r => { const x = r.slice(5); const o = []; for (let i = 0; i < x.length; i += 2) o.push(x[i + 1], x[i]); return o; };
   // Precedenti (come il calcio): ultime partite delle due squadre (Generale / Casa-Trasferta) e scontri diretti, con le statistiche
   const STL = (x, o) => { const v = (i, lab) => x[o + i] != null && x[o + i + 1] != null ? `${lab} ${x[o + i]}-${x[o + i + 1]}` : null;
@@ -1202,7 +1223,7 @@ function renderMatch() {
   const lgF = rows.reduce((a, r) => a + r.f * r.n, 0) / (rows.reduce((a, r) => a + r.n, 0) || 1), lgA = rows.reduce((a, r) => a + r.a * r.n, 0) / (rows.reduce((a, r) => a + r.n, 0) || 1);
   const me = ven === "home" ? g.h : g.a;
   $("#mrend").innerHTML = `<section class="card mtrend"><h2>Rendimento · ${esc(B.leghe[g.lg][0])}</h2>
-    <div class="mtrc"><label for="bkMk" class="sr">Statistica</label><select id="bkMk">${RK.filter(([k]) => has(k) || k === rk).map(([k, n]) => `<option value="${k}"${k === rk ? " selected" : ""}>${n}</option>`).join("")}</select>
+    <div class="mtrc"><label for="bkMk" class="sr">Statistica</label><select id="bkMk">${RK.map(([k, n]) => `<option value="${k}"${k === rk ? " selected" : ""}>${n}</option>`).join("")}</select>
       <div class="seg" role="group" aria-label="Sede"><button type="button" class="segb" data-rv="home" aria-pressed="${ven === "home"}">Casa</button><button type="button" class="segb" data-rv="away" aria-pressed="${ven === "away"}">Trasferta</button></div></div>
     <div class="stdleg"><span class="mh">${esc(team(g.lg, g.h)[0])}${ven === "home" ? " · gioca in casa" : ""}</span><span class="ma">${esc(team(g.lg, g.a)[0])}${ven === "away" ? " · gioca in trasferta" : ""}</span></div>
     ${rows.length ? `<div class="lt lt2" role="table"><div class="lth" role="row"><span>#</span><span>Squadra</span><span>Fatti<em>media</em></span><span>Subiti<em>media</em></span><span>Sfide vinte<em>vinte/partite</em></span></div>
@@ -1341,24 +1362,113 @@ function renderSeg() {   // 15/11/2026 (Denny): come i Segnali del calcio
   $("#sigOut").innerHTML = `<h2>${L.length} segnal${L.length === 1 ? "e" : "i"}</h2><p class="small muted" style="margin:0">${intro}</p>` + (L.length ? `<div class="siglist">${L.join("")}</div>` : `<p class="muted">Nessun segnale con questi filtri${S.sw.has("r") ? "" : ": prova Giornata"}.</p>`);
   $("#sigOut").querySelectorAll(".sigopen").forEach(b => b.addEventListener("click", () => { S.game = b.dataset.gid; S.mt = b.dataset.mt; show("match"); }));
 }
-/* Tendenze */
-function renderTen() {
-  const T = B.tendenze;
-  $("#genOut").innerHTML = `<h2>Tendenze · stagione in corso</h2>` + LG_ORD.filter(lg => T[lg]).map(lg => { const t = T[lg];
-    return `<div class="card tcard"><h3>${FL[lg] || ""} ${esc(B.leghe[lg][0])} <small>${t.partite} partite</small></h3><div class="tgrid">
-      <div><b>${f1(t.media_punti)}</b><small>punti a partita</small></div><div><b>${pc(t.casa_vince)}</b><small>vince la squadra di casa</small></div>
-      <div><b>${f1(t.scarto_medio)}</b><small>scarto medio</small></div><div><b>${pc(t.supplementari)}</b><small>ai supplementari</small></div>
-      <div><b>${t.max_punti}</b><small>totale più alto</small></div><div><b>${t.min_punti}</b><small>totale più basso</small></div></div></div>`; }).join("");
+/* ---------- Tendenze e Digiuni (15/11/2026, Denny: come il calcio) ---------- */
+// riga partita della squadra: [data, avversaria, casa 1/0, punti f, s, rimb f, s, ass f, s, triple f, s, palle perse f, s, falli f, s, 1°T f, s, stagione in corso 1/0]
+const TMK = [
+  ["vit", "Vittorie", r => r[3] > r[4], "vince", "non vince"],
+  ["sop", "Totale sopra la media del campionato", (r, m) => m && r[3] + r[4] > m, "partita sopra la media punti", "non ha una partita sopra la media punti del campionato"],
+  ["sot", "Totale sotto la media del campionato", (r, m) => m && r[3] + r[4] < m, "partita sotto la media punti", "non ha una partita sotto la media punti del campionato"],
+  ["v10", "Vince di 10 o più", r => r[3] - r[4] >= 10, "vince di 10+", "non vince di 10 o più"],
+  ["h1", "Vince il 1° tempo", r => r[15] != null ? r[15] > r[16] : null, "vince il 1° tempo", "non vince il 1° tempo"],
+  ["reb", "Più rimbalzi dell'avversaria", r => r[5] != null ? r[5] > r[6] : null, "più rimbalzi", "non prende più rimbalzi dell'avversaria"],
+  ["ast", "Più assist dell'avversaria", r => r[7] != null ? r[7] > r[8] : null, "più assist", "non fa più assist dell'avversaria"],
+  ["tri", "Più triple dell'avversaria", r => r[9] != null ? r[9] > r[10] : null, "più triple", "non segna più triple dell'avversaria"],
+  ["pp", "Meno palle perse dell'avversaria", r => r[11] != null ? r[11] < r[12] : null, "meno palle perse", "non perde meno palloni dell'avversaria"],
+  ["fl", "Più falli dell'avversaria", r => r[13] != null ? r[13] > r[14] : null, "più falli", "non commette più falli dell'avversaria"]];
+const tGames = (lg, id) => B.ultime[`${lg}|${id}`] || [];
+const nextOf = (lg, id) => games().filter(g => g.lg === lg && !fin(g) && !live(g) && (g.h === id || g.a === id) && g.day >= todayIso()).sort((a, b) => a.d.localeCompare(b.d))[0];
+function nextProb(k, g, id) {   // probabilità di Prevista sull'esito nella prossima partita (dove c'è un modello)
+  const R = g && reading(g); if (!R) return null; const home = g.h === id, s = B.sigma[g.lg], avg = (B.tendenze[g.lg] || {}).media_punti;
+  if (k === "vit") return { p: home ? R.pw : 1 - R.pw, lab: "vittoria" };
+  if ((k === "sop" || k === "sot") && avg) { const po = 1 - Phi((avg - R.mt) / s[1]); return { p: k === "sop" ? po : 1 - po, lab: k === "sop" ? `sopra ${lnum(avg.toFixed(1))}` : `sotto ${lnum(avg.toFixed(1))}` }; }
+  if (k === "v10") { const ms = home ? R.ms : -R.ms; return { p: 1 - Phi((9.5 - ms) / s[0]), lab: "+10" }; }
+  return null;
 }
-/* Digiuni (serie aperte) */
+function leanOf(k, g, id) {   // la Lettura va verso l'esito? (per i Digiuni)
+  if (!g || !g.p) return null; const p = g.p, home = g.h === id;
+  const np = nextProb(k, g, id); if (np) return np.p >= 0.5;
+  if (k === "h1") return home ? p.eh > p.ea : p.ea > p.eh;
+  if (k === "reb" && p.rh != null) return home ? p.rh > p.ra : p.ra > p.rh;
+  if (k === "fl" && p.fh != null) return home ? p.fh > p.fa : p.fa > p.fh;
+  return null;
+}
+const G_ = { lg: "all", mk: "vit", v: "tot", per: "s", w: "all", more: 10 };
+function renderTen() {
+  const sel = $("#genLg"), mk = $("#genMk");
+  if (!sel.options.length) {
+    sel.innerHTML = `<option value="all">Tutti i campionati</option>` + LG_ORD.map(lg => `<option value="${lg}">${esc(B.leghe[lg][1])} · ${esc(B.leghe[lg][0])}</option>`).join("");
+    mk.innerHTML = TMK.map(([k, n]) => `<option value="${k}">${n}</option>`).join("");
+    sel.addEventListener("change", () => { G_.lg = sel.value; G_.more = 10; renderTen(); }); mk.addEventListener("change", () => { G_.mk = mk.value; G_.more = 10; renderTen(); });
+    for (const [box, key, attr] of [["#genVenue", "v", "gv"], ["#genPer", "per", "gp"], ["#genWhen", "w", "gw"]]) $(box).querySelectorAll("[data-" + attr + "]").forEach(b => b.addEventListener("click", () => { G_[key] = b.dataset[attr]; G_.more = 10; renderTen(); }));
+  }
+  sel.value = G_.lg; mk.value = G_.mk;
+  for (const [box, key, attr] of [["#genVenue", "v", "gv"], ["#genPer", "per", "gp"], ["#genWhen", "w", "gw"]]) $(box).querySelectorAll("[data-" + attr + "]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset[attr] === G_[key])));
+  const M = TMK.find(x => x[0] === G_.mk), t0 = todayIso(), wantDay = G_.w === "all" ? null : addDays(t0, +G_.w);
+  const rows = [], lgRate = {};
+  for (const lg of LG_ORD) { if (G_.lg !== "all" && lg !== G_.lg) continue; const avg = (B.tendenze[lg] || {}).media_punti; let ln = 0, ly = 0;
+    for (const id of Object.keys(B.squadre[lg] || {})) {
+      let L = tGames(lg, id).filter(r => r[17]);
+      if (G_.v !== "tot") L = L.filter(r => r[2] === (G_.v === "home" ? 1 : 0));
+      if (G_.per !== "s") L = L.slice(-(+G_.per));
+      const ev = L.map(r => M[2](r, avg)).filter(x => x != null); ln += ev.length; ly += ev.filter(Boolean).length;
+      if (ev.length < 3) continue;
+      const nx = nextOf(lg, id); if (wantDay && (!nx || nx.day !== wantDay)) continue;
+      rows.push({ lg, id, y: ev.filter(Boolean).length, n: ev.length, nx });
+    }
+    lgRate[lg] = ln ? ly / ln : null; }
+  rows.sort((a, b) => b.y / b.n - a.y / a.n || b.n - a.n);
+  const out = rows.slice(0, G_.more).map((r, i) => { const rate = r.y / r.n, lr = lgRate[r.lg], np = r.nx ? nextProb(G_.mk, r.nx, r.id) : null;
+    return `<button type="button" class="grow${i < 3 ? " top" : ""}" data-gid="${r.nx ? esc(r.nx.id) : ""}">
+      <span class="grk">${i + 1}</span><span class="gmain"><span class="gteam">${esc(team(r.lg, r.id)[0])}</span><span class="glg">${esc(B.leghe[r.lg][1])} · ${esc(B.leghe[r.lg][0])}</span></span>
+      <span class="gval"><b>${r.y}/${r.n}</b><small>${Math.round(rate * 100)}%</small></span>
+      <span class="gbar" aria-hidden="true"><i style="width:${rate * 100}%"></i>${lr != null ? `<u style="left:${lr * 100}%"></u>` : ""}</span>
+      <span class="gref">${lr != null ? `Media campionato ${Math.round(lr * 100)}%` : ""}</span>
+      ${r.nx ? `<span class="gnext">${r.nx.h === r.id ? "In casa con" : "In trasferta con"} <b>${esc(team(r.lg, r.nx.h === r.id ? r.nx.a : r.nx.h)[0])}</b> · ${dlab(r.nx.day)} ${timeOf(r.nx.d)}${np ? ` · <em>${esc(np.lab)} ${pc(np.p)}</em>` : ""}</span>` : ""}
+    </button>`; }).join("");
+  $("#genOut").innerHTML = (out || `<section class="card"><p class="muted">Nessuna squadra con almeno 3 partite per questo mercato e questi filtri.</p></section>`) + (rows.length > G_.more ? `<button type="button" class="genmore" id="genMore">Mostra altre ${Math.min(10, rows.length - G_.more)}</button>` : "");
+  $("#genOut").querySelectorAll(".grow[data-gid]").forEach(b => b.addEventListener("click", () => { if (b.dataset.gid) { S.game = b.dataset.gid; S.mt = "prev"; show("match"); } }));
+  const mb = $("#genMore"); if (mb) mb.addEventListener("click", () => { G_.more += 10; renderTen(); });
+}
+const D_ = { lg: "all", t: "all", gr: "all", v: "all", w: "all", dot: false, grd: false };
+const DGR = [["all", "Tutte le statistiche"], ["ris", "Risultati", ["vit", "v10", "h1"]], ["pun", "Punti", ["sop", "sot"]], ["reb", "Rimbalzi", ["reb"]], ["ast", "Assist", ["ast"]], ["tri", "Triple", ["tri"]], ["pp", "Palle perse", ["pp"]], ["fl", "Falli", ["fl"]]];
 function renderDig() {
-  const K = [["vittorie", "Vittorie consecutive"], ["sconfitte", "Sconfitte consecutive"], ["vittorie_casa", "Vittorie in casa di fila"], ["sconfitte_trasferta", "Sconfitte in trasferta di fila"],
-    ["sopra_media", "Partite sopra la media punti del campionato"], ["sotto_media", "Partite sotto la media punti del campionato"]];
-  const chips = [["all", "Tutti"], ...LG_ORD.map(lg => [lg, B.leghe[lg][0]])];
-  $("#ritOut").innerHTML = `<h2>Serie aperte</h2><div class="self">${chips.map(([c, n]) => `<button type="button" class="chip" data-dlg="${c}" aria-pressed="${S.dlg === c}">${esc(n)}</button>`).join("")}</div>` +
-    K.map(([k, lab]) => { const L = Object.entries(B.serie).filter(([key]) => S.dlg === "all" || key.startsWith(S.dlg + "|")).map(([key, v]) => ({ lg: key.split("|")[0], id: key.split("|")[1], n: v[k] })).filter(x => x.n >= 3).sort((a, b) => b.n - a.n).slice(0, 8);
-      return `<div class="card"><h3>${lab}</h3>${L.length ? `<table class="bkt2"><tbody>${L.map(x => `<tr><td>${logo(x.lg, x.id)}${esc(team(x.lg, x.id)[0])} <small class="muted">${esc(B.leghe[x.lg][0])}</small></td><td class="num"><b>${x.n}</b></td></tr>`).join("")}</tbody></table>` : `<p class="small muted">Nessuna serie di almeno 3.</p>`}</div>`; }).join("");
-  document.querySelectorAll("#ritOut [data-dlg]").forEach(b => b.addEventListener("click", () => { S.dlg = b.dataset.dlg; renderDig(); }));
+  const sl = $("#ritLg"), st = $("#ritTeam"), sg_ = $("#ritGr");
+  if (!sl.options.length) {
+    sl.innerHTML = `<option value="all">Tutti i campionati</option>` + LG_ORD.map(lg => `<option value="${lg}">${esc(B.leghe[lg][1])} · ${esc(B.leghe[lg][0])}</option>`).join("");
+    sg_.innerHTML = DGR.map(([k, n]) => `<option value="${k}">${n}</option>`).join("");
+    sl.addEventListener("change", () => { D_.lg = sl.value; D_.t = "all"; renderDig(); }); st.addEventListener("change", () => { D_.t = st.value; renderDig(); }); sg_.addEventListener("change", () => { D_.gr = sg_.value; renderDig(); });
+    $("#ritVen").querySelectorAll("[data-v]").forEach(b => b.addEventListener("click", () => { D_.v = b.dataset.v; renderDig(); }));
+  }
+  sl.value = D_.lg; sg_.value = D_.gr;
+  st.disabled = D_.lg === "all"; st.innerHTML = `<option value="all">Tutte le squadre</option>` + (D_.lg === "all" ? "" : Object.entries(B.squadre[D_.lg] || {}).sort((a, b) => a[1][0].localeCompare(b[1][0])).map(([id, t]) => `<option value="${id}">${esc(t[0])}</option>`).join("")); st.value = D_.t;
+  $("#ritVen").querySelectorAll("[data-v]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === D_.v)));
+  $("#ritWhen").innerHTML = [["all", "Sempre"], ["0", "Oggi"], ["1", "Domani"]].map(([k, n]) => `<button type="button" class="chip" data-rw="${k}" aria-pressed="${D_.w === k}">${n}</button>`).join("") +
+    `<button type="button" class="chip" id="ritDot" aria-pressed="${D_.dot}"><i aria-hidden="true"></i>Lettura</button><button type="button" class="chip" id="ritGrd" aria-pressed="${D_.grd}"><em class="ccls c-a" aria-hidden="true">A</em>Grado</button>`;
+  $("#ritWhen").querySelectorAll("[data-rw]").forEach(b => b.addEventListener("click", () => { D_.w = b.dataset.rw; renderDig(); }));
+  $("#ritDot").addEventListener("click", () => { D_.dot = !D_.dot; renderDig(); }); $("#ritGrd").addEventListener("click", () => { D_.grd = !D_.grd; renderDig(); });
+  const allow = D_.gr === "all" ? null : new Set(DGR.find(x => x[0] === D_.gr)[2]), t0 = todayIso(), wantDay = D_.w === "all" ? null : addDays(t0, +D_.w);
+  const items = [];
+  for (const lg of LG_ORD) { if (D_.lg !== "all" && lg !== D_.lg) continue; const avg = (B.tendenze[lg] || {}).media_punti;
+    for (const id of Object.keys(B.squadre[lg] || {})) { if (D_.t !== "all" && id !== D_.t) continue;
+      let L = tGames(lg, id); if (D_.v !== "all") L = L.filter(r => r[2] === (D_.v === "home" ? 1 : 0)); if (!L.length) continue;
+      const nx = nextOf(lg, id); if (wantDay && (!nx || nx.day !== wantDay)) continue;
+      for (const [k, , f, , neg] of TMK) { if (allow && !allow.has(k)) continue;
+        let n = 0; for (let i = L.length - 1; i >= 0; i--) { const e = f(L[i], avg); if (e == null) break; if (e) break; n++; }
+        if (n < 4) continue;
+        const lean = nx ? leanOf(k, nx, id) : null; if (D_.dot && !lean) continue;
+        const np = nx ? nextProb(k, nx, id) : null; let gr = null;
+        if (np && nx) { const R = reading(nx); const r0 = R && R.R.find(x => (k === "vit" && x.k === "vittoria" && x.sh === (nx.h === id ? "1" : "2"))); gr = r0 && r0.g; }
+        if (D_.grd && !gr) continue;
+        items.push({ lg, id, k, n, neg, nx, lean, gr }); } } }
+  items.sort((a, b) => b.n - a.n);
+  const head = D_.lg === "all" ? `<span class="flag" aria-hidden="true">🌍</span><span class="nm"><small>Tutti</small><b>I campionati</b></span>` : `<span class="flag" aria-hidden="true">${FL[D_.lg] || "🏀"}</span><span class="nm"><small>${esc(B.leghe[D_.lg][1])}</small><b>${esc(B.leghe[D_.lg][0])}</b></span>`;
+  const when = D_.w === "all" ? "Tutte le partite" : D_.w === "0" ? "Giocano oggi" : "Giocano domani";
+  $("#ritOut").innerHTML = `<section class="card gl4"><div class="gl4h">${head}<span class="gl4m">${when}</span></div>` + (items.length ? `<ul class="rtl">${items.slice(0, 80).map(x => `<li class="rtr${x.nx ? " go" : ""}" data-gid="${x.nx ? esc(x.nx.id) : ""}" role="button" tabindex="0">
+      <span class="rtt"><span>${esc(team(x.lg, x.id)[0])} <small class="rtlg">${esc(B.leghe[x.lg][1])} · ${esc(B.leghe[x.lg][0])}</small></span></span>
+      <span class="rte">${x.neg} da <b>${x.n}</b> partite${D_.v === "home" ? " in casa" : D_.v === "away" ? " in trasferta" : ""}</span>
+      <span class="rtn"><b>${x.n}</b><small>partite</small></span>${x.nx ? `<span class="rtl2 rtnx">${x.nx.h === x.id ? "In casa con" : "In trasferta con"} ${esc(team(x.lg, x.nx.h === x.id ? x.nx.a : x.nx.h)[0])} · ${dlab(x.nx.day)}${x.lean || x.gr ? `<span class="rtlp">${x.lean ? `<i class="rtdot" title="La Lettura di Prevista va verso questo esito"></i>` : ""}${x.gr ? `<span class="ccls ${x.gr === "A+" ? "c-ap" : x.gr === "A" ? "c-a" : x.gr === "B" ? "c-b" : "c-c"}" title="Grado della previsione su questo esito">${x.gr}</span>` : ""}</span>` : ""}</span>` : ""}</li>`).join("")}</ul>`
+      : `<p class="muted" style="padding:14px 16px;margin:0">Nessuna squadra con un digiuno${D_.w === "0" ? " gioca oggi" : D_.w === "1" ? " gioca domani" : " con questi filtri"}.</p>`) + `</section>`;
+  $("#ritOut").querySelectorAll(".rtr.go").forEach(li => li.addEventListener("click", () => { S.game = li.dataset.gid; S.mt = "prev"; show("match"); }));
 }
 /* ---------- avvio ---------- */
 function wire() {

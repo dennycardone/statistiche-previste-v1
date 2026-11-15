@@ -27,7 +27,6 @@ CSS = """<style>
 .vgood{color:var(--gold);font-weight:700}.okc{color:#47d18c}.koc{color:#ff6b6b}
 .gbadge{display:inline-flex;align-items:center;justify-content:center;min-width:30px;padding:2px 7px;border-radius:8px;font-weight:800;font-size:13px}
 .gbadge.ap{background:#d4ff3f;color:#111}.gbadge.a{background:#5fe0a0;color:#062014}.gbadge.b{background:#3b6fb6;color:#fff}.gbadge.c{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
-.grow{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.grow small{display:block;color:var(--ink-3);font-size:12px}.grow .num{text-align:right}.grow .num b{font-size:20px}
 .glegend{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:12.5px;color:var(--ink-2)}
 .selrow,.sigrow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;width:100%;text-align:left;padding:10px 2px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer}
 .selt b{display:block;font-size:14px}.selt small{color:var(--ink-3);font-size:12px}.selp{grid-column:1;display:flex;gap:8px;align-items:center;font-size:13.5px}.selp small{color:var(--ink-2)}
@@ -111,8 +110,30 @@ BODY = f"""<body>
     </section>
     <section class="card" id="sigOut" aria-label="Elenco segnali"></section>
   </div>
-  <div class="view" id="viewGen" hidden><section class="card" id="genOut"></section></div>
-  <div class="view" id="viewRit" hidden><section class="card" id="ritOut"></section></div>
+  <div class="view" id="viewGen" hidden>
+    <section class="card genf" aria-label="Filtri classifiche">
+      <div class="genrow">
+        <label for="genLg" class="fl">Campionato<select id="genLg"></select></label>
+        <label for="genMk" class="fl">Mercato<select id="genMk"></select></label>
+      </div>
+      <div class="seg" role="group" aria-label="Sede" id="genVenue"><button type="button" class="segb" data-gv="tot" aria-pressed="true">Totale</button><button type="button" class="segb" data-gv="home" aria-pressed="false">In casa</button><button type="button" class="segb" data-gv="away" aria-pressed="false">In trasferta</button></div>
+      <div class="seg" role="group" aria-label="Periodo" id="genPer"><button type="button" class="segb" data-gp="s" aria-pressed="true">Stagione</button><button type="button" class="segb" data-gp="10" aria-pressed="false">Ultime 10</button><button type="button" class="segb" data-gp="5" aria-pressed="false">Ultime 5</button></div>
+      <div class="seg" role="group" aria-label="Quando giocano" id="genWhen"><button type="button" class="segb" data-gw="all" aria-pressed="true">Tutte</button><button type="button" class="segb" data-gw="0" aria-pressed="false">Giocano oggi</button><button type="button" class="segb" data-gw="1" aria-pressed="false">Giocano domani</button></div>
+    </section>
+    <div id="genOut" class="genlist"></div>
+  </div>
+  <div class="view" id="viewRit" hidden>
+    <section class="card genf3" aria-label="Filtri digiuni">
+      <div class="genrow">
+        <label for="ritLg" class="fl"><span class="sr">Campionato</span><select id="ritLg"></select></label>
+        <label for="ritTeam" class="fl"><span class="sr">Squadra</span><select id="ritTeam"></select></label>
+      </div>
+      <label for="ritGr" class="fl"><span class="sr">Statistica</span><select id="ritGr"></select></label>
+      <div class="seg" role="group" aria-label="Sede" id="ritVen"><button type="button" class="segb" data-v="all" aria-pressed="true">Tutte</button><button type="button" class="segb" data-v="home" aria-pressed="false">Casa</button><button type="button" class="segb" data-v="away" aria-pressed="false">Trasferta</button></div>
+      <div class="rtf" role="group" aria-label="Quando giocano e Lettura" id="ritWhen"></div>
+    </section>
+    <div id="ritOut"></div>
+  </div>
   <p class="bkstamp" id="stamp"></p>
 </div>
 <script>

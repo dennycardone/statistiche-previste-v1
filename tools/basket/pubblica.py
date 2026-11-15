@@ -235,8 +235,9 @@ for lg, s in cur.items():
 for g in G:
     if not valid(g) or g["d"][:10] < (now - datetime.timedelta(days=400)).strftime("%Y-%m-%d"): continue
     for t, o, home, pf, pa in ((g["h"], g["a"], 1, g["sh"][5], g["sa"][5]), (g["a"], g["h"], 0, g["sa"][5], g["sh"][5])):
-        ULT[(g["lg"], t)].append([g["d"][:10], o, home, pf, pa] + gstats(g, home))
-ULTP = {f"{lg}|{t}": v[-10:] for (lg, t), v in ULT.items() if lg in cur}
+        ULT[(g["lg"], t)].append([g["d"][:10], o, home, pf, pa] + gstats(g, home) + [1 if g["s"] == cur.get(g["lg"]) else 0])
+# 15/11/2026: tutta la stagione in corso (Tendenze e Digiuni come il calcio) + almeno le ultime 10 (Precedenti); ultimo elemento 1 = stagione in corso
+ULTP = {f"{lg}|{t}": [r for i, r in enumerate(v) if r[-1] or i >= len(v) - 10] for (lg, t), v in ULT.items() if lg in cur}
 for (lg, t), v in ULT.items():
     if lg not in cur or not v: continue
     def streak(f):
