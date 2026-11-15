@@ -21,12 +21,14 @@ for lg in L:
     if nm in want and want[nm] == cn:
         ss = lg.get("seasons") or []
         last = ss[-1] if ss else {}; cov = last.get("coverage") or {}
+        ss = sorted(ss, key=lambda z: str(z.get("season"))); last = ss[-1] if ss else {}; cov = last.get("coverage") or {}
         picked.append((lg["id"], nm, cn, [s.get("season") for s in ss][:1] + [s.get("season") for s in ss][-1:], cov))
 note("campionati principali", " | ".join(f"{i} {n} ({c}) stagioni {s[0]}→{s[-1]} · copertura ultima: {json.dumps(cov)[:220]}" for i, n, c, s, cov in picked))
 nba = next((p for p in picked if p[1] == "NBA"), None)
 if nba:
-    season = nba[3][-1]
-    G = get("games", league=nba[0], season=season).get("response") or []
+    season = "2026-2027"
+    d_ = get("games", league=nba[0], season=season); G = d_.get("response") or []
+    if d_.get("errors"): note("NBA errori", json.dumps(d_.get("errors"))[:300])
     fin = [g for g in G if (g.get("status") or {}).get("short") in ("FT", "AOT")]
     note("NBA partite", f"stagione {season}: {len(G)} in calendario, {len(fin)} finite")
     if fin:
@@ -42,6 +44,7 @@ if nba:
         note("NBA quote", f"{up[0]['teams']['home']['name']}–{up[0]['teams']['away']['name']}: {len(bks)} bookmaker ({', '.join(bk['name'] for bk in bks[:12])}) · mercati {len(bets)}: {', '.join(bets[:40])}")
 ita = next((p for p in picked if p[1] == "Lega A"), None)
 if ita:
-    G = get("games", league=ita[0], season=ita[3][-1]).get("response") or []
-    note("Serie A basket", f"stagione {ita[3][-1]}: {len(G)} partite in calendario, finite {sum(1 for g in G if (g.get('status') or {}).get('short') in ('FT','AOT'))}")
+    d_ = get("games", league=ita[0], season="2026-2027"); G = d_.get("response") or []
+    if d_.get("errors"): note("Serie A errori", json.dumps(d_.get("errors"))[:300])
+    note("Serie A basket", f"stagione 2026-2027: {len(G)} partite in calendario, finite {sum(1 for g in G if (g.get('status') or {}).get('short') in ('FT','AOT'))}")
 note("richieste", f"usate {used} (solo servizio basket)")
