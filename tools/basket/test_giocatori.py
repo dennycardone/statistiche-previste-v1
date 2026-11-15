@@ -200,3 +200,73 @@ for p in ("verifica", "holdout"):
 res["doppia_tripla"] = ddr
 json.dump(res, open(OUT, "w"), indent=1, ensure_ascii=False)
 print(json.dumps(res, indent=1, ensure_ascii=False))
+# ===== 15/11/2026 (Denny): versione automatica per l'app, code basse e Punti + Assist =====
+# Versione app: minuti medi (quintetto non noto), ancoraggio α, assenze = abituali che mancavano all'ultima partita (β live).
+BL = {k: res["versione_app_senza_quintetto"][f"{k} · verifica"]["beta_ultima_partita"] for k in ST}
+def mu_live(k):
+    sc = A["rp"] if k != "reb" else A["rr"]
+    return A["L" + k] * sc ** AL[k] * (1 + BL[k] * A["p" + k])
+MU = {k: mu_live(k) for k in ST}; MU["pa"] = MU["pts"] + MU["ast"]; A["pa"] = A["pts"] + A["ast"]
+# distribuzioni: NB1 (varianza φ·media) contro NB2 (varianza media + media²/r): la NB2 stringe la coda bassa dei giocatori con media piccola
+def sf1(mu, line, phi): mu = np.maximum(mu, 0.05); return nbinom.sf(np.floor(line), mu / (phi - 1), 1 / phi)
+def sf2(mu, line, r): mu = np.maximum(mu, 0.05); return nbinom.sf(np.floor(line), r, r / (r + mu))
+FIX = {"pts": (9.5, 14.5, 19.5, 24.5, 29.5), "reb": (3.5, 5.5, 7.5, 9.5, 11.5), "ast": (2.5, 4.5, 6.5, 8.5), "pa": (14.5, 19.5, 24.5, 29.5, 34.5)}
+def sc_fixed(k, f, par, mask):
+    out = []
+    for L_ in FIX[k]:
+        pr = f(MU[k][mask], L_, par); y = (A[k][mask] > L_).astype(float); ref = sf1(MU[k][mask], L_, 2.0); keep = (ref > 0.03) & (ref < 0.97)   # stesse righe per tutte le distribuzioni
+        out.append(ll(pr[keep], y[keep]))
+    return np.concatenate(out)
+DIST = {}
+for k in ("pts", "reb", "ast", "pa"):
+    b1 = min((float(sc_fixed(k, sf1, ph, S).mean()), ph) for ph in (1.1, 1.3, 1.6, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0))
+    b2 = min((float(sc_fixed(k, sf2, r, S).mean()), r) for r in (2, 3, 4, 5, 6, 8, 10, 13, 16, 20, 30, 50))
+    out = {"NB1 φ": b1[1], "NB2 r": b2[1]}
+    for p in ("verifica", "holdout"):
+        m = A["per"] == p
+        a1, a2 = sc_fixed(k, sf1, b1[1], m), sc_fixed(k, sf2, b2[1], m); d = a2 - a1
+        out[f"{p} NB2 − NB1"] = [round(float(d.mean()), 5), round(float(d.mean() / (d.std() / math.sqrt(len(d)))), 2)]
+    best = ("NB2", b2[1]) if out["verifica NB2 − NB1"][0] < 0 and out["holdout NB2 − NB1"][0] < 0 else ("NB1", b1[1])
+    out["scelta"] = best; DIST[k] = best
+    # calibrazione holdout con la distribuzione scelta
+    m = A["per"] == "holdout"; f = sf2 if best[0] == "NB2" else sf1
+    for L_ in FIX[k]:
+        pr = f(MU[k][m], L_, best[1]); y = A[k][m] > L_
+        bins = collections.defaultdict(lambda: [0, 0.0, 0])
+        for a, b in zip(pr, y):
+            if a < 0.03: continue
+            bb = min(9, int(a * 10)); c = bins[bb]; c[0] += 1; c[1] += a; c[2] += b
+        out[f"calibrazione holdout Over {L_}"] = " ".join(f"{c[1]/c[0]:.2f}/{c[2]/c[0]:.2f}" for _, c in sorted(bins.items()) if c[0] >= 30)
+    # contro la media semplice (stessa distribuzione)
+    res.setdefault("app_distribuzioni", {})[k] = out
+# doppia/tripla doppia della versione app (voci indipendenti, distribuzioni scelte)
+def p10(k): f = sf2 if DIST[k][0] == "NB2" else sf1; return f(MU[k], 9.5, DIST[k][1])
+a, b, c = p10("pts"), p10("reb"), p10("ast"); dd = a * b + a * c + b * c - 2 * a * b * c; td = a * b * c
+for p in ("verifica", "holdout"):
+    m = A["per"] == p; bins = collections.defaultdict(lambda: [0, 0.0, 0])
+    for x, y in zip(dd[m], ydd[m]):
+        if x < 0.05: continue
+        bb = min(9, int(x * 10)); cc = bins[bb]; cc[0] += 1; cc[1] += x; cc[2] += y
+    res.setdefault("app_doppia", {})[p] = {"dd prevista/uscita": f"{dd[m].mean():.4f}/{ydd[m].mean():.4f}", "td prevista/uscita": f"{td[m].mean():.5f}/{ytd[m].mean():.5f}",
+                                         "calibrazione dd": " ".join(f"{cc[1]/cc[0]:.2f}/{cc[2]/cc[0]:.2f} ({cc[0]})" for _, cc in sorted(bins.items()) if cc[0] >= 20)}
+res["app_parametri"] = {"alpha": AL, "beta_ultima_partita": BL, "distribuzioni": DIST, "DP": DP, "KMIN": KMIN, "KGM": KGM}
+json.dump(res, open(OUT, "w"), indent=1, ensure_ascii=False)
+print(json.dumps({k: res[k] for k in ("app_distribuzioni", "app_doppia", "app_parametri")}, indent=1, ensure_ascii=False))
+# ricalibrazione di doppia e tripla doppia (logit(p') = a + b·logit(p), a e b scelti nel periodo scelta)
+def lg_(p): p = np.clip(p, 1e-6, 1 - 1e-6); return np.log(p / (1 - p))
+def il(z): return 1 / (1 + np.exp(-z))
+RC = {}
+for nm, pr, y in (("dd", dd, ydd), ("td", td, ytd)):
+    best = min((float(ll(il(a_ + b_ * lg_(pr[S])), y[S]).mean()), a_, b_) for a_ in np.arange(-0.6, 1.21, 0.1) for b_ in (0.8, 0.9, 1.0, 1.1, 1.2))
+    RC[nm] = (round(best[1], 2), best[2])
+    for p in ("verifica", "holdout"):
+        m = A["per"] == p; q = il(RC[nm][0] + RC[nm][1] * lg_(pr[m])); d = ll(q, y[m]) - ll(pr[m], y[m])
+        bins = collections.defaultdict(lambda: [0, 0.0, 0])
+        for x, yy in zip(q, y[m]):
+            if x < 0.05: continue
+            bb = min(9, int(x * 10)); cc = bins[bb]; cc[0] += 1; cc[1] += x; cc[2] += yy
+        res.setdefault("app_doppia_ricalibrata", {})[f"{nm} · {p}"] = {"prevista/uscita": f"{q.mean():.4f}/{y[m].mean():.4f}", "logloss ricalibrata − grezza": [round(float(d.mean()), 6), round(float(d.mean() / (d.std() / math.sqrt(len(d)))), 2)],
+                                                                    "calibrazione": " ".join(f"{cc[1]/cc[0]:.2f}/{cc[2]/cc[0]:.2f} ({cc[0]})" for _, cc in sorted(bins.items()) if cc[0] >= 20)}
+res["app_parametri"]["ricalibrazione_dd_td"] = RC
+json.dump(res, open(OUT, "w"), indent=1, ensure_ascii=False)
+print(json.dumps(res["app_doppia_ricalibrata"], indent=1, ensure_ascii=False), RC)
