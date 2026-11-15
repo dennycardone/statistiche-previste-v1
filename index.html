@@ -626,6 +626,8 @@ select{pointer-events:none}
 .gitem[open] summary .gil b{color:var(--accent)}
 .rtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--hot);min-height:20px}
 .gword.sm{font-size:16px}.gsay.sm{font-size:13.5px}
+.bdg .bflag{font-size:40px;line-height:1}
+.tflag{display:inline-block;flex:none;width:18px;font-size:15px;line-height:18px;text-align:center;margin-right:7px;vertical-align:-2px}.tflag.big{display:block;width:auto;font-size:30px;line-height:32px;margin:0 auto 6px}
 .selp2 .mk{margin-left:4px}.gsum{margin:0 0 8px}
 .selp2{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center;font-size:14px}.selp2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp2 .gin{font-size:12.5px;color:var(--ink-2);white-space:nowrap}.selp2 .gin b{font-size:15px;color:var(--ink)}
 .mhead .hsw-n{max-width:100%;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;font-family:var(--body);font-stretch:88%;font-size:11px;font-weight:700;color:var(--gold-ink);background:var(--gold);border-radius:999px;padding:2px 8px;white-space:nowrap;animation:hswp 2.4s ease-in-out 3}
@@ -4083,9 +4085,14 @@ const CLUBCOL = { red: "#d32f2f", white: "#ffffff", black: "#111111", blue: "#1e
 function clubCols(txt) {
   return String(txt || "").toLowerCase().split(/\s*[\/,;&]\s*|\s+and\s+|\s*-\s*/).map(w => w.trim()).map(w => CLUBCOL[w] || CLUBCOL[w.split(" ").pop()]).filter(Boolean).slice(0, 2);
 }
+// 15/11/2026: nazionali, bandiera di riserva se il logo di API-Football non si carica (Francia e Turchia restavano senza)
+const NAZ_ISO = {"Albania": "AL", "Andorra": "AD", "Armenia": "AM", "Austria": "AT", "Azerbaigian": "AZ", "Belgio": "BE", "Bielorussia": "BY", "Bosnia ed Erzegovina": "BA", "Bulgaria": "BG", "Cipro": "CY", "Croazia": "HR", "Danimarca": "DK", "Estonia": "EE", "Isole Fær Øer": "FO", "Finlandia": "FI", "Francia": "FR", "Georgia": "GE", "Germania": "DE", "Gibilterra": "GI", "Grecia": "GR", "Ungheria": "HU", "Islanda": "IS", "Irlanda": "IE", "Israele": "IL", "Italia": "IT", "Kazakistan": "KZ", "Kosovo": "XK", "Lettonia": "LV", "Liechtenstein": "LI", "Lituania": "LT", "Lussemburgo": "LU", "Malta": "MT", "Moldavia": "MD", "Montenegro": "ME", "Olanda": "NL", "Macedonia del Nord": "MK", "Norvegia": "NO", "Polonia": "PL", "Portogallo": "PT", "Romania": "RO", "Russia": "RU", "San Marino": "SM", "Serbia": "RS", "Slovacchia": "SK", "Slovenia": "SI", "Spagna": "ES", "Svezia": "SE", "Svizzera": "CH", "Turchia": "TR", "Ucraina": "UA", "Repubblica Ceca": "CZ", "Argentina": "AR", "Brasile": "BR", "Uruguay": "UY", "Colombia": "CO", "Cile": "CL", "Perù": "PE", "Ecuador": "EC", "Paraguay": "PY", "Bolivia": "BO", "Venezuela": "VE", "Messico": "MX", "Stati Uniti": "US", "Canada": "CA", "Giappone": "JP", "Corea del Sud": "KR", "Australia": "AU", "Marocco": "MA", "Senegal": "SN", "Nigeria": "NG", "Egitto": "EG", "Tunisia": "TN", "Algeria": "DZ", "Camerun": "CM", "Ghana": "GH", "Costa d'Avorio": "CI", "Arabia Saudita": "SA", "Iran": "IR", "Qatar": "QA"};
+const nazFlag = n => { const c = NAZ_ISO[n]; if (!c) return ""; if (c === "XK") return "🇽🇰"; return String.fromCodePoint(...[...c].map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65)); };
 function crest(div, team, cls = "cr") {
-  const u = logoOf(div, team);
-  if (u) return `<img class="tlogo${cls === "crl" ? " big" : ""}" src="${esc(u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`;
+  const u = logoOf(div, team), fl = div === "NAZ" ? nazFlag(team) : "";
+  const fb = fl ? `<span class=&quot;tflag${cls === "crl" ? " big" : ""}&quot; aria-hidden=&quot;true&quot;>${fl}</span>` : "";
+  if (u) return `<img class="tlogo${cls === "crl" ? " big" : ""}" src="${esc(u)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="${fb ? `this.outerHTML='${fb}'` : "this.remove()"}">`;
+  if (fl) return `<span class="tflag${cls === "crl" ? " big" : ""}" aria-hidden="true">${fl}</span>`;
   const c = clubCols(CRESTS[div] && CRESTS[div][team]); if (!c.length) return "";
   return `<i class="tcol${cls === "crl" ? " big" : ""}" style="--c1:${c[0]};--c2:${c[1] || c[0]}" aria-hidden="true"></i>`;
 }
@@ -4679,7 +4686,10 @@ function matchHeroHTML(home, away, e, cfg, G) {
   if (!home || !away || home === away) return `<div class="sx-band"><b>Lettura</b></div><p style="padding:14px;margin:0">Scegli due squadre diverse.</p>`;
   const L_ = LG[S.league], m = e && e.m;
   const ini = t => t.replace(/[^A-Za-zÀ-ÿ0-9 ]/g, " ").split(/\s+/).filter(w => w.length > 2 || /^[A-Z0-9]+$/.test(w)).map(w => w[0]).join("").slice(0, 3).toUpperCase() || t.slice(0, 3).toUpperCase();
-  const badge = (t, fb) => { const u = logoOf(S.league, t); if (u) return `<span class="bdg lg"><img src="${esc(u)}" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('lg');this.parentElement.textContent='${esc(ini(t)).replace(/'/g, "")}'"></span>`;
+  // 15/11/2026: nazionali, se il logo non si carica la bandiera al posto dell'iniziale
+  const badge = (t, fb) => { const u = logoOf(S.league, t), fl = S.league === "NAZ" ? nazFlag(t) : "", alt = fl ? `<span class=&quot;bflag&quot;>${fl}</span>` : esc(ini(t)).replace(/'/g, "");
+    if (u) return `<span class="bdg lg"><img src="${esc(u)}" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('lg');this.parentElement.innerHTML='${alt}'"></span>`;
+    if (fl) return `<span class="bdg"><span class="bflag">${fl}</span></span>`;
     const c = clubCols(CRESTS[S.league] && CRESTS[S.league][t]); return `<span class="bdg" style="--c1:${c[0] || fb};--c2:${c[1] || c[0] || fb}" aria-hidden="true">${esc(ini(t))}</span>`; };
   let tb = []; try { const NG = S.league === "NAZ" ? nazGroup(home, away) : null; tb = S.league === "NAZ" ? (NG ? standings(NG.list.filter(q => !S.cutoff || q.date < S.cutoff), "tot") : []) : standings(seasonMatches(), "tot"); } catch (x) {}   // nazionali: classifica del girone
   const pos = t => { const i = tb.findIndex(r => r.t === t); return i >= 0 ? `${i + 1}° · ${tb[i].pt} pt` : "&nbsp;"; };
