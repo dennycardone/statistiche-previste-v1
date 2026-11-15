@@ -124,3 +124,13 @@ Studio del livello (tools/calib_livello.py, run del 15/11): Cartellini non passa
 120 giorni +0,00211, campionati migliorati 42%). Controllo mese per mese su extra.json: livello allineato (reale/atteso 0,91-1,04 da agosto).
 La perdita viene dalla scelta per valore (Under dove il modello si stacca di più dal book). Da Denny (15/11): cartellini Under in osservazione,
 senza peso, visibili e refertati. Over restano (club 7 giocate, 4 prese, attese 4,0). Da rileggere al 7/12 e al 18/1.
+
+## 15/11/2026 · Basket (API-Basketball Pro fino al 15/12): archivio e primo modello
+Archivio (ramo basket, tools/basket/archivio.py, workflow basket.yml ogni mattina): NBA, Eurolega, Eurocup, Serie A, ACB, BBL, LNB dal 2019,
+~23.000 partite finite con punteggi per quarto, statistiche di squadra (tiri da 2/3, liberi, rimbalzi, assist, recuperi, stoppate, perse, falli)
+e dei giocatori (minuti, punti, tiri, rimbalzi, assist), 1.946 richieste. Quote: tools/basket/quote.py ogni 3 ore, 9 book (Pinnacle e Bet365
+compresi), apertura e chiusura, cifrate sul ramo basket-quote.
+Modello (tools/basket/modello.py): ritmo (possessi) × attacco/difesa ogni 100 possessi (media mobile DP 0,97, K 6 partite verso il campionato)
++ vantaggio del campo; scarto e totale Normali con σ robuste per campionato (scarto 11,5-13,3, totale 16,0-18,3). Tolte 609 partite (All-Star,
+interrotte, a tavolino, senza quarti). Log-loss contro la media del campionato (verifica / holdout): vittoria −0,067 / −0,070, totale −0,030 / −0,029.
+Vittoria calibrata nell'holdout (es. 55% → 59%, 65% → 65%, 75% → 75%, 84% → 83%). Contro le quote reali: non ancora (le quote si accumulano da oggi).
