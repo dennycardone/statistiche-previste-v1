@@ -61,3 +61,9 @@ A["agg"] = nows
 json.dump(A, open(FN, "w"), separators=(",", ":"))
 bk = sorted({b for e in A["partite"].values() if e.get("c") for m in e["c"][1].values() for v in m.values() for b in v})
 print(f"::notice title=Basket · quote::{len(games)} partite in programma oggi e domani · nuove {n_new} · aggiornate {n_upd} · archivio {len(A['partite'])} partite · book {', '.join(bk)} · richieste {used}")
+# 15/11: esempio dei valori dei mercati principali (solo nomi dei valori, niente quote) per scrivere il calcolo delle linee
+_ex = {}
+for e in A["partite"].values():
+    for m, vals in (e.get("c") or [None, {}])[1].items():
+        if m not in _ex: _ex[m] = list(vals)[:8]
+print("::notice title=Basket · valori dei mercati::" + " | ".join(f"{m}: {', '.join(v)}" for m, v in sorted(_ex.items()))[:3500])

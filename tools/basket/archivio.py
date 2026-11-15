@@ -71,6 +71,8 @@ for cod, lid in LEGHE.items():
             for g in G:
                 h, a = g["teams"]["home"], g["teams"]["away"]
                 D["squadre"][str(h["id"])] = h["name"]; D["squadre"][str(a["id"])] = a["name"]
+                for t_ in (h, a):
+                    if t_.get("logo"): D.setdefault("loghi", {})[str(t_["id"])] = t_["logo"]   # 15/11: loghi per l'app
                 D["partite"][str(g["id"])] = [g.get("date", "")[:16], (g.get("status") or {}).get("short"), h["id"], a["id"],
                                              sc((g.get("scores") or {}).get("home")), sc((g.get("scores") or {}).get("away")), g.get("week") or g.get("stage")]
         fatte = set(D["fatte"])
