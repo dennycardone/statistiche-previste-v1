@@ -31,7 +31,7 @@ def tok(s): return {t for t in re.sub(r"[^a-z ]", " ", asc(s)).split() if len(t)
 def load_out(fn):
     return json.load(open(fn)) if os.path.exists(fn) else {"partite": {}, "fatte": []}
 summary = []
-for fn in sorted(glob.glob(os.path.join(ARCH, "*.json"))):
+for fn in sorted(glob.glob(os.path.join(ARCH, "*.json")), key=lambda f: os.path.basename(f).split("_", 1)[1], reverse=True):   # prima le stagioni in corso
     D = json.load(open(fn)); lg, ss = D["lega"], D["stagione"]
     if lg not in ("NBA", "EL", "EC"): continue
     of = os.path.join(OUT, f"{lg}_{ss}.json"); O = load_out(of); fatte = set(map(str, O["fatte"]))
