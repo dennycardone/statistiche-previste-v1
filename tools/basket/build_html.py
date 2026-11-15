@@ -42,7 +42,7 @@ CSS = """<style>
 .fpill.w{background:#2e8b57;color:#fff}.fpill.l{background:#7a2e3a;color:#fff}
 .bkstamp{color:var(--ink-3);font-size:11.5px;text-align:center;margin:14px 0}
 </style>"""
-SPORT = """<label class="sportpick"><span class="sr">Sport</span><select id="sport" autocomplete="off" onchange="if(this.value!=='basket'){try{localStorage.setItem('prevista.sport',this.value)}catch(e){}location.assign(new window.URL('./?s='+Date.now(),location.href).href)}"><option value="calcio">⚽ Calcio</option><option value="basket" selected>🏀 Basket</option></select></label><script>addEventListener("pageshow",function(){var s=document.getElementById("sport");if(s)s.value="basket"});</script>"""
+SPORT = """<label class="sportpick"><span class="sr">Sport</span><select id="sport" autocomplete="off" onchange="if(this.value!=='basket'){try{localStorage.setItem('prevista.sport',this.value)}catch(e){}location.assign(new window.URL('./?s='+Date.now(),location.href).href)}"><option value="calcio">⚽ Calcio</option><option value="basket" selected>🏀 Basket</option></select></label><script data-sport>addEventListener("pageshow",function(){var s=document.getElementById("sport");if(s)s.value="basket"});</script>"""
 BODY = f"""<body>
 {icons}
 <header class="appbar">
