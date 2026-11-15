@@ -12,9 +12,11 @@ ALPHA = {"pts": 0.75, "reb": 1.25, "ast": 1.5}
 BETA = {"pts": 0.2, "reb": 0.1, "ast": 0.3}
 GPAR = {"pts": ["nb1", 3.0], "reb": ["nb2", 13.0], "ast": ["nb2", 13.0], "pa": ["nb1", 3.0], "dd": [-0.1, 0.8], "td": [0.1, 0.9], "beta": BETA}
 ST = ("pts", "reb", "ast")
-def norm(s): return frozenset(re.sub(r"[^a-z ]", " ", unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()).split())
+TRANS = str.maketrans({"ø": "o", "Ø": "o", "đ": "d", "Đ": "d", "ł": "l", "Ł": "l", "ß": "ss", "æ": "ae", "Æ": "ae", "œ": "oe", "ı": "i", "þ": "th", "ð": "d"})
+def asc(s): return unicodedata.normalize("NFKD", (s or "").translate(TRANS)).encode("ascii", "ignore").decode().lower()   # č/ć → c, ö → o, ø → o ...
+def norm(s): return frozenset(t for t in re.sub(r"[^a-z ]", " ", asc(s)).split() if t not in ("jr", "sr", "ii", "iii", "iv"))
 SUF = {"jr", "sr", "ii", "iii", "iv"}
-def toks(s): return [t for t in re.sub(r"[^a-z. ]", " ", unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()).replace(".", ". ").split() if t.strip(".") not in SUF]
+def toks(s): return [t for t in re.sub(r"[^a-z. ]", " ", asc(s)).replace(".", ". ").split() if t.strip(".") and t.strip(".") not in SUF]
 def key_arch(n):   # archivio: "Cognome Nome" oppure "N. Cognome" → (cognome, iniziale)
     t = toks(n)
     if len(t) < 2: return None
