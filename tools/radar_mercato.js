@@ -68,7 +68,7 @@ for (const [key, v] of Object.entries(OH)) {
         const [L, o, u] = c, po = D[k](L); if (po == null || !isFinite(po)) continue;
         const base = k.replace(/^[ha](?=(st|c|f|k)$)/, ""), R = REAL[base]; if (!R || R[0] == null || R[1] == null) continue;
         const real = k[0] === "h" && k !== "hst" ? R[0] : k[0] === "a" && k !== "ast" ? R[1] : k === "hst" ? R[0] : k === "ast" ? R[1] : R[0] + R[1];
-        const eo = po * o - 1, eu = (1 - po) * u - 1, side = eo >= eu ? "O" : "U", ev = Math.max(eo, eu);
+        const eo = po * o - 1, eu = (1 - po) * u - 1, side = po >= 0.5 ? "O" : "U", ev = side === "O" ? eo : eu;   // 15/11/2026: il lato della lettura, come nell'app
         const p = side === "O" ? po : 1 - po, odd = side === "O" ? o : u, hit = side === "O" ? real > L : real < L;
         rows.push({ key, d, lg, k, fam: FAM[k], side, p, odd, ev, hit: hit ? 1 : 0, val: ev >= BK_MIN, team: k.length > 1 && k !== "st" });
         const MEAN = { c: M && M.tot, hc: M && M.lh, ac: M && M.la, st: MT && MT.tot, hst: MT && MT.lh, ast: MT && MT.la, s: MT && MT.MS && MT.MS.lh + MT.MS.la,

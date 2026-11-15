@@ -1007,7 +1007,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <section class="card" aria-label="Filtri segnali">
       <div class="selhead"><h2>Segnali</h2>
         <div class="seg sigv" role="tablist" aria-label="Squadre o giocatori" id="sigView"><button type="button" class="segb" data-sv="sq" aria-pressed="true">Squadre</button><button type="button" class="segb" data-sv="gi" aria-pressed="false">Giocatori</button></div></div>
-      <p class="small muted sigsq" style="margin:0">Dalla probabilità più alta, con una soglia per mercato (Over 2,5 60%, Over 3,5 40%, Gol 60%, No gol 65%, corner e falli 70%, tiri e tiri in porta 80%, fuorigioco 65%, cartellini secondo la linea), solo squadre con almeno 3 partite in casa/trasferta. Partite con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri, tiri in porta e fuorigioco (chi ne fa di più).</p>
+      <p class="small muted sigsq" style="margin:0">Dalla probabilità più alta, con una soglia per mercato (Over 2,5 60%, Over 3,5 50%, Gol 60%, No gol 65%, corner e falli 70%, tiri e tiri in porta 80%, fuorigioco 65%, cartellini secondo la linea), solo squadre con almeno 3 partite in casa/trasferta. Partite con buone probabilità di Over gol o Gol/No gol, e di 1 o 2 su corner, falli, tiri, tiri in porta e fuorigioco (chi ne fa di più).</p>
       <div class="sigf">
         <label for="sigLeague" class="sigsq">Campionato<select id="sigLeague"></select></label>
         <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano">
@@ -3309,7 +3309,7 @@ const SIGW = { days: new Set(["0", "1"]) };   // Oggi, Domani, Giornata ("r"): s
 const SIG_MINP = 0.70;
 /* soglie per mercato della pagina Segnali (walk-forward feb–ott 2026, 8.725 partite): la più bassa con almeno ~70% di presi
    e qualche segnale a settimana. Over 3,5 e Over/Under cartellini estremi: il modello quasi non ci arriva, soglie più basse/alte */
-const SIG_TH = { o: 0.65, g15: 0.80, g25: 0.60, g35: 0.40, gol: 0.60, ng: 0.65, c: 0.70, f: 0.70, s: 0.80, st: 0.80,
+const SIG_TH = { o: 0.65, g15: 0.80, g25: 0.60, g35: 0.50,   /* g35: 15/11/2026 (Denny) da 0,40 a 0,50: un segnale deve stare dalla parte della lettura */ gol: 0.60, ng: 0.65, c: 0.70, f: 0.70, s: 0.80, st: 0.80,
   "kO2.5": 0.90, "kO3.5": 0.75, "kO4.5": 0.70, "kO5.5": 2, "kU2.5": 2, "kU3.5": 0.70, "kU4.5": 0.80, "kU5.5": 0.90 };
 function sigPickDays(code) {
   const t0 = localIso(), want = new Set([...SIGW.days].filter(c => c !== "r").map(c => addDays(t0, +c)));
@@ -4519,7 +4519,7 @@ function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u,
 }
 function off1x2HTML(O, LB, offR) {   // fuorigioco 1X2: modello (squadre indipendenti, Binomiale Negativa r = 10,68) contro 1xBet
   if (!O || O.nd || !LB || !LB.o1x2) return "";
-  const P = headToHeadProb(O.lh, O.la, Infinity, OFF_R_TEAM), p = [P.home, P.draw, P.away], q = LB.o1x2, ev = p.map((x, i) => x * q[i] - 1), b = ev.indexOf(Math.max(...ev));
+  const P = headToHeadProb(O.lh, O.la, Infinity, OFF_R_TEAM), p = [P.home, P.draw, P.away], q = LB.o1x2, ev = p.map((x, i) => x * q[i] - 1), b = p.indexOf(Math.max(...p));   // 15/11: il segno della lettura, non quello col valore più alto
   const real = offR ? (offR.oh > offR.oa ? 0 : offR.oh === offR.oa ? 1 : 2) : null, lab = ["1", "X", "2"];
   return `<p class="small" style="margin:6px 10px 2px"><b>Fuorigioco 1X2</b> · ${p.map((x, i) => `${lab[i]} ${pc(x)} <span class="muted">@${f2(q[i])}</span>`).join(" · ")}${real != null ? ` · reale ${lab[real]} (${offR.oh}-${offR.oa})` : ""}</p>`;
 }
@@ -4556,6 +4556,7 @@ function qMinCerca(e, key, p, R) {
   let best = null;
   for (const i of [0, 2]) {
     const side = i === 0 ? "1" : "2"; let why = null;
+    if (p[i] < Math.max(...p)) continue;   // 15/11/2026 (Denny): solo il segno della lettura (il più probabile per Prevista)
     if (mk !== "y") { const L = e && !e.m && typeof confEntry === "function" ? confEntry(e, MODES.dyn, true) : null, r = L && L.find(r => r.mk === mk && r.side === side);
       if (r && (r.cls === "A+" || r.cls === "A")) why = `Grado ${r.cls}`; }
     if (!why && mk === "f" && R && R.xiF && R.preXi) { const P0 = headToHeadProb(R.preXi.lh, R.preXi.la, R.r, R.rTeam, R.cop), d = p[i] - (i === 0 ? P0.home : P0.away); if (d >= 0.08) why = `formazioni ufficiali +${Math.round(d * 100)} punti`; }

@@ -114,3 +114,7 @@ stavano quasi tutte in osservazione (1X2 corner a quota lunga). Non è un test d
 - 15/11 (Denny): anche il blocco 5 (cartellini sopra la quota equa di Pinnacle) e il riquadro Pinnacle della scheda partita seguono la lettura:
   solo le linee che Prevista dà sopra il 50% (es. Tenerife–Ceuta, attesi 6,52: niente più Under 4,5/5,5). Lo studio "sharp" in sistema.py
   (sezione 7) resta com'è, solo prezzo, come confronto.
+- 15/11 (check-up "tutto sulla lettura", Denny): corretti gli ultimi punti che sceglievano per valore: Fuorigioco 1X2 della scheda (evidenziava il
+  segno col valore più alto), "Quota minima da cercare" (solo il segno più probabile, anche quando le formazioni alzano l'altro), Segnali Over 3,5
+  gol (soglia da 40% a 50%), studio settimanale del Mercato (tools/radar_mercato.js: il lato della lettura, come l'app). Già sulla lettura:
+  Grado, Segnali, Operatività, Mercato, Pinnacle, Giocatori (solo probabilità).
