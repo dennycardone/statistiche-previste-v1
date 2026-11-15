@@ -990,12 +990,16 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     <section class="card" id="selOut"></section>
   </div>
   <div class="view" id="viewSig" hidden>
-    <section class="card" aria-label="Filtri segnali"><div class="selhead"><h2>Segnali</h2></div>
-      <div class="seg" id="sigView" role="tablist" aria-label="Squadre o giocatori"><button type="button" class="segb" data-sv="sq" aria-pressed="true">Squadre</button><button type="button" class="segb" data-sv="gi" aria-pressed="false">Giocatori</button></div>
-      <div class="row"><label for="sigLeague">Campionato<select id="sigLeague"></select></label></div>
-      <div class="self" id="sigWhen" role="group" aria-label="Quando"><button type="button" class="chip" data-sw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-sw="1" aria-pressed="true">Domani</button><button type="button" class="chip" data-sw="r" aria-pressed="false">Giornata</button></div>
-      <p class="small muted" style="margin:0" id="sigNote">Previsioni dalla parte della lettura che, nelle stagioni passate, sono uscite almeno 72 volte su 100 (grado A o A+). Totale e handicap sulla linea del book quando c'è.</p></section>
-    <section class="card" id="sigOut"></section>
+    <section class="card" aria-label="Filtri segnali">
+      <div class="selhead"><h2>Segnali</h2>
+        <div class="seg sigv" role="tablist" aria-label="Squadre o giocatori" id="sigView"><button type="button" class="segb" data-sv="sq" aria-pressed="true">Squadre</button><button type="button" class="segb" data-sv="gi" aria-pressed="false">Giocatori</button></div></div>
+      <div class="sigf">
+        <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
+        <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano"><button type="button" class="chip" data-sw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-sw="1" aria-pressed="true">Domani</button><button type="button" class="chip" data-sw="r" aria-pressed="false">Giornata</button></div>
+        <div class="row" id="sigStats" role="group" aria-label="Mercati"></div>
+      </div>
+    </section>
+    <section class="card" id="sigOut" aria-label="Elenco segnali"></section>
   </div>
   <div class="view" id="viewGen" hidden><section class="card" id="genOut"></section></div>
   <div class="view" id="viewRit" hidden><section class="card" id="ritOut"></section></div>
@@ -1147,10 +1151,24 @@ function renderMatch() {
       </div>${body}
     </div>`;
   const sw = $("#bkSw"); if (sw) sw.addEventListener("click", () => { S.bk = !S.bk; renderMatch(); });
-  // Grado
-  $("#mgrado").innerHTML = R ? `<h2>Grado</h2><p class="small muted">Quante volte previsioni come questa sono uscite nelle stagioni 2024-25 e 2025-26 (partite che il modello non aveva visto).</p>
-    ${R.R.map(r => `<div class="grow"><div><b>${esc(r.lab)}</b><small>${r.book ? "linea del book" : r.k === "totale" ? "linea del modello" : ""}</small></div>${gbadge(r.g)}<div class="num"><b>${r.uscite == null ? "—" : Math.round(r.uscite * 100)}</b> su 100<small>Prevista ${pc(r.p)}</small></div></div>`).join("")}
-    <div class="glegend"><span class="gbadge ap">A+</span> 80+ su 100 · <span class="gbadge a">A</span> 72+ · <span class="gbadge b">B</span> 64+ · <span class="gbadge c">C</span> 56+</div>` : `<p class="muted">Grado non disponibile.</p>`;
+  // Grado (15/11/2026, Denny: come il calcio)
+  const GW = { "A+": "Ottima", A: "Molto buona", B: "Buona", C: "Discreta" }, GC = { "A+": "c-ap", A: "c-a", B: "c-b", C: "c-c" };
+  const gTitle = r => r.k === "vittoria" ? `Vittoria ${r.lab.replace(/^Vince /, "")}` : r.k === "totale" ? `${r.lab}` : `Handicap ${r.lab}`;
+  const gSub = r => r.k === "vittoria" ? `Vincente ${r.sh} (supplementari compresi)` : r.k === "totale" ? `Totale punti · ${r.book ? "linea dei book" : "linea del modello"}` : "Handicap · linea dei book";
+  const gWhy = r => `<div class="gnums small"><span class="gck ok"><i>✓</i>Base: ${r.n} previsioni simili nelle stagioni 2024-25 e 2025-26, partite che il modello non aveva visto</span>${r.q ? `<span class="gck ${r.ev >= 0 ? "ok" : "ko"}"><i>${r.ev >= 0 ? "✓" : "✗"}</i>Quota ${f2(r.q)} contro equa ${f2(r.fair)}</span>` : ""}</div>`;
+  const GR = R ? R.R.filter(r => r.g).sort((x, y) => y.uscite - x.uscite) : [];
+  if (!GR.length) $("#mgrado").innerHTML = `<h2>Grado</h2><p class="gintro">Nessuna previsione di questa partita ha un grado: previsioni simili nelle stagioni passate sono uscite meno di 56 volte su 100.</p>`;
+  else { const t = GR[0], dots = Math.round(t.uscite * 10);
+    $("#mgrado").innerHTML = `<h2>Grado</h2>
+    <p class="gintro">Quanto ci si può fidare di ogni previsione, in base a come sono andate previsioni simili nelle stagioni passate.</p>
+    <div class="gtop ${GC[t.g]}"><small class="gk">La previsione più affidabile</small><b class="gq">${esc(gTitle(t))}</b><small class="muted">${esc(gSub(t))}</small>
+      <div class="gline"><span class="ccls ${GC[t.g]} gbig">${t.g}</span><span class="gword">${GW[t.g]}</span><span class="gdots ${GC[t.g]}" role="img" aria-label="${dots} su 10">${Array.from({ length: 10 }, (_, i) => `<i class="${i < dots ? "on" : ""}"></i>`).join("")}</span></div>
+      <p class="gsay">Previsioni come questa sono uscite <b>${Math.round(t.uscite * 100)} volte su 100</b>.</p>
+      <details class="gmore"><summary>Perché questo grado</summary>${gWhy(t)}</details></div>
+    <div class="gscale" aria-label="Scala del Grado"><span><span class="ccls c-ap">A+</span>Ottima</span><span><span class="ccls c-a">A</span>Molto buona</span><span><span class="ccls c-b">B</span>Buona</span><span><span class="ccls c-c">C</span>Discreta</span></div>
+    <h3 class="gh">Tutte le previsioni della partita</h3>
+    <div class="glist">${GR.map(r => `<details class="gitem"><summary><span class="gil"><b>${esc(gTitle(r))}</b><small class="muted">${esc(gSub(r))}</small></span><span class="gir"><span class="ccls ${GC[r.g]}">${r.g}</span><span class="gin"><b class="num">${Math.round(r.uscite * 100)}</b> su 100</span></span></summary>${gWhy(r)}</details>`).join("")}</div>
+    <p class="small muted" style="margin:0">Tocca una previsione per vedere perché ha quel grado.</p>`; }
   const U = id => (B.ultime[`${g.lg}|${id}`] || []).slice().reverse();
   const swapSt = r => { const x = r.slice(5); const o = []; for (let i = 0; i < x.length; i += 2) o.push(x[i + 1], x[i]); return o; };
   // Precedenti (come il calcio): ultime partite delle due squadre (Generale / Casa-Trasferta) e scontri diretti, con le statistiche
@@ -1287,30 +1305,41 @@ function renderRadar() {
   bindRows(box);
 }
 /* Segnali */
-function renderSeg() {
+const SQK = [["vittoria", "Vincente"], ["totale", "Totale punti"], ["handicap", "Handicap"]];
+const GIK = [["pts", "Punti"], ["rbl", "Rimbalzi"], ["ast", "Assist"], ["pa", "Punti + Assist"], ["dd", "Doppia doppia"]];
+function renderSeg() {   // 15/11/2026 (Denny): come i Segnali del calcio
   const t0 = todayIso(), want = new Set([...S.sw].filter(k => k !== "r").map(k => addDays(t0, +k)));
   document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.setAttribute("aria-pressed", String(S.sw.has(b.dataset.sw))));
-  const G = games().filter(g => !fin(g) && !live(g) && g.day >= t0 && (want.has(g.day) || (S.sw.has("r") && g.day <= addDays(t0, 4))) && (S.slg === "all" || g.lg === S.slg));
   document.querySelectorAll("#sigView [data-sv]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.sv === S.sv)));
   const sel = $("#sigLeague");
-  if (S.sv === "gi") {   // giocatori: per giocatore e voce la soglia più alta ancora al 72% o più (niente doppioni 10+, 15+ ...)
-    $("#sigNote").textContent = "Giocatori: per ogni voce la soglia più alta che Prevista dà tra il 72% e l'80% (quota equa da 1,25 in su), oppure con la quota del book (NBA). Probabilità calibrate sulle stagioni passate; Punti + Assist e Rimbalzi O/U dal lato più probabile.";
-    if (!sel.options.length) { sel.innerHTML = `<option value="all">Tutti</option>` + LG_ORD.map(lg => `<option value="${lg}">${esc(B.leghe[lg][0])}</option>`).join(""); sel.addEventListener("change", () => { S.slg = sel.value; renderSeg(); }); }
+  if (!sel.options.length) { sel.innerHTML = `<option value="all">Tutti i campionati</option>` + LG_ORD.map(lg => `<option value="${lg}">${esc(B.leghe[lg][1])} · ${esc(B.leghe[lg][0])}</option>`).join(""); sel.addEventListener("change", () => { S.slg = sel.value; renderSeg(); }); }
+  const K = S.sv === "gi" ? GIK : SQK; if (!S.sk) S.sk = {}; const on = k => S.sk[k] !== false;
+  $("#sigStats").innerHTML = K.map(([k, n]) => `<button type="button" class="chip sstat" data-k="${k}" aria-pressed="${on(k)}">${n}</button>`).join("");
+  $("#sigStats").querySelectorAll("[data-k]").forEach(b => b.addEventListener("click", () => { S.sk[b.dataset.k] = !on(b.dataset.k); renderSeg(); }));
+  const G = games().filter(g => !fin(g) && !live(g) && g.day >= t0 && (want.has(g.day) || (S.sw.has("r") && g.day <= addDays(t0, 4))) && (S.slg === "all" || g.lg === S.slg));
+  const when = g => `${dlab(g.day)} ${timeOf(g.d)} · ${esc(B.leghe[g.lg][0])}`;
+  const sigHTML = (g, m, pct, q, tag, pick, det, w, mt) => `<div class="sig"><button type="button" class="sigopen" data-gid="${esc(g.id)}" data-mt="${mt}"><span class="m">${m}</span><span class="p num">${pct}${q ? `<small class="qsm">@${f2(q)}</small>` : ""}</span>
+      <span class="d"><span class="stag">${tag}</span><b>${pick}</b>${det ? ` · ${det}` : ""}</span><span class="w">${w}</span></button></div>`;
+  let L = [], intro = "";
+  if (S.sv === "gi") {
+    intro = "Giocatori: per ogni voce la soglia più alta che Prevista dà tra il 72% e l'80% (quota equa da 1,25 in su), oppure con la quota del book (NBA). Si annulla se il giocatore non entra.";
     const best = new Map();
-    for (const x of playerEntries(G)) { if (x.o.p < 0.72 || (x.o.p > 0.8 && !x.o.q)) continue;   /* 15/11 (Denny): quota equa ≥ 1,25 (72-80%) oppure quota del book */ const key = `${x.g.id}|${x.r[1]}|${x.o.k}`; const b = best.get(key); if (!b || (x.o.k !== "pa" && x.o.lab.localeCompare(b.o.lab, "it", { numeric: true }) > 0)) best.set(key, x); }
-    const L = [...best.values()].sort((a, b) => b.o.p - a.o.p);
-    $("#sigOut").innerHTML = `<div class="selhead"><h2>${L.length} segnali giocatori</h2></div>` + (L.length ? L.map(({ g, side, r, o }) => `<button type="button" class="sigrow" data-gid="${esc(g.id)}"><span class="sigp"><b>${pc(o.p)}</b></span>
-      <span class="sigt"><b>${esc(r[0])} <small>${esc(team(g.lg, side === "h" ? g.h : g.a)[0])}</small></b><span>${esc(o.lab)} · equa ${f2(o.fair)}${o.q ? ` · @${f2(o.q)} ${esc(o.book)}` : ""}</span><small>${FL[g.lg] || ""} ${esc(B.leghe[g.lg][0])} · ${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])} · ${dlab(g.day)} ${timeOf(g.d)}</small></span></button>`).join("")
-      : `<p class="muted">Nessun giocatore al 72% con questi filtri (i giocatori ci sono per le partite dei prossimi 3 giorni).</p>`);
-    $("#sigOut").querySelectorAll("[data-gid]").forEach(b => b.addEventListener("click", () => { S.game = b.dataset.gid; S.mt = "gio"; show("match"); }));
-    return;
+    for (const x of playerEntries(G)) { const kk = x.o.k === "reb" ? "rbl" : x.o.k; if (!on(kk === "td" ? "dd" : kk) || x.o.p < 0.72 || (x.o.p > 0.8 && !x.o.q)) continue;
+      const key = `${x.g.id}|${x.r[1]}|${x.o.k}`; const b = best.get(key); if (!b || (x.o.k !== "pa" && x.o.lab.localeCompare(b.o.lab, "it", { numeric: true }) > 0)) best.set(key, x); }
+    L = [...best.values()].sort((a, b) => b.o.p - a.o.p).map(({ g, side, r, o }) => { const tag = o.k === "pts" ? "Punti" : o.k === "reb" || o.k === "rbl" ? "Rimbalzi" : o.k === "ast" ? "Assist" : o.k === "pa" ? "Punti + Assist" : o.k === "dd" ? "Doppia doppia" : "Tripla doppia";
+      const pick = o.lab.replace(/^(Punti \+ Assist|Punti|Rimbalzi|Assist) /, ""), det = `equa ${f2(o.fair)}${o.book ? ` · ${esc(o.book)}` : ""}`;
+      return sigHTML(g, `${esc(r[0])} <small class="muted">${esc(team(g.lg, side === "h" ? g.h : g.a)[0])}</small>`, pc(o.p), o.q, tag, esc(pick), det, `${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])} · ${when(g)}`, "gio"); });
+  } else {
+    intro = "Previsioni dalla parte della lettura che nelle stagioni passate sono uscite almeno 72 volte su 100 (grado A o A+). Vincente supplementari compresi; totale e handicap sulla linea dei book quando c'è.";
+    const rows = G.flatMap(g => { const R = reading(g); return R ? R.R.filter(r => on(r.k) && r.uscite != null && r.uscite >= 0.72).map(r => ({ g, r, R })) : []; }).sort((a, b) => b.r.uscite - a.r.uscite || b.r.p - a.r.p);
+    L = rows.map(({ g, r, R }) => { const p = g.p;
+      const tag = r.k === "vittoria" ? "Vincente" : r.k === "totale" ? "Totale" : "Handicap";
+      const pick = r.k === "vittoria" ? `${r.sh} · ${esc(team(g.lg, r.sh === "1" ? g.h : g.a)[0])}` : esc(r.lab.replace(/ punti$/, ""));
+      const det = r.k === "vittoria" ? `punti previsti ${f1(p.eh)} – ${f1(p.ea)}` : r.k === "totale" ? `previsti ${f1(R.mt)} · ${r.book ? "linea dei book" : "linea del modello"}` : `scarto previsto ${f1(Math.abs(R.ms))}`;
+      return sigHTML(g, `${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}`, `${Math.round(r.uscite * 100)}%`, r.q, tag, pick, det, when(g), "prev"); });
   }
-  $("#sigNote").textContent = "Previsioni dalla parte della lettura che, nelle stagioni passate, sono uscite almeno 72 volte su 100 (grado A o A+). Totale e handicap sulla linea del book quando c'è.";
-  const rows = G.flatMap(g => { const R = reading(g); return R ? R.R.filter(r => r.uscite != null && r.uscite >= 0.72).map(r => ({ g, r })) : []; }).sort((a, b) => b.r.uscite - a.r.uscite || b.r.p - a.r.p); if (!sel.options.length) { sel.innerHTML = `<option value="all">Tutti</option>` + LG_ORD.map(lg => `<option value="${lg}">${esc(B.leghe[lg][0])}</option>`).join(""); sel.addEventListener("change", () => { S.slg = sel.value; renderSeg(); }); }
-  $("#sigOut").innerHTML = `<div class="selhead"><h2>${rows.length} segnali</h2></div>` + (rows.length ? rows.map(({ g, r }) => `<button type="button" class="sigrow" data-gid="${esc(g.id)}"><span class="sigp"><b>${Math.round(r.uscite * 100)}%</b>${gbadge(r.g)}</span>
-      <span class="sigt"><b>${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}</b><span>${esc(r.lab)}${r.q ? ` · @${f2(r.q)}` : ""}</span><small>${FL[g.lg] || ""} ${esc(B.leghe[g.lg][0])} · ${dlab(g.day)} ${timeOf(g.d)} · Prevista ${pc(r.p)}</small></span></button>`).join("")
-    : `<p class="muted">Nessun segnale con questi filtri${S.sw.has("r") ? "" : ": prova Giornata"}.</p>`);
-  bindRows($("#sigOut"));
+  $("#sigOut").innerHTML = `<h2>${L.length} segnal${L.length === 1 ? "e" : "i"}</h2><p class="small muted" style="margin:0">${intro}</p>` + (L.length ? `<div class="siglist">${L.join("")}</div>` : `<p class="muted">Nessun segnale con questi filtri${S.sw.has("r") ? "" : ": prova Giornata"}.</p>`);
+  $("#sigOut").querySelectorAll(".sigopen").forEach(b => b.addEventListener("click", () => { S.game = b.dataset.gid; S.mt = b.dataset.mt; show("match"); }));
 }
 /* Tendenze */
 function renderTen() {

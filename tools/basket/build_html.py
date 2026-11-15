@@ -100,12 +100,16 @@ BODY = f"""<body>
     <section class="card" id="selOut"></section>
   </div>
   <div class="view" id="viewSig" hidden>
-    <section class="card" aria-label="Filtri segnali"><div class="selhead"><h2>Segnali</h2></div>
-      <div class="seg" id="sigView" role="tablist" aria-label="Squadre o giocatori"><button type="button" class="segb" data-sv="sq" aria-pressed="true">Squadre</button><button type="button" class="segb" data-sv="gi" aria-pressed="false">Giocatori</button></div>
-      <div class="row"><label for="sigLeague">Campionato<select id="sigLeague"></select></label></div>
-      <div class="self" id="sigWhen" role="group" aria-label="Quando"><button type="button" class="chip" data-sw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-sw="1" aria-pressed="true">Domani</button><button type="button" class="chip" data-sw="r" aria-pressed="false">Giornata</button></div>
-      <p class="small muted" style="margin:0" id="sigNote">Previsioni dalla parte della lettura che, nelle stagioni passate, sono uscite almeno 72 volte su 100 (grado A o A+). Totale e handicap sulla linea del book quando c'è.</p></section>
-    <section class="card" id="sigOut"></section>
+    <section class="card" aria-label="Filtri segnali">
+      <div class="selhead"><h2>Segnali</h2>
+        <div class="seg sigv" role="tablist" aria-label="Squadre o giocatori" id="sigView"><button type="button" class="segb" data-sv="sq" aria-pressed="true">Squadre</button><button type="button" class="segb" data-sv="gi" aria-pressed="false">Giocatori</button></div></div>
+      <div class="sigf">
+        <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
+        <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano"><button type="button" class="chip" data-sw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-sw="1" aria-pressed="true">Domani</button><button type="button" class="chip" data-sw="r" aria-pressed="false">Giornata</button></div>
+        <div class="row" id="sigStats" role="group" aria-label="Mercati"></div>
+      </div>
+    </section>
+    <section class="card" id="sigOut" aria-label="Elenco segnali"></section>
   </div>
   <div class="view" id="viewGen" hidden><section class="card" id="genOut"></section></div>
   <div class="view" id="viewRit" hidden><section class="card" id="ritOut"></section></div>
