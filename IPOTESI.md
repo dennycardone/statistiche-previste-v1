@@ -118,3 +118,9 @@ stavano quasi tutte in osservazione (1X2 corner a quota lunga). Non è un test d
   segno col valore più alto), "Quota minima da cercare" (solo il segno più probabile, anche quando le formazioni alzano l'altro), Segnali Over 3,5
   gol (soglia da 40% a 50%), studio settimanale del Mercato (tools/radar_mercato.js: il lato della lettura, come l'app). Già sulla lettura:
   Grado, Segnali, Operatività, Mercato, Pinnacle, Giocatori (solo probabilità).
+
+## 15/11/2026 · Cartellini: livello non passa → Under in osservazione
+Studio del livello (tools/calib_livello.py, run del 15/11): Cartellini non passa (fattore oggi 1,02; holdout log-loss +0,00051 [−0,00063, +0,00184],
+120 giorni +0,00211, campionati migliorati 42%). Controllo mese per mese su extra.json: livello allineato (reale/atteso 0,91-1,04 da agosto).
+La perdita viene dalla scelta per valore (Under dove il modello si stacca di più dal book). Da Denny (15/11): cartellini Under in osservazione,
+senza peso, visibili e refertati. Over restano (club 7 giocate, 4 prese, attese 4,0). Da rileggere al 7/12 e al 18/1.

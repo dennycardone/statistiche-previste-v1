@@ -102,7 +102,7 @@ let nLock = 0;
   const day = LR[romeDate] || (LR[romeDate] = { singole: [], contro: [], q2: null, q3: null });
   // 14/11/2026 (Denny): cartellini delle nazionali senza peso. Le proposte di oggi già fissate e non ancora iniziate passano in osservazione.
   day.oss = day.oss || [];
-  for (const o of [...day.singole]) if (o.lg === "NAZ" && o.k === "kou" && todayE.some(e => e.id === o.id)) {
+  for (const o of [...day.singole]) if (o.k === "kou" && (o.lg === "NAZ" || /^Under/.test(o.side || "")) && todayE.some(e => e.id === o.id)) {   // 15/11: anche i cartellini Under
     day.singole = day.singole.filter(x => x !== o);
     if (!day.oss.some(x => x.id === o.id && x.k === o.k)) day.oss.push({ ...o, f: 0, w: 0, oss: 1, t: nowIso });
   }
