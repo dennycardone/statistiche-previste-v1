@@ -20,7 +20,7 @@ CSS = """<style>
 .bkt .tlogo.big{width:54px;height:54px;object-fit:contain}
 .bkc{display:flex;flex-direction:column;gap:3px;align-items:center}.bkc small{color:var(--ink-2);font-size:12px}.bksc{font-size:30px;font-variant-numeric:tabular-nums;color:var(--accent)}
 .bkl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.bkl th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);text-align:center;padding:9px 4px 2px}
-.bkl td{padding:6px 8px;text-align:center;border-top:1px solid var(--line)}.bkl td small{color:var(--ink-2);display:block;font-size:12px}.bkl td b{font-size:18px}
+.bkl td,.bkl th{padding:6px 8px;text-align:center;border-top:1px solid var(--line)}.bkl td small{color:var(--ink-2);display:block;font-size:12px}.bkl td b{font-size:18px}
 .bkl tr.sub td{border-top:0;padding-top:0;color:var(--ink-2);font-size:12.5px}
 .bkq{margin-top:12px}.bkq h3,.card h3{font-size:14px;margin:0 0 8px;display:flex;align-items:center;gap:6px}.bkq h3 small,.card h3 small{color:var(--ink-3);font-weight:500}
 .bkt2{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}.bkt2 th,.bkt2 td{padding:6px 4px;border-top:1px solid var(--line);text-align:left}
