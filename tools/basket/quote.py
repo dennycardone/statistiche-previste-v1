@@ -8,7 +8,7 @@ FN = sys.argv[1] if len(sys.argv) > 1 else "quote_basket.json"
 MAXR = int(sys.argv[2]) if len(sys.argv) > 2 else 200
 KEY = os.environ["APIFOOTBALL_KEY"].strip(); BASE = "https://v1.basketball.api-sports.io/"
 LEGHE = {12: "NBA", 120: "EL", 194: "EC", 52: "ITA", 117: "ACB", 40: "BBL", 2: "LNB"}
-KEEP = re.compile(r"^(Home/Away|3Way Result|Asian Handicap|Over/Under|Asian Handicap First Half|Over/Under 1st Half|1st Half 3Way Result|Home/Away \(1st Half\))$|Team Total (Goals|Points) ?\((Including OT|1st Half)\)", re.I)
+KEEP = re.compile(r"^(Home/Away|3Way Result|Asian Handicap|Over/Under|Asian Handicap First Half|Over/Under 1st Half|1st Half 3Way Result|Home/Away \(1st Half\))$|Team Total (Goals|Points) ?\((Including OT|1st Half)\)|^Player ", re.I)   # 15/11: anche i mercati giocatori (NBA: punti, punti+assist)
 used = 0
 def get(p, **q):
     global used
@@ -67,3 +67,9 @@ for e in A["partite"].values():
     for m, vals in (e.get("c") or [None, {}])[1].items():
         if m not in _ex: _ex[m] = list(vals)[:8]
 print("::notice title=Basket · valori dei mercati::" + " | ".join(f"{m}: {', '.join(v)}" for m, v in sorted(_ex.items()))[:3500])
+# 15/11: mercati giocatori in archivio (solo conteggi e nomi dei valori, niente quote)
+_pl = {}
+for e in A["partite"].values():
+    for m, vals in (e.get("c") or [None, {}])[1].items():
+        if m.lower().startswith("player "): x = _pl.setdefault(m, [0, set(), list(vals)[:3]]); x[0] += 1; x[1].update(b for v in vals.values() for b in v)
+print("::notice title=Basket · quote giocatori::" + (" | ".join(f"{m}: {n} partite, book {', '.join(sorted(b))}, es. {'; '.join(ex)}" for m, (n, b, ex) in sorted(_pl.items())) or "nessuna partita con mercati giocatori")[:3500])

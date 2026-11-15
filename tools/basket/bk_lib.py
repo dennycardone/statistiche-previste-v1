@@ -9,7 +9,33 @@ Phi = lambda z: 0.5 * (1 + math.erf(z / math.sqrt(2)))
 NBA_START = {"2019-2020": "2019-10-23", "2020-2021": "2020-12-23", "2021-2022": "2021-10-19", "2022-2023": "2022-10-18",
              "2023-2024": "2023-10-24", "2024-2025": "2024-10-22", "2025-2026": "2025-10-21", "2026-2027": "2026-10-20"}
 
-def load(DIR, preseason=False):
+NUOVO_FORMATO = "2026-01-05"   # dall'8/1/2026 API-Basketball passa i tiri dal campo solo da 2 e i rimbalzi offensivi vuoti
+
+def possessi(rows, fix=True, filt=None):
+    filt = fix if filt is None else filt
+    """possessi per squadra: FGA − OREB + TOV + 0,44·FTA. fix=True (15/11/2026): con il formato nuovo FGA = tiri da 2 + tiri da 3 e,
+    quando mancano i rimbalzi offensivi, OREB = rimbalzi totali × quota offensiva del campionato (media mobile point-in-time).
+    fix=False: com'era (senza rimbalzi offensivi niente possessi → ripiego su punti / rendimento)."""
+    Q = collections.defaultdict(lambda: [0.0, 0.0])
+    for r in sorted(rows, key=lambda r: (r["t"], r["id"])):
+        q = Q[r["lg"]]
+        for k, x in (("qph", r["sh"]), ("qpa", r["sa"])):
+            r[k] = None
+            if not x or None in (x[1], x[12], x[5]): continue
+            if x[7] is not None:
+                r[k] = x[1] - x[7] + x[12] + 0.44 * x[5]
+                if x[6]: q[0] = q[0] * 0.998 + 1; q[1] = q[1] * 0.998 + x[7] / x[6]
+            elif fix and x[6] and q[0] > 20:
+                fga = x[1] + (x[3] or 0) if r["d"] >= NUOVO_FORMATO else x[1]
+                r[k] = fga - q[1] / q[0] * x[6] + x[12] + 0.44 * x[5]
+        # 15/11/2026: statistiche rotte (tiri o rimbalzi a zero o a centinaia, partite a metà): possessi buttati se i punti ogni 100 possessi
+        # escono da 70-160 o se le due squadre differiscono di oltre il 12% (in una partita i possessi delle due squadre sono quasi uguali)
+        if filt and r["qph"] and r["qpa"]:
+            m_ = (r["qph"] + r["qpa"]) / 2
+            if not (70 < 100 * r["ph"] / r["qph"] < 160 and 70 < 100 * r["pa"] / r["qpa"] < 160) or abs(r["qph"] - r["qpa"]) / m_ > 0.12: r["qph"] = r["qpa"] = None
+    return rows
+
+def load(DIR, preseason=False, fix=True, filt=None):
     """righe ordinate per data: dict con lega, stagione, data, id, h, a, ph, pa, qh/qa (quarti), stat h/a (S), gioc (lista), possessi"""
     rows = []
     for fn in sorted(glob.glob(os.path.join(DIR, "*.json"))):
@@ -35,7 +61,7 @@ def load(DIR, preseason=False):
     THR = {k: min(15, max(2, sorted(v)[len(v) // 2] / 2)) for k, v in med.items()}
     rows = [r for r in rows if cnt[(r["lg"], r["ss"], r["h"])] >= THR[(r["lg"], r["ss"])] and cnt[(r["lg"], r["ss"], r["a"])] >= THR[(r["lg"], r["ss"])]]
     rows.sort(key=lambda r: (r["t"], r["id"]))
-    return rows
+    return possessi(rows, fix, filt)
 
 def team_model(rows, DP=0.97, K=6.0, LD=0.998, extra=None):
     """aggiunge a ogni riga (dalla 31ª partita del campionato) eh, ea (punti attesi), pace (possessi attesi), nh, na (partite della squadra),
