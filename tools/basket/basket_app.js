@@ -211,7 +211,7 @@ function wire() {
   document.querySelectorAll("#viewMatch .mtab").forEach(b => b.addEventListener("click", () => { S.mt = b.dataset.mt; renderMatch(); }));
   document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { S.rt = b.dataset.rt; renderRadar(); }));
   document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.addEventListener("click", () => { const k = b.dataset.sw; if (S.sw.has(k)) S.sw.delete(k); else S.sw.add(k); renderSeg(); }));
-  const sp = $("#sport"); if (sp) { sp.value = "basket"; sp.addEventListener("change", () => { if (sp.value === "calcio") { try { localStorage.setItem("prevista.sport", "calcio"); } catch (e) {} location.href = "./"; } }); }
+  const sp = $("#sport"); if (sp) { sp.value = "basket"; sp.addEventListener("change", () => { if (sp.value === "calcio") { try { localStorage.setItem("prevista.sport", "calcio"); } catch (e) {} location.assign(new URL("./?s=" + Date.now(), location.href).href); } }); }
 }
 (async () => {
   wire();
