@@ -592,13 +592,13 @@ select{pointer-events:none}
 .gpx tbody th{text-align:left;font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gpx tbody th small{color:var(--ink-3);font-weight:600;margin-right:4px;font-size:10.5px}
 .gpx td{text-align:center;white-space:nowrap}.gpx td small{display:block;color:var(--ink-2);font-size:11px}.gpx td.lo{color:var(--ink-3)}
 .sigv{margin-left:auto}.sigv .segb{padding:5px 12px;font-size:12.5px}
-#sigGi .gimk{margin:8px 0 6px;display:flex;gap:6px;flex-wrap:wrap}#sigGi .gimk button{font:inherit;font-size:12.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer}#sigGi .gimk button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}.gim b{color:var(--ink);font-weight:600}#sigGi .self{margin:6px 0}.gil{display:flex;flex-direction:column;margin-top:6px}
-.gih{font-size:13px;margin:14px 0 4px;display:flex;align-items:baseline;gap:8px}.gih small{color:var(--ink-3);font-weight:500;font-size:11.5px}
-.gir{display:grid;grid-template-columns:1fr auto;grid-template-areas:"n p" "m p";gap:1px 10px;align-items:center;text-align:left;width:100%;padding:7px 2px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer}
-.gin{grid-area:n;font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gin small{color:var(--ink-3);font-weight:700;font-size:10.5px;margin-right:5px}
-.gim{grid-area:m;font-size:11.5px;color:var(--ink-2);min-width:0}.gix{display:inline-block;margin-left:4px;padding:0 6px;border-radius:999px;font-size:10.5px;font-weight:700;background:var(--ink);color:var(--surface);line-height:16px}
-.gip{grid-area:p;text-align:right;font-variant-numeric:tabular-nums;line-height:1.15}.gip b{font-size:15px}.gip small{display:block;color:var(--ink-2);font-size:11.5px}
-.gimore{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}.linkb{border:0;background:none;color:var(--ink);text-decoration:underline;font:inherit;cursor:pointer;padding:0}.gpx .gpd{display:inline-block;min-width:15px;padding:0 4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);font-size:10.5px;font-weight:700;text-align:center;line-height:15px}.gpx .gpn{margin:8px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.45}
+#sigGi .gimk{margin:8px 0 6px;display:flex;gap:6px;flex-wrap:wrap}#sigGi .gimk button{font:inherit;font-size:12.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer}#sigGi .gimk button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}.pgm b{color:var(--ink);font-weight:600}#sigGi .self{margin:6px 0}.pgl{display:flex;flex-direction:column;margin-top:6px}
+.pgh{font-size:13px;margin:14px 0 4px;display:flex;align-items:baseline;gap:8px}.pgh small{color:var(--ink-3);font-weight:500;font-size:11.5px}
+.pgr{display:grid;grid-template-columns:1fr auto;grid-template-areas:"n p" "m p";gap:1px 10px;align-items:center;text-align:left;width:100%;padding:7px 2px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer}
+.pgn{grid-area:n;font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pgn small{color:var(--ink-3);font-weight:700;font-size:10.5px;margin-right:5px}
+.pgm{grid-area:m;font-size:11.5px;color:var(--ink-2);min-width:0}.pgx{display:inline-block;margin-left:4px;padding:0 6px;border-radius:999px;font-size:10.5px;font-weight:700;background:var(--ink);color:var(--surface);line-height:16px}
+.pgp{grid-area:p;text-align:right;font-variant-numeric:tabular-nums;line-height:1.15}.pgp b{font-size:15px}.pgp small{display:block;color:var(--ink-2);font-size:11.5px}
+.pgmore{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}.linkb{border:0;background:none;color:var(--ink);text-decoration:underline;font:inherit;cursor:pointer;padding:0}.gpx .gpd{display:inline-block;min-width:15px;padding:0 4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);font-size:10.5px;font-weight:700;text-align:center;line-height:15px}.gpx .gpn{margin:8px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.45}
 .mhead .bk1x2 td small,.mhead .bk1x2 th small{display:block;font-size:11px;font-weight:400}.mhead .bk1x2 td.hit{color:var(--good);font-weight:700}
 .mhead .bk1x2-n{margin:6px 0 0;font-size:11px;color:var(--ink-3)}
 .mhead .sx-fb{margin:0;padding:9px 12px;font-size:11.5px;color:var(--ink-3);text-align:center;border-top:1px solid var(--line)}.mhead .sx-fb b{color:var(--ink-2)}
@@ -5914,15 +5914,15 @@ function renderSigGi() {
   const lgs = GI_LG.filter(([c]) => E.some(([e]) => e.lg.code === c));
   const nUff = E.filter(([, D]) => D.uff).length;
   const chips = PROP_MK.flatMap(([k, lab, lines]) => lines.map((Lx, jx) => [k, jx, `${lab} ${k === "yc" ? "Sì" : "Over " + th1(Lx)}`]));
-  const row = r => `<button type="button" class="gir" data-gid="${esc(r.e.id)}">
-      <span class="gin"><small>${RL_G[r.ruolo] || ""}</small><b>${esc(r.nome)}</b>${r.dub ? ` <span class="gpd" title="In dubbio">?</span>` : ""}</span>
-      <span class="gim">${r.side === "h" ? `<b>${esc(r.e.home)}</b> – ${esc(r.e.away)}` : `${esc(r.e.home)} – <b>${esc(r.e.away)}</b>`} · ${r.e.time ? esc(r.e.time) : dstr(r.e.date)}${r.uff ? ` <span class="gix">XI ufficiale</span>` : ""}</span>
-      <span class="gip"><b>${pc(r.p)}</b><small>${f2(1 / r.p)}</small></span></button>`;
+  const row = r => `<button type="button" class="pgr" data-gid="${esc(r.e.id)}">
+      <span class="pgn"><small>${RL_G[r.ruolo] || ""}</small><b>${esc(r.nome)}</b>${r.dub ? ` <span class="gpd" title="In dubbio">?</span>` : ""}</span>
+      <span class="pgm">${r.side === "h" ? `<b>${esc(r.e.home)}</b> – ${esc(r.e.away)}` : `${esc(r.e.home)} – <b>${esc(r.e.away)}</b>`} · ${r.e.time ? esc(r.e.time) : dstr(r.e.date)}${r.uff ? ` <span class="pgx">XI ufficiale</span>` : ""}</span>
+      <span class="pgp"><b>${pc(r.p)}</b><small>${f2(1 / r.p)}</small></span></button>`;
   const MIN_P = 0.05;
-  const list = R => { const V = R.filter(r => r.p >= MIN_P), S2 = GI.all ? V : V.slice(0, GI.n); return S2.length ? S2.map(row).join("") + (V.length > S2.length ? `<p class="gimore">altri ${V.length - S2.length} sotto · <button type="button" class="linkb" data-giall="1">mostra tutti</button></p>` : "") : `<p class="muted small" style="margin:6px 0">Nessun giocatore sopra il ${Math.round(MIN_P * 100)}%.</p>`; };
+  const list = R => { const V = R.filter(r => r.p >= MIN_P), S2 = GI.all ? V : V.slice(0, GI.n); return S2.length ? S2.map(row).join("") + (V.length > S2.length ? `<p class="pgmore">altri ${V.length - S2.length} sotto · <button type="button" class="linkb" data-giall="1">mostra tutti</button></p>` : "") : `<p class="muted small" style="margin:6px 0">Nessun giocatore sopra il ${Math.round(MIN_P * 100)}%.</p>`; };
   let body;
   if (!E.length) body = `<p class="muted" style="margin:0">${SIGW.days.size ? `Nessuna partita di Serie A, Premier, Liga, Bundesliga, Ligue 1 o Champions con questi filtri.${SIGW.days.has("r") ? "" : " Prova Giornata."}` : "Scegli Oggi, Domani o Giornata."}</p>`;
-  else if (GI.lg === "all" && GI.view !== "tutti") body = lgs.map(([c, nm]) => { const R = rows.filter(r => r.e.lg.code === c); return R.length ? `<h3 class="gih">${esc(nm)} <small>${new Set(R.map(r => r.e.id)).size} partite</small></h3>${list(R)}` : ""; }).join("") || `<p class="muted" style="margin:0">Nessuna partita con le formazioni ufficiali uscite.</p>`;
+  else if (GI.lg === "all" && GI.view !== "tutti") body = lgs.map(([c, nm]) => { const R = rows.filter(r => r.e.lg.code === c); return R.length ? `<h3 class="pgh">${esc(nm)} <small>${new Set(R.map(r => r.e.id)).size} partite</small></h3>${list(R)}` : ""; }).join("") || `<p class="muted" style="margin:0">Nessuna partita con le formazioni ufficiali uscite.</p>`;
   else body = rows.length ? list(rows) : `<p class="muted" style="margin:0">Nessuna partita con questo filtro.</p>`;
   box.innerHTML = `<div class="selhead"><h2>Giocatori</h2><span class="small muted" style="white-space:nowrap">${when}</span></div>
     <div class="gpm gimk" role="group" aria-label="Mercato e linea">${chips.map(([k, jx, lab]) => `<button type="button" data-gik="${k}" data-gij="${jx}" aria-pressed="${k === GI.k && jx === j}">${lab}</button>`).join("")}</div>
@@ -5930,7 +5930,7 @@ function renderSigGi() {
     <div class="self" role="group" aria-label="Opzioni">
       <button type="button" class="chip" data-giuff="1" aria-pressed="${GI.uff}">Solo XI ufficiale${nUff ? ` · ${nUff}` : ""}</button>
       ${GI.lg === "all" ? `<button type="button" class="chip" data-giview="1" aria-pressed="${GI.view === "tutti"}">Tutti insieme</button>` : ""}</div>
-    <div class="gil">${body}</div>
+    <div class="pgl">${body}</div>
     <p class="gpn">Probabilità per i titolari (probabili, tolti gli indisponibili, o ufficiali quando escono le formazioni, circa un'ora prima) e quota minima giusta (100 / probabilità). Stessi numeri della tab Giocatori nella scheda partita; tocca un giocatore per aprire la partita. Mostrati quelli sopra il ${Math.round(MIN_P * 100)}%, i primi ${GI.n}${GI.lg === "all" && GI.view !== "tutti" ? " per campionato" : ""}.</p>`;
   box.querySelectorAll("[data-gik]").forEach(b => b.addEventListener("click", () => { GI.k = b.dataset.gik; GI.j = +b.dataset.gij; GI.all = false; renderSigGi(); }));
   box.querySelectorAll("[data-gilg]").forEach(b => b.addEventListener("click", () => { GI.lg = b.dataset.gilg; GI.all = false; renderSigGi(); }));
