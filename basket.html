@@ -1470,6 +1470,43 @@ function renderDig() {
       : `<p class="muted" style="padding:14px 16px;margin:0">Nessuna squadra con un digiuno${D_.w === "0" ? " gioca oggi" : D_.w === "1" ? " gioca domani" : " con questi filtri"}.</p>`) + `</section>`;
   $("#ritOut").querySelectorAll(".rtr.go").forEach(li => li.addEventListener("click", () => { S.game = li.dataset.gid; S.mt = "prev"; show("match"); }));
 }
+/* ---------- Tendine come il calcio (15/11/2026): lo stile dell'app rende le <select> intoccabili (pointer-events:none) e il tocco sul riquadro
+   apre un foglio con le voci; senza questo codice nel basket le tendine non si aprivano ---------- */
+const DDS = (() => { const d = document.createElement("div"); d.className = "sheet ddsheet"; d.hidden = true;
+  d.innerHTML = `<div class="sh" role="dialog" aria-modal="true"><div class="sh-h"><b></b><button type="button" class="sh-x" aria-label="Chiudi">✕</button></div><div class="sh-b" role="listbox"></div></div>`;
+  document.body.appendChild(d); return d; })();
+let DD_SEL = null; const DDN = { skip: false };
+function ddTitle(sel) {
+  for (const lab of [sel.closest("label"), sel.id && document.querySelector(`label[for="${sel.id}"]`)]) {
+    if (!lab) continue; const c = lab.cloneNode(true); c.querySelectorAll("select").forEach(x => x.remove());
+    const t = c.textContent.replace(/\s+/g, " ").trim(); if (t) return t;
+  }
+  return sel.getAttribute("aria-label") || "Scegli";
+}
+function ddClose() { if (DDS.hidden) return; DDS.hidden = true; if (history.state && history.state.dd) { DDN.skip = true; history.back(); } }
+function ddOpen(sel) {
+  DD_SEL = sel; DDS.querySelector(".sh-h b").textContent = ddTitle(sel);
+  const opt = o => `<button type="button" class="ddo" role="option" data-v="${esc(o.value)}" aria-selected="${o.selected}"${o.disabled ? " disabled" : ""}>${esc(o.textContent)}</button>`;
+  DDS.querySelector(".sh-b").innerHTML = [...sel.children].map(c => c.tagName === "OPTGROUP" ? `<div class="ddg">${esc(c.label)}</div>` + [...c.children].map(opt).join("") : opt(c)).join("");
+  DDS.hidden = false; try { history.pushState(Object.assign({}, history.state, { dd: 1 }), ""); } catch (e) {}
+  const cur = DDS.querySelector('.ddo[aria-selected="true"]'); if (cur) { cur.scrollIntoView({ block: "center" }); cur.focus(); }
+}
+DDS.addEventListener("click", ev => {
+  if (ev.target === DDS || ev.target.closest(".sh-x")) { ddClose(); return; }
+  const b = ev.target.closest(".ddo"); if (!b || !DD_SEL) return;
+  const sel = DD_SEL, changed = sel.value !== b.dataset.v; sel.value = b.dataset.v; ddClose();
+  if (changed) sel.dispatchEvent(new Event("change", { bubbles: true }));
+});
+document.addEventListener("click", ev => {
+  if (ev.target.closest(".sheet")) return;
+  const x = ev.clientX, y = ev.clientY;
+  const sel = [...document.querySelectorAll("select")].find(s => { if (s.disabled || !s.offsetParent) return false; const r = s.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; });
+  if (sel) { ev.preventDefault(); ev.stopPropagation(); ddOpen(sel); }
+}, true);
+document.addEventListener("keydown", ev => {
+  if (ev.target.tagName === "SELECT" && ["Enter", " ", "ArrowDown", "ArrowUp"].includes(ev.key)) { ev.preventDefault(); ddOpen(ev.target); }
+  else if (!DDS.hidden && ev.key === "Escape") ddClose();
+}, true);
 /* ---------- avvio ---------- */
 function wire() {
   $("#navStats").addEventListener("click", () => show("part"));
@@ -1493,7 +1530,7 @@ function wire() {
   } catch (e) { $("#boot").innerHTML = `<p class="muted">Dati del basket non disponibili in questo momento.</p>`; return; }
   try { localStorage.setItem("prevista.sport", "basket"); } catch (e) {}
   try { history.replaceState({ v: "part" }, ""); } catch (e) {}
-  addEventListener("popstate", ev => { const st = ev.state || { v: "part" }; if (st.game) S.game = st.game; if (st.mt) S.mt = st.mt; show(st.v || "part", false); });
+  addEventListener("popstate", ev => { if (DDN.skip) { DDN.skip = false; return; } if (!DDS.hidden) { DDS.hidden = true; return; } const st = ev.state || { v: "part" }; if (st.game) S.game = st.game; if (st.mt) S.mt = st.mt; show(st.v || "part", false); });
   $("#boot").hidden = true; $("#stamp").textContent = `Aggiornato ${B.agg.slice(8, 10)}/${B.agg.slice(5, 7)} ${B.agg.slice(11)} UTC`;
   show("part", false);
 })();
