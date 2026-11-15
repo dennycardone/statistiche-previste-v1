@@ -590,7 +590,14 @@ select{pointer-events:none}
 .gpx table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:12.5px}.gpx caption{text-align:left;font-weight:600;font-size:12.5px;padding:2px 0 4px}
 .gpx th,.gpx td{padding:4px 3px;border-top:1px solid var(--line)}.gpx thead th{border-top:0;color:var(--ink-3);font-weight:600;font-size:11.5px;text-align:center}
 .gpx tbody th{text-align:left;font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gpx tbody th small{color:var(--ink-3);font-weight:600;margin-right:4px;font-size:10.5px}
-.gpx td{text-align:center;white-space:nowrap}.gpx td small{display:block;color:var(--ink-2);font-size:11px}.gpx td.lo{color:var(--ink-3)}.gpx .gpd{display:inline-block;min-width:15px;padding:0 4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);font-size:10.5px;font-weight:700;text-align:center;line-height:15px}.gpx .gpn{margin:8px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.45}
+.gpx td{text-align:center;white-space:nowrap}.gpx td small{display:block;color:var(--ink-2);font-size:11px}.gpx td.lo{color:var(--ink-3)}
+#selGi .gimk{margin:8px 0 6px;display:flex;gap:6px;flex-wrap:wrap}#selGi .gimk button{font:inherit;font-size:12.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);cursor:pointer}#selGi .gimk button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}.gim b{color:var(--ink);font-weight:600}#selGi .self{margin:6px 0}.gil{display:flex;flex-direction:column;margin-top:6px}
+.gih{font-size:13px;margin:14px 0 4px;display:flex;align-items:baseline;gap:8px}.gih small{color:var(--ink-3);font-weight:500;font-size:11.5px}
+.gir{display:grid;grid-template-columns:1fr auto;grid-template-areas:"n p" "m p";gap:1px 10px;align-items:center;text-align:left;width:100%;padding:7px 2px;border:0;border-top:1px solid var(--line);background:none;color:inherit;font:inherit;cursor:pointer}
+.gin{grid-area:n;font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gin small{color:var(--ink-3);font-weight:700;font-size:10.5px;margin-right:5px}
+.gim{grid-area:m;font-size:11.5px;color:var(--ink-2);min-width:0}.gix{display:inline-block;margin-left:4px;padding:0 6px;border-radius:999px;font-size:10.5px;font-weight:700;background:var(--ink);color:var(--surface);line-height:16px}
+.gip{grid-area:p;text-align:right;font-variant-numeric:tabular-nums;line-height:1.15}.gip b{font-size:15px}.gip small{display:block;color:var(--ink-2);font-size:11.5px}
+.gimore{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}.linkb{border:0;background:none;color:var(--ink);text-decoration:underline;font:inherit;cursor:pointer;padding:0}.gpx .gpd{display:inline-block;min-width:15px;padding:0 4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);font-size:10.5px;font-weight:700;text-align:center;line-height:15px}.gpx .gpn{margin:8px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.45}
 .mhead .bk1x2 td small,.mhead .bk1x2 th small{display:block;font-size:11px;font-weight:400}.mhead .bk1x2 td.hit{color:var(--good);font-weight:700}
 .mhead .bk1x2-n{margin:6px 0 0;font-size:11px;color:var(--ink-3)}
 .mhead .sx-fb{margin:0;padding:9px 12px;font-size:11.5px;color:var(--ink-3);text-align:center;border-top:1px solid var(--line)}.mhead .sx-fb b{color:var(--ink-2)}
@@ -921,10 +928,12 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <button type="button" class="segb" data-rt="all" aria-pressed="true"><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Grado <b id="rtC"></b></button>
       <button type="button" class="segb" data-rt="bk" aria-pressed="false"><svg class="ic ic-mercato gold" aria-hidden="true"><use href="#i-mercato"/></svg>Mercato <b id="rtB"></b></button>
       <button type="button" class="segb" data-rt="op" aria-pressed="false"><svg class="ic ic-op" aria-hidden="true"><use href="#i-op"/></svg>Operatività <b id="rtO"></b></button>
+      <button type="button" class="segb" data-rt="gi" aria-pressed="false"><svg class="ic" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4.5 20.5c.8-4 3.9-6.3 7.5-6.3s6.7 2.3 7.5 6.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Giocatori <b id="rtG"></b></button>
     </div>
     <section class="card aplus" id="selAplus" aria-label="A+ sul radar" hidden></section>
     <section class="card" id="selBk" aria-label="Linea 1xBet" hidden></section>
     <section class="card" id="selOp" aria-label="Operatività" hidden></section>
+    <section class="card" id="selGi" aria-label="Giocatori" hidden></section>
     <section class="card" id="selAll" aria-label="Partite in arrivo">
       <div class="selhead"><h2><svg class="ic ic-tutte" aria-hidden="true"><use href="#i-tutte"/></svg>Partite in arrivo</h2></div>
       <div class="self" role="group" aria-label="Filtri" id="selF">
@@ -4573,10 +4582,11 @@ function pkHTML(e, m) {
 let GIOC = null, GPM = "sot", ASSENZE = null;   // 14/11: assenze di oggi e domani (data/assenze.json, injuries di API-Football)
 const PROP_LG = new Set(["I1", "E0", "SP1", "D1", "F1", "UCL"]);
 const PROP_MK = [["sot", "Tiri in porta", [0.5, 1.5]], ["fc", "Falli commessi", [0.5, 1.5]], ["fd", "Falli subiti", [0.5, 1.5, 2.5]], ["yc", "Ammonito", [0.5]]];
-function propsHTML(e, m, home, away, MT, MF, x) {
-  if (m || !e || !GIOC || !GIOC.squadre || !PROP_LG.has(S.league)) return "";
+// 15/11/2026: calcolo separato dalla grafica, lo usano la scheda partita e la pagina Giocatori del Radar (stessi numeri)
+function propsData(e, home, away, MT, MF, x) {
+  if (!e || !GIOC || !GIOC.squadre || !PROP_LG.has(S.league)) return null;
   const sq = n => GIOC.squadre[n] || (GIOC.api && GIOC.squadre[GIOC.api[n]]);
-  const H = sq(home), A = sq(away); if (!H || !A) return "";
+  const H = sq(home), A = sq(away); if (!H || !A) return null;
   let F = null; try { F = formazFor(home, away); } catch (err) {}
   const rt = (v, ab) => v > 0 && ab > 0 && isFinite(v) ? v / ab : 1;
   const refF = (x && x[0] && GIOC.arbitri && GIOC.arbitri[x[0]]) || 1;
@@ -4596,17 +4606,25 @@ function propsHTML(e, m, home, away, MT, MF, x) {
   };
   const XH = xiOf("h", H), XA = xiOf("a", A), uff = XH.uff && XA.uff;
   const prob = (mu, L, k) => { const al = GIOC.alpha[k], pmf = pmfTotal(mu, al > 1e-6 ? 1 / al : Infinity, 14); return pOver(pmf, L); };
-  const RL = { G: "P", D: "D", M: "C", F: "A" };
-  const table = (team, X, side, k, lines) => {
-    const rows = X.L.map(p => { const g = GIOC.giocatori[p.id], base = g ? g[MI[k]] : (GIOC.ruolo[p.ruolo] || GIOC.ruolo.M)[RI[k]], mu = base * R[side][k];
-      return { ...p, nome: p.nome !== "—" ? p.nome : (g && g[0]) || "—", P: lines.map(L => prob(mu, L, k)) }; }).sort((u, v) => v.P[0] - u.P[0]);
+  const team = (X, side, name, opp) => X.L.map(p => { const g = GIOC.giocatori[p.id], P = {};
+    for (const [k, , lines] of PROP_MK) { const base = g ? g[MI[k]] : (GIOC.ruolo[p.ruolo] || GIOC.ruolo.M)[RI[k]]; P[k] = lines.map(L => prob(base * R[side][k], L, k)); }
+    return { ...p, nome: p.nome !== "—" ? p.nome : (g && g[0]) || "—", P, sq: name, avv: opp, side }; });
+  return { uff, nOut, AS, DUB, refF, h: team(XH, "h", home, away), a: team(XA, "a", away, home) };
+}
+const RL_G = { G: "P", D: "D", M: "C", F: "A" };
+function propsHTML(e, m, home, away, MT, MF, x) {
+  if (m) return "";
+  const D = propsData(e, home, away, MT, MF, x); if (!D) return "";
+  const { uff, nOut, AS, DUB, refF } = D, RL = RL_G;
+  const table = (teamName, rowsIn, k, lines) => {
+    const ix = PROP_MK.findIndex(z => z[0] === k), rows = rowsIn.map(r => ({ ...r, PP: r.P[k] })).sort((u, v) => v.PP[0] - u.PP[0]);
     const cell = q => q < 0.03 ? `<td class="lo">${pc(q)}</td>` : `<td><b>${pc(q)}</b><small>${f2(1 / q)}</small></td>`;
-    return `<table><caption>${esc(team)}</caption><thead><tr><th></th>${lines.map(L => `<th>${k === "yc" ? "Sì" : "Over " + th1(L)}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr><th title="${esc(r.nome)}${r.dub ? " · in dubbio" : ""}"><small>${RL[r.ruolo] || ""}</small>${esc(r.nome)}${r.dub ? ` <span class="gpd" title="In dubbio">?</span>` : ""}</th>${r.P.map(cell).join("")}</tr>`).join("")}</tbody></table>`;
+    return `<table><caption>${esc(teamName)}</caption><thead><tr><th></th>${lines.map(L => `<th>${k === "yc" ? "Sì" : "Over " + th1(L)}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr><th title="${esc(r.nome)}${r.dub ? " · in dubbio" : ""}"><small>${RL[r.ruolo] || ""}</small>${esc(r.nome)}${r.dub ? ` <span class="gpd" title="In dubbio">?</span>` : ""}</th>${r.PP.map(cell).join("")}</tr>`).join("")}</tbody></table>`;
   };
   const cur = PROP_MK.some(z => z[0] === GPM) ? GPM : "sot";
   return `<details class="gpx"><summary><b>Giocatori</b><small>${uff ? "formazioni ufficiali" : "probabili titolari (dalle ultime partite)"} · tiri in porta, falli, ammonito</small></summary>
     <div class="gpm" role="group" aria-label="Mercato giocatore">${PROP_MK.map(([k, lab]) => `<button type="button" data-gpm="${k}" aria-pressed="${k === cur}">${lab}</button>`).join("")}</div>
-    ${PROP_MK.map(([k, , lines]) => `<div class="gpt" data-gpt="${k}"${k === cur ? "" : " hidden"}>${table(home, XH, "h", k, lines)}${table(away, XA, "a", k, lines)}</div>`).join("")}
+    ${PROP_MK.map(([k, , lines]) => `<div class="gpt" data-gpt="${k}"${k === cur ? "" : " hidden"}>${table(home, D.h, k, lines)}${table(away, D.a, k, lines)}</div>`).join("")}
     <p class="gpn">Probabilità per i titolari; sotto, la quota minima giusta (100 / probabilità): sul book conviene solo da lì in su. Il mercato vale se il giocatore parte dal 1′.
     ${uff ? "Titolari ufficiali; falli attesi già corretti con le formazioni." : `Titolari probabili: i più presenti nelle ultime partite${nOut ? `, ${nOut === 1 ? "tolto 1 indisponibile" : `tolti ${nOut} indisponibili`} (infortuni e squalifiche di API-Football)` : AS ? "" : " (assenze lette il giorno prima e il giorno della partita)"}${DUB.size ? "; ? = in dubbio" : ""}. Con le formazioni ufficiali (circa un'ora prima) la tabella si aggiorna da sola.`}
     Ammonito: severità dell'arbitro ${refF === 1 ? "non nota" : (refF > 1 ? "+" : "−") + Math.round(Math.abs(refF - 1) * 100) + "%"}. Test su 121.614 titolari dal 2023 (in verifica dal 14/11/2026).</p></details>`;
@@ -4721,7 +4739,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
       ${M ? halves("c", M.lh, M.la) : ""}
       ${row("Falli", MF && MF.lh, MF && MF.la, MF && MF.tot, 1, null, null, m && m.hf, m && m.af)}
       ${row("Fuorigioco", O && !O.nd ? O.lh : null, O && !O.nd ? O.la : null, O && !O.nd ? O.tot : null, 1, null, null, m && offR ? offR.oh : null, m && offR ? offR.oa : null)}
-      ${O && !O.nd ? halves("o", O.lh, O.la) : ""}
+      ${""/* 15/11/2026 (Denny): Fuorigioco 1° tempo tolto dalla scheda, non interessa */}
       ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
       ${G || se ? `<p class="sx-fb">${G ? `<b>Multigol (MG)</b> · sotto i gol: la fascia più stretta più probabile, poi la fascia più sicura` : ""}${G && se ? "<br>" : ""}${se ? `<b>Forbice</b> · sotto i cartellini: dove cade la media di quella squadra 8 volte su 10` : ""}</p>` : ""}`}
     </div>${(() => { try { return propsHTML(e, m, home, away, MT, MF, x); } catch (err) { return ""; } })()}`;
@@ -5839,14 +5857,70 @@ function renderSelOp(ents, cfg, when) {
   if (todo.length) setTimeout(() => { if (!$("#viewSel").hidden) renderSelOp(selEntries(), cfg, when); }, 30);
 }
 /* Radar a due schede: Grado · Mercato (11/10/2026: tolta "Segnali A+", gli A+ sono già nel Grado) */
+/* 15/11/2026 (Denny) · Radar › Giocatori: tutto il turno di Serie A, Premier, Liga, Bundesliga, Ligue 1 e Champions in una pagina, per un
+   mercato e una linea alla volta. Numeri identici alla tab Giocatori della scheda partita (propsData, Modello B), nessun calcolo nuovo. */
+const GI = { k: "sot", j: 0, lg: "all", uff: false, all: false, n: 10 };
+const GI_C = new Map();
+const GI_LG = [["I1", "Serie A"], ["E0", "Premier League"], ["SP1", "La Liga"], ["D1", "Bundesliga"], ["F1", "Ligue 1"], ["UCL", "Champions League"]];
+function giEntry(e, cfg) {
+  const fz = FORMAZ && FORMAZ.partite && FORMAZ.partite[e.id] ? 1 : 0, key = [e.id, cfg.key, fz, ASSENZE ? ASSENZE.agg : "", GIOC ? GIOC.agg : ""].join("|");
+  if (GI_C.has(key)) return GI_C.get(key);
+  let D = null;
+  withLeague(e.lg.code, () => { const c0 = S.cutoff; S.cutoff = null;
+    try { let MT = null, MF = null; try { MF = model(e.home, e.away, cfg, "f"); MT = modelShots(e.home, e.away, cfg); } catch (x) {}
+      D = propsData(e, e.home, e.away, MT, MF, extraFor(e.home, e.away)); } catch (x) { D = null; } finally { S.cutoff = c0; } });
+  GI_C.set(key, D); return D;
+}
+function renderSelGi(ents, cfg, when) {
+  const box = $("#selGi"); if (!box) return;
+  if (!GIOC || !GIOC.squadre) { box.innerHTML = ""; SEL.giN = null; return; }
+  const E = ents.filter(e => PROP_LG.has(e.lg.code)).map(e => [e, giEntry(e, cfg)]).filter(([, D]) => D);
+  SEL.giN = E.length || null;
+  const MK = PROP_MK.find(z => z[0] === GI.k) || PROP_MK[0], j = Math.min(GI.j, MK[2].length - 1), L = MK[2][j];
+  const rows = [];
+  for (const [e, D] of E) {
+    if (GI.uff && !D.uff) continue;
+    if (GI.lg !== "all" && e.lg.code !== GI.lg) continue;
+    for (const r of D.h.concat(D.a)) rows.push({ ...r, e, uff: D.uff, p: r.P[GI.k][j] });
+  }
+  rows.sort((u, v) => v.p - u.p);
+  const lgs = GI_LG.filter(([c]) => E.some(([e]) => e.lg.code === c));
+  const nUff = E.filter(([, D]) => D.uff).length;
+  const chips = PROP_MK.flatMap(([k, lab, lines]) => lines.map((Lx, jx) => [k, jx, `${lab} ${k === "yc" ? "Sì" : "Over " + th1(Lx)}`]));
+  const row = r => `<button type="button" class="gir" data-gid="${esc(r.e.id)}">
+      <span class="gin"><small>${RL_G[r.ruolo] || ""}</small><b>${esc(r.nome)}</b>${r.dub ? ` <span class="gpd" title="In dubbio">?</span>` : ""}</span>
+      <span class="gim">${r.side === "h" ? `<b>${esc(r.e.home)}</b> – ${esc(r.e.away)}` : `${esc(r.e.home)} – <b>${esc(r.e.away)}</b>`} · ${r.e.time ? esc(r.e.time) : dstr(r.e.date)}${r.uff ? ` <span class="gix">XI ufficiale</span>` : ""}</span>
+      <span class="gip"><b>${pc(r.p)}</b><small>${f2(1 / r.p)}</small></span></button>`;
+  const MIN_P = 0.05;
+  const list = R => { const V = R.filter(r => r.p >= MIN_P), S2 = GI.all ? V : V.slice(0, GI.n); return S2.length ? S2.map(row).join("") + (V.length > S2.length ? `<p class="gimore">altri ${V.length - S2.length} sotto · <button type="button" class="linkb" data-giall="1">mostra tutti</button></p>` : "") : `<p class="muted small" style="margin:6px 0">Nessun giocatore sopra il ${Math.round(MIN_P * 100)}%.</p>`; };
+  let body;
+  if (!E.length) body = `<p class="muted" style="margin:0">Nessuna partita dei Top campionati o della Champions ${selDaysTxt().toLowerCase()}${GIOC ? "" : ""}.</p>`;
+  else if (GI.lg === "all" && GI.view !== "tutti") body = lgs.map(([c, nm]) => { const R = rows.filter(r => r.e.lg.code === c); return R.length ? `<h3 class="gih">${esc(nm)} <small>${new Set(R.map(r => r.e.id)).size} partite</small></h3>${list(R)}` : ""; }).join("") || `<p class="muted" style="margin:0">Nessuna partita con le formazioni ufficiali uscite.</p>`;
+  else body = rows.length ? list(rows) : `<p class="muted" style="margin:0">Nessuna partita con questo filtro.</p>`;
+  box.innerHTML = `<div class="selhead"><h2>Giocatori</h2><span class="small muted" style="white-space:nowrap">${selDaysTxt()}</span></div>
+    <div class="gpm gimk" role="group" aria-label="Mercato e linea">${chips.map(([k, jx, lab]) => `<button type="button" data-gik="${k}" data-gij="${jx}" aria-pressed="${k === GI.k && jx === j}">${lab}</button>`).join("")}</div>
+    <div class="self" role="group" aria-label="Campionato">${[["all", "Tutti"], ...lgs].map(([c, nm]) => `<button type="button" class="chip" data-gilg="${c}" aria-pressed="${GI.lg === c}">${esc(c === "all" ? nm : nm.replace(" League", ""))}</button>`).join("")}</div>
+    <div class="self" role="group" aria-label="Opzioni">
+      <button type="button" class="chip" data-giuff="1" aria-pressed="${GI.uff}">Solo XI ufficiale${nUff ? ` · ${nUff}` : ""}</button>
+      ${GI.lg === "all" ? `<button type="button" class="chip" data-giview="1" aria-pressed="${GI.view === "tutti"}">Tutti insieme</button>` : ""}</div>
+    <div class="gil">${body}</div>
+    <p class="gpn">Probabilità per i titolari (probabili, tolti gli indisponibili, o ufficiali quando escono le formazioni, circa un'ora prima) e quota minima giusta (100 / probabilità). Stessi numeri della tab Giocatori nella scheda partita; tocca un giocatore per aprire la partita. Mostrati quelli sopra il ${Math.round(MIN_P * 100)}%, i primi ${GI.n}${GI.lg === "all" && GI.view !== "tutti" ? " per campionato" : ""}.</p>`;
+  box.querySelectorAll("[data-gik]").forEach(b => b.addEventListener("click", () => { GI.k = b.dataset.gik; GI.j = +b.dataset.gij; GI.all = false; renderSelGi(ents, cfg, when); radarTabs(); }));
+  box.querySelectorAll("[data-gilg]").forEach(b => b.addEventListener("click", () => { GI.lg = b.dataset.gilg; GI.all = false; renderSelGi(ents, cfg, when); radarTabs(); }));
+  box.querySelectorAll("[data-giuff]").forEach(b => b.addEventListener("click", () => { GI.uff = !GI.uff; renderSelGi(ents, cfg, when); radarTabs(); }));
+  box.querySelectorAll("[data-giview]").forEach(b => b.addEventListener("click", () => { GI.view = GI.view === "tutti" ? "lg" : "tutti"; GI.all = false; renderSelGi(ents, cfg, when); radarTabs(); }));
+  box.querySelectorAll("[data-giall]").forEach(b => b.addEventListener("click", () => { GI.all = true; renderSelGi(ents, cfg, when); radarTabs(); }));
+  box.querySelectorAll("[data-gid]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.gid); if (e) openEntry(e); }));
+}
 function radarTabs() {
   if (!SEL.tab || SEL.tab === "aplus") SEL.tab = "all";
   const set = (id, n) => { const el = $(id); if (el) el.textContent = n == null ? "" : n; };
-  set("#rtB", SEL.bkN); set("#rtC", SEL.cN); set("#rtO", SEL.opN);
+  set("#rtB", SEL.bkN); set("#rtC", SEL.cN); set("#rtO", SEL.opN); set("#rtG", SEL.giN);
   document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.rt === SEL.tab)));
   $("#selAplus").hidden = true; $("#selAll").hidden = SEL.tab !== "all";
   const bk = $("#selBk"); if (bk && bk.innerHTML) bk.hidden = SEL.tab !== "bk";
   const op = $("#selOp"); if (op && op.innerHTML) op.hidden = SEL.tab !== "op";
+  const gi = $("#selGi"); if (gi) gi.hidden = SEL.tab !== "gi" || !gi.innerHTML;
 }
 document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { SEL.tab = b.dataset.rt; radarTabs(); }));
 let SEL_T = 0;
@@ -5874,6 +5948,7 @@ function renderSel() {
   const when = e => `${DAYS_SHORT[e.date.getUTCDay()]} ${dstr(e.date)}${e.time ? " · " + esc(e.time) : ""}`;
   try { renderSelBk(past ? [] : ents, cfg, when); } catch (x) { console.warn(x); }
   try { renderSelOp(past ? [] : ents, cfg, when); } catch (x) { console.warn(x); }
+  try { renderSelGi(past ? [] : ents, cfg, when); } catch (x) { console.warn(x); }
   aBox.innerHTML = `<div class="selhead"><h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${selDaysTxt()}</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button type="button" class="apcard" data-id="${esc(e.id)}">
       <span class="aptag"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
