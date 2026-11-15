@@ -134,3 +134,6 @@ Modello (tools/basket/modello.py): ritmo (possessi) × attacco/difesa ogni 100 p
 + vantaggio del campo; scarto e totale Normali con σ robuste per campionato (scarto 11,5-13,3, totale 16,0-18,3). Tolte 609 partite (All-Star,
 interrotte, a tavolino, senza quarti). Log-loss contro la media del campionato (verifica / holdout): vittoria −0,067 / −0,070, totale −0,030 / −0,029.
 Vittoria calibrata nell'holdout (es. 55% → 59%, 65% → 65%, 75% → 75%, 84% → 83%). Contro le quote reali: non ancora (le quote si accumulano da oggi).
+- 15/11 basket: soglia All-Star resa relativa (metà della mediana delle partite delle squadre nella stagione): con 15 fisso la stagione in corso
+  dei campionati europei restava fuori dal modello. Adeguamento più rapido del livello del campionato (0,995/0,99/0,98): NON passa nel periodo
+  scelta (resta 0,998). Scarto reale − previsto sul totale 2026-27: ACB +7,6, ITA +2,6, LNB +1,9, BBL +1,4, EL +1,3, EC −1,8, NBA −1,4.

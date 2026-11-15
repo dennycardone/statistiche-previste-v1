@@ -31,8 +31,14 @@ fin = lambda g: g["st"] in ("FT", "AOT") and g["sh"] and g["sa"] and g["sh"][5] 
 cnt = collections.Counter()
 for g in G:
     if fin(g): cnt[(g["lg"], g["s"], g["h"])] += 1; cnt[(g["lg"], g["s"], g["a"])] += 1
+# soglia All-Star: metà della mediana delle partite giocate dalle squadre in quella stagione (max 15). Con 15 fisso la stagione in corso
+# dei campionati europei (6-9 partite a squadra) restava fuori dal modello (15/11/2026)
+_med = collections.defaultdict(list)
+for (l_, s_, t_), n_ in cnt.items(): _med[(l_, s_)].append(n_)
+THR = {k: min(15, max(2, sorted(v)[len(v) // 2] / 2)) for k, v in _med.items()}
 def valid(g):   # come nel test: fuori All-Star, interrotte, a tavolino
-    return fin(g) and g["sh"][5] + g["sa"][5] >= 100 and g["sh"][0] is not None and cnt[(g["lg"], g["s"], g["h"])] >= 15 and cnt[(g["lg"], g["s"], g["a"])] >= 15
+    t = THR.get((g["lg"], g["s"]), 15)
+    return fin(g) and g["sh"][5] + g["sa"][5] >= 100 and g["sh"][0] is not None and cnt[(g["lg"], g["s"], g["h"])] >= t and cnt[(g["lg"], g["s"], g["a"])] >= t
 def poss(x): return None if not x or None in (x[1], x[7], x[12], x[5]) else x[1] - x[7] + x[12] + 0.44 * x[5]
 
 T = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "off": 0.0, "dfn": 0.0, "g": 0})

@@ -36,12 +36,15 @@ cnt = collections.Counter()
 for r in rows: cnt[(r[0], r[11], r[3])] += 1; cnt[(r[0], r[11], r[4])] += 1
 def season_of(r): return r[11]
 n0 = len(rows)
-rows = [r for r in rows if cnt[(r[0], season_of(r), r[3])] >= 15 and cnt[(r[0], season_of(r), r[4])] >= 15 and r[5] + r[6] >= 100 and r[10][0] is not None]
+_med = collections.defaultdict(list)
+for (l_, s_, t_), n_ in cnt.items(): _med[(l_, s_)].append(n_)
+THR = {k: min(15, max(2, sorted(v)[len(v) // 2] / 2)) for k, v in _med.items()}   # 15/11: soglia relativa (stagione in corso compresa)
+rows = [r for r in rows if cnt[(r[0], season_of(r), r[3])] >= THR[(r[0], season_of(r))] and cnt[(r[0], season_of(r), r[4])] >= THR[(r[0], season_of(r))] and r[5] + r[6] >= 100 and r[10][0] is not None]
 print("tolte (All-Star, interrotte, tavolino)", n0 - len(rows))
 rows.sort(key=lambda r: (r[1], r[2]))
 print("partite finite", len(rows), dict(collections.Counter(r[0] for r in rows)))
 
-def run(DP, K, KEEP=None):
+def run(DP, K, KEEP=None, LD=0.998):
     T = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "off": 0.0, "dfn": 0.0})
     L = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "rtg": 0.0, "hca": 0.0})
     out = []
@@ -63,7 +66,7 @@ def run(DP, K, KEEP=None):
         for t, pf, pa_ in ((T[(lg, h)], ph, pa), (T[(lg, a)], pa, ph)):
             for k in ("n", "pace", "off", "dfn"): t[k] *= DP
             t["n"] += 1; t["pace"] += P; t["off"] += 100 * pf / P; t["dfn"] += 100 * pa_ / P
-        for k in ("n", "pace", "rtg", "hca"): Lg[k] *= 0.998
+        for k in ("n", "pace", "rtg", "hca"): Lg[k] *= LD
         Lg["n"] += 1; Lg["pace"] += P; Lg["rtg"] += 100 * (ph + pa) / 2 / P; Lg["hca"] += ph - pa
     return out
 
@@ -96,15 +99,22 @@ def sigmas(out):
     return S
 
 best = None
-for DP in (0.93, 0.95, 0.96, 0.97, 0.98):
-    for K in (1.0, 3.0, 6.0):
-        o = run(DP, K); sg = sigmas(o); R = evaluate(o, sg)
-        sc = sum(np.mean(v) for (p, mk), v in R["m"].items() if p == "scelta")
-        print(f"DP {DP} K {K}: log-loss somma nel periodo scelta {sc:.4f}")
-        if best is None or sc < best[0]: best = (sc, DP, K)
-_, DP, K = best
-o = run(DP, K); sg = sigmas(o); R = evaluate(o, sg, "all")
-res = {"parametri": {"DP": DP, "K": K}, "sigma": sg, "periodi": {}}
+for DP in (0.95, 0.96, 0.97, 0.98):
+    for K in (3.0, 6.0):
+        for LD in (0.998, 0.995, 0.99, 0.98):   # 15/11: velocità con cui si adegua il livello del campionato (ACB 2026-27 +7,6 punti)
+            o = run(DP, K, LD=LD); sg = sigmas(o); R = evaluate(o, sg)
+            sc = sum(np.mean(v) for (p, mk), v in R["m"].items() if p == "scelta")
+            print(f"DP {DP} K {K} LD {LD}: log-loss somma nel periodo scelta {sc:.4f}")
+            if best is None or sc < best[0]: best = (sc, DP, K, LD)
+_, DP, K, LD = best
+o = run(DP, K, LD=LD); sg = sigmas(o); R = evaluate(o, sg, "all")
+# confronto sul livello: lo stesso modello con l'adeguamento lento di prima (0,998), per verifica e holdout
+o0 = run(DP, K, LD=0.998); R0 = evaluate(o0, sigmas(o0), "m")
+res = {"parametri": {"DP": DP, "K": K, "LD": LD}, "sigma": sg, "periodi": {}, "contro_LD_0998": {}}
+for p in ("verifica", "holdout"):
+    for mk in ("vittoria", "totale", "handicap"):
+        a_, b_ = R["m"].get((p, mk), []), R0["m"].get((p, mk), [])
+        if a_ and b_: res["contro_LD_0998"][f"{p} · {mk}"] = round(float(np.mean(a_) - np.mean(b_)), 5)
 for p in ("scelta", "verifica", "holdout"):
     for mk in ("vittoria", "totale", "handicap"):
         m, r = R["m"].get((p, mk), []), R["rif"].get((p, mk), [])
