@@ -94,7 +94,7 @@ function renderPart() {
   if (!G.length) { box.innerHTML = `<div class="empty">${S.day === t0 ? "Oggi nessuna partita" : "Nessuna partita"} di questi campionati.</div>`; return; }
   const played = G.map(g => reading(g)).filter(R => R && R.R[0].hit != null);
   const sum = played.length ? `<div class="daysum"><span>Vincente giusta in questo giorno</span><b class="${played.filter(R => R.R[0].hit).length / played.length >= 0.5 ? "good" : "bad"}">${Math.round(played.filter(R => R.R[0].hit).length / played.length * 100)}%</b><small>${played.filter(R => R.R[0].hit).length} su ${played.length}</small></div>` : "";
-  box.innerHTML = sum + LG_ORD.filter(lg => G.some(g => g.lg === lg)).map(lg => lgBlock(lg, G.filter(g => g.lg === lg).sort((a, b) => a.d.localeCompare(b.d)))).join("");
+  box.innerHTML = sum + LG_ORD.filter(lg => G.some(g => g.lg === lg)).map(lg => lgBlock(lg, G.filter(g => g.lg === lg).sort((a, b) => a.d.localeCompare(b.d)), false)).join("");   // 15/11: campionati chiusi all'avvio
   box.querySelectorAll(".lghead").forEach(h => h.addEventListener("click", () => { const s = h.parentElement; s.classList.toggle("closed"); h.setAttribute("aria-expanded", String(!s.classList.contains("closed"))); }));
   bindRows(box);
 }
