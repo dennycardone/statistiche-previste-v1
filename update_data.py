@@ -935,6 +935,8 @@ try:
             import shutil as _sh
             _GP = os.path.join(os.path.dirname(OUT), "valori", "giocatori.json")
             if os.path.exists(_GP): _sh.copyfile(_GP, os.path.join(OUT, "giocatori.json"))
+            _BP = os.path.join(os.path.dirname(OUT), "basket_sito", "basket.json")   # 15/11: basket
+            if os.path.exists(_BP): _sh.copyfile(_BP, os.path.join(OUT, "basket.json"))
         except Exception as e_: print("::warning title=Giocatori::" + str(e_)[:150])
         # archivio privato delle correzioni (mai pubblicato, mai sfoltito): serve allo studio Quota 2 / Quota 3 "statistiche + formazioni"
         _HP = os.path.join(OUT, "formazioni_hist.json"); _FH = json.load(open(_HP)) if os.path.exists(_HP) else {}
