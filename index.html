@@ -627,6 +627,7 @@ select{pointer-events:none}
 .rtabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.rtabs .segb{font-size:13.5px;padding:8px 4px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15}.rtabs .segb b{font-family:var(--display);font-stretch:75%;font-size:18px;color:var(--hot);min-height:20px}
 .gword.sm{font-size:16px}.gsay.sm{font-size:13.5px}
 .bdg .bflag{font-size:40px;line-height:1}
+.sportpick{flex:0 0 auto;margin-left:auto}.sportpick select{width:auto;padding:6px 28px 6px 10px;font-size:14px;font-weight:600;background:rgba(255,255,255,.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center/11px;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:10px;-webkit-appearance:none;appearance:none}.sportpick select option{color:var(--ink);background:var(--surface)}
 .tflag{display:inline-block;flex:none;width:18px;font-size:15px;line-height:18px;text-align:center;margin-right:7px;vertical-align:-2px}.tflag.big{display:block;width:auto;font-size:30px;line-height:32px;margin:0 auto 6px}
 .selp2 .mk{margin-left:4px}.gsum{margin:0 0 8px}
 .selp2{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center;font-size:14px}.selp2>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.selp2 .gin{font-size:12.5px;color:var(--ink-2);white-space:nowrap}.selp2 .gin b{font-size:15px;color:var(--ink)}
@@ -906,6 +907,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 <header class="appbar">
   <div class="appbar-in">
     <h1 class="brand"><svg class="pmark" viewBox="0 0 100 100" aria-hidden="true"><rect x="27" y="14" width="15" height="72" rx="4" fill="currentColor"/><circle cx="52" cy="40" r="19" fill="none" stroke="currentColor" stroke-width="15"/><circle cx="52" cy="40" r="6.5" fill="#D4FF3F"/></svg><span class="bname">Prevista</span></h1>
+    <label class="sportpick"><span class="sr">Sport</span><select id="sport"><option value="calcio" selected>⚽ Calcio</option><option value="basket">🏀 Basket</option></select></label>
     <p class="bslog">Guarda la partita <b>prima</b> che si giochi</p>
     <label for="decay" class="modepick" hidden><span class="sr">Statistica richiesta</span>
       <select id="decay">
@@ -5282,6 +5284,7 @@ $("#ritLg").innerHTML = `<option value="all">Tutti i campionati</option>` + LEAG
 document.querySelectorAll(".rtf [data-rw]").forEach(b => b.addEventListener("click", () => { RIT.when = b.dataset.rw; document.querySelectorAll(".rtf [data-rw]").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
 document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.addEventListener("click", () => { const k = b.dataset.sw; if (SIGW.days.has(k)) SIGW.days.delete(k); else SIGW.days.add(k); b.setAttribute("aria-pressed", String(SIGW.days.has(k))); if (SIGV === "gi") renderSigGi(); else renderSignals(); }));
 document.querySelectorAll("#sigView [data-sv]").forEach(b => b.addEventListener("click", () => { SIGV = b.dataset.sv; sigViewApply(); }));
+{ const sp = document.getElementById("sport"); if (sp) sp.addEventListener("change", () => { if (sp.value === "basket") { try { localStorage.setItem("prevista.sport", "basket"); } catch (e) {} location.href = "basket.html"; } }); }   // 15/11/2026: tendina Calcio / Basket
 $("#ritDot").addEventListener("click", () => { RIT.dot = !RIT.dot; $("#ritDot").setAttribute("aria-pressed", String(RIT.dot)); renderRit(); });
 $("#ritGrd").addEventListener("click", () => { RIT.grd = !RIT.grd; $("#ritGrd").setAttribute("aria-pressed", String(RIT.grd)); renderRit(); });
 document.querySelectorAll("#ritVen .segb").forEach(b => b.addEventListener("click", () => { RIT.ven = b.dataset.v; document.querySelectorAll("#ritVen .segb").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderRit(); }));
