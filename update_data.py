@@ -1391,6 +1391,7 @@ if ODDS_FULL or ODDS_NEAR:
              "Home Corners Over/Under": "hcou", "Away Corners Over/Under": "acou", "Total Shots": "sou", "Total ShotOnGoal": "sot", "Fouls. Total": "fou",
              "Corners Asian Handicap": "cah", "Cards Asian Handicap": "kah", "Cards Over/Under": "kou"}
     BOOK_TAG = {"1xBet": "x.", "Pinnacle": "p."}
+    PLX, PLX_EX, PLX_M = collections.Counter(), {}, set()   # 15/11: mercati giocatore di Bet365 visti in questo giro (per la nota)
     def take(e, f):   # quote mediane di una partita
         lg = BY_ID[f["league"]["id"]]; fdd = datetime.date.fromisoformat(f["fixture"]["date"][:10])
         m = pick(lg, fdd, f["teams"]["home"]["name"], f["teams"]["away"]["name"])
@@ -1429,6 +1430,11 @@ if ODDS_FULL or ODDS_NEAR:
                         xacc.setdefault("x.off." + re.sub(r"[^a-z0-9]+", "_", nm.lower()).strip("_") + ":" + val, {})[b["name"]] = o
                     if nm in NICHE and b["name"] in BOOK_TAG:
                         xacc.setdefault(BOOK_TAG[b["name"]] + NICHE[nm] + ":" + val, {})[b["name"]] = o
+                    # 15/11/2026 (Denny, player props): mercati sui GIOCATORI di Bet365 (l'unico book che li passa) per Top 5 e Champions:
+                    # tiri, tiri in porta, falli, ammonito. Arrivano già in queste risposte: nessuna richiesta in più. Solo archivio privato.
+                    if b["name"] == "Bet365" and lg in ("I1", "E0", "SP1", "D1", "F1", "UCL") and re.search(r"player|booked|to be carded", nm, re.I) and not re.search(r"goal|scor|assist", nm, re.I):
+                        xacc.setdefault("b365.pl." + re.sub(r"[^a-z0-9]+", "_", nm.lower()).strip("_") + ":" + val, {})[b["name"]] = o
+                        PLX[nm] += 1; PLX_EX.setdefault(nm, val); PLX_M.add(f"{lg}|{m[1]}|{m[2]}")
                     if nm == "Match Winner": key = "1x2:" + {"Home": "1", "Draw": "X", "Away": "2"}.get(val, "")
                     elif nm == "Goals Over/Under" and val.split(" ")[-1] in ("1.5", "2.5", "3.5"): key = "ou" + val.split(" ")[-1] + ":" + val.split(" ")[0][0]
                     elif nm == "Both Teams Score": key = "gg:" + {"Yes": "S", "No": "N"}.get(val, "")
@@ -1532,6 +1538,7 @@ if ODDS_FULL or ODDS_NEAR:
                         and (OH[k0].get("ultima") or {}).get("ora", "") <= (OH[k1].get("prima") or {}).get("ora", "~"):
                     _merge_old(k1, k0)
         if _moved: print("::notice title=Quote · partite spostate::archivio unito per " + str(len(_moved)) + ": " + "; ".join(_moved[:10]))
+        if globals().get("PLX"): print("::notice title=Quote giocatori Bet365::" + f"{len(PLX_M)} partite in questo giro · " + " | ".join(f"{k}: {n} voci (es. {PLX_EX[k][:40]})" for k, n in PLX.most_common(8)))
         for kk, q in allq.items():
             x = OH.setdefault(kk, {})
             if "prima" not in x: x["prima"] = {"ora": ts, "q": dict(q)}
