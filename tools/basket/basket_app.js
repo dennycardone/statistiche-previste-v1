@@ -57,7 +57,8 @@ const games = () => B.partite.map(g => ({ ...g, day: dayOf(g.d) }));
 const VAL_MIN = 0.03;
 
 /* ---------- viste ---------- */
-function show(v) {
+function show(v, push = true) {   // 15/11/2026: ogni vista entra nella cronologia, così il tasto indietro del telefono resta nel basket
+  if (push && (S.view !== v || v === "match")) { try { history.pushState({ v, game: S.game, mt: S.mt }, ""); } catch (e) {} }
   S.view = v;
   for (const [id, vv] of [["#viewPart", "part"], ["#viewMatch", "match"], ["#viewSel", "radar"], ["#viewSig", "seg"], ["#viewGen", "ten"], ["#viewRit", "dig"]]) $(id).hidden = vv !== v;
   for (const [id, vv] of [["#navStats", "part"], ["#navSel", "radar"], ["#navSig", "seg"], ["#navGen", "ten"], ["#navRit", "dig"]]) $(id).setAttribute("aria-pressed", String(vv === v || (v === "match" && vv === "part")));
@@ -72,14 +73,13 @@ function dayStrip(box, cur, onPick, opts = {}) {
   box.querySelectorAll(".day").forEach(b => b.addEventListener("click", () => onPick(b.dataset.d)));
   const sel = box.querySelector('[aria-selected="true"]'); if (sel) { const r = sel.getBoundingClientRect(), bb = box.getBoundingClientRect(); box.scrollLeft += (r.left + r.width / 2) - (bb.left + bb.width / 2); }
 }
-function rowHTML(g) {
-  const R = reading(g), v = R && R.R[0];
+function rowHTML(g) {   // 15/11/2026 (Denny): in Partite solo il risultato reale, niente previsioni
   const tm = fin(g) ? "Finale" : live(g) ? "In corso" : timeOf(g.d);
-  const end = v ? `<span class="pv${v.hit == null ? (v.p >= 0.7 ? " hi" : "") : v.hit ? " ok" : " ko"}"><small>${esc(v.sh)}</small><b>${Math.round(v.p * 100)}</b></span>` : "";
+  const sc = (x, y) => fin(g) ? `<b>${x}</b>` : "<b></b>";
   return `<button type="button" class="mrow" data-gid="${esc(g.id)}">
-    <span class="tmc"><span class="tm${fin(g) ? " fin" : ""}">${tm}</span>${end}</span>
-    <span class="tt"><span class="${fin(g) && g.sh[5] > g.sa[5] ? "w" : ""}">${logo(g.lg, g.h)}${esc(team(g.lg, g.h)[0])}</span><b>${fin(g) ? g.sh[5] : g.p ? `<small class="prevpt">${Math.round(g.p.eh)}</small>` : ""}</b>
-    <span class="${fin(g) && g.sa[5] > g.sh[5] ? "w" : ""}">${logo(g.lg, g.a)}${esc(team(g.lg, g.a)[0])}</span><b>${fin(g) ? g.sa[5] : g.p ? `<small class="prevpt">${Math.round(g.p.ea)}</small>` : ""}</b></span></button>`;
+    <span class="tmc"><span class="tm${fin(g) ? " fin" : ""}">${tm}</span></span>
+    <span class="tt"><span class="${fin(g) && g.sh[5] > g.sa[5] ? "w" : ""}">${logo(g.lg, g.h)}${esc(team(g.lg, g.h)[0])}</span>${sc(g.sh && g.sh[5])}
+    <span class="${fin(g) && g.sa[5] > g.sh[5] ? "w" : ""}">${logo(g.lg, g.a)}${esc(team(g.lg, g.a)[0])}</span>${sc(g.sa && g.sa[5])}</span></button>`;
 }
 function bindRows(box) { box.querySelectorAll("[data-gid]").forEach(b => b.addEventListener("click", () => openGame(b.dataset.gid))); }
 function openGame(id) { S.game = id; S.mt = "prev"; show("match"); }
@@ -105,46 +105,91 @@ function renderMatch() {
   document.querySelectorAll("#viewMatch .mpane").forEach(p => { p.hidden = p.dataset.mp !== S.mt; });
   $("#seasonTag").textContent = `${B.leghe[g.lg][0]} · ${B.stagioni[g.lg]}`;
   const R = reading(g), ph = posOf(g.lg, g.h), pa = posOf(g.lg, g.a), p = g.p;
-  const head = `<div class="bkhead"><div class="bkt">${logo(g.lg, g.h, 1)}<b>${esc(team(g.lg, g.h)[0])}</b><small>${ph ? `${ph.pos}° · ${ph.w}-${ph.l}` : ""}</small></div>
-    <div class="bkc"><small>${FL[g.lg] || ""} ${esc(B.leghe[g.lg][0])}</small><b class="bksc">${fin(g) ? `${g.sh[5]} – ${g.sa[5]}` : p ? `${Math.round(p.eh)} – ${Math.round(p.ea)}` : "vs"}</b><small>${fin(g) ? "Finale" + ((g.sh[4] || 0) + (g.sa[4] || 0) > 0 ? " d.t.s." : "") : live(g) ? "In corso" : `${dlab(g.day)} · ${timeOf(g.d)}`}</small>${fin(g) || !p ? "" : `<small class="muted">punti previsti</small>`}</div>
-    <div class="bkt">${logo(g.lg, g.a, 1)}<b>${esc(team(g.lg, g.a)[0])}</b><small>${pa ? `${pa.pos}° · ${pa.w}-${pa.l}` : ""}</small></div></div>`;
-  // Lettura
-  let lett = "";
-  if (p && R) {
-    const row = (lab, h, c, a) => `<tr><td class="num">${h}</td><th>${lab}</th><td class="num">${a}</td></tr>${c != null ? `<tr class="sub"><td colspan="3">${c}</td></tr>` : ""}`;
-    const real = fin(g), h1 = p.h1 || 0.5;
-    lett = `<table class="bkl"><tbody>
-      ${row("Punti", `<b>${real ? g.sh[5] : ""}</b> <small>prev. ${f1(p.eh)}</small>`, `Totale ${real ? `<b>${g.sh[5] + g.sa[5]}</b> · ` : ""}prev. ${f1(R.mt)}`, `<b>${real ? g.sa[5] : ""}</b> <small>prev. ${f1(p.ea)}</small>`)}
-      ${row("1° tempo", real && g.sh[1] != null ? `<b>${g.sh[0] + g.sh[1]}</b> <small>prev. ${f1(p.eh * h1)}</small>` : `<small>prev. ${f1(p.eh * h1)}</small>`, null, real && g.sa[1] != null ? `<b>${g.sa[0] + g.sa[1]}</b> <small>prev. ${f1(p.ea * h1)}</small>` : `<small>prev. ${f1(p.ea * h1)}</small>`)}
-      ${row("Vittoria", `<b>${pc(R.pw)}</b>`, `Scarto previsto ${sg(R.ms)} per ${team(g.lg, R.ms >= 0 ? g.h : g.a)[0]}`, `<b>${pc(1 - R.pw)}</b>`)}
-      ${row("Ritmo", "", `<b>${f1(p.pace)}</b> possessi a squadra${B.ritmo && B.ritmo[g.lg] ? ` · media del campionato ${f1(B.ritmo[g.lg])} (${p.pace >= B.ritmo[g.lg] + 1.5 ? "partita veloce" : p.pace <= B.ritmo[g.lg] - 1.5 ? "partita lenta" : "nella media"})` : ""}`, "")}
-      ${p.rh != null ? row("Rimbalzi", `${real && g.stat && g.stat.h && g.stat.h[6] != null ? `<b>${g.stat.h[6]}</b> ` : ""}<small>prev. ${f1(p.rh)}</small>`, `Totale ${real && g.stat && g.stat.h && g.stat.a && g.stat.h[6] != null && g.stat.a[6] != null ? `<b>${g.stat.h[6] + g.stat.a[6]}</b> · ` : ""}prev. ${f1(p.rh + p.ra)} · ${Math.abs(p.rh - p.ra) < 1 ? "equilibrio a rimbalzo" : `più rimbalzi per ${team(g.lg, p.rh > p.ra ? g.h : g.a)[0]}`}`, `${real && g.stat && g.stat.a && g.stat.a[6] != null ? `<b>${g.stat.a[6]}</b> ` : ""}<small>prev. ${f1(p.ra)}</small>`) : ""}
-      ${p.fh != null ? row("Falli", `${g.fl ? `<b>${g.fl[0]}</b> ` : ""}<small>prev. ${f1(p.fh)}</small>`, `Totale ${g.fl ? `<b>${g.fl[0] + g.fl[1]}</b> · ` : ""}prev. ${f1(p.fh + p.fa)} · ${Math.abs(p.fh - p.fa) < 1 ? "falli in equilibrio" : `più falli per ${team(g.lg, p.fh > p.fa ? g.h : g.a)[0]}`}`, `${g.fl ? `<b>${g.fl[1]}</b> ` : ""}<small>prev. ${f1(p.fa)}</small>`) : g.fl ? row("Falli", g.fl[0], null, g.fl[1]) : ""}
-      ${real && g.stat && g.stat.h && g.stat.a ? row("Assist", g.stat.h[9] ?? "—", null, g.stat.a[9] ?? "—") + row("Triple", `${g.stat.h[2] ?? "—"}/${g.stat.h[3] ?? "—"}`, null, `${g.stat.a[2] ?? "—"}/${g.stat.a[3] ?? "—"}`) + row("Palle perse", g.stat.h[12] ?? "—", null, g.stat.a[12] ?? "—") : ""}
-    </tbody></table>`;
-    const LN = R.LN, lines = R.R.filter(r => r.q);
-    lett += lines.length ? `<div class="card bkq"><h3>Linee dei book · lato della lettura</h3><table class="bkt2"><thead><tr><th></th><th>Prevista</th><th>Quota</th><th>Equa</th><th>Valore</th></tr></thead><tbody>${lines.map(r => `<tr><th>${esc(r.lab)}${r.hit != null ? ` <span class="${r.hit ? "okc" : "koc"}">${r.hit ? "✓" : "✗"}</span>` : ""}</th><td class="num">${pc(r.p)}</td><td class="num"><b>${f2(r.q)}</b><small>${esc(r.bk || "")}</small></td><td class="num">${f2(r.fair)}</td><td class="num ${r.ev >= VAL_MIN ? "vgood" : ""}">${r.ev == null ? "—" : (r.ev >= 0 ? "+" : "−") + Math.round(Math.abs(r.ev) * 100) + "%"}</td></tr>`).join("")}</tbody></table>
-      <p class="small muted">Solo il lato che Prevista dà più probabile; equa = 100 / probabilità; valore = probabilità × quota − 1 (miglior quota tra ${LN.tot ? LN.tot[9] : "i"} book). Il modello è verificato sui risultati, non ancora contro le quote: un valore grande, soprattutto contro Pinnacle, è più spesso un limite del modello che un errore del book. Quote solo informative, 18+.</p></div>`
-      : `<p class="small muted">Linee dei book non ancora disponibili per questa partita (arrivano il giorno prima e il giorno della partita).</p>`;
-  } else lett = `<p class="muted">Previsione non disponibile (poche partite delle squadre nella stagione).</p>`;
-  $("#mhead").innerHTML = head + lett;
+  // Lettura (15/11/2026, Denny: come il calcio, solo i numeri della previsione, niente percentuali né spiegazioni)
+  const ini = t => t.split(/\s+/).filter(w => w.length > 2).map(w => w[0]).join("").slice(0, 3).toUpperCase() || t.slice(0, 3).toUpperCase();
+  const badge = id => { const t = team(g.lg, id); return t[1] ? `<span class="bdg lg"><img src="${esc(t[1])}" alt="" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('lg');this.parentElement.textContent='${esc(ini(t[0])).replace(/'/g, "")}'"></span>` : `<span class="bdg">${esc(ini(t[0]))}</span>`; };
+  const real = fin(g), st = g.stat && g.stat.h && g.stat.a ? g.stat : null, ok = x => x != null && isFinite(x);
+  const nd = `<span class="nd">—</span>`;
+  const rowP = (lab, h, a, t, rh, ra) => {   // con la partita giocata: numero grande = reale, sotto la previsione
+    if (real && ok(rh) && ok(ra)) { const hi = rh > ra ? "h" : rh < ra ? "a" : "";
+      const cell = (rv, pv, top) => `<span class="sx-v pl${top ? " top" : ""}"><b class="rv">${rv}</b>${ok(pv) ? `<small class="pv">prev. ${f1(pv)}</small>` : ""}</span>`;
+      return `<div class="sx-r">${cell(rh, h, hi === "h")}<span class="sx-m"><small>${lab}</small><b>${rh + ra}</b>${ok(t) ? `<small class="pv">prev. ${f1(t)}</small>` : ""}</span>${cell(ra, a, hi === "a")}</div>`; }
+    if (!ok(t)) return "";
+    const hi = ok(h) && ok(a) && Math.abs(h - a) > 0.05 ? (h > a ? "h" : "a") : "";
+    return `<div class="sx-r"><span class="sx-v${hi === "h" ? " top" : ""}">${ok(h) ? f1(h) : nd}</span><span class="sx-m"><small>${lab}</small><b>${f1(t)}</b></span><span class="sx-v${hi === "a" ? " top" : ""}">${ok(a) ? f1(a) : nd}</span></div>`; };
+  const BK = S.bk && !!R && R.R.some(r => r.q);
+  let body = "";
+  if (!p) body = `<p class="bk-none">Previsione non disponibile: poche partite delle squadre nella stagione.</p>`;
+  else if (BK) body = R.R.filter(r => r.q).map(r => `<div class="sx-r"><span class="sx-v pl"><b class="rv">${f2(r.q)}</b><small class="pv">${esc(r.bk || "")}</small></span><span class="sx-m"><small>${esc(r.lab)}</small><b>${f2(r.fair)}</b><small class="pv">quota equa</small></span><span class="sx-v pl${r.ev >= VAL_MIN ? " top" : ""}"><b class="rv${r.ev >= VAL_MIN ? " vgood" : ""}">${r.ev >= 0 ? "+" : ""}${Math.round(r.ev * 100)}%</b><small class="pv">valore</small></span></div>`).join("") + `<p class="sx-fb">Quote solo informative, 18+.</p>`;
+  else {
+    const h1 = p.h1 || 0.5, ms = p.eh - p.ea;
+    body = rowP("Punti", p.eh, p.ea, p.eh + p.ea, real ? g.sh[5] : null, real ? g.sa[5] : null)
+      + rowP("1° tempo", p.eh * h1, p.ea * h1, (p.eh + p.ea) * h1, real && g.sh[1] != null ? g.sh[0] + g.sh[1] : null, real && g.sa[1] != null ? g.sa[0] + g.sa[1] : null)
+      + (() => { if (!real) return `<div class="sx-r"><span class="sx-v${ms > 0 ? " top" : ""}">${ms > 0 ? "+" + f1(ms) : nd}</span><span class="sx-m"><small>Scarto</small><b>${f1(Math.abs(ms))}</b></span><span class="sx-v${ms < 0 ? " top" : ""}">${ms < 0 ? "+" + f1(-ms) : nd}</span></div>`;
+        const d = g.sh[5] - g.sa[5], cell = (rv, pv, top) => `<span class="sx-v pl${top ? " top" : ""}"><b class="rv">${rv > 0 ? "+" + rv : "—"}</b>${pv > 0 ? `<small class="pv">prev. +${f1(pv)}</small>` : ""}</span>`;
+        return `<div class="sx-r">${cell(d, ms, d > 0)}<span class="sx-m"><small>Scarto</small><b>${Math.abs(d)}</b><small class="pv">prev. ${f1(Math.abs(ms))}</small></span>${cell(-d, -ms, d < 0)}</div>`; })()
+      + `<div class="sx-r"><span class="sx-v">${ok(p.pch) ? f1(p.pch) : nd}</span><span class="sx-m"><small>Possessi</small><b>${f1(p.pace)}</b></span><span class="sx-v">${ok(p.pca) ? f1(p.pca) : nd}</span></div>`
+      + rowP("Rimbalzi", p.rh, p.ra, ok(p.rh) ? p.rh + p.ra : null, st ? st.h[6] : null, st ? st.a[6] : null)
+      + rowP("Falli", p.fh, p.fa, ok(p.fh) ? p.fh + p.fa : null, g.fl ? g.fl[0] : null, g.fl ? g.fl[1] : null)
+      + (real && st ? rowP("Assist", null, null, null, st.h[9], st.a[9]) + rowP("Triple", null, null, null, st.h[2], st.a[2]) + rowP("Palle perse", null, null, null, st.h[12], st.a[12]) : "");
+  }
+  const nq = R ? R.R.filter(r => r.q).length : 0;
+  $("#mhead").innerHTML = `<div class="sx-band"><span class="flag" aria-hidden="true">${FL[g.lg] || "🏀"}</span><span class="nm"><small>${esc(B.leghe[g.lg][1])} · ${dlab(g.day)} · ${timeOf(g.d)}</small><b>${esc(B.leghe[g.lg][0])}</b></span></div>
+    <div class="sx">
+      <div class="sx-r sx-h">
+        <span class="sx-t">${badge(g.h)}<b>${esc(team(g.lg, g.h)[0])}</b><small>${ph ? `${ph.pos}° · ${ph.w}-${ph.l}` : "&nbsp;"}</small></span>
+        <span class="sx-m sx-c">${nq ? `<button class="hsw${BK ? " on" : ""}" type="button" id="bkSw" role="switch" aria-checked="${BK}" aria-label="Passa da Modello a Mercato"><span class="hsw-t" aria-hidden="true"><i></i></span><span class="hsw-l">${BK ? "Mercato" : "Modello"}</span></button>` : ""}${real ? `<b class="scr">${g.sh[5]} – ${g.sa[5]}</b><small>${(g.sh[4] || 0) + (g.sa[4] || 0) > 0 ? "Finale d.t.s." : "Finale"}</small>` : live(g) ? `<b>VS</b><small>In corso</small>` : `<b>VS</b><small>${timeOf(g.d)}</small>`}</span>
+        <span class="sx-t">${badge(g.a)}<b>${esc(team(g.lg, g.a)[0])}</b><small>${pa ? `${pa.pos}° · ${pa.w}-${pa.l}` : "&nbsp;"}</small></span>
+      </div>${body}
+    </div>`;
+  const sw = $("#bkSw"); if (sw) sw.addEventListener("click", () => { S.bk = !S.bk; renderMatch(); });
   // Grado
   $("#mgrado").innerHTML = R ? `<h2>Grado</h2><p class="small muted">Quante volte previsioni come questa sono uscite nelle stagioni 2024-25 e 2025-26 (partite che il modello non aveva visto).</p>
     ${R.R.map(r => `<div class="grow"><div><b>${esc(r.lab)}</b><small>${r.book ? "linea del book" : r.k === "totale" ? "linea del modello" : ""}</small></div>${gbadge(r.g)}<div class="num"><b>${r.uscite == null ? "—" : Math.round(r.uscite * 100)}</b> su 100<small>Prevista ${pc(r.p)}</small></div></div>`).join("")}
     <div class="glegend"><span class="gbadge ap">A+</span> 80+ su 100 · <span class="gbadge a">A</span> 72+ · <span class="gbadge b">B</span> 64+ · <span class="gbadge c">C</span> 56+</div>` : `<p class="muted">Grado non disponibile.</p>`;
-  // Precedenti
-  const PR = (B.precedenti[g.id] || []).slice().reverse();
-  $("#mh2h").innerHTML = `<h2>Precedenti</h2>` + (PR.length ? `<table class="bkt2"><tbody>${PR.map(x => `<tr><td class="small">${dlab(x[0])} ${x[0].slice(0, 4)}</td><td>${esc(team(g.lg, x[1])[0])}</td><td class="num"><b>${x[3]} – ${x[4]}</b></td><td>${esc(team(g.lg, x[2])[0])}</td></tr>`).join("")}</tbody></table>` : `<p class="muted">Nessun precedente nell'archivio dal 2019.</p>`);
+  const U = id => (B.ultime[`${g.lg}|${id}`] || []).slice().reverse();
+  const swapSt = r => { const x = r.slice(5); const o = []; for (let i = 0; i < x.length; i += 2) o.push(x[i + 1], x[i]); return o; };
+  // Precedenti (come il calcio): ultime partite delle due squadre (Generale / Casa-Trasferta) e scontri diretti, con le statistiche
+  const STL = (x, o) => { const v = (i, lab) => x[o + i] != null && x[o + i + 1] != null ? `${lab} ${x[o + i]}-${x[o + i + 1]}` : null;
+    return [v(10, "1°T"), v(0, "Rimb"), v(2, "Ass"), v(4, "Tri"), v(6, "PP"), v(8, "Falli")].filter(Boolean).map(t => `<span class="nw">${t}</span>`).join(" · "); };
+  const avgTot = (B.tendenze[g.lg] || {}).media_punti;
+  const hmRow = (d, hId, aId, hp, ap, meHome, stl, res) => `<div class="hm"><span class="dt">${d.slice(8, 10)}/${d.slice(5, 7)}.${d.slice(2, 4)}</span>
+    <span class="tm2"><span class="${meHome === 1 ? "me" : ""}">${esc(team(g.lg, hId)[0])}</span><b>${hp}</b><span class="${meHome === 0 ? "me" : ""}">${esc(team(g.lg, aId)[0])}</span><b>${ap}</b></span>
+    ${res ? `<span class="rb ${res}">${res}</span>` : "<span></span>"}<span class="st">${stl}</span></div>`;
+  const hsum = L => { const n = L.length, w = L.filter(x => x.w).length, ov = L.filter(x => avgTot && x.t > avgTot).length;
+    return `<div class="hsum"><span>V-P <b>${w}-${n - w}</b></span><span>Punti <b>${f1(L.reduce((a, x) => a + x.pf, 0) / (n || 1))}-${f1(L.reduce((a, x) => a + x.pa, 0) / (n || 1))}</b></span>${avgTot ? `<span>Sopra ${lnum(avgTot.toFixed(1))} <b>${ov}/${n}</b></span>` : ""}</div>`; };
+  const block = (title, rows) => { if (!rows.length) return `<section class="card hh"><h3>${title}</h3><p class="small muted">Nessuna partita.</p></section>`;
+    const vis = rows.slice(0, 5).map(r => r.html).join(""), more = rows.slice(5);
+    return `<section class="card hh"><h3>${title}</h3>${hsum(rows)}${vis}${more.length ? `<div class="hmore" hidden>${more.map(r => r.html).join("")}</div><button class="morebtn" type="button" data-l="Mostra altre (${more.length})">Mostra altre (${more.length}) <span class="chv" aria-hidden="true"></span></button>` : ""}</section>`; };
+  const ult = (id, side) => U(id).filter(r => S.hv !== "venue" || r[2] === (side === "h" ? 1 : 0)).map(r => { const w = r[3] > r[4];
+    return { w, pf: r[3], pa: r[4], t: r[3] + r[4], html: hmRow(r[0], r[2] ? id : r[1], r[2] ? r[1] : id, r[2] ? r[3] : r[4], r[2] ? r[4] : r[3], r[2] ? 1 : 0, STL(r, 5) && r[2] ? STL(r, 5) : STL(swapSt(r), 0), w ? "V" : "P") }; });
+  const PRx = (B.precedenti[g.id] || []).slice().reverse().map(x => { const hw = x[1] === g.h ? x[3] > x[4] : x[4] > x[3];
+    return { w: hw, pf: x[1] === g.h ? x[3] : x[4], pa: x[1] === g.h ? x[4] : x[3], t: x[3] + x[4], html: hmRow(x[0], x[1], x[2], x[3], x[4], x[1] === g.h ? 1 : 0, STL(x, 5), hw ? "V" : "P") }; });
+  $("#mh2h").innerHTML = `<div class="seg" role="group" aria-label="Filtro partite"><button type="button" class="segb" data-hv="all" aria-pressed="${S.hv !== "venue"}">Generale</button><button type="button" class="segb" data-hv="venue" aria-pressed="${S.hv === "venue"}">Casa / Trasferta</button></div>
+    <div class="h2hlist">${block(`Ultime partite: ${esc(team(g.lg, g.h)[0])}${S.hv === "venue" ? " in casa" : ""}`, ult(g.h, "h"))}${block(`Ultime partite: ${esc(team(g.lg, g.a)[0])}${S.hv === "venue" ? " in trasferta" : ""}`, ult(g.a, "a"))}${block("Scontri diretti", PRx)}</div>`;
+  $("#mh2h").querySelectorAll("[data-hv]").forEach(b => b.addEventListener("click", () => { S.hv = b.dataset.hv; renderMatch(); }));
+  $("#mh2h").querySelectorAll(".morebtn").forEach(b => b.addEventListener("click", () => { const m = b.previousElementSibling; m.hidden = !m.hidden; b.innerHTML = m.hidden ? `${b.dataset.l} <span class="chv" aria-hidden="true"></span>` : `Mostra meno <span class="chv up" aria-hidden="true"></span>`; }));
   // Classifica
   const C = B.classifica[g.lg] || [];
   $("#mtab").innerHTML = `<h2>Classifica · ${esc(B.leghe[g.lg][0])}</h2><table class="bkt2 cls"><thead><tr><th>#</th><th>Squadra</th><th>G</th><th>V</th><th>P</th><th>Diff.</th></tr></thead><tbody>${C.map((r, i) => `<tr class="${r[0] === g.h || r[0] === g.a ? "hl" : ""}"><td>${i + 1}</td><td>${logo(g.lg, r[0])}${esc(team(g.lg, r[0])[0])}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td><td class="num">${r[3]}</td><td class="num">${sg(r[4] - r[5]).replace(",0", "")}</td></tr>`).join("")}</tbody></table>`;
-  // Rendimento
-  const U = id => (B.ultime[`${g.lg}|${id}`] || []).slice().reverse();
-  const rend = id => { const L = U(id), w = L.filter(r => r[3] > r[4]).length, pf = L.reduce((a, r) => a + r[3], 0) / (L.length || 1), pa_ = L.reduce((a, r) => a + r[4], 0) / (L.length || 1);
-    return `<div class="card"><h3>${logo(g.lg, id)}${esc(team(g.lg, id)[0])}</h3><p class="small">Ultime ${L.length}: <b>${w} vinte</b>, ${L.length - w} perse · punti fatti ${f1(pf)}, subiti ${f1(pa_)}</p>
-      <div class="formrow">${L.map(r => `<span class="fpill ${r[3] > r[4] ? "w" : "l"}" title="${esc(team(g.lg, r[1])[0])}">${r[3] > r[4] ? "V" : "P"}</span>`).join("")}</div>
-      <table class="bkt2"><tbody>${L.map(r => `<tr><td class="small">${dlab(r[0])}</td><td>${r[2] ? "vs" : "@"} ${esc(team(g.lg, r[1])[0])}</td><td class="num"><b class="${r[3] > r[4] ? "okc" : "koc"}">${r[3]} – ${r[4]}</b></td></tr>`).join("")}</tbody></table></div>`; };
-  $("#mrend").innerHTML = rend(g.h) + rend(g.a);
+  // Rendimento (come il calcio): classifica del campionato su una statistica, in casa (squadra di casa) o in trasferta
+  const RK = [["pts", "Punti"], ["h1", "Punti 1° tempo"], ["reb", "Rimbalzi"], ["ast", "Assist"], ["tre", "Triple"], ["pp", "Palle perse"], ["fl", "Falli"]];
+  const RDl = (B.rendimento || {})[g.lg] || {}, ven = S.rv || "home", rk = S.rk || "pts";
+  const has = k => Object.values(RDl).some(t => t[ven] && t[ven][k] && t[ven][k][3]);
+  const rows = Object.entries(RDl).map(([id, t]) => { const c = t[ven] && t[ven][rk]; return c && c[3] ? { id, f: c[0] / c[3], a: c[1] / c[3], w: c[2], n: c[3] } : null; }).filter(Boolean).sort((x, y) => y.f - x.f);
+  const lgF = rows.reduce((a, r) => a + r.f * r.n, 0) / (rows.reduce((a, r) => a + r.n, 0) || 1), lgA = rows.reduce((a, r) => a + r.a * r.n, 0) / (rows.reduce((a, r) => a + r.n, 0) || 1);
+  const me = ven === "home" ? g.h : g.a;
+  $("#mrend").innerHTML = `<section class="card mtrend"><h2>Rendimento · ${esc(B.leghe[g.lg][0])}</h2>
+    <div class="mtrc"><label for="bkMk" class="sr">Statistica</label><select id="bkMk">${RK.filter(([k]) => has(k) || k === rk).map(([k, n]) => `<option value="${k}"${k === rk ? " selected" : ""}>${n}</option>`).join("")}</select>
+      <div class="seg" role="group" aria-label="Sede"><button type="button" class="segb" data-rv="home" aria-pressed="${ven === "home"}">Casa</button><button type="button" class="segb" data-rv="away" aria-pressed="${ven === "away"}">Trasferta</button></div></div>
+    <div class="stdleg"><span class="mh">${esc(team(g.lg, g.h)[0])}${ven === "home" ? " · gioca in casa" : ""}</span><span class="ma">${esc(team(g.lg, g.a)[0])}${ven === "away" ? " · gioca in trasferta" : ""}</span></div>
+    ${rows.length ? `<div class="lt lt2" role="table"><div class="lth" role="row"><span>#</span><span>Squadra</span><span>Fatti<em>media</em></span><span>Subiti<em>media</em></span><span>Sfide vinte<em>vinte/partite</em></span></div>
+      ${rows.map((r, i) => `<div class="ltr${r.id === g.h ? " mh" : r.id === g.a ? " ma" : ""}" role="row"><span class="ltk">${i + 1}</span><span class="ltt">${esc(team(g.lg, r.id)[0])}</span><span class="lta"><b>${f1(r.f)}</b></span><span class="lta">${f1(r.a)}</span><span class="ltf"><b>${r.w}</b>/${r.n}</span></div>`).join("")}
+      <div class="ltr ltavg" role="row"><span class="ltk"></span><span class="ltt">Campionato</span><span class="lta">${f1(lgF)}</span><span class="lta">${f1(lgA)}</span><span class="ltf">50%</span></div></div>` : `<p class="small muted">Dato non disponibile per questo campionato nella stagione in corso.</p>`}
+    <p class="small muted">Partite ${ven === "home" ? "in casa" : "in trasferta"} della stagione in corso. Sfide vinte: partite in cui la squadra ne ha fatti più dell'avversaria.</p></section>`;
+  $("#bkMk").addEventListener("change", e => { S.rk = e.target.value; renderMatch(); });
+  $("#mrend").querySelectorAll("[data-rv]").forEach(b => b.addEventListener("click", () => { S.rv = b.dataset.rv; renderMatch(); }));
+  void me;
   renderGio(g);
 }
 /* ---------- Giocatori (15/11/2026): probabilità con la binomiale negativa, stessi parametri dell'harness (B.giocatori.gpar) ---------- */
@@ -289,7 +334,7 @@ function wire() {
   $("#navSig").addEventListener("click", () => show("seg"));
   $("#navGen").addEventListener("click", () => show("ten"));
   $("#navRit").addEventListener("click", () => show("dig"));
-  $("#back").addEventListener("click", () => show("part"));
+  $("#back").addEventListener("click", () => { if (history.state && history.state.v === "match") history.back(); else show("part"); });
   document.querySelectorAll("#viewMatch .mtab").forEach(b => b.addEventListener("click", () => { S.mt = b.dataset.mt; renderMatch(); }));
   document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { S.rt = b.dataset.rt; renderRadar(); }));
   document.querySelectorAll("#sigWhen [data-sw]").forEach(b => b.addEventListener("click", () => { const k = b.dataset.sw; if (S.sw.has(k)) S.sw.delete(k); else S.sw.add(k); renderSeg(); }));
@@ -304,6 +349,8 @@ function wire() {
     B = await fetch("data/basket.json?v=" + v, { cache: "no-cache" }).then(r => r.json());
   } catch (e) { $("#boot").innerHTML = `<p class="muted">Dati del basket non disponibili in questo momento.</p>`; return; }
   try { localStorage.setItem("prevista.sport", "basket"); } catch (e) {}
+  try { history.replaceState({ v: "part" }, ""); } catch (e) {}
+  addEventListener("popstate", ev => { const st = ev.state || { v: "part" }; if (st.game) S.game = st.game; if (st.mt) S.mt = st.mt; show(st.v || "part", false); });
   $("#boot").hidden = true; $("#stamp").textContent = `Aggiornato ${B.agg.slice(8, 10)}/${B.agg.slice(5, 7)} ${B.agg.slice(11)} UTC`;
-  show("part");
+  show("part", false);
 })();

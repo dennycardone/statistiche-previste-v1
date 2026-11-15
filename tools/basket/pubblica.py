@@ -197,6 +197,19 @@ for g in G:
     PART.append({"id": g["id"], "lg": g["lg"], "d": g["d"], "st": g["st"], "h": g["h"], "a": g["a"], "sh": g["sh"] if fin(g) else None, "sa": g["sa"] if fin(g) else None, "p": p,
                  "stat": g["stat"] if fin(g) else None, "fl": fouls_of(g) if fin(g) else None})
 # classifiche, ultime partite, precedenti, tendenze, serie aperte (stagione in corso, solo partite valide)
+# 15/11/2026 (Denny: Precedenti e Rendimento come il calcio): statistiche della partita dal lato della squadra
+# [rimbalzi fatti, subiti, assist f, s, triple f, s, palle perse f, s, falli f, s, 1° tempo f, s] (None se mancano)
+def gstats(g, home):
+    S = g["stat"] or {}; a, b = (S.get("h"), S.get("a")) if home else (S.get("a"), S.get("h")); f = fouls_of(g)
+    if f and not home: f = (f[1], f[0])
+    out = []
+    for i in (6, 9, 2, 12):
+        out += [a[i] if a else None, b[i] if b else None]
+    out += [f[0], f[1]] if f else [None, None]
+    sh, sa = (g["sh"], g["sa"]) if home else (g["sa"], g["sh"])
+    out += [sh[0] + sh[1], sa[0] + sa[1]] if sh[1] is not None and sa[1] is not None else [None, None]
+    return out
+REND = {}
 CLA, ULT, TEN, SER = {}, collections.defaultdict(list), {}, {}
 for lg, s in cur.items():
     rows = collections.defaultdict(lambda: [0, 0, 0, 0, 0])
@@ -205,6 +218,14 @@ for lg, s in cur.items():
         ph, pa = g["sh"][5], g["sa"][5]
         for t, pf, pa_, w in ((g["h"], ph, pa, ph > pa), (g["a"], pa, ph, pa > ph)):
             r = rows[t]; r[0] += 1; r[1] += w; r[2] += 1 - w; r[3] += pf; r[4] += pa_
+    RD = collections.defaultdict(lambda: {"home": collections.defaultdict(lambda: [0, 0, 0, 0]), "away": collections.defaultdict(lambda: [0, 0, 0, 0])})
+    for g in gs:
+        for t, home in ((g["h"], 1), (g["a"], 0)):
+            st = gstats(g, home); pf, pa = (g["sh"][5], g["sa"][5]) if home else (g["sa"][5], g["sh"][5])
+            for k, (x, y) in (("pts", (pf, pa)), ("reb", st[0:2]), ("ast", st[2:4]), ("tre", st[4:6]), ("pp", st[6:8]), ("fl", st[8:10]), ("h1", st[10:12])):
+                if x is None or y is None: continue
+                c = RD[t]["home" if home else "away"][k]; c[0] += x; c[1] += y; c[2] += x > y; c[3] += 1
+    REND[lg] = {t: {v: dict(d) for v, d in x.items()} for t, x in RD.items()}
     CLA[lg] = sorted([[t] + r for t, r in rows.items()], key=lambda r: (-(r[2] / r[1] if r[1] else 0), -(r[4] - r[5])))
     if gs:
         tot = [g["sh"][5] + g["sa"][5] for g in gs]
@@ -214,7 +235,7 @@ for lg, s in cur.items():
 for g in G:
     if not valid(g) or g["d"][:10] < (now - datetime.timedelta(days=400)).strftime("%Y-%m-%d"): continue
     for t, o, home, pf, pa in ((g["h"], g["a"], 1, g["sh"][5], g["sa"][5]), (g["a"], g["h"], 0, g["sa"][5], g["sh"][5])):
-        ULT[(g["lg"], t)].append([g["d"][:10], o, home, pf, pa])
+        ULT[(g["lg"], t)].append([g["d"][:10], o, home, pf, pa] + gstats(g, home))
 ULTP = {f"{lg}|{t}": v[-10:] for (lg, t), v in ULT.items() if lg in cur}
 for (lg, t), v in ULT.items():
     if lg not in cur or not v: continue
@@ -231,7 +252,7 @@ for (lg, t), v in ULT.items():
 PREC = {}
 for g in PART:
     if g["sh"] is not None: continue
-    pr = [[x["d"][:10], x["h"], x["a"], x["sh"][5], x["sa"][5]] for x in G if valid(x) and x["lg"] == g["lg"] and {x["h"], x["a"]} == {g["h"], g["a"]}]
+    pr = [[x["d"][:10], x["h"], x["a"], x["sh"][5], x["sa"][5]] + gstats(x, 1) for x in G if valid(x) and x["lg"] == g["lg"] and {x["h"], x["a"]} == {g["h"], g["a"]}]
     PREC[g["id"]] = pr[-8:]
 RITMO = {lg: round(L[lg]["pace"] / L[lg]["n"], 1) for lg in NOMI if L[lg]["n"]}
 # 15/11/2026: giocatori (punti, rimbalzi, assist, punti+assist, doppia/tripla doppia) per le partite dei prossimi 3 giorni
@@ -241,7 +262,7 @@ hi3 = (now + datetime.timedelta(days=3)).strftime("%Y-%m-%d")
 GIOC = giocatori_pub.build(files, [g for g in PART if g["sh"] is None and g["d"][:10] <= hi3 and g["st"] == "NS"], PRE, QA, valid, today)
 J = {"agg": now.strftime("%Y-%m-%d %H:%M"), "ritmo": RITMO, "leghe": {k: list(v) for k, v in NOMI.items()}, "stagioni": cur, "sigma": SIG, "grado": GRADO,
      "squadre": {lg: {k: [v, loghi[lg].get(k, "")] for k, v in d.items()} for lg, d in squadre.items()},
-     "partite": PART, "linee": LINEE, "classifica": CLA, "ultime": ULTP, "precedenti": PREC, "tendenze": TEN, "serie": SER, "giocatori": GIOC}
+     "partite": PART, "linee": LINEE, "classifica": CLA, "ultime": ULTP, "precedenti": PREC, "tendenze": TEN, "serie": SER, "giocatori": GIOC, "rendimento": REND}
 json.dump(J, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))
 fut = [g for g in PART if g["sh"] is None]
 chk = []

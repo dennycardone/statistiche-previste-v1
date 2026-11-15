@@ -45,9 +45,12 @@ CSS = """<style>
 .gpl.out>summary{opacity:.45}.gtag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--surface-2);color:var(--ink-2);margin-left:4px;vertical-align:1px}
 .gdet{padding:2px 0 10px}.gdet table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}.gdet td,.gdet th{padding:4px 2px;text-align:right;border-top:1px solid var(--line)}.gdet th{text-align:left;font-weight:600}
 .gdet tr.hi td,.gdet tr.hi th{color:var(--accent)}
+.mtabs{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.mtabs::-webkit-scrollbar{display:none}.mtab{flex:0 0 auto}
+.sx-m small{overflow-wrap:anywhere}
+.sx-c .scr{white-space:nowrap;font-size:clamp(24px,8vw,34px)}.nw{white-space:nowrap}
 .bkstamp{color:var(--ink-3);font-size:11.5px;text-align:center;margin:14px 0}
 </style>"""
-SPORT = """<details class="sportpick" id="sport"><summary aria-label="Sport">🏀 Basket</summary><div class="sportmenu"><a href="./">⚽ Calcio</a><a href="basket.html" aria-current="page">🏀 Basket</a></div></details>"""
+SPORT = """<details class="sportpick" id="sport"><summary aria-label="Sport">🏀 Basket</summary><div class="sportmenu"><a href="./" onclick="location.replace(this.href);return false">⚽ Calcio</a><a href="basket.html" onclick="location.replace(this.href);return false" aria-current="page">🏀 Basket</a></div></details>"""
 BODY = f"""<body>
 {icons}
 <header class="appbar">
@@ -80,10 +83,10 @@ BODY = f"""<body>
       <button type="button" class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
       <button type="button" class="mtab" data-mt="rend" aria-pressed="false">Rendimento</button>
     </div>
-    <div class="mpane" data-mp="prev"><section class="card mhead" id="mhead" aria-label="Lettura della partita"></section></div>
+    <div class="mpane" data-mp="prev"><section class="mhead" id="mhead" aria-label="Lettura della partita"></section></div>
     <div class="mpane" data-mp="sig" hidden><section class="card" id="mgrado"></section></div>
     <div class="mpane" data-mp="gio" hidden><div id="mgio"></div></div>
-    <div class="mpane" data-mp="h2h" hidden><section class="card" id="mh2h"></section></div>
+    <div class="mpane" data-mp="h2h" hidden><div id="mh2h"></div></div>
     <div class="mpane" data-mp="tab" hidden><section class="card" id="mtab"></section></div>
     <div class="mpane" data-mp="rend" hidden><div id="mrend"></div></div>
   </div>
