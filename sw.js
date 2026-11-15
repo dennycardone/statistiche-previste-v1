@@ -2,7 +2,7 @@
    così l'app si apre anche senza connessione con i dati dell'ultima volta. Solo file dello stesso sito.
    19/10/2026: i file dati chiesti con ?v=impronta (data/stato.json) non cambiano mai a parità di impronta: si prendono dalla copia
    salvata se c'è (nessun download); al primo arrivo di una impronta nuova si scaricano e le copie vecchie dello stesso file si tolgono. */
-const CACHE = "prevista-v2";   // 15/11/2026: v2 (pagina basket): i telefoni prendono subito il service worker nuovo
+const CACHE = "prevista-v3";   // 15/11/2026: v2 (pagina basket): i telefoni prendono subito il service worker nuovo
 self.addEventListener("install", e => self.skipWaiting());
 self.addEventListener("activate", e => e.waitUntil(
   caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));
@@ -19,7 +19,9 @@ self.addEventListener("fetch", e => {
     }))).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || new Response("Offline", { status: 503, statusText: "Offline" }))));
     return;
   }
-  e.respondWith(fetch(req).then(res => {
+  // 15/11/2026: le pagine si chiedono sempre fresche al sito (senza la copia di 10 minuti del browser), così una correzione arriva subito
+  const net = req.mode === "navigate" ? fetch(req.url, { cache: "no-cache", credentials: "same-origin" }).then(r => r.redirected ? fetch(req) : r) : fetch(req);
+  e.respondWith(net.then(res => {
     if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {}); }
     return res;
   }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || (req.mode === "navigate" && !/basket\.html$/.test(url.pathname) ? caches.match("index.html", { ignoreSearch: true }) : undefined))

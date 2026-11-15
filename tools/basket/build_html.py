@@ -12,8 +12,6 @@ icons = H[H.index('<svg width="0" height="0"'):H.index("</defs></svg>") + len("<
 brand = re.search(r'<h1 class="brand">.*?</h1>', H, re.S).group(0)
 CSS = """<style>
 /* Basket (15/11/2026) */
-.sportpick{flex:0 0 auto;margin-left:auto}.sportpick select{width:auto;padding:6px 28px 6px 10px;font-size:14px;font-weight:600;background:rgba(255,255,255,.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center/11px;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:10px;-webkit-appearance:none;appearance:none}
-.sportpick select option{color:var(--ink);background:var(--surface)}
 .prevpt{color:var(--ink-3);font-weight:600;font-size:12px}
 .bkhead{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:14px 10px;text-align:center}
 .bkt{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}.bkt b{font-size:14px;line-height:1.2}.bkt small{color:var(--ink-2);font-size:12px}
@@ -42,7 +40,7 @@ CSS = """<style>
 .fpill.w{background:#2e8b57;color:#fff}.fpill.l{background:#7a2e3a;color:#fff}
 .bkstamp{color:var(--ink-3);font-size:11.5px;text-align:center;margin:14px 0}
 </style>"""
-SPORT = """<label class="sportpick"><span class="sr">Sport</span><select id="sport" autocomplete="off" onchange="if(this.value!=='basket'){try{localStorage.setItem('prevista.sport',this.value)}catch(e){}location.assign(new window.URL('./?s='+Date.now(),location.href).href)}"><option value="calcio">⚽ Calcio</option><option value="basket" selected>🏀 Basket</option></select></label><script data-sport>addEventListener("pageshow",function(){var s=document.getElementById("sport");if(s)s.value="basket"});</script>"""
+SPORT = """<details class="sportpick" id="sport"><summary aria-label="Sport">🏀 Basket</summary><div class="sportmenu"><a href="./">⚽ Calcio</a><a href="basket.html" aria-current="page">🏀 Basket</a></div></details>"""
 BODY = f"""<body>
 {icons}
 <header class="appbar">
