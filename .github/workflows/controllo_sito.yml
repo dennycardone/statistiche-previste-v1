@@ -14,7 +14,7 @@ jobs:
         run: |
           U=$(gh api repos/${GITHUB_REPOSITORY}/pages --jq .html_url); U=${U%/}/
           for f in "" basket.html sw.js data/basket.json; do
-            code=$(curl -s -o out.txt -w '%{http_code} %{size_download} %{url_effective}' -L "${U}${f}?t=$(date +%s)")
+            code=$(curl -s -o out.txt -w '%{http_code} %{size_download}' -L "${U}${f}?t=$(date +%s)")
             t=$(grep -o '<title>[^<]*' out.txt | head -1 | sed 's/<title>//'); c=$(grep -o 'prevista-v[0-9]*' out.txt | head -1)
             echo "::notice title=${f:-index}::${code#* } · http ${code%% *} · ${t}${c}"
           done
