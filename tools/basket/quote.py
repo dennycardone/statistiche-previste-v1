@@ -11,9 +11,16 @@ LEGHE = {12: "NBA", 120: "EL", 194: "EC", 52: "ITA", 117: "ACB", 40: "BBL", 2: "
 KEEP = re.compile(r"^(Home/Away|3Way Result|Asian Handicap|Over/Under|Asian Handicap First Half|Over/Under 1st Half|1st Half 3Way Result|Home/Away \(1st Half\))$|Team Total (Goals|Points) ?\((Including OT|1st Half)\)", re.I)
 used = 0
 def get(p, **q):
-    global used; used += 1
-    req = urllib.request.Request(BASE + p + "?" + urllib.parse.urlencode(q), headers={"x-apisports-key": KEY})
-    with urllib.request.urlopen(req, timeout=60) as r: return json.loads(r.read().decode())
+    global used
+    import time
+    for t in range(6):   # 300 richieste al minuto in tutto (anche l'archivio): se si supera, si aspetta e si riprova
+        used += 1
+        req = urllib.request.Request(BASE + p + "?" + urllib.parse.urlencode(q), headers={"x-apisports-key": KEY})
+        with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
+        if d.get("errors") and "rateLimit" in json.dumps(d["errors"]): time.sleep(15 + 10 * t); continue
+        time.sleep(0.25)
+        return d
+    return d
 A = json.load(open(FN)) if os.path.exists(FN) else {"partite": {}}
 now = datetime.datetime.now(datetime.timezone.utc); nows = now.strftime("%Y-%m-%dT%H:%M")
 games, errs = [], []

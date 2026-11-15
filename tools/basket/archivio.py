@@ -32,6 +32,7 @@ def get(p, **q):
                 if rem is not None: left = int(rem)
                 d = json.loads(r.read().decode())
             if d.get("errors") and "rateLimit" in json.dumps(d["errors"]): time.sleep(20); continue
+            time.sleep(0.15)   # resta sotto 300 al minuto e lascia spazio alle quote
             return d
         except Exception as e:
             if t == 3: raise
