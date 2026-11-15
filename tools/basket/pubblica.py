@@ -6,6 +6,7 @@ classifiche, ultime partite, precedenti, tendenze dei campionati e serie aperte 
 Uso: python tools/basket/pubblica.py ARCHIVIO_DIR QUOTE.json USCITA.json"""
 import json, glob, os, sys, math, collections, datetime, re
 DIR, QF, OUT = (sys.argv[1:4] + ["basket", "quote_basket.json", "basket.json"][len(sys.argv) - 1:])[:3]
+FDIR = sys.argv[4] if len(sys.argv) > 4 else None   # 15/11/2026: archivio falli (ramo basket-falli: ESPN per NBA, sito Eurolega per EL/EC)
 DP, K = 0.97, 6.0
 SCELTA, VERIFICA = "2024-06-30", "2025-06-30"
 NOMI = {"NBA": ("NBA", "USA"), "EL": ("Eurolega", "Europa"), "EC": ("Eurocup", "Europa"), "ITA": ("Serie A", "Italia"), "ACB": ("Liga ACB", "Spagna"),
@@ -63,12 +64,29 @@ def poss_game(g):
         m_ = (qh + qa) / 2
         if not (70 < 100 * g["sh"][5] / qh < 160 and 70 < 100 * g["sa"][5] / qa < 160) or abs(qh - qa) / m_ > 0.12: return None, None
     return qh, qa
+# falli di squadra attesi (informativi, Lettura; test tools/basket/test_falli.py: falli totali z −22 verifica, −14 holdout, 7/7 campionati):
+# falli commessi = media di (falli che la squadra commette di solito, falli che l'avversaria subisce di solito), media mobile DP 0,90, K 0,5 partite,
+# ± metà della differenza casa/trasferta del campionato. Solo se entrambe le squadre hanno falli negli ultimi 45 giorni (API-Basketball non li passa più
+# dall'8/1/2026: restano NBA, Eurolega ed Eurocup dalle fonti gratuite).
+EXTF = {}
+if FDIR and os.path.isdir(FDIR):
+    for fn in glob.glob(os.path.join(FDIR, "*.json")):
+        try:
+            for gid_, v in json.load(open(fn))["partite"].items():
+                if v["h"][0] is not None and v["a"][0] is not None: EXTF[gid_] = (v["h"][0], v["a"][0])
+        except Exception: pass
+FT = collections.defaultdict(lambda: [0.0, 0.0, 0.0, None]); LF = collections.defaultdict(lambda: [0.0, 0.0, 0.0])
+def fouls_of(g):
+    if g["id"] in EXTF: return EXTF[g["id"]]
+    S = g["stat"] or {}
+    if S.get("h") and S.get("a") and S["h"][13] is not None and S["a"][13] is not None and S["h"][13] > 5 and S["a"][13] > 5: return (S["h"][13], S["a"][13])
+    return None
 # rimbalzi attesi (informativi, Lettura): rimbalzi presi e concessi ogni 100 possessi (media mobile DP, ristretti con K partite verso il campionato)
 RB = collections.defaultdict(lambda: [0.0, 0.0, 0.0]); LRB = collections.defaultdict(lambda: [0.0, 0.0])
 
 T = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "off": 0.0, "dfn": 0.0, "pts": 0.0, "g": 0})
 L = collections.defaultdict(lambda: {"n": 0.0, "pace": 0.0, "rtg": 0.0, "hca": 0.0, "h1": 0.0, "h1n": 0.0})
-def predict(lg, h, a):
+def predict(lg, h, a, day=None):
     Lg = L[lg]
     if Lg["n"] < 30: return None
     lp, lr, hca = Lg["pace"] / Lg["n"], Lg["rtg"] / Lg["n"], Lg["hca"] / Lg["n"]
@@ -85,13 +103,18 @@ def predict(lg, h, a):
         lrate = lr_[1] / lr_[0]
         def g_(t, i): x = RB[(lg, t)]; return (x[i] + K * lrate) / (x[0] + K)
         out["rh"] = round(pace * (g_(h, 1) + g_(a, 2)) / 2 / 100, 1); out["ra"] = round(pace * (g_(a, 1) + g_(h, 2)) / 2 / 100, 1)
+    lf_ = LF[lg]; fh_, fa_ = FT[(lg, h)], FT[(lg, a)]
+    if lf_[0] > 30 and fh_[0] >= 3 and fa_[0] >= 3 and day and all(x[3] and (datetime.date.fromisoformat(day) - datetime.date.fromisoformat(x[3])).days <= 45 for x in (fh_, fa_)):
+        lfm, lhd = lf_[1] / lf_[0], lf_[2] / lf_[0]
+        def f_(x, i): return (x[i] + 0.5 * lfm) / (x[0] + 0.5)
+        out["fh"] = round((f_(fh_, 1) + f_(fa_, 2)) / 2 + lhd / 2, 1); out["fa"] = round((f_(fa_, 1) + f_(fh_, 2)) / 2 - lhd / 2, 1)
     return out
 hist = []   # (lega, data, previsione, punti casa, punti ospite) per σ e Grado
 PRE = {}
 for g in G:
     lg = g["lg"]
     if g["d"][:10] >= (now - datetime.timedelta(days=10)).strftime("%Y-%m-%d") or not fin(g):
-        p = predict(lg, g["h"], g["a"])
+        p = predict(lg, g["h"], g["a"], g["d"][:10])
         if p: PRE[g["id"]] = p
     if not valid(g): continue
     p = predict(lg, g["h"], g["a"])
@@ -103,6 +126,11 @@ for g in G:
         for t, f_, a_ in ((g["h"], S["h"][6], S["a"][6]), (g["a"], S["a"][6], S["h"][6])):
             x = RB[(lg, t)]; x[0] = x[0] * DP + 1; x[1] = x[1] * DP + 100 * f_ / P; x[2] = x[2] * DP + 100 * a_ / P
         x = LRB[lg]; x[0] = x[0] * 0.998 + 2; x[1] = x[1] * 0.998 + 100 * (S["h"][6] + S["a"][6]) / P
+    f = fouls_of(g)
+    if f:
+        for t, fc, fd in ((g["h"], f[0], f[1]), (g["a"], f[1], f[0])):
+            x = FT[(lg, t)]; x[0] = x[0] * 0.9 + 1; x[1] = x[1] * 0.9 + fc; x[2] = x[2] * 0.9 + fd; x[3] = g["d"][:10]
+        x = LF[lg]; x[0] = x[0] * 0.998 + 1; x[1] = x[1] * 0.998 + (f[0] + f[1]) / 2; x[2] = x[2] * 0.998 + f[0] - f[1]
     for t, pf, pa_ in ((T[(lg, g["h"])], ph, pa), (T[(lg, g["a"])], pa, ph)):
         for k in ("n", "pace", "off", "dfn", "pts"): t[k] *= DP
         t["n"] += 1; t["pace"] += P; t["off"] += 100 * pf / P; t["dfn"] += 100 * pa_ / P; t["pts"] += pf; t["g"] += 1
@@ -167,7 +195,7 @@ for g in G:
     p = PRE.get(g["id"])
     if not p and not fin(g): continue
     PART.append({"id": g["id"], "lg": g["lg"], "d": g["d"], "st": g["st"], "h": g["h"], "a": g["a"], "sh": g["sh"] if fin(g) else None, "sa": g["sa"] if fin(g) else None, "p": p,
-                 "stat": g["stat"] if fin(g) else None})
+                 "stat": g["stat"] if fin(g) else None, "fl": fouls_of(g) if fin(g) else None})
 # classifiche, ultime partite, precedenti, tendenze, serie aperte (stagione in corso, solo partite valide)
 CLA, ULT, TEN, SER = {}, collections.defaultdict(list), {}, {}
 for lg, s in cur.items():

@@ -160,3 +160,14 @@ Giocatori (287.773 giocatori-partita, ≥15 minuti attesi, quintetto noto come n
 - Doppia doppia con voci indipendenti calibrata (holdout 5,9% prevista, 5,3% uscita); legarle ai minuti peggiora. Tripla doppia 0,26% / 0,29%.
 - Senza quintetto ufficiale (API-Basketball non lo passa prima della partita): minuti medi + assenze = chi mancava l'ultima partita (passa su punti e assist, rimbalzi solo verifica).
   Costo di non sapere il quintetto: log-loss +0,020 sui punti (quanto il salto dalla media semplice al modello A).
+
+## 15/11/2026 · Basket: possessi, giocatori online, falli di squadra
+- Possessi (test_possessi.py): formato nuovo ricostruito (tiri da 2 + da 3, rimbalzi offensivi stimati) + statistiche rotte scartate (70-160 punti/100 possessi,
+  possessi delle due squadre entro il 12%). Errore sul totale in verifica 15,03 → 14,41; guadagno in Serie A ed Eurocup (dati rotti), NBA/EL invariati, LNB/BBL di poco peggio.
+  Adottato come correzione di dati (OK di Denny). Preseason NBA: toglierla peggiora (verifica z +3,3, holdout z +2,4) → resta.
+- Giocatori online (giocatori_pub.py): versione automatica; distribuzioni sulle soglie fisse: punti e P+A NB φ 3, rimbalzi e assist NB2 r 13 (coda bassa
+  0,16/0,14 invece di 0,15/0,10); doppia/tripla doppia ricalibrate (verifica 6,56%/6,54%, holdout 6,0%/5,3%). "Player Runs" di Betano = rimbalzi (corr 0,96, scarto 0,6).
+  Segnali giocatori: 72-80% (equa ≥ 1,25) o con quota del book. NBA: primo dei 2 realizzatori non quotato con ≥4 compagni quotati → "non quotato" (non verificabile sull'harness).
+- Falli di squadra (test_falli.py, falli API-Basketball fino a gennaio 2026): modello (DP 0,90, K 0,5) contro media del campionato: falli totali verifica z −22,
+  holdout z −14, chi ne fa di più z −13 / −7, 7/7 campionati in tutti. Informativi nella Lettura (nessun mercato nel feed). Dati correnti solo NBA (ESPN) ed
+  EL/EC (sito Eurolega; falli identici ad API-Basketball 110/111; rimbalzi offensivi contati diversamente, non usati). Archivio: ramo basket-falli, basket_falli.yml.
