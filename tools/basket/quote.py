@@ -16,12 +16,16 @@ def get(p, **q):
     with urllib.request.urlopen(req, timeout=60) as r: return json.loads(r.read().decode())
 A = json.load(open(FN)) if os.path.exists(FN) else {"partite": {}}
 now = datetime.datetime.now(datetime.timezone.utc); nows = now.strftime("%Y-%m-%dT%H:%M")
-games = []
-for k in (0, 1):
-    d = (now + datetime.timedelta(days=k)).strftime("%Y-%m-%d")
-    for g in get("games", date=d).get("response") or []:
-        lid = (g.get("league") or {}).get("id")
-        if lid in LEGHE and (g.get("status") or {}).get("short") == "NS": games.append((g, LEGHE[lid]))
+games, errs = [], []
+SEAS = {12: "2026-2027", 120: "2026", 194: "2026", 52: "2026-2027", 117: "2026-2027", 40: "2026-2027", 2: "2026-2027"}   # stagioni in corso
+for lid, cod in LEGHE.items():   # 15/11: games?date da solo non restituisce nulla, serve campionato + stagione
+    for k in (0, 1):
+        d = (now + datetime.timedelta(days=k)).strftime("%Y-%m-%d")
+        r = get("games", league=lid, season=SEAS[lid], date=d, timezone="UTC")
+        if r.get("errors"): errs.append(f"{cod} {json.dumps(r['errors'])[:80]}")
+        for g in r.get("response") or []:
+            if (g.get("status") or {}).get("short") == "NS": games.append((g, cod))
+if errs: print("::warning title=Basket · quote::" + "; ".join(errs)[:500])
 n_new = n_upd = 0
 for g, cod in games:
     if used >= MAXR: break
