@@ -137,3 +137,26 @@ Vittoria calibrata nell'holdout (es. 55% → 59%, 65% → 65%, 75% → 75%, 84% 
 - 15/11 basket: soglia All-Star resa relativa (metà della mediana delle partite delle squadre nella stagione): con 15 fisso la stagione in corso
   dei campionati europei restava fuori dal modello. Adeguamento più rapido del livello del campionato (0,995/0,99/0,98): NON passa nel periodo
   scelta (resta 0,998). Scarto reale − previsto sul totale 2026-27: ACB +7,6, ITA +2,6, LNB +1,9, BBL +1,4, EL +1,3, EC −1,8, NBA −1,4.
+
+## 15/11/2026 · Basket: ricognizione giocatori e Lettura arricchita (tools/basket/test_lettura.py, test_giocatori.py, sonda_props.py)
+Archivio: statistiche di squadra e giocatori già scaricate per tutte le partite (90-100% per stagione; BBL e LNB 2019-20 senza squadre). Backfill: 0 richieste.
+Giocatori (API): minuti, punti, tiri da 2, da 3, liberi, rimbalzi totali, assist. Niente falli, recuperi, stoppate, palle perse, rimbalzi off/dif.
+Squadre (API): dall'8/1/2026 il formato è cambiato: tiri dal campo = solo da 2, rimbalzi offensivi/difensivi e falli = vuoti (prima c'erano).
+  Effetto: dal gennaio 2026 i possessi del modello usano il ripiego (punti / rendimento). Da sistemare (possessi con tiri da 2 + da 3 e rimbalzi offensivi stimati).
+NBA: la preseason sta nello stesso file della stagione; nei test esclusa (bk_lib.NBA_START). Nel modello pubblicato è ancora dentro.
+Quote (feed API-Basketball): moltissimi mercati di 1° tempo e quarti (O/U, handicap, 1X2, totali di squadra); nessun mercato rimbalzi di squadra.
+  Giocatori: solo NBA, "Player Points Milestones" (2 book) e "Player Points and Assists" (1); niente rimbalzi, assist, doppia doppia. Eurolega: nessuno.
+Lettura (19.868 partite):
+- Riposo: NBA back-to-back −2,2 punti di scarto (scelta); migliora la verifica (z −3,2) ma in holdout peggiora → non adottato. In Europa il back-to-back quasi non esiste (18 casi).
+- Chiavi tattiche: solo la quota rimbalzi (e % rimbalzi offensivi) è legata allo scarto oltre attacco/difesa (corr. 0,02 / 0,06 / 0,07). Correzione dello scarto:
+  verifica z −1,8 (6/7), holdout z −2,4 (6/7) → non abbastanza in verifica, in osservazione. Assist, tiro da 3, liberi, falli, palle perse: niente.
+- 1° tempo con la quota propria della squadra: verifica z −4,8 ma 3/7 campionati, holdout z −2,9 5/7 → non adottato. 1° quarto: niente.
+- Rimbalzi totali e chi ne prende di più: il modello di squadra batte nettamente la media del campionato (z −15, 7/7 in verifica e holdout), ma i book del feed non li quotano: solo informazione.
+Giocatori (287.773 giocatori-partita, ≥15 minuti attesi, quintetto noto come nel calcio):
+- A batte la media semplice della stagione (log-loss −0,02, z −10/−17). φ: punti 2,5, rimbalzi 1,6, assist 1,6.
+- B (α punti 0,5, rimbalzi 1,25, assist 0,75): punti e assist passano (verifica z −2,5 / −3,6, holdout z −10,6 / −10,0, maggioranza dei campionati); rimbalzi no (verifica z −1,5).
+- Assenze (β punti 0,2, rimbalzi 0,2, assist 0,4): passano su tutte e tre. Grezzo: se manca uno dei primi 2 della squadra, i titolari presenti fanno +1,0 punti, +0,3 rimbalzi, +0,3 assist sopra B.
+- Calibrazione buona sui punti; rimbalzi e assist sopravvalutati nelle probabilità basse (0,15 prevista, 0,10 uscita): φ da legare alla media.
+- Doppia doppia con voci indipendenti calibrata (holdout 5,9% prevista, 5,3% uscita); legarle ai minuti peggiora. Tripla doppia 0,26% / 0,29%.
+- Senza quintetto ufficiale (API-Basketball non lo passa prima della partita): minuti medi + assenze = chi mancava l'ultima partita (passa su punti e assist, rimbalzi solo verifica).
+  Costo di non sapere il quintetto: log-loss +0,020 sui punti (quanto il salto dalla media semplice al modello A).
