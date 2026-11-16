@@ -22,7 +22,7 @@ for f in FILES:
 HALF = {}
 for fn in glob.glob("tempi/*.json"):
     HALF.update(json.load(open(fn)))
-lim = (datetime.date.today() - datetime.timedelta(days=60)).isoformat()   # l'archivio quote parte dal 9/10/2026
+lim = os.environ.get("ESITI_DA") or (datetime.date.today() - datetime.timedelta(days=60)).isoformat()   # l'archivio quote parte dal 9/10/2026 (ESITI_DA: verifiche sul campo)
 bylg = collections.defaultdict(list)
 for fid, v in AP.items():
     if v[9] in ("FT", "AET", "PEN"): bylg[v[1]].append((fid, v))
@@ -42,6 +42,7 @@ for lg, L in bylg.items():
         e = {}
         H, A = v[7], v[8]
         if H and A and H[4] is not None and A[4] is not None: e["y"] = [int(H[4]), int(A[4])]
+        if H and A and None not in (H[0], H[1], H[2], A[0], A[1], A[2]): e["tot"] = [[H[2], H[0], H[1]], [A[2], A[0], A[1]]]   # corner, tiri, tiri in porta a 90'
         t = HALF.get(fid)
         if t and t[3] and t[4]:
             for i, k in enumerate(("c1", "s1", "st1")):

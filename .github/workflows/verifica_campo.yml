@@ -1,0 +1,29 @@
+name: Verifica sul campo (modifiche del 15/10, solo numeri aggregati)
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  verifica:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: dati-${{ github.run_id }}
+          restore-keys: dati-
+      - name: Dati pubblicati e statistiche per tempo
+        run: |
+          mkdir -p pub tempi && git fetch -q --depth 1 origin pages
+          for f in bundle bundle_storico extra tiri_area fuorigioco tempi; do git show FETCH_HEAD:data/$f.json > pub/$f.json; done
+          git fetch -q --depth 1 origin tempi && git archive FETCH_HEAD | tar -x -C tempi
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: node --max-old-space-size=6000 tools/verifica_15ott.js . 2026-10-15
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy scipy pandas
+      - run: ESITI_DA=2024-07-01 python3 tools/esiti_extra.py
+      - run: python3 tools/verifica_15ott.py
