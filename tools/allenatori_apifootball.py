@@ -80,10 +80,9 @@ def same(a, b):   # 16/11: API-Football ha lo stesso allenatore con id e grafie 
     return False
 PUB, n_ch = {}, 0
 for tid, L in BY.items():
-    L.sort(); j = len(L) - 1
-    while j > 0 and same(L[j - 1], L[-1]): j -= 1
-    if j == 0: continue   # sempre lo stesso allenatore nella finestra
-    n_ch += 1; e = {"c": L[-1][2], "da": L[j][0], "n": len(L) - j, "prev": L[j - 1][2]}
+    L.sort(); j = next(i for i, x in enumerate(L) if same(x, L[-1]))   # prima partita dell'allenatore attuale nella finestra
+    if j == 0: continue   # c'era già all'inizio: nessun cambio (un vice in panchina per una squalifica non conta, es. Juventus 18 e 25/10)
+    n_ch += 1; e = {"c": L[-1][2], "da": L[j][0], "n": sum(1 for x in L[j:] if same(x, L[-1])), "prev": L[j - 1][2]}
     for lg, nm in TEAMS.get(tid, []): PUB.setdefault(lg, {})[nm] = e
 json.dump({"agg": NOW.strftime("%Y-%m-%dT%H:%M"), "squadre": PUB}, open(os.path.join(OUT, "allenatori.json"), "w"), ensure_ascii=False, separators=(",", ":"))
 print(f"::notice title=Calcio · allenatori::richieste {used} · partite con allenatore {len(ST['fx'])} (senza formazione {len(ST['nolu'])}) · squadre {len(BY)}/{len(TEAMS)} · cambi negli ultimi 150 giorni {n_ch}")
