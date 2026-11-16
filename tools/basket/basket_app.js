@@ -48,12 +48,11 @@ function reading0(g) {
   // 16/11/2026: statistiche di squadra (chi ne fa di più: almeno 1 in più, il pari perde) e possessi sopra/sotto la media del campionato
   const SX = B.sigx || {}, sr = fin(g) && g.stat && g.stat.h && g.stat.a ? g.stat : null;
   const XS = [["reb", "rimbalzi", p.rh != null ? [p.rh, p.ra] : null, sr ? [sr.h[6], sr.a[6]] : null], ["ast", "assist", p.ast, sr ? [sr.h[9], sr.a[9]] : null],
-    ["tri", "triple", p.tri, sr ? [sr.h[2], sr.a[2]] : null], ["pp", "palle perse", p.pp, sr ? [sr.h[12], sr.a[12]] : null], ["fl", "falli", p.fh != null ? [p.fh, p.fa] : null, g.fl || null]];
+    ["tri", "triple", p.tri, sr ? [sr.h[2], sr.a[2]] : null], ["fl", "falli", p.fh != null ? [p.fh, p.fa] : null, g.fl || null]];
   for (const [k, nm, e, rv] of XS) { const sx = SX[k] && SX[k][g.lg]; if (!e || !sx) continue;
     const md = e[0] - e[1], ph = 1 - Phi((0.5 - md) / sx), pa = Phi((-0.5 - md) / sx), home = ph >= pa;
     out.R.push({ k, x: true, nm, lab: `Più ${nm}: ${team(g.lg, home ? g.h : g.a)[0]}`, sh: home ? "1" : "2", p: home ? ph : pa, ph, pa, prev: e, hit: rv && rv[0] != null && rv[1] != null ? (home ? rv[0] > rv[1] : rv[1] > rv[0]) : null }); }
-  if (SX.pos && SX.pos[g.lg] && p.lp) { const po = 1 - Phi((p.lp - p.pace) / SX.pos[g.lg]), ov = po >= 0.5;
-    out.R.push({ k: "pos", x: true, nm: "possessi", lab: `Possessi ${ov ? "sopra" : "sotto"} ${lnum(p.lp.toFixed(1))}`, sh: ov ? "Sopra" : "Sotto", L: p.lp, p: ov ? po : 1 - po, hit: null }); }
+  // 16/11 (Denny): possessi e palle perse solo nella Lettura (righe del ritmo e delle palle perse), non in Grado, Radar, Segnali, Tendenze, Digiuni
   for (const r of out.R) { r.ev = r.q ? r.p * r.q - 1 : null; r.fair = 1 / r.p; const gr = gradeOf(r.k, r.p); r.uscite = gr.u; r.n = gr.n; r.g = gr.g; }
   return out;
 }
@@ -79,7 +78,7 @@ function show(v, push = true) {   // 15/11/2026: ogni vista entra nella cronolog
 }
 function dayStrip(box, cur, onPick, opts = {}) {
   const t0 = todayIso(), G = games(), set = new Set(G.map(g => g.day)); set.add(t0);
-  const days = [...set].filter(d => !opts.future || d >= t0).sort();
+  const days = [...set].filter(d => (!opts.future || d >= t0) && (!opts.back || d >= addDays(t0, -opts.back))).sort();
   box.innerHTML = days.map(d => { const n = G.filter(g => g.day === d).length;
     return `<button type="button" class="day${d < t0 ? " past" : ""}" role="tab" data-d="${d}" aria-selected="${d === cur}"><b>${d === t0 ? "Oggi" : DAYS[new Date(d + "T12:00:00Z").getUTCDay()]}</b><span>${d.slice(8)}.${d.slice(5, 7)}</span><small>${n ? n + " partite" : "—"}</small></button>`; }).join("");
   box.querySelectorAll(".day").forEach(b => b.addEventListener("click", () => onPick(b.dataset.d)));
@@ -282,25 +281,35 @@ function playerEntries(G) {   // per Segnali e Mercato: righe giocatore di tutte
   return out;
 }
 /* Radar */
-function radarItems(day) {
-  return games().filter(g => g.day === day && !fin(g) && !live(g)).map(g => ({ g, R: reading(g) })).filter(x => x.R);
+function radarItems(day) {   // 16/11 (Denny): giorno passato = partite giocate con la previsione fatta prima della partita (storico come nel calcio)
+  const past = day < todayIso();
+  return games().filter(g => g.day === day && (past ? fin(g) : !fin(g) && !live(g))).map(g => ({ g, R: reading(g) })).filter(x => x.R);
 }
+const hitMk = r => r.hit == null ? "" : r.hit ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`;
 function itemHTML(g, r, extra) {
-  return `<button type="button" class="selrow" data-gid="${esc(g.id)}"><span class="selt"><b>${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}</b><small>${FL[g.lg] || ""} ${esc(B.leghe[g.lg][0])} · ${timeOf(g.d)}</small></span>
+  return `<button type="button" class="selrow" data-gid="${esc(g.id)}"><span class="selt"><b>${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}${fin(g) ? ` <small class="muted">${g.sh[5]}-${g.sa[5]}</small>` : ""}</b><small>${FL[g.lg] || ""} ${esc(B.leghe[g.lg][0])} · ${timeOf(g.d)}</small></span>
     <span class="selp"><span>${esc(r.lab)}</span>${r.q ? `<small>@${f2(r.q)}</small>` : ""}${gbadge(r.g)}</span><span class="selv">${extra}</span></button>`;
 }
 function renderRadar() {
-  const t0 = todayIso(); if (!S.rday || S.rday < t0) S.rday = t0;
-  dayStrip($("#rdays"), S.rday, d => { S.rday = d; renderRadar(); }, { future: true });
-  const I = radarItems(S.rday);
+  const t0 = todayIso(); if (!S.rday || S.rday < addDays(t0, -7)) S.rday = t0;
+  dayStrip($("#rdays"), S.rday, d => { S.rday = d; renderRadar(); }, { back: 7 });
+  const past = S.rday < t0, I = radarItems(S.rday);
   const gr = I.flatMap(({ g, R }) => R.R.filter(r => r.g).map(r => ({ g, r }))).sort((a, b) => b.r.uscite - a.r.uscite);
   const mk = I.flatMap(({ g, R }) => R.R.filter(r => r.q && r.ev >= VAL_MIN).map(r => ({ g, r }))).sort((a, b) => b.r.ev - a.r.ev);
-  const mkp = playerEntries(games().filter(g => g.day === S.rday && !fin(g) && !live(g))).filter(x => x.o.q && x.o.p >= 0.5 && x.o.ev >= VAL_MIN).sort((a, b) => b.o.ev - a.o.ev);
-  const op = I.flatMap(({ g, R }) => R.R.filter(r => r.q && r.ev > 0 && r.g && r.g !== "C").map(r => ({ g, r }))).sort((a, b) => b.r.ev - a.r.ev);
+  const mkp = past ? [] : playerEntries(games().filter(g => g.day === S.rday && !fin(g) && !live(g))).filter(x => x.o.q && x.o.p >= 0.5 && x.o.ev >= VAL_MIN).sort((a, b) => b.o.ev - a.o.ev);
+  const op = past ? [] : I.flatMap(({ g, R }) => R.R.filter(r => r.q && r.ev > 0 && r.g && r.g !== "C").map(r => ({ g, r }))).sort((a, b) => b.r.ev - a.r.ev);
+  if (past) mk.length = 0;
   $("#rtA").textContent = gr.length || ""; $("#rtB").textContent = (mk.length + mkp.length) || ""; $("#rtO").textContent = op.length || "";
   document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.rt === S.rt)));
   const box = $("#selOut");
-  if (S.rt === "gr") box.innerHTML = `<div class="selhead"><h2>Grado</h2><span class="small muted">${dlab(S.rday)}</span></div>` + (gr.length ? gr.map(({ g, r }) => itemHTML(g, r, `<b>${Math.round(r.uscite * 100)}</b><small>su 100</small>`)).join("") : `<p class="muted">Nessuna previsione con grado per questo giorno.</p>`);
+  let gsum = "";
+  if (past) {   // riepilogo del giorno come nel calcio: previsioni con esito, quante uscite, quante attese in media
+    const sm = (X, lab) => { const D = X.filter(x => x.r.hit != null); if (!D.length) return `<b>${lab}</b>: nessuna con esito`;
+      const k = D.filter(x => x.r.hit).length; return `<b>${lab}</b>: ${D.length} · uscite <b>${k}</b> (${pc(k / D.length)}) · attese in media ${pc(D.reduce((a, x) => a + x.r.uscite, 0) / D.length)}`; };
+    gsum = `<div class="bkieri gsum"><p>${sm(gr, `Previsioni con grado · ${dlab(S.rday).toLowerCase()}`)}</p><p>${sm(gr.filter(x => x.r.g === "A+" || x.r.g === "A"), "Grado A+ e A")}</p><p class="bkric">Previsioni fatte con i soli dati precedenti a ogni partita.</p></div>`;
+  }
+  if (S.rt === "gr") box.innerHTML = `<div class="selhead"><h2>Grado</h2><span class="small muted">${dlab(S.rday)}</span></div>` + gsum + (gr.length ? gr.map(({ g, r }) => itemHTML(g, r, `<b>${Math.round(r.uscite * 100)}</b><small>su 100${past ? " " + hitMk(r) : ""}</small>`)).join("") : `<p class="muted">Nessuna previsione con grado per questo giorno.</p>`);
+  else if (past) box.innerHTML = `<div class="selhead"><h2>${S.rt === "mk" ? "Mercato" : "Operatività"}</h2><span class="small muted">${dlab(S.rday)}</span></div><p class="muted">Per i giorni passati c'è lo storico del Grado; ${S.rt === "mk" ? "Mercato" : "Operatività"} mostra i giorni da giocare.</p>`;
   else if (S.rt === "mk") box.innerHTML = `<div class="selhead"><h2>Mercato</h2><span class="small muted">${dlab(S.rday)}</span></div><div class="opnote"><b>In verifica.</b> Lato della lettura con valore di almeno il ${Math.round(VAL_MIN * 100)}% sulla miglior quota. Il modello basket è verificato sui risultati ma non ancora contro le quote (archiviate dal 15/11/2026): i valori molto alti vanno letti con prudenza. Le linee arrivano il giorno prima e il giorno della partita.</div>` +
     (mk.length ? mk.map(({ g, r }) => itemHTML(g, r, `<b class="vgood">+${Math.round(r.ev * 100)}%</b><small>vale ${f2(r.fair)}</small>`)).join("") : `<p class="muted">Nessun valore sulle linee disponibili.</p>`) +
     `<div class="selhead" style="margin-top:14px"><h2>Giocatori</h2><span class="small muted">quote dei book nel feed (NBA)</span></div>` +
@@ -310,7 +319,7 @@ function renderRadar() {
   bindRows(box);
 }
 /* Segnali */
-const SQK = [["vittoria", "Vincente"], ["totale", "Totale punti"], ["handicap", "Handicap"], ["pos", "Possessi"], ["reb", "Rimbalzi"], ["fl", "Falli"], ["ast", "Assist"], ["tri", "Triple"], ["pp", "Palle perse"]];
+const SQK = [["vittoria", "Vincente"], ["totale", "Totale punti"], ["handicap", "Handicap"], ["reb", "Rimbalzi"], ["fl", "Falli"], ["ast", "Assist"], ["tri", "Triple"]];
 const GIK = [["pts", "Punti"], ["rbl", "Rimbalzi"], ["ast", "Assist"], ["pa", "Punti + Assist"], ["dd", "Doppia doppia"]];
 function renderSeg() {   // 15/11/2026 (Denny): come i Segnali del calcio
   const t0 = todayIso(), want = new Set([...S.sw].filter(k => k !== "r").map(k => addDays(t0, +k)));
@@ -357,10 +366,7 @@ const TMK = [
   ["reb", "Più rimbalzi dell'avversaria", r => r[5] != null ? r[5] > r[6] : null, "più rimbalzi", "non prende più rimbalzi dell'avversaria"],
   ["ast", "Più assist dell'avversaria", r => r[7] != null ? r[7] > r[8] : null, "più assist", "non fa più assist dell'avversaria"],
   ["tri", "Più triple dell'avversaria", r => r[9] != null ? r[9] > r[10] : null, "più triple", "non segna più triple dell'avversaria"],
-  ["pp", "Meno palle perse dell'avversaria", r => r[11] != null ? r[11] < r[12] : null, "meno palle perse", "non perde meno palloni dell'avversaria"],
-  ["fl", "Più falli dell'avversaria", r => r[13] != null ? r[13] > r[14] : null, "più falli", "non commette più falli dell'avversaria"],
-  ["pos", "Possessi sopra la media del campionato", (r, m, pm) => r[18] != null && pm ? r[18] > pm : null, "possessi sopra la media", "non ha una partita con possessi sopra la media del campionato"],
-  ["pos_s", "Possessi sotto la media del campionato", (r, m, pm) => r[18] != null && pm ? r[18] < pm : null, "possessi sotto la media", "non ha una partita con possessi sotto la media del campionato"]];
+  ["fl", "Più falli dell'avversaria", r => r[13] != null ? r[13] > r[14] : null, "più falli", "non commette più falli dell'avversaria"]];
 const pmOf = lg => { if (!B.ritmo) return null; return B.ritmo[lg] || null; };
 const tGames = (lg, id) => B.ultime[`${lg}|${id}`] || [];
 const nextOf = (lg, id) => games().filter(g => g.lg === lg && !fin(g) && !live(g) && (g.h === id || g.a === id) && g.day >= todayIso()).sort((a, b) => a.d.localeCompare(b.d))[0];
@@ -420,7 +426,7 @@ function renderTen() {
   const mb = $("#genMore"); if (mb) mb.addEventListener("click", () => { G_.more += 10; renderTen(); });
 }
 const D_ = { lg: "all", t: "all", gr: "all", v: "all", w: "all", dot: false, grd: false };
-const DGR = [["all", "Tutte le statistiche"], ["ris", "Risultati", ["vit", "v10", "h1"]], ["pun", "Punti", ["sop", "sot"]], ["reb", "Rimbalzi", ["reb"]], ["ast", "Assist", ["ast"]], ["tri", "Triple", ["tri"]], ["pp", "Palle perse", ["pp"]], ["fl", "Falli", ["fl"]], ["pos", "Possessi", ["pos", "pos_s"]]];
+const DGR = [["all", "Tutte le statistiche"], ["ris", "Risultati", ["vit", "v10", "h1"]], ["pun", "Punti", ["sop", "sot"]], ["reb", "Rimbalzi", ["reb"]], ["ast", "Assist", ["ast"]], ["tri", "Triple", ["tri"]], ["fl", "Falli", ["fl"]]];
 function renderDig() {
   const sl = $("#ritLg"), st = $("#ritTeam"), sg_ = $("#ritGr");
   if (!sl.options.length) {

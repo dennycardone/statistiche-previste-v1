@@ -204,3 +204,7 @@ Palle perse (DP 0,90) totale z −19 / −19, chi ne fa di più z −11 / −10,
 - App: riquadro "Cambio di allenatore" in cima alla Lettura e "nuovo all." in Partite, finché il nuovo allenatore ha meno di 8 partite di campionato con la squadra.
 - Da verificare più avanti con l'harness: le previsioni nelle prime 8 partite dopo un cambio sono davvero peggiori? Se sì, si può provare a pesare di più le partite recenti.
 - 16/11 · Prima partita del nuovo allenatore segnalata in anticipo: (1) /coachs ogni giorno per chi gioca nei prossimi 3 giorni (ogni 6 ore entro 30 ore): un allenatore "in carica" mai visto nelle formazioni = nuovo annunciato; (2) al più tardi la formazione ufficiale (~1 ora prima) porta l'allenatore (hc/ac in formazioni.json) e l'app lo confronta con quello dell'ultima partita. Etichetta "1ª nuovo all." in Partite.
+
+## 16/11/2026 · Basket: storico del Grado, possessi e palle perse solo nella Lettura
+- Radar basket: giorni passati (fino a 7) con le partite giocate, la previsione fatta prima della partita, ✓/✗ e riepilogo del giorno (uscite contro attese), come il calcio. Mercato e Operatività solo per i giorni da giocare.
+- Denny: possessi e palle perse tolti da Grado, Radar, Segnali, Tendenze e Digiuni; restano nella Lettura.
