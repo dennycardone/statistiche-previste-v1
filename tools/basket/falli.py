@@ -60,18 +60,22 @@ for fn in sorted(glob.glob(os.path.join(ARCH, "*.json")), key=lambda f: os.path.
             if not can(): break
             for dd in (d, (datetime.date.fromisoformat(d) - datetime.timedelta(days=1)).isoformat()):   # data UTC contro data USA
                 key = "d" + dd
-                if key in fatte: continue
+                recent = dd >= (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+                if key in fatte and not recent: continue
+                all_done = True
                 J = get(f"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates={dd.replace('-', '')}")
                 if J is None: continue
                 for ev in J.get("events") or []:
                     if not can(): break
                     comp = (ev.get("competitions") or [{}])[0]; cs = comp.get("competitors") or []
-                    if str(ev["id"]) in fatte or len(cs) != 2 or not (((ev.get("status") or {}).get("type") or {}).get("completed")): continue
+                    if (str(ev["id"]) in fatte and not recent) or len(cs) != 2: continue
+                    if not (((ev.get("status") or {}).get("type") or {}).get("completed")): all_done = False; continue
                     h = next((c for c in cs if c.get("homeAway") == "home"), None); a = next((c for c in cs if c.get("homeAway") == "away"), None)
                     try: ph, pa = int(h["score"]), int(a["score"])
                     except Exception: continue
                     gid = match(ph, pa, datetime.date.fromisoformat(dd))
-                    fatte.add(str(ev["id"]))
+                    if gid or not recent: fatte.add(str(ev["id"]))   # 16/11: non abbinata di recente = l'archivio non l'ha ancora finita, si riprova
+                    else: all_done = False
                     if not gid or gid in O["partite"]: continue
                     S = get(f"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event={ev['id']}")
                     if not S: continue
@@ -82,7 +86,7 @@ for fn in sorted(glob.glob(os.path.join(ARCH, "*.json")), key=lambda f: os.path.
                         try: out[side] = [int(st.get("fouls")), int(st.get("offensiveRebounds"))]
                         except Exception: pass
                     if "h" in out and "a" in out: out["src"] = "espn:" + str(ev["id"]); O["partite"][gid] = out
-                if can(): fatte.add(key)
+                if can() and all_done: fatte.add(key)
     else:
         code = ("E" if lg == "EL" else "U") + ss[:4]
         miss = 0; gc = 0
