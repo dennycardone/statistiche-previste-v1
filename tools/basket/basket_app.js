@@ -132,7 +132,7 @@ function renderMatch() {
   const BK = S.bk && !!R && R.R.some(r => r.q);
   let body = "";
   if (!p) body = `<p class="bk-none">Previsione non disponibile: poche partite delle squadre nella stagione.</p>`;
-  else if (BK) body = R.R.filter(r => r.q).map(r => `<div class="sx-r"><span class="sx-v pl"><b class="rv">${f2(r.q)}</b><small class="pv">${esc(r.bk || "")}</small></span><span class="sx-m"><small>${esc(r.lab)}</small><b>${f2(r.fair)}</b><small class="pv">quota equa</small></span><span class="sx-v pl${r.ev >= VAL_MIN ? " top" : ""}"><b class="rv${r.ev >= VAL_MIN ? " vgood" : ""}">${r.ev >= 0 ? "+" : ""}${Math.round(r.ev * 100)}%</b><small class="pv">valore</small></span></div>`).join("") + `<p class="sx-fb">Quote solo informative, 18+.</p>`;
+  else if (BK) body = R.R.filter(r => r.q).map(r => `<div class="sx-r"><span class="sx-v pl"><b class="rv">${f2(r.q)}</b><small class="pv">${esc(r.bk || "")}</small></span><span class="sx-m"><small>${esc(r.lab)}</small><b>${f2(r.fair)}</b><small class="pv">vale</small></span><span class="sx-v pl${r.ev >= VAL_MIN ? " top" : ""}"><b class="rv${r.ev >= VAL_MIN ? " vgood" : ""}">${r.ev >= 0 ? "+" : ""}${Math.round(r.ev * 100)}%</b><small class="pv">valore</small></span></div>`).join("") + `<p class="sx-fb">Quote solo informative, 18+.</p>`;
   else {
     const h1 = p.h1 || 0.5, ms = p.eh - p.ea;
     body = rowP("Punti", p.eh, p.ea, p.eh + p.ea, real ? g.sh[5] : null, real ? g.sa[5] : null)
@@ -160,7 +160,7 @@ function renderMatch() {
   const GW = { "A+": "Ottima", A: "Molto buona", B: "Buona", C: "Discreta" }, GC = { "A+": "c-ap", A: "c-a", B: "c-b", C: "c-c" };
   const gTitle = r => r.k === "vittoria" ? `Vittoria ${r.lab.replace(/^Vince /, "")}` : r.k === "totale" || r.x ? `${r.lab}` : `Handicap ${r.lab}`;
   const gSub = r => r.k === "vittoria" ? `Vincente ${r.sh} (supplementari compresi)` : r.k === "totale" ? `Totale punti · ${r.book ? "linea dei book" : "linea del modello"}` : r.k === "pos" ? "Possessi a squadra · media del campionato" : r.x ? `Chi ne fa di più · previsti ${f1(r.prev[0])} – ${f1(r.prev[1])} (il pari non vale)` : "Handicap · linea dei book";
-  const gWhy = r => `<div class="gnums small"><span class="gck ok"><i>✓</i>Base: ${r.n} previsioni simili nelle stagioni 2024-25 e 2025-26, partite che il modello non aveva visto</span>${r.q ? `<span class="gck ${r.ev >= 0 ? "ok" : "ko"}"><i>${r.ev >= 0 ? "✓" : "✗"}</i>Quota ${f2(r.q)} contro equa ${f2(r.fair)}</span>` : ""}</div>`;
+  const gWhy = r => `<div class="gnums small"><span class="gck ok"><i>✓</i>Base: ${r.n} previsioni simili nelle stagioni 2024-25 e 2025-26, partite che il modello non aveva visto</span>${r.q ? `<span class="gck ${r.ev >= 0 ? "ok" : "ko"}"><i>${r.ev >= 0 ? "✓" : "✗"}</i>Quota ${f2(r.q)} contro vale ${f2(r.fair)}</span>` : ""}</div>`;
   const GR = R ? R.R.filter(r => r.g).sort((x, y) => y.uscite - x.uscite) : [];
   if (!GR.length) $("#mgrado").innerHTML = `<h2>Grado</h2><p class="gintro">Nessuna previsione di questa partita ha un grado: previsioni simili nelle stagioni passate sono uscite meno di 56 volte su 100.</p>`;
   else { const t = GR[0], dots = Math.round(t.uscite * 10);
@@ -271,7 +271,7 @@ function teamPlayersHTML(g, side) {
 }
 function renderGio(g) {
   const G = B.giocatori && B.giocatori.partite[g.id];
-  $("#mgio").innerHTML = G ? `<section class="card"><h2>Giocatori</h2><p class="small muted">Valori attesi oggi (tocca un giocatore per probabilità e quota equa = 100 / probabilità). Media al minuto × minuti medi, ancorata a punti e ritmo che Prevista si aspetta dalla squadra; chi mancava all'ultima partita (o, in NBA, una stella non quotata dai book) è assente e il suo peso passa ai compagni. Verificato sulle stagioni passate (punti e assist z −10, doppia doppia calibrata). In verde le probabilità da 72% in su. Quote solo informative, 18+.</p></section>` + teamPlayersHTML(g, "h") + teamPlayersHTML(g, "a")
+  $("#mgio").innerHTML = G ? `<section class="card"><h2>Giocatori</h2><p class="small muted">Valori attesi oggi (tocca un giocatore per probabilità e quanto vale = 100 / probabilità). Media al minuto × minuti medi, ancorata a punti e ritmo che Prevista si aspetta dalla squadra; chi mancava all'ultima partita (o, in NBA, una stella non quotata dai book) è assente e il suo peso passa ai compagni. Verificato sulle stagioni passate (punti e assist z −10, doppia doppia calibrata). In verde le probabilità da 72% in su. Quote solo informative, 18+.</p></section>` + teamPlayersHTML(g, "h") + teamPlayersHTML(g, "a")
     : `<section class="card"><h2>Giocatori</h2><p class="muted">Giocatori disponibili per le partite dei prossimi 3 giorni con abbastanza storico nel campionato.</p></section>`;
 }
 function playerEntries(G) {   // per Segnali e Mercato: righe giocatore di tutte le partite indicate
@@ -302,9 +302,9 @@ function renderRadar() {
   const box = $("#selOut");
   if (S.rt === "gr") box.innerHTML = `<div class="selhead"><h2>Grado</h2><span class="small muted">${dlab(S.rday)}</span></div>` + (gr.length ? gr.map(({ g, r }) => itemHTML(g, r, `<b>${Math.round(r.uscite * 100)}</b><small>su 100</small>`)).join("") : `<p class="muted">Nessuna previsione con grado per questo giorno.</p>`);
   else if (S.rt === "mk") box.innerHTML = `<div class="selhead"><h2>Mercato</h2><span class="small muted">${dlab(S.rday)}</span></div><div class="opnote"><b>In verifica.</b> Lato della lettura con valore di almeno il ${Math.round(VAL_MIN * 100)}% sulla miglior quota. Il modello basket è verificato sui risultati ma non ancora contro le quote (archiviate dal 15/11/2026): i valori molto alti vanno letti con prudenza. Le linee arrivano il giorno prima e il giorno della partita.</div>` +
-    (mk.length ? mk.map(({ g, r }) => itemHTML(g, r, `<b class="vgood">+${Math.round(r.ev * 100)}%</b><small>equa ${f2(r.fair)}</small>`)).join("") : `<p class="muted">Nessun valore sulle linee disponibili.</p>`) +
+    (mk.length ? mk.map(({ g, r }) => itemHTML(g, r, `<b class="vgood">+${Math.round(r.ev * 100)}%</b><small>vale ${f2(r.fair)}</small>`)).join("") : `<p class="muted">Nessun valore sulle linee disponibili.</p>`) +
     `<div class="selhead" style="margin-top:14px"><h2>Giocatori</h2><span class="small muted">quote dei book nel feed (NBA)</span></div>` +
-    (mkp.length ? mkp.map(({ g, r, o }) => itemHTML(g, { lab: `${r[0]} · ${o.lab}`, q: o.q }, `<b class="vgood">+${Math.round(o.ev * 100)}%</b><small>Prevista ${pc(o.p)} · equa ${f2(o.fair)}</small>`)).join("") : `<p class="muted">Nessun valore sulle quote giocatori disponibili (oggi le passano solo Bet365 e Betano sull'NBA: soglie punti e punti + assist).</p>`);
+    (mkp.length ? mkp.map(({ g, r, o }) => itemHTML(g, { lab: `${r[0]} · ${o.lab}`, q: o.q }, `<b class="vgood">+${Math.round(o.ev * 100)}%</b><small>Prevista ${pc(o.p)} · vale ${f2(o.fair)}</small>`)).join("") : `<p class="muted">Nessun valore sulle quote giocatori disponibili (oggi le passano solo Bet365 e Betano sull'NBA: soglie punti e punti + assist).</p>`);
   else box.innerHTML = `<div class="selhead"><h2>Operatività</h2><span class="small muted">${dlab(S.rday)}</span></div><div class="opnote"><b>In osservazione, senza peso.</b> Le quote basket si archiviano dal 15/11/2026: finché il registro non dice se il valore è reale contro le quote, nessuna puntata. Giocate dal lato della lettura, grado B o meglio, valore positivo.</div>` +
     (op.length ? op.map(({ g, r }) => itemHTML(g, r, `<b>${r.ev >= 0 ? "+" : ""}${Math.round(r.ev * 100)}%</b><small>senza peso</small>`)).join("") : `<p class="muted">Nessuna giocata in osservazione per questo giorno.</p>`);
   bindRows(box);
@@ -327,12 +327,12 @@ function renderSeg() {   // 15/11/2026 (Denny): come i Segnali del calcio
       <span class="d"><span class="stag">${tag}</span><b>${pick}</b>${det ? ` · ${det}` : ""}</span><span class="w">${w}</span></button></div>`;
   let L = [], intro = "";
   if (S.sv === "gi") {
-    intro = "Giocatori: per ogni voce la soglia più alta che Prevista dà tra il 72% e l'80% (quota equa da 1,25 in su), oppure con la quota del book (NBA). Si annulla se il giocatore non entra.";
+    intro = "Giocatori: per ogni voce la soglia più alta che Prevista dà tra il 72% e l'80% (vale da 1,25 in su), oppure con la quota del book (NBA). Si annulla se il giocatore non entra.";
     const best = new Map();
     for (const x of playerEntries(G)) { const kk = x.o.k === "reb" ? "rbl" : x.o.k; if (!on(kk === "td" ? "dd" : kk) || x.o.p < 0.72 || (x.o.p > 0.8 && !x.o.q)) continue;
       const key = `${x.g.id}|${x.r[1]}|${x.o.k}`; const b = best.get(key); if (!b || (x.o.k !== "pa" && x.o.lab.localeCompare(b.o.lab, "it", { numeric: true }) > 0)) best.set(key, x); }
     L = [...best.values()].sort((a, b) => b.o.p - a.o.p).map(({ g, side, r, o }) => { const tag = o.k === "pts" ? "Punti" : o.k === "reb" || o.k === "rbl" ? "Rimbalzi" : o.k === "ast" ? "Assist" : o.k === "pa" ? "Punti + Assist" : o.k === "dd" ? "Doppia doppia" : "Tripla doppia";
-      const pick = o.lab.replace(/^(Punti \+ Assist|Punti|Rimbalzi|Assist) /, ""), det = `equa ${f2(o.fair)}${o.book ? ` · ${esc(o.book)}` : ""}`;
+      const pick = o.lab.replace(/^(Punti \+ Assist|Punti|Rimbalzi|Assist) /, ""), det = `vale ${f2(o.fair)}${o.book ? ` · ${esc(o.book)}` : ""}`;
       return sigHTML(g, `${esc(r[0])} <small class="muted">${esc(team(g.lg, side === "h" ? g.h : g.a)[0])}</small>`, pc(o.p), o.q, tag, esc(pick), det, `${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])} · ${when(g)}`, "gio"); });
   } else {
     intro = "Previsioni dalla parte della lettura che nelle stagioni passate sono uscite almeno 72 volte su 100 (grado A o A+). Vincente supplementari compresi; totale e handicap sulla linea dei book quando c'è; statistiche: chi ne fa di più (il pari non vale); possessi: sopra o sotto la media del campionato.";

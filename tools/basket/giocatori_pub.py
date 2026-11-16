@@ -76,6 +76,7 @@ def build(files, upcoming, pre, quotes, valid, today):
         idx = {}
         sur = collections.Counter(key_book(nm)[0] for nm in out if key_book(nm))
         for nm, q in out.items():
+            t0 = toks(nm); q["_i"] = t0[0][0] if t0 else None
             idx[norm(nm)] = q; k2 = key_book(nm); idx.setdefault(k2, q)
             if k2 and sur[k2[0]] == 1: idx[("cognome", k2[0])] = q   # ripiego: cognome unico nella partita
             t = toks(nm)
@@ -87,13 +88,22 @@ def build(files, upcoming, pre, quotes, valid, today):
         if not p_ or "habh" not in p_: continue
         lg, d = g["lg"], g["d"][:10]
         QP = qplayers(g["id"])
+        # 16/11/2026: prima gli abbinamenti sicuri (nome intero, cognome + iniziale), poi i ripieghi solo sulle voci del book rimaste libere e con
+        # l'iniziale compatibile (le linee di Jaylen Brown, 76ers, finivano anche su M. J. Brown dei Nets col ripiego sul solo cognome)
+        QM, used = {}, set()
+        allp = list(ROST[(lg, g["h"])]) + list(ROST[(lg, g["a"])])
+        for pid in allp:
+            n = NOMI.get(pid, ""); hit = QP.get(norm(n)) or QP.get(key_arch(n))
+            if hit: QM[pid] = hit; used.add(id(hit))
+        for pid in allp:
+            if pid in QM: continue
+            n = NOMI.get(pid, ""); k = key_arch(n); ini = {t[0] for t in toks(n) if t}
+            c = [QP.get(("cognome", k[0])) if k else None] + [QP.get(("ult", t)) for t in toks(n) if len(t) >= 4]
+            for hit in c:
+                if hit and id(hit) not in used and (not hit.get("_i") or hit["_i"] in ini): QM[pid] = hit; used.add(id(hit)); break
         def qof(pid):
-            n = NOMI.get(pid, ""); k = key_arch(n)
-            hit = QP.get(norm(n)) or QP.get(k) or (QP.get(("cognome", k[0])) if k else None)
-            if hit: return hit
-            for t in toks(n):
-                if len(t) >= 4 and ("ult", t) in QP: return QP[("ult", t)]
-            return None
+            q = QM.get(pid)
+            return {k: v for k, v in q.items() if k != "_i"} if q else None
         res = {}
         for side, team in (("h", g["h"]), ("a", g["a"])):
             regs = []

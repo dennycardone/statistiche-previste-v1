@@ -196,3 +196,4 @@ Palle perse (DP 0,90) totale z −19 / −19, chi ne fa di più z −11 / −10,
 - Possessi sopra/sotto la media del campionato (media mobile dei possessi della lega prima della partita) con σ dal periodo scelta.
 - Grado da tabelle storiche (verifica + holdout) per ogni voce, come vittoria/totale. Mercato escluso: nessuna quota nel feed per queste voci.
 - Digiuni/Tendenze: elenco partite e Lettura calcolati una volta (prima andava in crash il telefono con tutti i campionati).
+- 16/11 · Giocatori: abbinamento nomi book ↔ archivio in due passi (prima nome intero o cognome + iniziale, poi i ripieghi solo su voci libere con iniziale compatibile). Caso: le linee di Jaylen Brown (76ers) finivano anche su M. J. Brown (Nets) → "91% contro @1,93" era un errore di abbinamento, non un disaccordo col book. Etichetta "equa" → "vale".
