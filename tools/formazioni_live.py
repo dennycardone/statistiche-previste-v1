@@ -56,6 +56,8 @@ def fetch(ms):
         if got and mm > -1:   # solo prima del fischio (dato noto prima della partita)
             XL["xi"][m["fid"]] = {"t": now().strftime("%Y-%m-%d %H:%M"), "hid": got[0], "aid": got[1], "h": got[2], "a": got[3],
                                   "key": key_of(m), "ko": m["ko"]}
+            try: XL["xi"][m["fid"]]["hc"], XL["xi"][m["fid"]]["ac"] = xi_corr.coaches(R, got[0], got[1])   # 16/11: allenatori della formazione
+            except Exception: pass
             log.append(f"{m['h']}–{m['a']} ({mm:.0f}′ prima): presa")
         else:
             log.append(f"{m['h']}–{m['a']} ({mm:.0f}′ prima): {why if not got else 'iniziata'}"); left.append(m)

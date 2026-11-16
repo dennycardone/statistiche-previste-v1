@@ -2,7 +2,8 @@ name: Allenatori (calcio)
 on:
   schedule:
     - cron: "38 0 * * *"    # 0:38 UTC: subito dopo l'azzeramento delle richieste (nei giorni feriali ne avanzano migliaia)
-    - cron: "33 11 * * *"   # 11:33 UTC: partite della sera prima (solo richieste che avanzano dopo la riserva)
+    - cron: "33 11 * * *"   # 11:33 UTC: partite della sera prima e allenatori annunciati (solo richieste che avanzano dopo la riserva)
+    - cron: "43 17 * * *"   # 17:43 UTC: allenatori annunciati in giornata, per chi gioca entro 30 ore
     - cron: "28 23 * * *"   # 23:28 UTC: richieste avanzate della giornata (nel weekend il giro di notte lascia tutto all'app)
   workflow_dispatch: {}
 concurrency:

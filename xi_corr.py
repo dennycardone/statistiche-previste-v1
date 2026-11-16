@@ -29,6 +29,14 @@ def parse_lineups(resp, home_api, away_api):
     if len(T[hk][1]) < 10 or len(T[ak][1]) < 10: return None, f"titolari {len(T[hk][1])}/{len(T[ak][1])}"
     return (T[hk][0], T[ak][0], T[hk][1], T[ak][1]), None
 
+def coaches(resp, hid, aid):
+    """16/11/2026: allenatori scritti nella formazione ufficiale (nome) → (casa, trasferta); per segnalare la prima di un allenatore nuovo"""
+    C = {(t.get("team") or {}).get("id"): ((t.get("coach") or {}).get("name") or None) for t in resp or []}
+    return C.get(hid), C.get(aid)
+
 def entry(x):
-    """voce pubblicata in formazioni.json: nome, numero, ruolo e (dal 14/11/2026, tab Giocatori) id API-Football del giocatore"""
-    return {"h": [[p[1], p[2], p[3], p[0]] for p in x["h"]], "a": [[p[1], p[2], p[3], p[0]] for p in x["a"]]}
+    """voce pubblicata in formazioni.json: nome, numero, ruolo e (dal 14/11/2026, tab Giocatori) id API-Football del giocatore;
+    dal 16/11/2026 anche gli allenatori della formazione ufficiale (hc, ac)"""
+    e = {"h": [[p[1], p[2], p[3], p[0]] for p in x["h"]], "a": [[p[1], p[2], p[3], p[0]] for p in x["a"]]}
+    if x.get("hc") or x.get("ac"): e["hc"], e["ac"] = x.get("hc"), x.get("ac")
+    return e

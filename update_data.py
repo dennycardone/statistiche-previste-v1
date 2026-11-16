@@ -881,7 +881,7 @@ try:
         _XL = os.path.join(os.path.dirname(OUT), "xi_live", "xi.json")
         if os.path.exists(_XL):
             try:
-                for fid, x in json.load(open(_XL)).get("xi", {}).items(): XI.setdefault(fid, {k: x[k] for k in ("t", "hid", "aid", "h", "a")})
+                for fid, x in json.load(open(_XL)).get("xi", {}).items(): XI.setdefault(fid, {k: x[k] for k in ("t", "hid", "aid", "h", "a", "hc", "ac") if k in x})
             except Exception as e_: print("::warning title=Formazioni ufficiali::ramo xi non letto: " + str(e_)[:120])
         FORMZ, W_XI, _nxi, _DX, _KO, _NEXT = {}, xi_corr.W_XI, 0, [], {}, []   # _DX: esito di ogni tentativo (diagnosi nell'avviso)
         _nowu = datetime.datetime.now(datetime.timezone.utc)
@@ -902,6 +902,8 @@ try:
                         got, why = xi_corr.parse_lineups(R, v[2], v[3])
                         if got:
                             XI[fid] = {"t": _nowu.strftime("%Y-%m-%d %H:%M"), "hid": got[0], "aid": got[1], "h": got[2], "a": got[3]}
+                            try: XI[fid]["hc"], XI[fid]["ac"] = xi_corr.coaches(R, got[0], got[1])   # 16/11: allenatori della formazione ufficiale
+                            except Exception: pass
                             _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): presa")
                         else: _DX.append(f"{v[2]}–{v[3]} ({mins:.0f}′ prima): {why}")
                     except Exception as e_: _DX.append(f"{v[2]}–{v[3]}: errore {str(e_)[:80]}")

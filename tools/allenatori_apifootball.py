@@ -18,7 +18,26 @@ os.makedirs(OUT, exist_ok=True); SP = os.path.join(OUT, "stato.json")
 ST = json.load(open(SP)) if os.path.exists(SP) else {}
 ST = {k: v for k, v in ST.items() if k in ("fx", "nolu")}   # 16/11: via lo stato della prima versione (/coachs)
 ST.setdefault("fx", {}); ST.setdefault("nolu", {})   # fx: id partita → [data, id casa, id all. casa, nome, id trasferta, id all., nome]; nolu: senza formazione (si riprova per 3 giorni)
-NOW = datetime.datetime.now(datetime.timezone.utc); D0 = (NOW - datetime.timedelta(days=150)).strftime("%Y-%m-%d"); TODAY = NOW.strftime("%Y-%m-%d")
+NOW = datetime.datetime.now(datetime.timezone.utc); D0 = (NOW - datetime.timedelta(days=150)).strftime("%Y-%m-%d"); TODAY = NOW.strftime("%Y-%m-%d"); D3 = (NOW + datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+ST.setdefault("coachs", {})   # 16/11: id squadra → [ora controllo, [[id, nome, inizio]...] allenatori "in carica" secondo /coachs]
+SOON = {}   # id squadra → data della prossima partita (prossimi 3 giorni)
+import unicodedata
+TR = str.maketrans({"ß": "ss", "ø": "o", "Ø": "o", "æ": "ae", "Æ": "ae", "ł": "l", "Ł": "l", "đ": "d", "ı": "i"})
+PART = {"de", "da", "do", "dos", "das", "del", "van", "von", "der", "den", "la", "le", "di", "el", "jr"}
+def toks(n): return [t for t in re.sub(r"[^a-z ]", " ", unicodedata.normalize("NFKD", (n or "").translate(TR)).encode("ascii", "ignore").decode().lower()).split() if len(t) >= 3 and t not in PART]
+def lev1(a, b):   # distanza di modifica al massimo 1 ("Aranbarri" / "Arambarri")
+    if abs(len(a) - len(b)) > 1: return False
+    i = 0
+    while i < min(len(a), len(b)) and a[i] == b[i]: i += 1
+    return a[i + 1:] == b[i + 1:] or a[i + 1:] == b[i:] or a[i:] == b[i + 1:]
+def same(a, b):   # 16/11: API-Football ha lo stesso allenatore con id e grafie diverse ("M. Carrick" / "Michael Carrick", "Paiva Renato" / "Renato Paiva")
+    if a[1] == b[1]: return True
+    ta, tb = toks(a[2]), toks(b[2])
+    if not ta or not tb: return False
+    if len(set(ta) & set(tb)) >= 2: return True
+    for x, y in ((ta[-1], tb), (tb[-1], ta)):   # il cognome (ultima parola) di uno dei due compare nell'altro
+        if any(x == t or (len(x) >= 5 and len(t) >= 5 and lev1(x, t)) for t in y): return True
+    return False
 used = 0
 def get(p, **q):
     global used
@@ -41,8 +60,11 @@ if budget > 60:
     todo = []
     for code, lid in LG.items():
         if code not in LOG or lid not in cur or used >= budget - 5: continue
-        for f in get("fixtures", league=lid, season=cur[lid], **{"from": D0, "to": TODAY}).get("response", []):
+        for f in get("fixtures", league=lid, season=cur[lid], **{"from": D0, "to": D3}).get("response", []):
             fid = str(f["fixture"]["id"])
+            if f["fixture"]["status"]["short"] in ("NS", "TBD"):
+                for sd in ("home", "away"): t_ = f["teams"][sd]["id"]; SOON[t_] = min(SOON.get(t_, "9"), f["fixture"]["date"][:16])
+                continue
             if f["fixture"]["status"]["short"] not in ("FT", "AET", "PEN") or fid in ST["fx"]: continue
             if fid in ST["nolu"] and ST["nolu"][fid] < (NOW - datetime.timedelta(days=3)).strftime("%Y-%m-%d"): continue
             todo.append(fid)
@@ -54,6 +76,19 @@ if budget > 60:
             h, a = f["teams"]["home"]["id"], f["teams"]["away"]["id"]; ch, ca = L.get(str(h)) or {}, L.get(str(a)) or {}
             if ch.get("id") or ca.get("id"): ST["fx"][fid] = [f["fixture"]["date"][:10], h, ch.get("id"), ch.get("name"), a, ca.get("id"), ca.get("name")]; ST["nolu"].pop(fid, None)
             else: ST["nolu"].setdefault(fid, f["fixture"]["date"][:10])
+    # 16/11 (Denny: "devo saperlo prima che è la prima di uno nuovo"): per le squadre che giocano nei prossimi 3 giorni, allenatori in carica
+    # secondo /coachs (una richiesta per squadra, al massimo una volta ogni 20 ore). Le date di /coachs non servono: conta solo il nome.
+    for tid in sorted(SOON, key=SOON.get):
+        if used >= budget: break
+        c_ = ST["coachs"].get(str(tid))
+        near = SOON[tid] <= (NOW + datetime.timedelta(hours=30)).strftime("%Y-%m-%dT%H:%M")   # chi gioca entro 30 ore: ricontrollo ogni 6 ore
+        if c_ and (NOW - datetime.datetime.fromisoformat(c_[0] + ":00+00:00")).total_seconds() < (6 if near else 20) * 3600: continue
+        act = []
+        for c in get("coachs", team=tid).get("response") or []:
+            for k in c.get("career") or []:
+                if (k.get("team") or {}).get("id") == tid and not k.get("end"): act.append([c.get("id"), c.get("name"), k.get("start")])
+        ST["coachs"][str(tid)] = [NOW.strftime("%Y-%m-%dT%H:%M"), act]
+ST["coachs"] = {k: v for k, v in ST["coachs"].items() if v[0] >= (NOW - datetime.timedelta(days=7)).strftime("%Y-%m-%d")}
 ST["fx"] = {k: v for k, v in ST["fx"].items() if v[0] >= D0}; ST["nolu"] = {k: v for k, v in ST["nolu"].items() if v >= D0}
 json.dump(ST, open(SP, "w"), ensure_ascii=False, separators=(",", ":"))
 # allenatore per squadra: partite in ordine di data
@@ -61,28 +96,26 @@ BY = {}
 for fid, v in ST["fx"].items():
     for tid, cid, nm in ((v[1], v[2], v[3]), (v[4], v[5], v[6])):
         if cid: BY.setdefault(tid, []).append((v[0], cid, nm))
-import unicodedata
-TR = str.maketrans({"ß": "ss", "ø": "o", "Ø": "o", "æ": "ae", "Æ": "ae", "ł": "l", "Ł": "l", "đ": "d", "ı": "i"})
-PART = {"de", "da", "do", "dos", "das", "del", "van", "von", "der", "den", "la", "le", "di", "el", "jr"}
-def toks(n): return [t for t in re.sub(r"[^a-z ]", " ", unicodedata.normalize("NFKD", (n or "").translate(TR)).encode("ascii", "ignore").decode().lower()).split() if len(t) >= 3 and t not in PART]
-def lev1(a, b):   # distanza di modifica al massimo 1 ("Aranbarri" / "Arambarri")
-    if abs(len(a) - len(b)) > 1: return False
-    i = 0
-    while i < min(len(a), len(b)) and a[i] == b[i]: i += 1
-    return a[i + 1:] == b[i + 1:] or a[i + 1:] == b[i:] or a[i:] == b[i + 1:]
-def same(a, b):   # 16/11: API-Football ha lo stesso allenatore con id e grafie diverse ("M. Carrick" / "Michael Carrick", "Paiva Renato" / "Renato Paiva")
-    if a[1] == b[1]: return True
-    ta, tb = toks(a[2]), toks(b[2])
-    if not ta or not tb: return False
-    if len(set(ta) & set(tb)) >= 2: return True
-    for x, y in ((ta[-1], tb), (tb[-1], ta)):   # il cognome (ultima parola) di uno dei due compare nell'altro
-        if any(x == t or (len(x) >= 5 and len(t) >= 5 and lev1(x, t)) for t in y): return True
-    return False
 PUB, n_ch = {}, 0
 for tid, L in BY.items():
     L.sort(); j = next(i for i, x in enumerate(L) if same(x, L[-1]))   # prima partita dell'allenatore attuale nella finestra
     if j == 0: continue   # c'era già all'inizio: nessun cambio (un vice in panchina per una squalifica non conta, es. Juventus 18 e 25/10)
     n_ch += 1; e = {"c": L[-1][2], "da": L[j][0], "n": sum(1 for x in L[j:] if same(x, L[-1])), "prev": L[j - 1][2]}
     for lg, nm in TEAMS.get(tid, []): PUB.setdefault(lg, {})[nm] = e
-json.dump({"agg": NOW.strftime("%Y-%m-%dT%H:%M"), "squadre": PUB}, open(os.path.join(OUT, "allenatori.json"), "w"), ensure_ascii=False, separators=(",", ":"))
-print(f"::notice title=Calcio · allenatori::richieste {used} · partite con allenatore {len(ST['fx'])} (senza formazione {len(ST['nolu'])}) · squadre {len(BY)}/{len(TEAMS)} · cambi negli ultimi 150 giorni {n_ch}")
+# allenatore dell'ultima partita per ogni squadra (l'app lo confronta con quello della formazione ufficiale, un'ora prima del fischio)
+ULT = {}
+for tid, L in BY.items():
+    for lg, nm in TEAMS.get(tid, []): ULT.setdefault(lg, {})[nm] = L[-1][2]
+# nuovo allenatore annunciato (/coachs) che non ha ancora guidato partite: in carica per /coachs e mai visto nelle formazioni degli ultimi 150 giorni
+ANN, diag = {}, []
+for tid_s, (t0, act) in ST["coachs"].items():
+    tid = int(tid_s); L = BY.get(tid) or []
+    if not L or not act: continue
+    if any(same(("", a_[0], a_[1]), L[-1]) for a_ in act): continue   # l'allenatore dell'ultima partita è ancora in carica: nessun cambio
+    new = [a_ for a_ in act if not any(same(("", a_[0], a_[1]), x) for x in L) and (a_[2] or "") >= D0]   # voci vecchie rimaste "in carica" per errore: fuori
+    if len(new) != 1: diag.append(f"{TEAMS[tid][0][1] if tid in TEAMS else tid}: in carica {[a_[1] for a_ in act]}, ultima partita {L[-1][2]}"); continue
+    e = {"c": new[0][1], "prev": L[-1][2], "visto": t0[:10]}
+    for lg, nm in TEAMS.get(tid, []): ANN.setdefault(lg, {})[nm] = e
+json.dump({"agg": NOW.strftime("%Y-%m-%dT%H:%M"), "squadre": PUB, "ult": ULT, "annunciati": ANN}, open(os.path.join(OUT, "allenatori.json"), "w"), ensure_ascii=False, separators=(",", ":"))
+print(f"::notice title=Calcio · allenatori::richieste {used} · partite con allenatore {len(ST['fx'])} (senza formazione {len(ST['nolu'])}) · squadre {len(BY)}/{len(TEAMS)} · cambi negli ultimi 150 giorni {n_ch} · /coachs controllate {len(ST['coachs'])}, nuovi annunciati {sum(len(v) for v in ANN.values())}: "
+      + "; ".join(f"{nm} ({e['prev']} → {e['c']})" for v in ANN.values() for nm, e in v.items())[:1500] + (" · da guardare: " + "; ".join(diag[:20]) if diag else ""))
