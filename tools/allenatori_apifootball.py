@@ -1,70 +1,72 @@
 """Calcio · cambi di allenatore (16/11/2026, Denny: "voglio che mi venga segnalato quando c'è un cambio di allenatore, cambia il gioco
 della squadra e le statistiche diventano meno attendibili").
-API-Football /coachs?team=ID (una richiesta per squadra): allenatore attuale = voce della carriera su quella squadra senza fine, con
-l'inizio più recente; il precedente = la voce chiusa più recente. Id delle squadre dai loghi pubblicati (data/loghi.json: nome dell'app → logo
-https://media.api-sports.io/football/teams/<id>.png). Prima le squadre che giocano nelle prossime 36 ore (data/prossime.json) non controllate
-da 20 ore, poi le altre dal controllo più vecchio. Solo le richieste che avanzano dopo la riserva dell'app (af_budget), al massimo 800 a giro.
-Uso: python tools/allenatori_apifootball.py LOGHI.json PROSSIME.json CARTELLA (CARTELLA/stato.json = stato privato, CARTELLA/allenatori.json = sito)"""
+16/11: le date di /coachs di API-Football non sono affidabili (Spalletti alla Juve "dal 1/9/2026", è arrivato il 30/10/2025; Thioune al
+Werder "dal 1/10/2026", è arrivato a febbraio 2026). Si usa allora l'allenatore scritto nella formazione di ogni partita giocata
+(fixtures?ids=, 20 partite per richiesta): allenatore attuale = quello dell'ultima partita; cambio = nelle partite degli ultimi 150 giorni
+c'è un allenatore diverso prima della serie attuale. Data = prima partita col nuovo, partite = quante ne ha guidate (tutte le competizioni).
+Partite: fixtures?league&season&from&to per campionato (stagione in corso da leagues?current=true). Id delle squadre dai loghi del sito
+(nome dell'app → https://media.api-sports.io/football/teams/<id>.png). Solo le richieste che avanzano dopo la riserva dell'app (af_budget).
+Uso: python tools/allenatori_apifootball.py LOGHI.json CARTELLA (CARTELLA/stato.json = formazioni lette, CARTELLA/allenatori.json = sito)"""
 import json, os, re, sys, time, datetime, urllib.request, urllib.parse
 sys.path.insert(0, os.path.dirname(__file__)); import af_budget
-LOGHI, PROSS, OUT = sys.argv[1], sys.argv[2], sys.argv[3]
+LOGHI, OUT = sys.argv[1], sys.argv[2]
 KEY = os.environ["APIFOOTBALL_KEY"].strip()
+LG = {"I1": 135, "I2": 136, "E0": 39, "E1": 40, "E2": 41, "E3": 42, "SP1": 140, "SP2": 141, "F1": 61, "F2": 62, "D1": 78, "D2": 79, "N1": 88,
+      "P1": 94, "SC0": 179, "B1": 144, "T1": 203, "G1": 197, "ARG": 128, "AUT": 218, "BRA": 71, "DNK": 119, "IRL": 357, "JPN": 98, "MEX": 262,
+      "NOR": 103, "RUS": 235, "SWE": 113, "SWZ": 207, "USA": 253, "CZE": 345, "UCL": 2, "UEL": 3}
 os.makedirs(OUT, exist_ok=True); SP = os.path.join(OUT, "stato.json")
 ST = json.load(open(SP)) if os.path.exists(SP) else {}
-NOW = datetime.datetime.now(datetime.timezone.utc); NOWS = NOW.strftime("%Y-%m-%dT%H:%M")
+ST = {k: v for k, v in ST.items() if k in ("fx", "nolu")}   # 16/11: via lo stato della prima versione (/coachs)
+ST.setdefault("fx", {}); ST.setdefault("nolu", {})   # fx: id partita → [data, id casa, id all. casa, nome, id trasferta, id all., nome]; nolu: senza formazione (si riprova per 3 giorni)
+NOW = datetime.datetime.now(datetime.timezone.utc); D0 = (NOW - datetime.timedelta(days=150)).strftime("%Y-%m-%d"); TODAY = NOW.strftime("%Y-%m-%d")
+used = 0
 def get(p, **q):
+    global used
+    used += 1
     req = urllib.request.Request("https://v3.football.api-sports.io/" + p + ("?" + urllib.parse.urlencode(q) if q else ""), headers={"x-apisports-key": KEY})
-    with urllib.request.urlopen(req, timeout=60) as r: return json.loads(r.read().decode())
-TEAMS = {}   # id → [(lega, nome dell'app)]
-for lg, m in json.load(open(LOGHI)).items():
+    with urllib.request.urlopen(req, timeout=60) as r: d = json.loads(r.read().decode())
+    time.sleep(0.25); return d
+LOG = json.load(open(LOGHI)); TEAMS = {}   # id squadra → [(lega, nome dell'app)]
+for lg, m in LOG.items():
     for nm, url in m.items():
         mm = re.search(r"/teams/(\d+)\.png", url or "")
-        if mm: TEAMS.setdefault(mm.group(1), []).append((lg, nm))
-soon = set()
-try:
-    for p in json.load(open(PROSS)):
-        for side in ("h", "a"):
-            for tid, L in TEAMS.items():
-                if (p["lg"], p[side]) in L: soon.add(tid)
-except Exception as e: print("::warning title=Allenatori::prossime partite non lette: " + str(e)[:100])
-def age_h(tid):
-    c = (ST.get(tid) or {}).get("chk")
-    return (NOW - datetime.datetime.fromisoformat(c + ":00+00:00")).total_seconds() / 3600 if c else 1e9
-order = sorted([t for t in TEAMS if t in soon and age_h(t) >= 20], key=age_h, reverse=True) + sorted([t for t in TEAMS if t not in soon and age_h(t) >= 20], key=age_h, reverse=True)
+        if mm: TEAMS.setdefault(int(mm.group(1)), []).append((lg, nm))
 budget = min(800, af_budget.test_budget(af_budget.requests_of(get("status"))))
-print(f"squadre {len(TEAMS)} · da controllare {len(order)} (prossime 36 ore: {sum(1 for t in order if t in soon)}) · richieste usabili {budget}")
-done, changes = 0, []
-for tid in order:
-    if done >= budget: break
-    try: R = get("coachs", team=tid).get("response") or []
-    except Exception as e: print("errore", tid, str(e)[:80]); time.sleep(2); continue
-    done += 1; time.sleep(0.25)
-    cur, prev = None, None
-    for c in R:
-        for k in c.get("career") or []:
-            if str((k.get("team") or {}).get("id")) != tid or not k.get("start"): continue
-            if not k.get("end"):
-                if not cur or k["start"] > cur[2]: cur = (c.get("id"), c.get("name"), k["start"])
-            elif not prev or k["end"] > prev[2]: prev = (c.get("id"), c.get("name"), k["end"])
-    old = ST.get(tid) or {}
-    e = {"chk": NOWS}
-    if cur:
-        e.update({"cid": cur[0], "c": cur[1], "da": cur[2]})
-        if prev: e.update({"prev": prev[1], "fine_prev": prev[2]})
-        if old.get("cid") and old["cid"] != cur[0]:   # cambiato tra due controlli: la data di inizio potrebbe non essere ancora aggiornata
-            e["visto"] = NOWS[:10]; e.setdefault("prev", old.get("c")); changes.append(f"{TEAMS[tid][0][1]}: {old.get('c')} → {cur[1]}")
-        elif old.get("visto") and old.get("cid") == cur[0]: e["visto"] = old["visto"]
-    else: e.update({k: old[k] for k in ("cid", "c", "da", "prev", "fine_prev", "visto") if k in old})   # nessun allenatore in corso nei dati: si tiene l'ultimo
-    ST[tid] = e
+print("richieste usabili", budget)
+if budget > 60:
+    cur = {}
+    for x in get("leagues", current="true").get("response", []):
+        for s in x.get("seasons") or []:
+            if s.get("current"): cur[x["league"]["id"]] = s["year"]
+    todo = []
+    for code, lid in LG.items():
+        if code not in LOG or lid not in cur or used >= budget - 5: continue
+        for f in get("fixtures", league=lid, season=cur[lid], **{"from": D0, "to": TODAY}).get("response", []):
+            fid = str(f["fixture"]["id"])
+            if f["fixture"]["status"]["short"] not in ("FT", "AET", "PEN") or fid in ST["fx"]: continue
+            if fid in ST["nolu"] and ST["nolu"][fid] < (NOW - datetime.timedelta(days=3)).strftime("%Y-%m-%d"): continue
+            todo.append(fid)
+    todo = sorted(set(todo), key=int, reverse=True)   # prima le partite più recenti
+    for i in range(0, len(todo), 20):
+        if used >= budget: break
+        for f in get("fixtures", ids="-".join(todo[i:i + 20])).get("response", []):
+            fid = str(f["fixture"]["id"]); L = {str((x.get("team") or {}).get("id")): (x.get("coach") or {}) for x in f.get("lineups") or []}
+            h, a = f["teams"]["home"]["id"], f["teams"]["away"]["id"]; ch, ca = L.get(str(h)) or {}, L.get(str(a)) or {}
+            if ch.get("id") or ca.get("id"): ST["fx"][fid] = [f["fixture"]["date"][:10], h, ch.get("id"), ch.get("name"), a, ca.get("id"), ca.get("name")]; ST["nolu"].pop(fid, None)
+            else: ST["nolu"].setdefault(fid, f["fixture"]["date"][:10])
+ST["fx"] = {k: v for k, v in ST["fx"].items() if v[0] >= D0}; ST["nolu"] = {k: v for k, v in ST["nolu"].items() if v >= D0}
 json.dump(ST, open(SP, "w"), ensure_ascii=False, separators=(",", ":"))
-# sul sito: solo le squadre con un allenatore arrivato negli ultimi 120 giorni (l'app lo segnala finché ha meno di 8 partite con lui)
-lim = (NOW - datetime.timedelta(days=120)).strftime("%Y-%m-%d"); PUB = {}
-for tid, e in ST.items():
-    da = max(e.get("da") or "", e.get("visto") or "")
-    if not e.get("c") or da < lim: continue
-    for lg, nm in TEAMS.get(tid, []):
-        PUB.setdefault(lg, {})[nm] = {"c": e["c"], "da": da, **({"prev": e["prev"]} if e.get("prev") else {})}
-json.dump({"agg": NOWS, "squadre": PUB}, open(os.path.join(OUT, "allenatori.json"), "w"), ensure_ascii=False, separators=(",", ":"))
-n_pub = sum(len(v) for v in PUB.values())
-print(f"::notice title=Calcio · allenatori::richieste {done} · controllate in tutto {sum(1 for t in TEAMS if t in ST)}/{len(TEAMS)} · allenatori nuovi (120 giorni) {n_pub}"
-      + (" · cambi visti ora: " + "; ".join(changes[:15]) if changes else ""))
+# allenatore per squadra: partite in ordine di data
+BY = {}
+for fid, v in ST["fx"].items():
+    for tid, cid, nm in ((v[1], v[2], v[3]), (v[4], v[5], v[6])):
+        if cid: BY.setdefault(tid, []).append((v[0], cid, nm))
+PUB, n_ch = {}, 0
+for tid, L in BY.items():
+    L.sort(); cid = L[-1][1]; j = len(L) - 1
+    while j > 0 and L[j - 1][1] == cid: j -= 1
+    if j == 0: continue   # sempre lo stesso allenatore nella finestra
+    n_ch += 1; e = {"c": L[-1][2], "da": L[j][0], "n": len(L) - j, "prev": L[j - 1][2]}
+    for lg, nm in TEAMS.get(tid, []): PUB.setdefault(lg, {})[nm] = e
+json.dump({"agg": NOW.strftime("%Y-%m-%dT%H:%M"), "squadre": PUB}, open(os.path.join(OUT, "allenatori.json"), "w"), ensure_ascii=False, separators=(",", ":"))
+print(f"::notice title=Calcio · allenatori::richieste {used} · partite con allenatore {len(ST['fx'])} (senza formazione {len(ST['nolu'])}) · squadre {len(BY)}/{len(TEAMS)} · cambi negli ultimi 150 giorni {n_ch}")

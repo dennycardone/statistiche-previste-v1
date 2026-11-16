@@ -4608,19 +4608,19 @@ function pkHTML(e, m) {
    cartellini = falli × severità dell'arbitro. Tiri totali esclusi: API-Football non conta i tiri respinti del giocatore, i book sì.
    Dati: data/giocatori.json (tools/props/giocatori.py). Con le formazioni ufficiali i titolari sono quelli veri e i falli attesi già corretti. */
 let ALLEN = null; const COACH_C = new Map(), COACH_N = 8;   // 16/11/2026: allenatore arrivato da poco (data/allenatori.json, API-Football /coachs)
-function coachNew(lg, team) {   // segnalato finché ha meno di 8 partite di campionato con la squadra
+function coachNew(lg, team) {   // segnalato finché ha meno di 8 partite con la squadra
   const x = ALLEN && ALLEN.squadre && (ALLEN.squadre[lg] || {})[team]; if (!x || !x.da) return null;
   const k = lg + "|" + team; if (COACH_C.has(k)) return COACH_C.get(k);
-  const d0 = x.da; let n = 0;
-  for (const m of S.matches.values()) if (m.div === lg && (m.home === team || m.away === team) && m.date.toISOString().slice(0, 10) >= d0) n++;
+  let n = x.n;   // partite guidate (tutte le competizioni, dalle formazioni di API-Football)
+  if (n == null) { n = 0; for (const m of S.matches.values()) if (m.div === lg && (m.home === team || m.away === team) && m.date.toISOString().slice(0, 10) >= x.da) n++; }
   const r = n < COACH_N ? { ...x, n } : null; COACH_C.set(k, r); return r;
 }
 const coachMark = (lg, team) => coachNew(lg, team) ? `<i class="cmark" title="Nuovo allenatore">nuovo all.</i>` : "";
 function coachHTML(lg, home, away) {
   const L = [[home, coachNew(lg, home)], [away, coachNew(lg, away)]].filter(x => x[1]); if (!L.length) return "";
   const dd = d => `${+d.slice(8, 10)}/${+d.slice(5, 7)}`;
-  return `<h2>Cambio di allenatore</h2>` + L.map(([t, x]) => `<p class="warnbox" data-dz="keep" style="margin:0 0 8px"><b>${esc(t)}</b>: ${esc(x.c)} dal ${dd(x.da)}${x.prev ? ` (al posto di ${esc(x.prev)})` : ""} · ${x.n === 0 ? "nessuna partita di campionato con lui" : x.n === 1 ? "1 partita di campionato con lui" : `${x.n} partite di campionato con lui`}.</p>`).join("")
-    + `<p class="small muted" style="margin:0">Con un allenatore nuovo il gioco della squadra cambia: le statistiche delle partite passate sono meno attendibili. Segnalato fino a ${COACH_N} partite con lui.</p>`;
+  return `<h2>Cambio di allenatore</h2>` + L.map(([t, x]) => `<p class="warnbox" data-dz="keep" style="margin:0 0 8px"><b>${esc(t)}</b>: ${esc(x.c)} dal ${dd(x.da)}${x.prev ? ` (al posto di ${esc(x.prev)})` : ""} · ${x.n === 0 ? "nessuna partita con lui" : x.n === 1 ? "1 partita con lui" : `${x.n} partite con lui`}.</p>`).join("")
+    + `<p class="small muted" style="margin:0">Con un allenatore nuovo il gioco della squadra cambia: le statistiche delle partite passate sono meno attendibili. Segnalato fino a ${COACH_N} partite con lui (tutte le competizioni). Allenatore preso dalle formazioni ufficiali delle partite giocate.</p>`;
 }
 let GIOC = null, GPM = "sot", ASSENZE = null;   // 14/11: assenze di oggi e domani (data/assenze.json, injuries di API-Football)
 const PROP_LG = new Set(["I1", "E0", "SP1", "D1", "F1", "UCL"]);

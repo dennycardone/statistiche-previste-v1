@@ -200,5 +200,6 @@ Palle perse (DP 0,90) totale z −19 / −19, chi ne fa di più z −11 / −10,
 
 ## 16/11/2026 · Calcio: segnalazione dei cambi di allenatore
 - Denny: con un allenatore nuovo cambia il gioco e le statistiche sono meno attendibili. Solo segnalazione (nessuna modifica al modello): API-Football /coachs per squadra (allenatori.yml, richieste solo da quelle che avanzano dopo la riserva), id squadra dai loghi del sito.
+- 16/11: le date di /coachs sono sbagliate (Spalletti Juve "dal 1/9/2026", arrivato il 30/10/2025; Thioune Werder "dal 1/10/2026", arrivato a febbraio 2026): si usa l allenatore delle formazioni delle partite giocate (data esatta della prima partita, partite guidate).
 - App: riquadro "Cambio di allenatore" in cima alla Lettura e "nuovo all." in Partite, finché il nuovo allenatore ha meno di 8 partite di campionato con la squadra.
 - Da verificare più avanti con l'harness: le previsioni nelle prime 8 partite dopo un cambio sono davvero peggiori? Se sì, si può provare a pesare di più le partite recenti.
