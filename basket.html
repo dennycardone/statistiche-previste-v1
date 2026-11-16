@@ -923,7 +923,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
 .mtabs{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.mtabs::-webkit-scrollbar{display:none}.mtab{flex:0 0 auto}
 .sx-m small{overflow-wrap:anywhere}
 .sx-c .scr{white-space:nowrap;font-size:clamp(24px,8vw,34px)}.nw{white-space:nowrap}
-#selOut .bkieri,#sigOut .bkieri{display:flex;flex-direction:column;gap:4px;font-size:12.5px;line-height:1.4;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);margin:0 0 10px}#selOut .bkieri p,#sigOut .bkieri p{margin:0}#selOut .bkric,#sigOut .bkric{color:var(--ink-3);font-size:11.5px}.selv .mk{font-style:normal;font-weight:700;margin-left:3px;padding:0 4px;border-radius:4px}
+#selOut .bkieri,#sigOut .bkieri{display:flex;flex-direction:column;gap:4px;font-size:12.5px;line-height:1.4;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);margin:0 0 10px}#selOut .bkieri p,#sigOut .bkieri p{margin:0}#selOut .bkric,#sigOut .bkric{color:var(--ink-3);font-size:11.5px}.selreal{display:block;font-size:12px;color:var(--ink-2);margin-top:2px}.sreal{font-weight:600;color:var(--ink)}.selv .mk,#sigOut .sig .p .mk{display:grid;margin:6px 0 0 auto;width:22px;height:22px;font-size:13px;border-radius:50%;padding:0}#sigOut .sig .p{display:flex;flex-direction:column;align-items:flex-end}
 .bkstamp{color:var(--ink-3);font-size:11.5px;text-align:center;margin:14px 0}
 </style>
 </head>
@@ -1083,7 +1083,7 @@ function reading0(g) {
     ["tri", "triple", p.tri, sr ? [sr.h[2], sr.a[2]] : null], ["fl", "falli", p.fh != null ? [p.fh, p.fa] : null, g.fl || null]];
   for (const [k, nm, e, rv] of XS) { const sx = SX[k] && SX[k][g.lg]; if (!e || !sx) continue;
     const md = e[0] - e[1], ph = 1 - Phi((0.5 - md) / sx), pa = Phi((-0.5 - md) / sx), home = ph >= pa;
-    out.R.push({ k, x: true, nm, lab: `Più ${nm}: ${team(g.lg, home ? g.h : g.a)[0]}`, sh: home ? "1" : "2", p: home ? ph : pa, ph, pa, prev: e, hit: rv && rv[0] != null && rv[1] != null ? (home ? rv[0] > rv[1] : rv[1] > rv[0]) : null }); }
+    out.R.push({ k, x: true, nm, lab: `Più ${nm}: ${team(g.lg, home ? g.h : g.a)[0]}`, sh: home ? "1" : "2", p: home ? ph : pa, ph, pa, prev: e, act: rv && rv[0] != null && rv[1] != null ? rv : null, hit: rv && rv[0] != null && rv[1] != null ? (home ? rv[0] > rv[1] : rv[1] > rv[0]) : null }); }
   // 16/11 (Denny): possessi e palle perse solo nella Lettura (righe del ritmo e delle palle perse), non in Grado, Radar, Segnali, Tendenze, Digiuni
   for (const r of out.R) { r.ev = r.q ? r.p * r.q - 1 : null; r.fair = 1 / r.p; const gr = gradeOf(r.k, r.p); r.uscite = gr.u; r.n = gr.n; r.g = gr.g; }
   return out;
@@ -1317,10 +1317,17 @@ function radarItems(day) {   // 16/11 (Denny): giorno passato = partite giocate 
   const past = day < todayIso();
   return games().filter(g => g.day === day && (past ? fin(g) : !fin(g) && !live(g))).map(g => ({ g, R: reading(g) })).filter(x => x.R);
 }
+function realOf(g, r) {   // 16/11 (Denny): esito del pronostico, non solo il risultato della partita
+  if (!fin(g)) return ""; const h = g.sh[5], a = g.sa[5];
+  if (r.x) return r.act ? `reali ${r.act[0]} – ${r.act[1]}` : "";
+  if (r.k === "totale") return `punti totali ${h + a}`;
+  if (r.k === "handicap") return `finita ${h}-${a} (scarto ${Math.abs(h - a)})`;
+  return `finita ${h}-${a}`;
+}
 const hitMk = r => r.hit == null ? "" : r.hit ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`;
 function itemHTML(g, r, extra) {
-  return `<button type="button" class="selrow" data-gid="${esc(g.id)}"><span class="selt"><b>${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}${fin(g) ? ` <small class="muted">${g.sh[5]}-${g.sa[5]}</small>` : ""}</b><small>${FL[g.lg] || ""} ${esc(B.leghe[g.lg][0])} · ${timeOf(g.d)}</small></span>
-    <span class="selp"><span>${esc(r.lab)}</span>${r.q ? `<small>@${f2(r.q)}</small>` : ""}${gbadge(r.g)}</span><span class="selv">${extra}</span></button>`;
+  return `<button type="button" class="selrow" data-gid="${esc(g.id)}"><span class="selt"><b>${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}</b><small>${FL[g.lg] || ""} ${esc(B.leghe[g.lg][0])} · ${timeOf(g.d)}</small></span>
+    <span class="selp"><span>${esc(r.lab)}</span>${r.q ? `<small>@${f2(r.q)}</small>` : ""}${gbadge(r.g)}</span>${fin(g) && realOf(g, r) ? `<small class="selreal">${realOf(g, r)}</small>` : ""}<span class="selv">${extra}</span></button>`;
 }
 function renderRadar() {
   const t0 = todayIso(); if (!S.rday || S.rday < addDays(t0, -7)) S.rday = t0;
@@ -1340,7 +1347,7 @@ function renderRadar() {
       const k = D.filter(x => x.r.hit).length; return `<b>${lab}</b>: ${D.length} · uscite <b>${k}</b> (${pc(k / D.length)}) · attese in media ${pc(D.reduce((a, x) => a + x.r.uscite, 0) / D.length)}`; };
     gsum = `<div class="bkieri gsum"><p>${sm(gr, `Previsioni con grado · ${dlab(S.rday).toLowerCase()}`)}</p><p>${sm(gr.filter(x => x.r.g === "A+" || x.r.g === "A"), "Grado A+ e A")}</p><p class="bkric">Previsioni fatte con i soli dati precedenti a ogni partita.</p></div>`;
   }
-  if (S.rt === "gr") box.innerHTML = `<div class="selhead"><h2>Grado</h2><span class="small muted">${dlab(S.rday)}</span></div>` + gsum + (gr.length ? gr.map(({ g, r }) => itemHTML(g, r, `<b>${Math.round(r.uscite * 100)}</b><small>su 100${past ? " " + hitMk(r) : ""}</small>`)).join("") : `<p class="muted">Nessuna previsione con grado per questo giorno.</p>`);
+  if (S.rt === "gr") box.innerHTML = `<div class="selhead"><h2>Grado</h2><span class="small muted">${dlab(S.rday)}</span></div>` + gsum + (gr.length ? gr.map(({ g, r }) => itemHTML(g, r, `<b>${Math.round(r.uscite * 100)}</b><small>su 100</small>${past ? hitMk(r) : ""}`)).join("") : `<p class="muted">Nessuna previsione con grado per questo giorno.</p>`);
   else if (past) box.innerHTML = `<div class="selhead"><h2>${S.rt === "mk" ? "Mercato" : "Operatività"}</h2><span class="small muted">${dlab(S.rday)}</span></div><p class="muted">Per i giorni passati c'è lo storico del Grado; ${S.rt === "mk" ? "Mercato" : "Operatività"} mostra i giorni da giocare.</p>`;
   else if (S.rt === "mk") box.innerHTML = `<div class="selhead"><h2>Mercato</h2><span class="small muted">${dlab(S.rday)}</span></div><div class="opnote"><b>In verifica.</b> Lato della lettura con valore di almeno il ${Math.round(VAL_MIN * 100)}% sulla miglior quota. Il modello basket è verificato sui risultati ma non ancora contro le quote (archiviate dal 15/11/2026): i valori molto alti vanno letti con prudenza. Le linee arrivano il giorno prima e il giorno della partita.</div>` +
     (mk.length ? mk.map(({ g, r }) => itemHTML(g, r, `<b class="vgood">+${Math.round(r.ev * 100)}%</b><small>vale ${f2(r.fair)}</small>`)).join("") : `<p class="muted">Nessun valore sulle linee disponibili.</p>`) +
@@ -1366,7 +1373,7 @@ function renderSeg() {   // 15/11/2026 (Denny): come i Segnali del calcio
   $("#sigStats").querySelectorAll("[data-k]").forEach(b => b.addEventListener("click", () => { S.sk[b.dataset.k] = !on(b.dataset.k); renderSeg(); }));
   const G = games().filter(g => g.day === S.sday && (past ? fin(g) : !fin(g) && !live(g)) && (S.slg === "all" || g.lg === S.slg));
   const when = g => `${dlab(g.day)} ${timeOf(g.d)} · ${esc(B.leghe[g.lg][0])}`;
-  const sigHTML = (g, m, pct, q, tag, pick, det, w, mt, hit) => `<div class="sig"><button type="button" class="sigopen" data-gid="${esc(g.id)}" data-mt="${mt}"><span class="m">${m}${past && hit !== undefined ? " " + hitMk({ hit }) : ""}</span><span class="p num">${pct}${q ? `<small class="qsm">@${f2(q)}</small>` : ""}</span>
+  const sigHTML = (g, m, pct, q, tag, pick, det, w, mt, hit) => `<div class="sig"><button type="button" class="sigopen" data-gid="${esc(g.id)}" data-mt="${mt}"><span class="m">${m}</span><span class="p num">${pct}${q ? `<small class="qsm">@${f2(q)}</small>` : ""}${past && hit !== undefined ? hitMk({ hit }) : ""}</span>
       <span class="d"><span class="stag">${tag}</span><b>${pick}</b>${det ? ` · ${det}` : ""}</span><span class="w">${w}</span></button></div>`;
   let L = [], intro = "";
   let gsum = "";
@@ -1380,13 +1387,13 @@ function renderSeg() {   // 15/11/2026 (Denny): come i Segnali del calcio
       const pick = o.lab.replace(/^(Punti \+ Assist|Punti|Rimbalzi|Assist) /, ""), det = `vale ${f2(o.fair)}${o.book ? ` · ${esc(o.book)}` : ""}`;
       return sigHTML(g, `${esc(r[0])} <small class="muted">${esc(team(g.lg, side === "h" ? g.h : g.a)[0])}</small>`, pc(o.p), o.q, tag, esc(pick), det, `${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])} · ${when(g)}`, "gio"); });
   } else {
-    intro = "Previsioni dalla parte della lettura che nelle stagioni passate sono uscite almeno 72 volte su 100 (grado A o A+). Vincente supplementari compresi; totale e handicap sulla linea dei book quando c'è; statistiche: chi ne fa di più (il pari non vale); possessi: sopra o sotto la media del campionato.";
+    intro = "Previsioni dalla parte della lettura che nelle stagioni passate sono uscite almeno 72 volte su 100 (grado A o A+). Vincente supplementari compresi; totale e handicap sulla linea dei book quando c'è; statistiche: chi ne fa di più (il pari non vale).";
     const rows = G.flatMap(g => { const R = reading(g); return R ? R.R.filter(r => on(r.k) && r.uscite != null && r.uscite >= 0.72).map(r => ({ g, r, R })) : []; }).sort((a, b) => b.r.uscite - a.r.uscite || b.r.p - a.r.p);
     L = rows.map(({ g, r, R }) => { const p = g.p;
       const tag = r.k === "vittoria" ? "Vincente" : r.k === "totale" ? "Totale" : r.k === "handicap" ? "Handicap" : r.k === "pos" ? "Possessi" : r.nm[0].toUpperCase() + r.nm.slice(1);
       const pick = r.k === "vittoria" || r.x && r.k !== "pos" ? `${r.sh} · ${esc(team(g.lg, r.sh === "1" ? g.h : g.a)[0])}` : r.k === "pos" ? `${r.sh} ${lnum(r.L.toFixed(1))}` : esc(r.lab.replace(/ punti$/, ""));
       const det = r.k === "vittoria" ? `punti previsti ${f1(p.eh)} – ${f1(p.ea)}` : r.k === "totale" ? `previsti ${f1(R.mt)} · ${r.book ? "linea dei book" : "linea del modello"}` : r.k === "pos" ? `previsti ${f1(p.pace)} a squadra` : r.x ? `ne fa di più · previsti ${f1(r.prev[0])} – ${f1(r.prev[1])}` : `scarto previsto ${f1(Math.abs(R.ms))}`;
-      return sigHTML(g, `${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}${past ? ` <small class="muted">${g.sh[5]}-${g.sa[5]}</small>` : ""}`, `${Math.round(r.uscite * 100)}%`, r.q, tag, pick, det, when(g), "prev", r.hit); });
+      return sigHTML(g, `${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}`, `${Math.round(r.uscite * 100)}%`, r.q, tag, pick, det + (past && realOf(g, r) ? ` · <b class="sreal">${realOf(g, r)}</b>` : ""), when(g), "prev", r.hit); });
     if (past) { const D = rows.filter(x => x.r.hit != null), k = D.filter(x => x.r.hit).length;
       gsum = `<div class="bkieri"><p>${D.length ? `<b>Segnali ${dlab(S.sday).toLowerCase()}</b>: ${D.length} con esito · uscite <b>${k}</b> (${pc(k / D.length)}) · attese in media ${pc(D.reduce((a, x) => a + x.r.uscite, 0) / D.length)}` : "<b>Nessun segnale con esito</b>"}</p><p class="bkric">Previsioni fatte con i soli dati precedenti a ogni partita.</p></div>`; }
   }
