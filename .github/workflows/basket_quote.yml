@@ -28,6 +28,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           FALLI_MINUTI: "4"
+          FALLI_RECENTI: "1"
         run: |
           mkdir -p _falli && (git fetch -q --depth 1 origin basket-falli && git archive FETCH_HEAD | tar -x -C _falli) || true
           python3 tools/basket/falli.py _arch _falli 150

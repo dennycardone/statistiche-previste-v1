@@ -14,10 +14,10 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; prevista/1.0)", "Accept": "applica
 used = 0
 def get(url):
     global used
-    for t in range(3):
+    for t in range(2):
         used += 1
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15) as r:
                 time.sleep(1.0); return json.loads(r.read().decode("utf8", "ignore"))
         except urllib.error.HTTPError as e:
             time.sleep(1.0)
@@ -38,6 +38,9 @@ for fn in sorted(glob.glob(os.path.join(ARCH, "*.json")), key=lambda f: os.path.
     of = os.path.join(OUT, f"{lg}_{ss}.json"); O = load_out(of); fatte = set(map(str, O["fatte"]))
     games = {gid: v for gid, v in D["partite"].items() if v[1] in ("FT", "AOT") and v[4] and v[5] and v[4][5] is not None}
     todo = {gid for gid in games if gid not in O["partite"]}
+    if os.environ.get("FALLI_RECENTI"):   # 16/11: giro ogni 30 minuti: solo le partite finite negli ultimi 3 giorni (lo storico lo fa il giro di notte)
+        lim3 = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+        todo = {gid for gid in todo if games[gid][0][:10] >= lim3}
     if not todo: summary.append(f"{lg} {ss}: completo ({len(O['partite'])})"); continue
     by_score = {}
     for gid, v in games.items(): by_score.setdefault((v[4][5], v[5][5]), []).append((gid, v))
