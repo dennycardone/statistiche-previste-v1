@@ -61,10 +61,27 @@ BY = {}
 for fid, v in ST["fx"].items():
     for tid, cid, nm in ((v[1], v[2], v[3]), (v[4], v[5], v[6])):
         if cid: BY.setdefault(tid, []).append((v[0], cid, nm))
+import unicodedata
+TR = str.maketrans({"ß": "ss", "ø": "o", "Ø": "o", "æ": "ae", "Æ": "ae", "ł": "l", "Ł": "l", "đ": "d", "ı": "i"})
+PART = {"de", "da", "do", "dos", "das", "del", "van", "von", "der", "den", "la", "le", "di", "el", "jr"}
+def toks(n): return [t for t in re.sub(r"[^a-z ]", " ", unicodedata.normalize("NFKD", (n or "").translate(TR)).encode("ascii", "ignore").decode().lower()).split() if len(t) >= 3 and t not in PART]
+def lev1(a, b):   # distanza di modifica al massimo 1 ("Aranbarri" / "Arambarri")
+    if abs(len(a) - len(b)) > 1: return False
+    i = 0
+    while i < min(len(a), len(b)) and a[i] == b[i]: i += 1
+    return a[i + 1:] == b[i + 1:] or a[i + 1:] == b[i:] or a[i:] == b[i + 1:]
+def same(a, b):   # 16/11: API-Football ha lo stesso allenatore con id e grafie diverse ("M. Carrick" / "Michael Carrick", "Paiva Renato" / "Renato Paiva")
+    if a[1] == b[1]: return True
+    ta, tb = toks(a[2]), toks(b[2])
+    if not ta or not tb: return False
+    if len(set(ta) & set(tb)) >= 2: return True
+    for x, y in ((ta[-1], tb), (tb[-1], ta)):   # il cognome (ultima parola) di uno dei due compare nell'altro
+        if any(x == t or (len(x) >= 5 and len(t) >= 5 and lev1(x, t)) for t in y): return True
+    return False
 PUB, n_ch = {}, 0
 for tid, L in BY.items():
-    L.sort(); cid = L[-1][1]; j = len(L) - 1
-    while j > 0 and L[j - 1][1] == cid: j -= 1
+    L.sort(); j = len(L) - 1
+    while j > 0 and same(L[j - 1], L[-1]): j -= 1
     if j == 0: continue   # sempre lo stesso allenatore nella finestra
     n_ch += 1; e = {"c": L[-1][2], "da": L[j][0], "n": len(L) - j, "prev": L[j - 1][2]}
     for lg, nm in TEAMS.get(tid, []): PUB.setdefault(lg, {})[nm] = e
