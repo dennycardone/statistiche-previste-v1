@@ -270,3 +270,56 @@ for nm, pr, y in (("dd", dd, ydd), ("td", td, ytd)):
 res["app_parametri"]["ricalibrazione_dd_td"] = RC
 json.dump(res, open(OUT, "w"), indent=1, ensure_ascii=False)
 print(json.dumps(res["app_doppia_ricalibrata"], indent=1, ensure_ascii=False), RC)
+# ===== 16/11/2026: audit voce per voce delle probabilità esposte (versione app), fasce 50-60/60-65/65-72/72-80/80+, lato più probabile =====
+BANDS = [(0.5, 0.6), (0.6, 0.65), (0.65, 0.72), (0.72, 0.8), (0.8, 1.01)]
+def sfd(k, mu, L): f = sf2 if DIST[k][0] == "NB2" else sf1; return f(mu, L, DIST[k][1])
+AUD = {}
+for p in ("verifica", "holdout"):
+    m = A["per"] == p
+    for k in ("pts", "reb", "ast", "pa"):
+        P, Y = [], []
+        for L_ in FIX[k]:
+            po = sfd(k, MU[k][m], L_); y = A[k][m] > L_; side = po >= 0.5
+            P.append(np.where(side, po, 1 - po)); Y.append(np.where(side, y, ~y))
+        P, Y = np.concatenate(P), np.concatenate(Y).astype(float)
+        row = {f"{int(lo*100)}-{min(100,int(hi*100))}": f"{P[(P>=lo)&(P<hi)].mean()*100:.1f} / {Y[(P>=lo)&(P<hi)].mean()*100:.1f} ({int(((P>=lo)&(P<hi)).sum())})" for lo, hi in BANDS if ((P>=lo)&(P<hi)).sum() >= 30}
+        bins = np.minimum(((P - 0.5) * 20).astype(int), 9); ece = sum(abs(P[bins == b].mean() - Y[bins == b].mean()) * (bins == b).sum() for b in set(bins)) / len(P)
+        row["ECE"] = round(float(ece) * 100, 2); row["log-loss"] = round(float(ll(P, Y).mean()), 4); AUD[f"{k} · {p}"] = row
+    # doppia doppia ricalibrata (probabilità esposta) e segnali (soglia più alta tra 72 e 80% per voce)
+    q = il(RC["dd"][0] + RC["dd"][1] * lg_(dd[m])); y = ydd[m]
+    AUD[f"doppia doppia · {p}"] = {f"{int(lo*100)}-{min(100,int(hi*100))}": f"{q[(q>=lo)&(q<hi)].mean()*100:.1f} / {y[(q>=lo)&(q<hi)].mean()*100:.1f} ({int(((q>=lo)&(q<hi)).sum())})" for lo, hi in BANDS if ((q>=lo)&(q<hi)).sum() >= 30}
+    sel_p, sel_y = [], []
+    for k in ("pts", "reb", "ast"):
+        best_p = np.full(m.sum(), np.nan); best_y = np.full(m.sum(), np.nan)
+        for L_ in FIX[k]:
+            po = sfd(k, MU[k][m], L_); ok_ = (po >= 0.72) & (po <= 0.80); best_p = np.where(ok_, po, best_p); best_y = np.where(ok_, A[k][m] > L_, best_y)
+        keep = ~np.isnan(best_p); sel_p.append(best_p[keep]); sel_y.append(best_y[keep])
+    sp, sy = np.concatenate(sel_p), np.concatenate(sel_y)
+    AUD[f"Segnali giocatori (72-80%) · {p}"] = f"dichiarata {sp.mean()*100:.1f} / uscita {sy.mean()*100:.1f} ({len(sp)})"
+res["audit_voce_per_voce"] = AUD
+json.dump(res, open(OUT, "w"), indent=1, ensure_ascii=False)
+print(json.dumps(AUD, indent=1, ensure_ascii=False))
+# ===== 16/11: doppia doppia — ricalibrazione isotonica (scelta) contro quella logit (a + b·logit) nelle fasce alte =====
+def pav(x, y):
+    o = np.argsort(x); xs, ys = x[o], y[o].astype(float); w = np.ones_like(ys); vals, wts, xr = [], [], []
+    for xi, yi in zip(xs, ys):
+        vals.append(yi); wts.append(1.0); xr.append(xi)
+        while len(vals) > 1 and vals[-2] > vals[-1]:
+            v = (vals[-2] * wts[-2] + vals[-1] * wts[-1]) / (wts[-2] + wts[-1]); wsum = wts[-2] + wts[-1]
+            vals.pop(); wts.pop(); xr.pop(); vals[-1] = v; wts[-1] = wsum
+    return np.array(xr), np.array(vals)
+xr_, vr_ = pav(dd[S], ydd[S])
+def iso(p): return np.clip(np.interp(p, xr_, vr_), 1e-4, 1 - 1e-4)
+ISO = {}
+for p in ("verifica", "holdout"):
+    m = A["per"] == p; y = ydd[m]
+    for nm, q in (("logit", il(RC["dd"][0] + RC["dd"][1] * lg_(dd[m]))), ("isotonica", iso(dd[m]))):
+        hi = q >= 0.5
+        ISO[f"{nm} · {p}"] = {"log-loss": round(float(ll(q, y).mean()), 5), "da 50% in su previsto/uscito": f"{q[hi].mean()*100:.1f} / {y[hi].mean()*100:.1f} ({int(hi.sum())})",
+                              "fasce": {f"{int(lo*100)}-{min(100,int(h*100))}": f"{q[(q>=lo)&(q<h)].mean()*100:.1f} / {y[(q>=lo)&(q<h)].mean()*100:.1f} ({int(((q>=lo)&(q<h)).sum())})" for lo, h in [(0.0, 0.1), (0.1, 0.3), (0.3, 0.5)] + BANDS if ((q>=lo)&(q<h)).sum() >= 20}}
+    d = ll(iso(dd[m]), y) - ll(il(RC["dd"][0] + RC["dd"][1] * lg_(dd[m])), y)
+    ISO[f"isotonica − logit · {p}"] = [round(float(d.mean()), 5), round(float(d.mean() / (d.std() / math.sqrt(len(d)))), 2), f"{sum(d[A['lg'][m] == g].mean() < 0 for g in set(A['lg'][m]))}/{len(set(A['lg'][m]))}"]
+ISO["tabella isotonica (probabilità grezza → calibrata)"] = [[round(float(a), 3), round(float(b), 3)] for a, b in zip(xr_[::max(1, len(xr_) // 25)], vr_[::max(1, len(vr_) // 25)])]
+res["doppia_isotonica"] = ISO
+json.dump(res, open(OUT, "w"), indent=1, ensure_ascii=False)
+print(json.dumps({k: v for k, v in ISO.items() if not k.startswith("tabella")}, indent=1, ensure_ascii=False))

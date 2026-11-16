@@ -171,3 +171,17 @@ Giocatori (287.773 giocatori-partita, ≥15 minuti attesi, quintetto noto come n
 - Falli di squadra (test_falli.py, falli API-Basketball fino a gennaio 2026): modello (DP 0,90, K 0,5) contro media del campionato: falli totali verifica z −22,
   holdout z −14, chi ne fa di più z −13 / −7, 7/7 campionati in tutti. Informativi nella Lettura (nessun mercato nel feed). Dati correnti solo NBA (ESPN) ed
   EL/EC (sito Eurolega; falli identici ad API-Basketball 110/111; rimbalzi offensivi contati diversamente, non usati). Archivio: ramo basket-falli, basket_falli.yml.
+
+## 16/11/2026 · Basket: audit di calibrazione voce per voce (tools/basket/audit_calibrazione.py, test_giocatori.py sezioni audit e doppia isotonica)
+Probabilità esposte: Vincente, Totale e Handicap (lato della lettura), Grado (uscite), giocatori (soglie punti/rimbalzi/assist, P+A, doppia/tripla).
+1° tempo, 1° quarto, punti di squadra, rimbalzi, falli, assist: solo numeri attesi, nessuna percentuale.
+- Vincente: sottostimato di 1-1,6 punti in tutti i periodi (holdout 84,7 dichiarato / 86,2 uscito sopra l'80%). Platt (b 1,1): verifica z −1,7 → non passa.
+- Handicap: ECE 0,3-0,6 punti, ben calibrato. Totale: ECE 1,4 punti in verifica/holdout: Under sopravvalutato (64,3 / 61-62), Over sottovalutato (66,6 / 68)
+  perché i totali europei recenti escono 2-4 punti sopra l'atteso. Correzione della distorsione (media mobile dei residui): verifica non significativa → non passa.
+- σ per campionato × fattore (scelto nel periodo scelta, 0,95-1,05): vittoria migliora (verifica z −2,3) ma l'handicap peggiora in holdout (z +3,9, 0/7) → non adottato.
+- Partite equilibrate e supplementari (4,8%): Over 66,6 / 68,3 contro 66,6 / 67,7 nelle altre, effetto piccolo.
+- Grado (tabelle sulla verifica, prova sull'holdout): A 73,5 / 72,9, A+ 84,3 / 82,8; Vincente A 74,7 / 72,2; Handicap A 72,8 / 70,2.
+- Giocatori (holdout): punti ECE 0,32, rimbalzi 0,44, assist 0,41, P+A 0,15; Segnali 72-80%: 75,9 dichiarato / 75,8 uscito (15.517).
+- Doppia doppia: sopra il 50% la ricalibrazione logit sottostima (holdout 58,7 / 67,2); isotonica migliora il log-loss (verifica z −4,1, 5/7; holdout z −1,3)
+  ma sopravvaluta nella fascia Segnali (72-80: 74,5 / 58,1 su 93 casi) → non adottata, da rivedere con più dati.
+Nessuna ricalibrazione in produzione.
