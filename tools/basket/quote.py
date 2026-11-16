@@ -38,6 +38,14 @@ for g, cod in games:
     if used >= MAXR: break
     gid = str(g["id"]); start = (g.get("date") or "")[:16]
     if start and start <= nows: continue
+    # 16/11/2026 (aggiornamenti come il calcio, ogni 30 minuti): quote richieste di nuovo solo se la partita inizia entro 6 ore e l'ultima lettura
+    # ha almeno 25 minuti, oppure se l'ultima lettura ha almeno 170 minuti (così le richieste restano poche anche con un giro ogni mezz'ora)
+    last = max(((A["partite"].get(gid) or {}).get("c") or [""])[0], A.setdefault("prova", {}).get(gid, ""))
+    if last and start:
+        mins_last = (now - datetime.datetime.fromisoformat(last + ":00+00:00")).total_seconds() / 60
+        mins_start = (datetime.datetime.fromisoformat(start + ":00+00:00") - now).total_seconds() / 60
+        if mins_last < (25 if mins_start <= 360 else 170): continue
+    A["prova"][gid] = nows
     od = get("odds", game=gid).get("response") or []
     Q = {}
     for o in od:
@@ -57,6 +65,7 @@ for g, cod in games:
 # pulizia: oltre 400 giorni via
 lim = (now - datetime.timedelta(days=400)).strftime("%Y-%m-%d")
 A["partite"] = {k: v for k, v in A["partite"].items() if v.get("d", "9") >= lim}
+A["prova"] = {k: v for k, v in (A.get("prova") or {}).items() if v >= (now - datetime.timedelta(days=3)).strftime("%Y-%m-%dT%H:%M")}
 A["agg"] = nows
 json.dump(A, open(FN, "w"), separators=(",", ":"))
 bk = sorted({b for e in A["partite"].values() if e.get("c") for m in e["c"][1].values() for v in m.values() for b in v})

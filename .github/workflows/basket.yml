@@ -6,7 +6,7 @@ on:
     inputs:
       max: { description: "richieste massime in questo giro (limite basket 7.500 al giorno, riserva 800)", required: false, default: "6000" }
 concurrency:
-  group: basket-archivio
+  group: basket
   cancel-in-progress: false
 permissions:
   contents: write

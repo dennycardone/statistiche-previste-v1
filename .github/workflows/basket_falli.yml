@@ -6,7 +6,7 @@ on:
     inputs:
       max: { description: "tetto di richieste (1 al secondo)", required: false, default: "2500" }
 concurrency:
-  group: basket-falli
+  group: basket
   cancel-in-progress: false
 permissions:
   contents: write
@@ -24,7 +24,7 @@ jobs:
       - name: Falli e rimbalzi offensivi
         run: python3 tools/basket/falli.py _arch _f ${{ inputs.max || '2500' }}
         env:
-          FALLI_MINUTI: "100"
+          FALLI_MINUTI: "25"   # di notte: lo storico mancante, a pezzi (non blocca a lungo l'aggiornamento ogni 30 minuti)
       - name: Salva sul ramo basket-falli
         env:
           GH_TOKEN: ${{ github.token }}
