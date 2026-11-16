@@ -101,7 +101,7 @@ def predict(lg, h, a, day=None):
     ea = pace * sh(ta, "off", lr) * sh(th, "dfn", lr) / lr / 100 - hca / 2
     h1 = Lg["h1"] / Lg["h1n"] if Lg["h1n"] else 0.5
     out = {"eh": round(eh, 2), "ea": round(ea, 2), "pace": round(pace, 1), "h1": round(h1, 4), "nh": th["g"], "na": ta["g"],
-           "habh": round(sh(th, "pts", lp * lr / 100), 2), "haba": round(sh(ta, "pts", lp * lr / 100), 2), "pch": round(sh(th, "pace", lp), 2), "pca": round(sh(ta, "pace", lp), 2)}
+           "habh": round(sh(th, "pts", lp * lr / 100), 2), "haba": round(sh(ta, "pts", lp * lr / 100), 2), "pch": round(sh(th, "pace", lp), 2), "pca": round(sh(ta, "pace", lp), 2), "lp": round(lp, 2)}
     lr_ = LRB[lg]
     if lr_[0] > 30:
         lrate = lr_[1] / lr_[0]
@@ -120,6 +120,8 @@ def predict(lg, h, a, day=None):
         out["fh"] = round((f_(fh_, 1) + f_(fa_, 2)) / 2 + lhd / 2, 1); out["fa"] = round((f_(fa_, 1) + f_(fh_, 2)) / 2 - lhd / 2, 1)
     return out
 hist = []   # (lega, data, previsione, punti casa, punti ospite) per σ e Grado
+poss_cache = {}
+HX = []     # 16/11/2026: (lega, data, previsione, partita, possessi reali) per σ e Grado delle statistiche (Radar, Segnali)
 PRE = {}
 for g in G:
     lg = g["lg"]
@@ -127,11 +129,13 @@ for g in G:
         p = predict(lg, g["h"], g["a"], g["d"][:10])
         if p: PRE[g["id"]] = p
     if not valid(g): continue
-    p = predict(lg, g["h"], g["a"])
+    p = predict(lg, g["h"], g["a"], g["d"][:10])
     ph, pa = g["sh"][5], g["sa"][5]
     if p and p["nh"] >= 5 and p["na"] >= 5: hist.append((lg, g["d"][:10], p, ph, pa))
     S = g["stat"] or {}; qh, qa = poss_game(g); Lg = L[lg]
+    if qh and qa: poss_cache[g["id"]] = (qh + qa) / 2
     P = (qh + qa) / 2 if qh and qa else ((ph + pa) / 2 / (Lg["rtg"] / Lg["n"] / 100) if Lg["n"] > 0 else (ph + pa) / 2 / 1.1)
+    if p and p["nh"] >= 5 and p["na"] >= 5: HX.append((lg, g["d"][:10], p, g, P if qh and qa else None))
     if S.get("h") and S.get("a") and S["h"][6] and S["a"][6]:
         for t, f_, a_ in ((g["h"], S["h"][6], S["a"][6]), (g["a"], S["a"][6], S["h"][6])):
             x = RB[(lg, t)]; x[0] = x[0] * DP + 1; x[1] = x[1] * DP + 100 * f_ / P; x[2] = x[2] * DP + 100 * a_ / P
@@ -173,6 +177,37 @@ for lg, d, p, ph, pa in hist:
         b = grado["totale"][int(q * 20)]; b[0] += 1; b[1] += y
         Ls = round(ms) + 0.5 + off / 2; pc = 1 - Phi((Ls - ms) / ss); q = max(pc, 1 - pc); y = (ph - pa > Ls) == (pc >= 0.5)
         b = grado["handicap"][int(q * 20)]; b[0] += 1; b[1] += y
+# 16/11/2026 (Denny: statistiche anche in Radar, Segnali, Tendenze, Digiuni): "chi ne fa di più" di rimbalzi, assist, triple, palle perse, falli
+# P(casa ne fa almeno 1 in più) = 1 − Φ((0,5 − scarto atteso)/σ), pari = né l'una né l'altra; possessi sopra/sotto la media del campionato.
+# σ robuste dal periodo scelta, Grado da verifica + holdout come le altre voci.
+def xvals(k, p, g):
+    S_ = g["stat"] or {}
+    if k == "fl":
+        f_ = fouls_of(g); return (p.get("fh"), p.get("fa"), f_[0] if f_ else None, f_[1] if f_ else None)
+    i_ = {"reb": 6, "ast": 9, "tri": 2, "pp": 12}[k]; e_ = (p.get("rh"), p.get("ra")) if k == "reb" else tuple(p.get(k) or (None, None))
+    ok_ = S_.get("h") and S_.get("a") and S_["h"][i_] is not None and S_["a"][i_] is not None and (i_ != 12 or (S_["h"][i_] > 0 and S_["a"][i_] > 0))
+    return (e_[0], e_[1], S_["h"][i_] if ok_ else None, S_["a"][i_] if ok_ else None)
+SIGX = {}
+for k in ("reb", "ast", "tri", "pp", "fl", "pos"):
+    for lg in NOMI:
+        if k == "pos": res_ = [P_ - p["pace"] for l, d, p, g, P_ in HX if l == lg and d <= SCELTA and P_]
+        else: res_ = [(x[2] - x[3]) - (x[0] - x[1]) for l, d, p, g, P_ in HX if l == lg and d <= SCELTA for x in [xvals(k, p, g)] if None not in x]
+        if len(res_) > 100: SIGX.setdefault(k, {})[lg] = round(rob(res_), 2)
+for k in SIGX:
+    gx = collections.defaultdict(lambda: [0, 0])
+    for l, d, p, g, P_ in HX:
+        if d <= SCELTA or l not in SIGX[k]: continue
+        sx = SIGX[k][l]
+        if k == "pos":
+            if not P_: continue
+            po = 1 - Phi((p["lp"] - p["pace"]) / sx); q = max(po, 1 - po); y = (P_ > p["lp"]) == (po >= 0.5)
+        else:
+            x = xvals(k, p, g)
+            if None in x: continue
+            md = x[0] - x[1]; ph_ = 1 - Phi((0.5 - md) / sx); pa_ = Phi((-0.5 - md) / sx); home = ph_ >= pa_; q = max(ph_, pa_)
+            y = (x[2] > x[3]) if home else (x[3] > x[2])
+        b = gx[int(q * 20)]; b[0] += 1; b[1] += y
+    grado[k] = gx
 GRADO = {m: {str(k): [v[0], round(v[1] / v[0], 4)] for k, v in sorted(t.items()) if v[0] >= 30} for m, t in grado.items()}
 
 # linee del giorno dalla lettura più recente dell'archivio quote
@@ -250,7 +285,8 @@ for lg, s in cur.items():
 for g in G:
     if not valid(g) or g["d"][:10] < (now - datetime.timedelta(days=400)).strftime("%Y-%m-%d"): continue
     for t, o, home, pf, pa in ((g["h"], g["a"], 1, g["sh"][5], g["sa"][5]), (g["a"], g["h"], 0, g["sa"][5], g["sh"][5])):
-        ULT[(g["lg"], t)].append([g["d"][:10], o, home, pf, pa] + gstats(g, home) + [1 if g["s"] == cur.get(g["lg"]) else 0])
+        qq = poss_cache.get(g["id"])
+        ULT[(g["lg"], t)].append([g["d"][:10], o, home, pf, pa] + gstats(g, home) + [1 if g["s"] == cur.get(g["lg"]) else 0, round(qq, 1) if qq else None])
 # 15/11/2026: tutta la stagione in corso (Tendenze e Digiuni come il calcio) + almeno le ultime 10 (Precedenti); ultimo elemento 1 = stagione in corso
 ULTP = {f"{lg}|{t}": [r for i, r in enumerate(v) if r[-1] or i >= len(v) - 10] for (lg, t), v in ULT.items() if lg in cur}
 for (lg, t), v in ULT.items():
@@ -276,7 +312,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import giocatori_pub
 hi3 = (now + datetime.timedelta(days=3)).strftime("%Y-%m-%d")
 GIOC = giocatori_pub.build(files, [g for g in PART if g["sh"] is None and g["d"][:10] <= hi3 and g["st"] == "NS"], PRE, QA, valid, today)
-J = {"agg": now.strftime("%Y-%m-%d %H:%M"), "ritmo": RITMO, "leghe": {k: list(v) for k, v in NOMI.items()}, "stagioni": cur, "sigma": SIG, "grado": GRADO,
+J = {"agg": now.strftime("%Y-%m-%d %H:%M"), "ritmo": RITMO, "leghe": {k: list(v) for k, v in NOMI.items()}, "stagioni": cur, "sigma": SIG, "sigx": SIGX, "grado": GRADO,
      "squadre": {lg: {k: [v, loghi[lg].get(k, "")] for k, v in d.items()} for lg, d in squadre.items()},
      "partite": PART, "linee": LINEE, "classifica": CLA, "ultime": ULTP, "precedenti": PREC, "tendenze": TEN, "serie": SER, "giocatori": GIOC, "rendimento": REND}
 json.dump(J, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))

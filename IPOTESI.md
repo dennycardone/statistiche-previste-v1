@@ -190,3 +190,9 @@ Nessuna ricalibrazione in produzione.
 Fatte e concesse ogni 100 possessi (media mobile, K 3) × possessi attesi, contro la media del campionato × possessi attesi:
 triple (DP 0,97) totale verifica z −22 7/7, holdout z −2,5 6/7; chi ne fa di più z −9 / −9 7/7. Assist (DP 0,95) totale z −29 / −19, chi ne fa di più z −13 / −14, 7/7.
 Palle perse (DP 0,90) totale z −19 / −19, chi ne fa di più z −11 / −10, 7/7. Rimbalzi (riferimento) z −14 / −13. Adottate nella Lettura come numeri attesi.
+
+## 16/11/2026 · Basket: statistiche e possessi in Radar, Segnali, Tendenze e Digiuni
+- "Chi ne fa di più" (almeno 1 in più, il pari perde) per rimbalzi, assist, triple, palle perse, falli: probabilità da atteso casa − trasferta con σ dei residui per campionato stimata nel periodo scelta.
+- Possessi sopra/sotto la media del campionato (media mobile dei possessi della lega prima della partita) con σ dal periodo scelta.
+- Grado da tabelle storiche (verifica + holdout) per ogni voce, come vittoria/totale. Mercato escluso: nessuna quota nel feed per queste voci.
+- Digiuni/Tendenze: elenco partite e Lettura calcolati una volta (prima andava in crash il telefono con tutti i campionati).

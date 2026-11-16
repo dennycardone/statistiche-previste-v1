@@ -1057,7 +1057,9 @@ const team = (lg, id) => (B.squadre[lg] || {})[id] || ["—", ""];
 const logo = (lg, id, big) => { const t = team(lg, id); return t[1] ? `<img class="tlogo${big ? " big" : ""}" src="${esc(t[1])}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""; };
 const fin = g => g.sh && g.sa && g.sh[5] != null;
 const live = g => !fin(g) && g.st && !["NS", "TBD", "POST", "CANC"].includes(g.st);
-function reading(g) {
+const RD_ = new WeakMap();
+function reading(g) { if (g && RD_.has(g)) return RD_.get(g); const o = reading0(g); if (g) RD_.set(g, o); return o; }
+function reading0(g) {
   const p = g.p, sgm = B.sigma[g.lg]; if (!p || !sgm) return null;
   const [ss, st] = sgm, ms = p.eh - p.ea, mt = p.eh + p.ea, LN = B.linee[g.id] || {};
   const pw = Phi(ms / ss), out = { ms, mt, pw, LN, R: [] };
@@ -1072,17 +1074,27 @@ function reading(g) {
   if (LN.hcp) { const Lh = LN.hcp[0], ph = 1 - Phi((-Lh - ms) / ss), home = ph >= 0.5, p_ = home ? ph : 1 - ph;
     out.R.push({ k: "handicap", lab: `${team(g.lg, home ? g.h : g.a)[0]} ${home ? sg(Lh) : sg(-Lh)}`, sh: `${home ? "1" : "2"} ${home ? sg(Lh) : sg(-Lh)}`, p: p_, L: Lh, book: true, q: home ? LN.hcp[1] : LN.hcp[3], bk: home ? LN.hcp[2] : LN.hcp[4],
       hit: fin(g) ? ((g.sh[5] - g.sa[5] + Lh > 0) === home) : null }); }
+  // 16/11/2026: statistiche di squadra (chi ne fa di più: almeno 1 in più, il pari perde) e possessi sopra/sotto la media del campionato
+  const SX = B.sigx || {}, sr = fin(g) && g.stat && g.stat.h && g.stat.a ? g.stat : null;
+  const XS = [["reb", "rimbalzi", p.rh != null ? [p.rh, p.ra] : null, sr ? [sr.h[6], sr.a[6]] : null], ["ast", "assist", p.ast, sr ? [sr.h[9], sr.a[9]] : null],
+    ["tri", "triple", p.tri, sr ? [sr.h[2], sr.a[2]] : null], ["pp", "palle perse", p.pp, sr ? [sr.h[12], sr.a[12]] : null], ["fl", "falli", p.fh != null ? [p.fh, p.fa] : null, g.fl || null]];
+  for (const [k, nm, e, rv] of XS) { const sx = SX[k] && SX[k][g.lg]; if (!e || !sx) continue;
+    const md = e[0] - e[1], ph = 1 - Phi((0.5 - md) / sx), pa = Phi((-0.5 - md) / sx), home = ph >= pa;
+    out.R.push({ k, x: true, nm, lab: `Più ${nm}: ${team(g.lg, home ? g.h : g.a)[0]}`, sh: home ? "1" : "2", p: home ? ph : pa, ph, pa, prev: e, hit: rv && rv[0] != null && rv[1] != null ? (home ? rv[0] > rv[1] : rv[1] > rv[0]) : null }); }
+  if (SX.pos && SX.pos[g.lg] && p.lp) { const po = 1 - Phi((p.lp - p.pace) / SX.pos[g.lg]), ov = po >= 0.5;
+    out.R.push({ k: "pos", x: true, nm: "possessi", lab: `Possessi ${ov ? "sopra" : "sotto"} ${lnum(p.lp.toFixed(1))}`, sh: ov ? "Sopra" : "Sotto", L: p.lp, p: ov ? po : 1 - po, hit: null }); }
   for (const r of out.R) { r.ev = r.q ? r.p * r.q - 1 : null; r.fair = 1 / r.p; const gr = gradeOf(r.k, r.p); r.uscite = gr.u; r.n = gr.n; r.g = gr.g; }
   return out;
 }
 function gradeOf(k, p) {
-  const T = (B.grado || {})[k] || {}; let b = Math.floor(p * 20); while (b > 10 && !T[b]) b--;
+  const T = (B.grado || {})[k] || {}; let b = Math.floor(p * 20); while (b > 9 && !T[b]) b--;
   const x = T[b]; if (!x) return { u: null, n: 0, g: null };
   const u = x[1]; return { u, n: x[0], g: u >= 0.80 ? "A+" : u >= 0.72 ? "A" : u >= 0.64 ? "B" : u >= 0.56 ? "C" : null };
 }
 const gcls = g => g === "A+" ? "ap" : g === "A" ? "a" : g === "B" ? "b" : "c";
 const gbadge = g => g ? `<span class="gbadge ${gcls(g)}">${g}</span>` : "";
-const games = () => B.partite.map(g => ({ ...g, day: dayOf(g.d) }));
+let GM_ = null, GM_B = null;   // 16/11: elenco partite calcolato una volta (Digiuni e Tendenze lo chiedono per ogni squadra)
+const games = () => { if (GM_B !== B.partite) { GM_B = B.partite; GM_ = B.partite.map(g => ({ ...g, day: dayOf(g.d) })); } return GM_; };
 const VAL_MIN = 0.03;
 
 /* ---------- viste ---------- */
@@ -1175,8 +1187,8 @@ function renderMatch() {
   const sw = $("#bkSw"); if (sw) sw.addEventListener("click", () => { S.bk = !S.bk; renderMatch(); });
   // Grado (15/11/2026, Denny: come il calcio)
   const GW = { "A+": "Ottima", A: "Molto buona", B: "Buona", C: "Discreta" }, GC = { "A+": "c-ap", A: "c-a", B: "c-b", C: "c-c" };
-  const gTitle = r => r.k === "vittoria" ? `Vittoria ${r.lab.replace(/^Vince /, "")}` : r.k === "totale" ? `${r.lab}` : `Handicap ${r.lab}`;
-  const gSub = r => r.k === "vittoria" ? `Vincente ${r.sh} (supplementari compresi)` : r.k === "totale" ? `Totale punti · ${r.book ? "linea dei book" : "linea del modello"}` : "Handicap · linea dei book";
+  const gTitle = r => r.k === "vittoria" ? `Vittoria ${r.lab.replace(/^Vince /, "")}` : r.k === "totale" || r.x ? `${r.lab}` : `Handicap ${r.lab}`;
+  const gSub = r => r.k === "vittoria" ? `Vincente ${r.sh} (supplementari compresi)` : r.k === "totale" ? `Totale punti · ${r.book ? "linea dei book" : "linea del modello"}` : r.k === "pos" ? "Possessi a squadra · media del campionato" : r.x ? `Chi ne fa di più · previsti ${f1(r.prev[0])} – ${f1(r.prev[1])} (il pari non vale)` : "Handicap · linea dei book";
   const gWhy = r => `<div class="gnums small"><span class="gck ok"><i>✓</i>Base: ${r.n} previsioni simili nelle stagioni 2024-25 e 2025-26, partite che il modello non aveva visto</span>${r.q ? `<span class="gck ${r.ev >= 0 ? "ok" : "ko"}"><i>${r.ev >= 0 ? "✓" : "✗"}</i>Quota ${f2(r.q)} contro equa ${f2(r.fair)}</span>` : ""}</div>`;
   const GR = R ? R.R.filter(r => r.g).sort((x, y) => y.uscite - x.uscite) : [];
   if (!GR.length) $("#mgrado").innerHTML = `<h2>Grado</h2><p class="gintro">Nessuna previsione di questa partita ha un grado: previsioni simili nelle stagioni passate sono uscite meno di 56 volte su 100.</p>`;
@@ -1327,7 +1339,7 @@ function renderRadar() {
   bindRows(box);
 }
 /* Segnali */
-const SQK = [["vittoria", "Vincente"], ["totale", "Totale punti"], ["handicap", "Handicap"]];
+const SQK = [["vittoria", "Vincente"], ["totale", "Totale punti"], ["handicap", "Handicap"], ["pos", "Possessi"], ["reb", "Rimbalzi"], ["fl", "Falli"], ["ast", "Assist"], ["tri", "Triple"], ["pp", "Palle perse"]];
 const GIK = [["pts", "Punti"], ["rbl", "Rimbalzi"], ["ast", "Assist"], ["pa", "Punti + Assist"], ["dd", "Doppia doppia"]];
 function renderSeg() {   // 15/11/2026 (Denny): come i Segnali del calcio
   const t0 = todayIso(), want = new Set([...S.sw].filter(k => k !== "r").map(k => addDays(t0, +k)));
@@ -1352,12 +1364,12 @@ function renderSeg() {   // 15/11/2026 (Denny): come i Segnali del calcio
       const pick = o.lab.replace(/^(Punti \+ Assist|Punti|Rimbalzi|Assist) /, ""), det = `equa ${f2(o.fair)}${o.book ? ` · ${esc(o.book)}` : ""}`;
       return sigHTML(g, `${esc(r[0])} <small class="muted">${esc(team(g.lg, side === "h" ? g.h : g.a)[0])}</small>`, pc(o.p), o.q, tag, esc(pick), det, `${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])} · ${when(g)}`, "gio"); });
   } else {
-    intro = "Previsioni dalla parte della lettura che nelle stagioni passate sono uscite almeno 72 volte su 100 (grado A o A+). Vincente supplementari compresi; totale e handicap sulla linea dei book quando c'è.";
+    intro = "Previsioni dalla parte della lettura che nelle stagioni passate sono uscite almeno 72 volte su 100 (grado A o A+). Vincente supplementari compresi; totale e handicap sulla linea dei book quando c'è; statistiche: chi ne fa di più (il pari non vale); possessi: sopra o sotto la media del campionato.";
     const rows = G.flatMap(g => { const R = reading(g); return R ? R.R.filter(r => on(r.k) && r.uscite != null && r.uscite >= 0.72).map(r => ({ g, r, R })) : []; }).sort((a, b) => b.r.uscite - a.r.uscite || b.r.p - a.r.p);
     L = rows.map(({ g, r, R }) => { const p = g.p;
-      const tag = r.k === "vittoria" ? "Vincente" : r.k === "totale" ? "Totale" : "Handicap";
-      const pick = r.k === "vittoria" ? `${r.sh} · ${esc(team(g.lg, r.sh === "1" ? g.h : g.a)[0])}` : esc(r.lab.replace(/ punti$/, ""));
-      const det = r.k === "vittoria" ? `punti previsti ${f1(p.eh)} – ${f1(p.ea)}` : r.k === "totale" ? `previsti ${f1(R.mt)} · ${r.book ? "linea dei book" : "linea del modello"}` : `scarto previsto ${f1(Math.abs(R.ms))}`;
+      const tag = r.k === "vittoria" ? "Vincente" : r.k === "totale" ? "Totale" : r.k === "handicap" ? "Handicap" : r.k === "pos" ? "Possessi" : r.nm[0].toUpperCase() + r.nm.slice(1);
+      const pick = r.k === "vittoria" || r.x && r.k !== "pos" ? `${r.sh} · ${esc(team(g.lg, r.sh === "1" ? g.h : g.a)[0])}` : r.k === "pos" ? `${r.sh} ${lnum(r.L.toFixed(1))}` : esc(r.lab.replace(/ punti$/, ""));
+      const det = r.k === "vittoria" ? `punti previsti ${f1(p.eh)} – ${f1(p.ea)}` : r.k === "totale" ? `previsti ${f1(R.mt)} · ${r.book ? "linea dei book" : "linea del modello"}` : r.k === "pos" ? `previsti ${f1(p.pace)} a squadra` : r.x ? `ne fa di più · previsti ${f1(r.prev[0])} – ${f1(r.prev[1])}` : `scarto previsto ${f1(Math.abs(R.ms))}`;
       return sigHTML(g, `${esc(team(g.lg, g.h)[0])} – ${esc(team(g.lg, g.a)[0])}`, `${Math.round(r.uscite * 100)}%`, r.q, tag, pick, det, when(g), "prev"); });
   }
   $("#sigOut").innerHTML = `<h2>${L.length} segnal${L.length === 1 ? "e" : "i"}</h2><p class="small muted" style="margin:0">${intro}</p>` + (L.length ? `<div class="siglist">${L.join("")}</div>` : `<p class="muted">Nessun segnale con questi filtri${S.sw.has("r") ? "" : ": prova Giornata"}.</p>`);
@@ -1375,7 +1387,10 @@ const TMK = [
   ["ast", "Più assist dell'avversaria", r => r[7] != null ? r[7] > r[8] : null, "più assist", "non fa più assist dell'avversaria"],
   ["tri", "Più triple dell'avversaria", r => r[9] != null ? r[9] > r[10] : null, "più triple", "non segna più triple dell'avversaria"],
   ["pp", "Meno palle perse dell'avversaria", r => r[11] != null ? r[11] < r[12] : null, "meno palle perse", "non perde meno palloni dell'avversaria"],
-  ["fl", "Più falli dell'avversaria", r => r[13] != null ? r[13] > r[14] : null, "più falli", "non commette più falli dell'avversaria"]];
+  ["fl", "Più falli dell'avversaria", r => r[13] != null ? r[13] > r[14] : null, "più falli", "non commette più falli dell'avversaria"],
+  ["pos", "Possessi sopra la media del campionato", (r, m, pm) => r[18] != null && pm ? r[18] > pm : null, "possessi sopra la media", "non ha una partita con possessi sopra la media del campionato"],
+  ["pos_s", "Possessi sotto la media del campionato", (r, m, pm) => r[18] != null && pm ? r[18] < pm : null, "possessi sotto la media", "non ha una partita con possessi sotto la media del campionato"]];
+const pmOf = lg => { if (!B.ritmo) return null; return B.ritmo[lg] || null; };
 const tGames = (lg, id) => B.ultime[`${lg}|${id}`] || [];
 const nextOf = (lg, id) => games().filter(g => g.lg === lg && !fin(g) && !live(g) && (g.h === id || g.a === id) && g.day >= todayIso()).sort((a, b) => a.d.localeCompare(b.d))[0];
 function nextProb(k, g, id) {   // probabilità di Prevista sull'esito nella prossima partita (dove c'è un modello)
@@ -1383,11 +1398,14 @@ function nextProb(k, g, id) {   // probabilità di Prevista sull'esito nella pro
   if (k === "vit") return { p: home ? R.pw : 1 - R.pw, lab: "vittoria" };
   if ((k === "sop" || k === "sot") && avg) { const po = 1 - Phi((avg - R.mt) / s[1]); return { p: k === "sop" ? po : 1 - po, lab: k === "sop" ? `sopra ${lnum(avg.toFixed(1))}` : `sotto ${lnum(avg.toFixed(1))}` }; }
   if (k === "v10") { const ms = home ? R.ms : -R.ms; return { p: 1 - Phi((9.5 - ms) / s[0]), lab: "+10" }; }
+  const x = R.R.find(r => r.x && (r.k === k || (k === "pos_s" && r.k === "pos")));
+  if (x && k !== "pos" && k !== "pos_s") return { p: home ? x.ph : x.pa, lab: `più ${x.nm}`, lean: (x.sh === "1") === home };
+  if (x && (k === "pos" || k === "pos_s")) { const up = x.sh === "Sopra"; const pOver = up ? x.p : 1 - x.p; return { p: k === "pos" ? pOver : 1 - pOver, lab: k === "pos" ? "possessi sopra" : "possessi sotto" }; }
   return null;
 }
 function leanOf(k, g, id) {   // la Lettura va verso l'esito? (per i Digiuni)
   if (!g || !g.p) return null; const p = g.p, home = g.h === id;
-  const np = nextProb(k, g, id); if (np) return np.p >= 0.5;
+  const np = nextProb(k, g, id); if (np) return np.lean != null ? np.lean : np.p >= 0.5;
   if (k === "h1") return home ? p.eh > p.ea : p.ea > p.eh;
   if (k === "reb" && p.rh != null) return home ? p.rh > p.ra : p.ra > p.rh;
   if (k === "fl" && p.fh != null) return home ? p.fh > p.fa : p.fa > p.fh;
@@ -1411,7 +1429,7 @@ function renderTen() {
       let L = tGames(lg, id).filter(r => r[17]);
       if (G_.v !== "tot") L = L.filter(r => r[2] === (G_.v === "home" ? 1 : 0));
       if (G_.per !== "s") L = L.slice(-(+G_.per));
-      const ev = L.map(r => M[2](r, avg)).filter(x => x != null); ln += ev.length; ly += ev.filter(Boolean).length;
+      const ev = L.map(r => M[2](r, avg, pmOf(lg))).filter(x => x != null); ln += ev.length; ly += ev.filter(Boolean).length;
       if (ev.length < 3) continue;
       const nx = nextOf(lg, id); if (wantDay && (!nx || nx.day !== wantDay)) continue;
       rows.push({ lg, id, y: ev.filter(Boolean).length, n: ev.length, nx });
@@ -1431,7 +1449,7 @@ function renderTen() {
   const mb = $("#genMore"); if (mb) mb.addEventListener("click", () => { G_.more += 10; renderTen(); });
 }
 const D_ = { lg: "all", t: "all", gr: "all", v: "all", w: "all", dot: false, grd: false };
-const DGR = [["all", "Tutte le statistiche"], ["ris", "Risultati", ["vit", "v10", "h1"]], ["pun", "Punti", ["sop", "sot"]], ["reb", "Rimbalzi", ["reb"]], ["ast", "Assist", ["ast"]], ["tri", "Triple", ["tri"]], ["pp", "Palle perse", ["pp"]], ["fl", "Falli", ["fl"]]];
+const DGR = [["all", "Tutte le statistiche"], ["ris", "Risultati", ["vit", "v10", "h1"]], ["pun", "Punti", ["sop", "sot"]], ["reb", "Rimbalzi", ["reb"]], ["ast", "Assist", ["ast"]], ["tri", "Triple", ["tri"]], ["pp", "Palle perse", ["pp"]], ["fl", "Falli", ["fl"]], ["pos", "Possessi", ["pos", "pos_s"]]];
 function renderDig() {
   const sl = $("#ritLg"), st = $("#ritTeam"), sg_ = $("#ritGr");
   if (!sl.options.length) {
@@ -1454,11 +1472,13 @@ function renderDig() {
       let L = tGames(lg, id); if (D_.v !== "all") L = L.filter(r => r[2] === (D_.v === "home" ? 1 : 0)); if (!L.length) continue;
       const nx = nextOf(lg, id); if (wantDay && (!nx || nx.day !== wantDay)) continue;
       for (const [k, , f, , neg] of TMK) { if (allow && !allow.has(k)) continue;
-        let n = 0; for (let i = L.length - 1; i >= 0; i--) { const e = f(L[i], avg); if (e == null) break; if (e) break; n++; }
+        let n = 0; for (let i = L.length - 1; i >= 0; i--) { const e = f(L[i], avg, pmOf(lg)); if (e == null) break; if (e) break; n++; }
         if (n < 4) continue;
         const lean = nx ? leanOf(k, nx, id) : null; if (D_.dot && !lean) continue;
         const np = nx ? nextProb(k, nx, id) : null; let gr = null;
-        if (np && nx) { const R = reading(nx); const r0 = R && R.R.find(x => (k === "vit" && x.k === "vittoria" && x.sh === (nx.h === id ? "1" : "2"))); gr = r0 && r0.g; }
+        if (np && nx) { const R = reading(nx), mine = nx.h === id ? "1" : "2";
+          const r0 = R && R.R.find(x => (k === "vit" && x.k === "vittoria" && x.sh === mine) || (x.x && x.k === k && x.sh === mine) || (x.k === "pos" && ((k === "pos" && x.sh === "Sopra") || (k === "pos_s" && x.sh === "Sotto"))));
+          gr = r0 && r0.g; }
         if (D_.grd && !gr) continue;
         items.push({ lg, id, k, n, neg, nx, lean, gr }); } } }
   items.sort((a, b) => b.n - a.n);
