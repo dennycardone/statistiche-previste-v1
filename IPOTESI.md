@@ -208,3 +208,4 @@ Palle perse (DP 0,90) totale z −19 / −19, chi ne fa di più z −11 / −10,
 ## 16/11/2026 · Basket: storico del Grado, possessi e palle perse solo nella Lettura
 - Radar basket: giorni passati (fino a 7) con le partite giocate, la previsione fatta prima della partita, ✓/✗ e riepilogo del giorno (uscite contro attese), come il calcio. Mercato e Operatività solo per i giorni da giocare.
 - Denny: possessi e palle perse tolti da Grado, Radar, Segnali, Tendenze e Digiuni; restano nella Lettura.
+- 16/11 · Segnali basket: barra dei giorni come il Radar (7 giorni passati con storico ✓/✗ e riepilogo) al posto di Oggi/Domani/Giornata. Calcio: Radar con la stessa barra dei giorni (−7…+7) al posto di Oggi + tendina Data.

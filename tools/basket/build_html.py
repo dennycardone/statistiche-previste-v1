@@ -47,7 +47,7 @@ CSS = """<style>
 .mtabs{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap}.mtabs::-webkit-scrollbar{display:none}.mtab{flex:0 0 auto}
 .sx-m small{overflow-wrap:anywhere}
 .sx-c .scr{white-space:nowrap;font-size:clamp(24px,8vw,34px)}.nw{white-space:nowrap}
-#selOut .bkieri{display:flex;flex-direction:column;gap:4px;font-size:12.5px;line-height:1.4;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);margin:0 0 10px}#selOut .bkieri p{margin:0}#selOut .bkric{color:var(--ink-3);font-size:11.5px}.selv .mk{font-style:normal;font-weight:700;margin-left:3px;padding:0 4px;border-radius:4px}
+#selOut .bkieri,#sigOut .bkieri{display:flex;flex-direction:column;gap:4px;font-size:12.5px;line-height:1.4;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);margin:0 0 10px}#selOut .bkieri p,#sigOut .bkieri p{margin:0}#selOut .bkric,#sigOut .bkric{color:var(--ink-3);font-size:11.5px}.selv .mk{font-style:normal;font-weight:700;margin-left:3px;padding:0 4px;border-radius:4px}
 .bkstamp{color:var(--ink-3);font-size:11.5px;text-align:center;margin:14px 0}
 </style>"""
 SPORT = """<details class="sportpick" id="sport"><summary aria-label="Sport">🏀 Basket</summary><div class="sportmenu"><a href="./" onclick="location.replace(this.href);return false">⚽ Calcio</a><a href="basket.html" onclick="location.replace(this.href);return false" aria-current="page">🏀 Basket</a></div></details>"""
@@ -100,12 +100,12 @@ BODY = f"""<body>
     <section class="card" id="selOut"></section>
   </div>
   <div class="view" id="viewSig" hidden>
+    <div class="daystrip" id="sdays" role="tablist" aria-label="Giorni"></div>
     <section class="card" aria-label="Filtri segnali">
       <div class="selhead"><h2>Segnali</h2>
         <div class="seg sigv" role="tablist" aria-label="Squadre o giocatori" id="sigView"><button type="button" class="segb" data-sv="sq" aria-pressed="true">Squadre</button><button type="button" class="segb" data-sv="gi" aria-pressed="false">Giocatori</button></div></div>
       <div class="sigf">
         <label for="sigLeague">Campionato<select id="sigLeague"></select></label>
-        <div class="rtf" id="sigWhen" role="group" aria-label="Quando giocano"><button type="button" class="chip" data-sw="0" aria-pressed="true">Oggi</button><button type="button" class="chip" data-sw="1" aria-pressed="true">Domani</button><button type="button" class="chip" data-sw="r" aria-pressed="false">Giornata</button></div>
         <div class="row" id="sigStats" role="group" aria-label="Mercati"></div>
       </div>
     </section>

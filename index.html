@@ -6021,6 +6021,7 @@ function radarTabs() {
 document.querySelectorAll("#selTabs [data-rt]").forEach(b => b.addEventListener("click", () => { SEL.tab = b.dataset.rt; radarTabs(); }));
 let SEL_T = 0;
 function renderSel() {
+  try { SEL_STRIP(); } catch (x) {}
   // 31/10/2026 (Denny): storico del Grado. Giorno passato = partite giocate di quel giorno, previsioni ricalcolate con i soli dati precedenti
   // alla partita (come la scheda Rendimento) ed esito ✓/✗
   const past = SEL.day < 0, pday = past ? addDays(localIso(), SEL.day) : null;
@@ -6073,17 +6074,21 @@ function renderSel() {
 }
 const selDayLab = k => { const d = new Date(addDays(localIso(), k) + "T00:00:00Z"); return `${DAYS_SHORT[d.getUTCDay()]} ${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}`; };
 const selDaysTxt = () => SEL.day === 0 ? "Oggi" : SEL.day === 1 ? "Domani" : SEL.day === -1 ? "Ieri" : selDayLab(SEL.day);
-{ // 30/10/2026 (Denny): periodo del Radar = tasto Oggi + tendina Data (da 7 giorni fa a fra 7 giorni, oggi al centro); tolto il tasto "Ieri"
+let SEL_STRIP = () => {};
+{ // 16/11/2026 (Denny): barra dei giorni come nel basket (da 7 giorni fa a fra 7 giorni, partite per giorno), al posto di Oggi + tendina Data
   const lab = $("#selWin").closest("label"), seg = document.createElement("div");
-  seg.className = "daystrip winstrip"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Giorno");
-  const opts = () => Array.from({ length: 15 }, (_, i) => i - 7).map(k => `<option value="${k}"${k === SEL.day ? " selected" : ""}>${k === 0 ? "Oggi · " : k === 1 ? "Domani · " : k === -1 ? "Ieri · " : ""}${selDayLab(k)}</option>`).join("");
+  seg.className = "daystrip"; seg.setAttribute("role", "tablist"); seg.setAttribute("aria-label", "Giorni"); seg.id = "seldays";
+  let NC = null, NK = "", SIG = "";
   const paint = () => {
-    seg.innerHTML = `<button type="button" class="day" data-w="0" aria-pressed="${SEL.day === 0}" aria-selected="${SEL.day === 0}"><b>Oggi</b><small>${selDayLab(0)}</small></button>
-      <span class="day daysel" aria-selected="${SEL.day !== 0}"><b>Data ▾</b><small>${SEL.day === 0 ? "scegli il giorno" : selDaysTxt() === selDayLab(SEL.day) ? selDayLab(SEL.day) : `${selDaysTxt()} · ${selDayLab(SEL.day)}`}</small><select aria-label="Data: da 7 giorni fa a fra 7 giorni">${opts()}</select></span>`;
-    seg.querySelector("[data-w]").addEventListener("click", () => { SEL.day = 0; paint(); renderSel(); });
-    seg.querySelector("select").addEventListener("change", ev => { SEL.day = +ev.target.value; paint(); renderSel(); });
+    const t0 = localIso(), nk = t0 + "|" + (S.matches ? S.matches.size : 0) + "|" + (STATO && STATO.updated || "");
+    if (nk !== NK || !NC) { NC = {}; NK = nk; try { for (const e of allEntries(t0, 7)) NC[e.d] = (NC[e.d] || 0) + 1; } catch (x) {} }
+    const N = NC, sig = nk + "|" + SEL.day + "|" + JSON.stringify(N); if (sig === SIG) return; SIG = sig;
+    seg.innerHTML = Array.from({ length: 15 }, (_, i) => i - 7).map(k => { const d = addDays(localIso(), k), dt = new Date(d + "T00:00:00Z"), n = N[d] || 0;
+      return `<button type="button" class="day${k < 0 ? " past" : ""}" role="tab" data-k="${k}" aria-selected="${k === SEL.day}"><b>${k === 0 ? "Oggi" : DAYS_SHORT[dt.getUTCDay()]}</b><span>${String(dt.getUTCDate()).padStart(2, "0")}.${String(dt.getUTCMonth() + 1).padStart(2, "0")}</span><small>${n ? n + " partite" : "—"}</small></button>`; }).join("");
+    seg.querySelectorAll("[data-k]").forEach(b => b.addEventListener("click", () => { SEL.day = +b.dataset.k; paint(); renderSel(); }));
+    const sl = seg.querySelector('[aria-selected="true"]'); if (sl && seg.offsetParent) { const r = sl.getBoundingClientRect(), bb = seg.getBoundingClientRect(); seg.scrollLeft += (r.left + r.width / 2) - (bb.left + bb.width / 2); }
   };
-  lab.hidden = true; lab.after(seg); paint();
+  lab.hidden = true; lab.after(seg); paint(); SEL_STRIP = paint;
 }
 document.querySelectorAll("#selF .chip").forEach(b => b.addEventListener("click", () => { SEL.f = b.dataset.sf; document.querySelectorAll("#selF .chip").forEach(x => x.setAttribute("aria-pressed", String(x === b))); renderSel(); }));
 document.querySelectorAll("[data-conf-info]").forEach(b => b.addEventListener("click", () => { const P = $("#confInfo"); P.hidden = !P.hidden; if (!P.hidden) { P.innerHTML = confInfoHTML(null) + ($("#selNote") && !$("#viewSel").hidden ? `<p class="small" style="margin:0">${$("#selNote").innerHTML}</p>` : ""); P.scrollIntoView({ block: "nearest" }); } }));
