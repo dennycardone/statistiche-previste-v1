@@ -197,3 +197,8 @@ Palle perse (DP 0,90) totale z −19 / −19, chi ne fa di più z −11 / −10,
 - Grado da tabelle storiche (verifica + holdout) per ogni voce, come vittoria/totale. Mercato escluso: nessuna quota nel feed per queste voci.
 - Digiuni/Tendenze: elenco partite e Lettura calcolati una volta (prima andava in crash il telefono con tutti i campionati).
 - 16/11 · Giocatori: abbinamento nomi book ↔ archivio in due passi (prima nome intero o cognome + iniziale, poi i ripieghi solo su voci libere con iniziale compatibile). Caso: le linee di Jaylen Brown (76ers) finivano anche su M. J. Brown (Nets) → "91% contro @1,93" era un errore di abbinamento, non un disaccordo col book. Etichetta "equa" → "vale".
+
+## 16/11/2026 · Calcio: segnalazione dei cambi di allenatore
+- Denny: con un allenatore nuovo cambia il gioco e le statistiche sono meno attendibili. Solo segnalazione (nessuna modifica al modello): API-Football /coachs per squadra (allenatori.yml, richieste solo da quelle che avanzano dopo la riserva), id squadra dai loghi del sito.
+- App: riquadro "Cambio di allenatore" in cima alla Lettura e "nuovo all." in Partite, finché il nuovo allenatore ha meno di 8 partite di campionato con la squadra.
+- Da verificare più avanti con l'harness: le previsioni nelle prime 8 partite dopo un cambio sono davvero peggiori? Se sì, si può provare a pesare di più le partite recenti.

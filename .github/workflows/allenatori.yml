@@ -1,0 +1,35 @@
+name: Allenatori (calcio)
+on:
+  schedule:
+    - cron: "38 0 * * *"    # 0:38 UTC: subito dopo l'azzeramento delle richieste (nei giorni feriali ne avanzano migliaia)
+    - cron: "33 11 * * *"   # 11:33 UTC: secondo giro per le squadre che giocano oggi e domani (solo richieste che avanzano dopo la riserva)
+    - cron: "28 23 * * *"   # 23:28 UTC: richieste avanzate della giornata (nel weekend il giro di notte lascia tutto all'app)
+  workflow_dispatch: {}
+concurrency:
+  group: allenatori
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  allenatori:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stato già scaricato (ramo allenatori) e squadre dal sito (loghi, prossime partite)
+        run: |
+          mkdir -p _al
+          if git ls-remote --exit-code origin allenatori >/dev/null 2>&1; then git fetch -q --depth 1 origin allenatori && git archive FETCH_HEAD | tar -x -C _al; fi
+          git fetch -q --depth 1 origin pages && git show FETCH_HEAD:data/loghi.json > _loghi.json && (git show FETCH_HEAD:data/prossime.json > _pross.json || echo "[]" > _pross.json)
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python tools/allenatori_apifootball.py _loghi.json _pross.json _al
+        env:
+          APIFOOTBALL_KEY: ${{ secrets.APIFOOTBALL_KEY }}
+      - name: Salva sul ramo allenatori
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd _al && rm -rf .git
+          git init -q -b allenatori && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Allenatori $(date -u '+%F %H:%M')"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" allenatori

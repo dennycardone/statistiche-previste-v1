@@ -144,6 +144,7 @@ summary{cursor:pointer;font-weight:600}
 .method p,.method li{max-width:65ch}
 .method code{font-size:13px;background:var(--surface-2);padding:1px 4px;border-radius:4px}
 .formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--surface-2);padding:8px 10px;border-radius:6px;overflow-x:auto;white-space:pre}
+.cmark{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.02em;margin-left:6px;padding:1px 5px;border-radius:4px;background:var(--surface-2);color:var(--warn);border:1px solid var(--warn);white-space:nowrap;vertical-align:1px}
 .warnbox{border-left:3px solid var(--warn);padding:6px 10px;background:var(--surface-2);border-radius:0 6px 6px 0;font-size:13px}
 .srcline{font-size:13px;color:var(--ink-2)}
 .viewnav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:4px}
@@ -1057,6 +1058,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <button type="button" class="mtab" data-mt="rend" aria-pressed="false">Rendimento</button>
     </div>
     <div class="mpane" data-mp="prev">
+      <section class="card" id="mcoach" aria-label="Cambio di allenatore" hidden></section>
       <section class="mhead" id="mhead" aria-label="Lettura della partita"></section>
       <section class="card" id="mxi" aria-label="Formazioni ufficiali" hidden></section>
       <section class="card" id="mwhy" aria-label="Perché questi numeri" hidden></section>
@@ -3949,7 +3951,7 @@ async function tryHosted(ST0) {
     }).catch(() => null);
     const P = { bundle: getBundle("bundle.json"), storico: ST && ST.v && ST.v.bundle_storico ? getBundle("bundle_storico.json") : Promise.resolve(null),
                 crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
-                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json"), fz: get("formazioni.json"), gi: get("giocatori.json"), as: get("assenze.json") };
+                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json"), fz: get("formazioni.json"), gi: get("giocatori.json"), as: get("assenze.json"), al: get("allenatori.json") };
     let man = null, texts = null;
     const [b, bs] = await Promise.all([P.bundle, P.storico]);
     if (ST && ST.v && ST.v.bundle_storico && !(bs && bs.files)) return false;   // stagioni chiuse non arrivate: meglio non mostrare dati a metà
@@ -3961,8 +3963,8 @@ async function tryHosted(ST0) {
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
-    const [cr, lo, od, li, ex, qu, pr, hf, qa, me, fz, gi, as] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer, P.fz, P.gi, P.as]);
-    if (gi && gi.squadre) GIOC = gi; if (as && as.partite) ASSENZE = as;
+    const [cr, lo, od, li, ex, qu, pr, hf, qa, me, fz, gi, as, al] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer, P.fz, P.gi, P.as, P.al]);
+    if (gi && gi.squadre) GIOC = gi; if (as && as.partite) ASSENZE = as; if (al && al.squadre) { ALLEN = al; COACH_C.clear(); }
     if (me && me.giocabili) MERCATI = me;
     if (fz && fz.partite) { FORMAZ = fz; clearCache(); }
     if (qa && qa.campionati) { TAREA = qa; clearCache(); }
@@ -4209,7 +4211,7 @@ function renderSched() {
     const end = R && m ? presiHTML(R) : "";   // sotto l'orario: % presi delle partite finite (i segnali A+ restano nel Radar)
     return `<button type="button" class="mrow" data-id="${esc(e.id)}">
           <span class="tmc"><span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>${end}</span>
-          <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}</span><b>${m ? m.ag : ""}</b></span>
+          <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}${m ? "" : coachMark(e.lg.code, e.home)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}${m ? "" : coachMark(e.lg.code, e.away)}</span><b>${m ? m.ag : ""}</b></span>
         </button>`; };   // percentuali Over/Gol tolte dalla lista (7/10/2026): restano nella Lettura
   const bind = b => b.addEventListener("click", () => { const e = all.find(x => x.id === b.dataset.id); if (e) openEntry(e); });
   const daySum = () => {
@@ -4605,6 +4607,21 @@ function pkHTML(e, m) {
    (Modello B), batte il solo valore del giocatore su tutti i mercati, nella verifica e nell'holdout. Falli subiti = falli attesi dell'AVVERSARIA;
    cartellini = falli × severità dell'arbitro. Tiri totali esclusi: API-Football non conta i tiri respinti del giocatore, i book sì.
    Dati: data/giocatori.json (tools/props/giocatori.py). Con le formazioni ufficiali i titolari sono quelli veri e i falli attesi già corretti. */
+let ALLEN = null; const COACH_C = new Map(), COACH_N = 8;   // 16/11/2026: allenatore arrivato da poco (data/allenatori.json, API-Football /coachs)
+function coachNew(lg, team) {   // segnalato finché ha meno di 8 partite di campionato con la squadra
+  const x = ALLEN && ALLEN.squadre && (ALLEN.squadre[lg] || {})[team]; if (!x || !x.da) return null;
+  const k = lg + "|" + team; if (COACH_C.has(k)) return COACH_C.get(k);
+  const d0 = x.da; let n = 0;
+  for (const m of S.matches.values()) if (m.div === lg && (m.home === team || m.away === team) && m.date.toISOString().slice(0, 10) >= d0) n++;
+  const r = n < COACH_N ? { ...x, n } : null; COACH_C.set(k, r); return r;
+}
+const coachMark = (lg, team) => coachNew(lg, team) ? `<i class="cmark" title="Nuovo allenatore">nuovo all.</i>` : "";
+function coachHTML(lg, home, away) {
+  const L = [[home, coachNew(lg, home)], [away, coachNew(lg, away)]].filter(x => x[1]); if (!L.length) return "";
+  const dd = d => `${+d.slice(8, 10)}/${+d.slice(5, 7)}`;
+  return `<h2>Cambio di allenatore</h2>` + L.map(([t, x]) => `<p class="warnbox" data-dz="keep" style="margin:0 0 8px"><b>${esc(t)}</b>: ${esc(x.c)} dal ${dd(x.da)}${x.prev ? ` (al posto di ${esc(x.prev)})` : ""} · ${x.n === 0 ? "nessuna partita di campionato con lui" : x.n === 1 ? "1 partita di campionato con lui" : `${x.n} partite di campionato con lui`}.</p>`).join("")
+    + `<p class="small muted" style="margin:0">Con un allenatore nuovo il gioco della squadra cambia: le statistiche delle partite passate sono meno attendibili. Segnalato fino a ${COACH_N} partite con lui.</p>`;
+}
 let GIOC = null, GPM = "sot", ASSENZE = null;   // 14/11: assenze di oggi e domani (data/assenze.json, injuries di API-Football)
 const PROP_LG = new Set(["I1", "E0", "SP1", "D1", "F1", "UCL"]);
 const PROP_MK = [["sot", "Tiri in porta", [0.5, 1.5]], ["fc", "Falli commessi", [0.5, 1.5]], ["fd", "Falli subiti", [0.5, 1.5, 2.5]], ["yc", "Ammonito", [0.5]]];
@@ -4792,6 +4809,7 @@ function renderMatchExtras(home, away) {
   $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G); HEROCTX = { home, away, e, cfg, G };
   if (!isCup(S.league) || S.league === "NAZ") renderMatchConf(home, away, e, cfg);
   $("#mref").hidden = true; REFCTX = { home, away, e };
+  { const bc = $("#mcoach"); let h = ""; try { h = home && away && home !== away ? coachHTML(S.league, home, away) : ""; } catch (x) {} bc.hidden = !h; bc.innerHTML = h; }
   { const bx = $("#mxi"); let MFx = null; try { MFx = !m && home && away && home !== away ? model(home, away, cfg, "f") : null; } catch (x) {}   // formazioni ufficiali (fase 1-B)
     bx.hidden = !(MFx && MFx.xiF); bx.innerHTML = MFx && MFx.xiF ? xiBoxHTML(home, away, MFx) : ""; }   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
   { const bw = $("#mwhy"); let h = ""; try { h = !m && home && away && home !== away && !isCup(S.league) ? whyHTML(home, away, cfg) : ""; } catch (x) {}   // fase 3: Perché questi numeri / E se…
@@ -6247,8 +6265,8 @@ async function reloadIfNew() {
       if (!(await tryHosted(ST))) return;
       const of = await getData("fuorigioco.json", "json", ST); if (of && of.campionati) { OFFS = of; attachOffs(); }
     } else {
-      const [od, li, pr, qu, me, fz, as] = await Promise.all(["odds.json", "linee.json", "precalc.json", "qualita.json", "mercati.json", "formazioni.json", "assenze.json"].map(f => ch(f.slice(0, -5)) ? getData(f, "json", ST) : Promise.resolve(undefined)));
-      if (od) ODDS = od; if (li) LINEE = li; if (qu) QUALITA = qu; if (me && me.giocabili) MERCATI = me; if (fz && fz.partite) FORMAZ = fz; if (as && as.partite) ASSENZE = as;
+      const [od, li, pr, qu, me, fz, as, al] = await Promise.all(["odds.json", "linee.json", "precalc.json", "qualita.json", "mercati.json", "formazioni.json", "assenze.json", "allenatori.json"].map(f => ch(f.slice(0, -5)) ? getData(f, "json", ST) : Promise.resolve(undefined)));
+      if (od) ODDS = od; if (li) LINEE = li; if (qu) QUALITA = qu; if (me && me.giocabili) MERCATI = me; if (fz && fz.partite) FORMAZ = fz; if (as && as.partite) ASSENZE = as; if (al && al.squadre) { ALLEN = al; COACH_C.clear(); }
       S.meta = { ...S.meta, fetched: ST.updated };
       const P2 = pr !== undefined ? pr : PRECALC; PRECALC = P2 && P2.updated === ST.updated ? P2 : null;
       STATO = ST;
