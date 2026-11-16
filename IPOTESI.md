@@ -185,3 +185,8 @@ Probabilità esposte: Vincente, Totale e Handicap (lato della lettura), Grado (u
 - Doppia doppia: sopra il 50% la ricalibrazione logit sottostima (holdout 58,7 / 67,2); isotonica migliora il log-loss (verifica z −4,1, 5/7; holdout z −1,3)
   ma sopravvaluta nella fascia Segnali (72-80: 74,5 / 58,1 su 93 casi) → non adottata, da rivedere con più dati.
 Nessuna ricalibrazione in produzione.
+
+## 16/11/2026 · Basket: triple, assist, palle perse attese (tools/basket/test_statistiche.py)
+Fatte e concesse ogni 100 possessi (media mobile, K 3) × possessi attesi, contro la media del campionato × possessi attesi:
+triple (DP 0,97) totale verifica z −22 7/7, holdout z −2,5 6/7; chi ne fa di più z −9 / −9 7/7. Assist (DP 0,95) totale z −29 / −19, chi ne fa di più z −13 / −14, 7/7.
+Palle perse (DP 0,90) totale z −19 / −19, chi ne fa di più z −11 / −10, 7/7. Rimbalzi (riferimento) z −14 / −13. Adottate nella Lettura come numeri attesi.

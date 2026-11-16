@@ -81,6 +81,10 @@ def fouls_of(g):
     S = g["stat"] or {}
     if S.get("h") and S.get("a") and S["h"][13] is not None and S["a"][13] is not None and S["h"][13] > 5 and S["a"][13] > 5: return (S["h"][13], S["a"][13])
     return None
+# 16/11/2026: triple, assist, palle perse attese (test tools/basket/test_statistiche.py, verifica e holdout migliori della media del campionato
+# in 7/7 campionati su totale e "chi ne fa di più"): fatte e concesse ogni 100 possessi, media mobile DP, K partite fittizie, × possessi attesi
+SX = {"tri": (2, 0.97, 3.0), "ast": (9, 0.95, 3.0), "pp": (12, 0.90, 3.0)}
+SXT = {k: collections.defaultdict(lambda: [0.0, 0.0, 0.0]) for k in SX}; SXL = {k: collections.defaultdict(lambda: [0.0, 0.0]) for k in SX}
 # rimbalzi attesi (informativi, Lettura): rimbalzi presi e concessi ogni 100 possessi (media mobile DP, ristretti con K partite verso il campionato)
 RB = collections.defaultdict(lambda: [0.0, 0.0, 0.0]); LRB = collections.defaultdict(lambda: [0.0, 0.0])
 
@@ -103,6 +107,12 @@ def predict(lg, h, a, day=None):
         lrate = lr_[1] / lr_[0]
         def g_(t, i): x = RB[(lg, t)]; return (x[i] + K * lrate) / (x[0] + K)
         out["rh"] = round(pace * (g_(h, 1) + g_(a, 2)) / 2 / 100, 1); out["ra"] = round(pace * (g_(a, 1) + g_(h, 2)) / 2 / 100, 1)
+    for k, (i_, dp_, k_) in SX.items():
+        Lx, th_, ta_ = SXL[k][lg], SXT[k][(lg, h)], SXT[k][(lg, a)]
+        if Lx[0] > 30 and th_[0] >= 3 and ta_[0] >= 3:
+            lr_ = Lx[1] / Lx[0]
+            def gx(x, j): return (x[j] + k_ * lr_) / (x[0] + k_)
+            out[k] = [round(pace * (gx(th_, 1) + gx(ta_, 2)) / 2 / 100, 1), round(pace * (gx(ta_, 1) + gx(th_, 2)) / 2 / 100, 1)]
     lf_ = LF[lg]; fh_, fa_ = FT[(lg, h)], FT[(lg, a)]
     if lf_[0] > 30 and fh_[0] >= 3 and fa_[0] >= 3 and day and all(x[3] and (datetime.date.fromisoformat(day) - datetime.date.fromisoformat(x[3])).days <= 45 for x in (fh_, fa_)):
         lfm, lhd = lf_[1] / lf_[0], lf_[2] / lf_[0]
@@ -126,6 +136,11 @@ for g in G:
         for t, f_, a_ in ((g["h"], S["h"][6], S["a"][6]), (g["a"], S["a"][6], S["h"][6])):
             x = RB[(lg, t)]; x[0] = x[0] * DP + 1; x[1] = x[1] * DP + 100 * f_ / P; x[2] = x[2] * DP + 100 * a_ / P
         x = LRB[lg]; x[0] = x[0] * 0.998 + 2; x[1] = x[1] * 0.998 + 100 * (S["h"][6] + S["a"][6]) / P
+    for k, (i_, dp_, k_) in SX.items():
+        if S.get("h") and S.get("a") and S["h"][i_] is not None and S["a"][i_] is not None and (i_ != 12 or (S["h"][i_] > 0 and S["a"][i_] > 0)):
+            for t, f_, a_ in ((g["h"], S["h"][i_], S["a"][i_]), (g["a"], S["a"][i_], S["h"][i_])):
+                x = SXT[k][(lg, t)]; x[0] = x[0] * dp_ + 1; x[1] = x[1] * dp_ + 100 * f_ / P; x[2] = x[2] * dp_ + 100 * a_ / P
+            x = SXL[k][lg]; x[0] = x[0] * 0.998 + 2; x[1] = x[1] * 0.998 + 100 * (S["h"][i_] + S["a"][i_]) / P
     f = fouls_of(g)
     if f:
         for t, fc, fd in ((g["h"], f[0], f[1]), (g["a"], f[1], f[0])):

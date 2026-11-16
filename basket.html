@@ -1160,7 +1160,8 @@ function renderMatch() {
       + `<div class="sx-r"><span class="sx-v">${ok(p.pch) ? f1(p.pch) : nd}</span><span class="sx-m"><small>Possessi</small><b>${f1(p.pace)}</b></span><span class="sx-v">${ok(p.pca) ? f1(p.pca) : nd}</span></div>`
       + rowP("Rimbalzi", p.rh, p.ra, ok(p.rh) ? p.rh + p.ra : null, st ? st.h[6] : null, st ? st.a[6] : null)
       + rowP("Falli", p.fh, p.fa, ok(p.fh) ? p.fh + p.fa : null, g.fl ? g.fl[0] : null, g.fl ? g.fl[1] : null)
-      + (real && st ? rowP("Assist", null, null, null, st.h[9], st.a[9]) + rowP("Triple", null, null, null, st.h[2], st.a[2]) + rowP("Palle perse", null, null, null, st.h[12], st.a[12]) : "");
+      + [["Assist", "ast", 9], ["Triple", "tri", 2], ["Palle perse", "pp", 12]].map(([lab, k, i]) => { const x = p[k];
+          return x ? rowP(lab, x[0], x[1], x[0] + x[1], st ? st.h[i] : null, st ? st.a[i] : null) : real && st ? rowP(lab, null, null, null, st.h[i], st.a[i]) : ""; }).join("");
   }
   const nq = R ? R.R.filter(r => r.q).length : 0;
   $("#mhead").innerHTML = `<div class="sx-band"><span class="flag" aria-hidden="true">${FL[g.lg] || "🏀"}</span><span class="nm"><small>${esc(B.leghe[g.lg][1])} · ${dlab(g.day)} · ${timeOf(g.d)}</small><b>${esc(B.leghe[g.lg][0])}</b></span></div>
