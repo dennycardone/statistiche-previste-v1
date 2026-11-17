@@ -12,12 +12,24 @@ concurrency:   # mai due aggiornamenti insieme
   cancel-in-progress: false
 permissions:
   contents: write
+  actions: write   # 17/11: per avviare il giro del basket (vedi sotto)
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with: { ref: main }   # sempre l'ultima versione (non quella di quando il giro è stato messo in coda)
+      - name: Avvia il giro del basket (GitHub salta quasi tutti i suoi orari programmati; questo giro invece parte ogni 30 minuti)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # 17/11/2026 (Denny: dati basket fermi alle 00:27): basket_quote.yml dalle 16:20 alle 7:20 è partito una volta sola. Se non c'è un suo giro
+          # partito negli ultimi 20 minuti lo avvia questo; i dati nuovi arrivano sul sito col giro successivo.
+          last=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/basket_quote.yml/runs?per_page=1" -q '.workflow_runs[0].created_at' 2>/dev/null || echo "")
+          if [ -z "$last" ] || [ $(( $(date -u +%s) - $(date -u -d "$last" +%s) )) -gt 1200 ]; then
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/workflows/basket_quote.yml/dispatches" -f ref=main && echo "giro basket avviato"
+          else echo "giro basket recente ($last)"; fi
       - name: Archivi dei dati dal magazzino privato di GitHub Actions (non pubblico)
         id: dati
         uses: actions/cache/restore@v4
