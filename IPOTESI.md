@@ -209,3 +209,16 @@ Palle perse (DP 0,90) totale z −19 / −19, chi ne fa di più z −11 / −10,
 - Radar basket: giorni passati (fino a 7) con le partite giocate, la previsione fatta prima della partita, ✓/✗ e riepilogo del giorno (uscite contro attese), come il calcio. Mercato e Operatività solo per i giorni da giocare.
 - Denny: possessi e palle perse tolti da Grado, Radar, Segnali, Tendenze e Digiuni; restano nella Lettura.
 - 16/11 · Segnali basket: barra dei giorni come il Radar (7 giorni passati con storico ✓/✗ e riepilogo) al posto di Oggi/Domani/Giornata. Calcio: Radar con la stessa barra dei giorni (−7…+7) al posto di Oggi + tendina Data.
+
+## 17/11/2026 · Gol attesi, fase 3 (Denny): backtest M0 / Dixon-Coles / livello / M1-M4 — NIENTE ANCORA NELL'APP
+Replica Python di M0 identica all'app (36.654 partite, differenza massima 5e-7 = arrotondamento). Tabella walk-forward 50.475 partite (31 campionati,
+da 9/2021): tools/p2/gol_feat.py; esperimenti gol_exp1_dc, gol_exp2_liv, gol_exp3_m14 (anche GOL_OFFSET=1), gol_exp4_forma, report gol_report.py.
+- Dixon-Coles rho unico mensile (≈ −0,04): 1X2 log-loss −0,08% verifica, −0,06% holdout (significativi, 22/31 campionati), pareggi 24,6→25,6 (reali 26,3),
+  ECE 1X2 1,54→1,06; risultato esatto −0,013% (verifica non significativa). Per campionato peggio (rumore); ristretto k=1000 ≈ unico.
+- Riequilibrio livello: coefficienti stimati di nuovo, fattore per campionato, livello recente/stagione: migliorano solo nel periodo scelta,
+  in verifica no (B peggiora +0,0008). Pendenza tra campionati scende (1,13→1,05) ma senza guadagno fuori campione → non passa.
+- M1 (volume, conversione) non passa contro il precedente in verifica; M2 (conversione concessa) e M3 (forma) passano contro il precedente;
+  M4 (campionato-stagione) non passa. Catena completa M4 contro M0: passa, ma 13 coefficienti.
+- Candidato: M0 + forma dei tiri in porta (ultime 10, fatti dalla squadra e concessi dall'avversaria, 2 coefficienti) + Dixon-Coles unico:
+  risultato esatto −0,091% verifica [significativo, 21/31], −0,094% holdout (20/31); 1X2 −0,22%/−0,19%; ECE 1X2 0,88/0,81; MAE invariato.
+  Over 3+ in holdout resta sottostimato (51,4 contro 53,0): è il livello della stagione in corso, nessuna correzione del livello passa la verifica.
