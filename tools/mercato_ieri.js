@@ -19,7 +19,7 @@ const ctx = vm.createContext({ console, Math, Date, JSON, Intl, Map, Set, Number
 vm.runInContext(html.slice(start, end) + "\nvar LINEE = null;\n" + BK + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, nazEntries, setNaz: j => { CUPD.NAZ = j; }, isoD, addDays, withLeague, model, modelGoals, modelShots, extraFor, bkCalc, isVal, BK_ROWS };", ctx);
 const A = ctx.API;
 const rd = f => { try { return fs.readFileSync(path.join(DATA, f), "utf8"); } catch (e) { return null; } };
-for (const [v, f] of [["EXTRA", "extra.json"], ["MERCATI", "mercati.json"], ["TAREA", "tiri_area.json"], ["FORMAZ", "formazioni.json"], ["OFFS", "fuorigioco.json"], ["LINEE", "linee.json"]]) {
+for (const [v, f] of [["EXTRA", "extra.json"], ["MERCATI", "mercati.json"], ["TAREA", "tiri_area.json"], ["FORMAZ", "formazioni.json"], ["OFFS", "fuorigioco.json"], ["LINEE", "linee.json"], ["GOL_RHO", "gol_rho.json"]]) {
   const t = rd(f); if (t) vm.runInContext(`${v} = ${t}; clearCache();`, ctx);
 }
 const man = JSON.parse(rd("manifest.json"));

@@ -90,7 +90,10 @@ jobs:
             python tools/half_shares.py tempi data/tempi.json || echo "::warning title=Tempi::quote per tempo non calcolate"
           else echo "::warning title=Tempi::ramo tempi non scaricato: resta il tempi.json del giro precedente"; fi
       - name: Previsioni della home
-        run: node precalc.js
+        run: |
+          # 17/11/2026: rho dei gol del mese (V2) anche per le previsioni calcolate qui
+          if git ls-remote --exit-code origin gol-rho >/dev/null 2>&1; then (git fetch -q --depth 1 origin gol-rho && git show FETCH_HEAD:gol_rho.json > data/gol_rho.json) || true; fi
+          node precalc.js
       - name: Radar Mercato · giocate bloccate al fischio ed esiti di ieri (data/mercato_ieri.json)
         run: node tools/mercato_ieri.js
       - name: Operatività · candidati bloccati al fischio ed esiti (data/operativita_ieri.json)
@@ -116,7 +119,9 @@ jobs:
           if git ls-remote --exit-code origin corretta >/dev/null 2>&1; then (git fetch -q --depth 1 origin corretta && git show FETCH_HEAD:corretta.json > data/corretta.json) || rm -f data/corretta.json; fi
           # 16/11/2026: allenatori arrivati da poco (allenatori.yml, ramo allenatori): l'app segnala il cambio nella Lettura e in Partite
           if git ls-remote --exit-code origin allenatori >/dev/null 2>&1; then (git fetch -q --depth 1 origin allenatori && git show FETCH_HEAD:allenatori.json > data/allenatori.json) || rm -f data/allenatori.json; fi
-          DATA="allenatori.json corretta.json operativita.json operativita_ieri.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json naz.json tempi.json fuorigioco.json tiri_area.json giocatori.json assenze.json basket.json"
+          # 17/11/2026: rho Dixon-Coles del mese per la V2 dei gol (gol_rho.yml, ramo gol-rho); senza file l'app usa la tabella nel codice
+          if git ls-remote --exit-code origin gol-rho >/dev/null 2>&1; then (git fetch -q --depth 1 origin gol-rho && git show FETCH_HEAD:gol_rho.json > data/gol_rho.json) || rm -f data/gol_rho.json; fi
+          DATA="gol_rho.json allenatori.json corretta.json operativita.json operativita_ieri.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json naz.json tempi.json fuorigioco.json tiri_area.json giocatori.json assenze.json basket.json"
           # 26/10/2026: il micro-processo delle formazioni (formazioni_live.yml) può aver pubblicato formazioni durante questo giro: si tengono
           # (unione con quelle già sul sito, quelle di questo giro hanno la precedenza; via dopo 3 ore dal fischio come in update_data.py)
           git fetch -q --depth 1 origin pages 2>/dev/null && git show FETCH_HEAD:data/formazioni.json > /tmp/fz_sito.json 2>/dev/null || true

@@ -11,6 +11,7 @@ const ctx = vm.createContext({ console, Math, Date, JSON, Intl, Map, Set, Number
 vm.runInContext(html.slice(start, end) + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, leagueMatches, modelGoals, goalDynParts, goalOnlyDynParts, gdynFit, eloAt, qualX, clearCache };", ctx);
 const D = path.join(REPO, "pub") + "/";
 for (const [v, f] of [["EXTRA", "extra"], ["TAREA", "tiri_area"], ["OFFS", "fuorigioco"]]) vm.runInContext(`${v} = ${fs.readFileSync(D + f + ".json", "utf8")}; clearCache();`, ctx);
+try { vm.runInContext(`GOL_RHO = ${fs.readFileSync(D + "gol_rho.json", "utf8")}; clearCache();`, ctx); } catch (e) {}   // 17/11/2026: rho dei gol per mese (riserva: tabella nel codice)
 const A = ctx.API; A.resetState();
 for (const bf of ["bundle_storico", "bundle"]) for (const f of JSON.parse(fs.readFileSync(D + bf + ".json")).files) A.addParsed(A.parseCSV(f.text));
 const r6 = v => v == null || !isFinite(v) ? null : Math.round(v * 1e6) / 1e6, iso = d => new Date(d).toISOString().slice(0, 10);
@@ -27,6 +28,7 @@ for (const code of process.argv[2].split(",")) {
     try {
       const G = A.modelGoals(m.home, m.away, A.MODES.dyn); if (G) { r.lh = r6(G.lh); r.la = r6(G.la); r.p = [r6(G.p1), r6(G.px), r6(G.p2)]; }
       const P = A.goalDynParts(m.home, m.away); r.src = P ? "gdyn" : "altro";
+      r.rho = G ? r6(G.rho || 0) : null; if (P && P.m0) r.m0 = [r6(P.m0.lh), r6(P.m0.la)];
       const Dd = +m.date, eH = A.eloAt(code, m.home, Dd), eA = A.eloAt(code, m.away, Dd); r.eh = eH ? r6(eH.elo) : null; r.ea = eA ? r6(eA.elo) : null;
       const QX = A.qualX(code, Dd, m.home, m.away); r.qx = QX ? QX.map(r6) : null;
     } catch (e) { r.err = String(e).slice(0, 80); }

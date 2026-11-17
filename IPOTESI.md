@@ -222,3 +222,13 @@ da 9/2021): tools/p2/gol_feat.py; esperimenti gol_exp1_dc, gol_exp2_liv, gol_exp
 - Candidato: M0 + forma dei tiri in porta (ultime 10, fatti dalla squadra e concessi dall'avversaria, 2 coefficienti) + Dixon-Coles unico:
   risultato esatto −0,091% verifica [significativo, 21/31], −0,094% holdout (20/31); 1X2 −0,22%/−0,19%; ECE 1X2 0,88/0,81; MAE invariato.
   Over 3+ in holdout resta sottostimato (51,4 contro 53,0): è il livello della stagione in corso, nessuna correzione del livello passa la verifica.
+
+## 17/11/2026 · Gol attesi V2 — ADOTTATA (Denny), congelata, verifica prospettica dal 18/11/2026
+V2 = M0 × e^(0,0084 + 6,4771·FS_squadra + 2,5448·FC_avversaria), K = 320, ultime 10 partite di campionato; Dixon-Coles con rho unico del mese
+(gol_rho.yml il 1° del mese, ramo gol-rho → data/gol_rho.json; riserva: tabella GOL_RHO_M nel codice). Spegnimento: GV2.on = false (= M0 identico,
+verificato su Serie A: 1.250 partite uguali); copia completa di M0 sul ramo backup-m0-gol (commit c13278e).
+Controlli: app = Python su 36.437 partite (differenza ≤ 5e-7 su λ, rho, 1X2); M0 dentro la V2 identico al vecchio M0; corner, falli, tiri, tiri in porta,
+fuorigioco identici (Serie A e MLS, 3.343 partite); precalc: cambiano solo gol, Over, Gol/No gol e i loro Confidence. Fattore V2/M0 0,85–1,30
+(99,8% tra 0,89 e 1,21), λ massimo 4,40; VIF < 2 (FS correlata 0,47 con il rating strutturale: i coefficienti misurano solo l'informazione in più).
+Coefficienti stimati sulla sola verifica (controllo, non usati): 5,32 e 2,80 (congelati 6,48 e 2,54). Holdout già visto = periodo di confronto.
+Verifica prospettica: tools/p2/gol_prospettico.py (ogni domenica in ricerca.yml) e al checkpoint del 7/12.

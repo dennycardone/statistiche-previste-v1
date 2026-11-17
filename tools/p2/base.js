@@ -13,6 +13,7 @@ const ctx = vm.createContext({ console, Math, Date, JSON, Intl, Map, Set, Number
 vm.runInContext(html.slice(start, end) + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, leagueMatches, model, modelShots, modelGoals, offModel, attachOffs };", ctx);
 const D = (process.env.P2_DATA || path.join(REPO, "pub")) + "/";   // dati pubblicati (bundle, extra, tiri_area, fuorigioco)
 for (const [v, f] of [["EXTRA", "extra"], ["TAREA", "tiri_area"], ["OFFS", "fuorigioco"]]) vm.runInContext(`${v} = ${fs.readFileSync(D + f + ".json", "utf8")}; clearCache();`, ctx);
+try { vm.runInContext(`GOL_RHO = ${fs.readFileSync(D + "gol_rho.json", "utf8")}; clearCache();`, ctx); } catch (e) {}   // 17/11/2026: rho dei gol per mese (riserva: tabella nel codice)
 const A = ctx.API; A.resetState();
 for (const bf of ["bundle_storico", "bundle"]) for (const f of JSON.parse(fs.readFileSync(D + bf + ".json")).files) A.addParsed(A.parseCSV(f.text));
 A.attachOffs();
@@ -30,7 +31,7 @@ for (const code of lgs.split(",")) {
     try { row.c = pk(A.model(m.home, m.away, cfg, "c")); } catch (e) {}
     try { row.f = pk(A.model(m.home, m.away, cfg, "f")); } catch (e) {}
     try { const T = A.modelShots(m.home, m.away, cfg); if (T) { row.s = pk(T.MS); row.st = pk(T.MD); } } catch (e) {}
-    try { const G = A.modelGoals(m.home, m.away, cfg); if (G) row.g = [r4(G.lh), r4(G.la), r4(G.rho || 0)]; } catch (e) {}
+    try { const G = A.modelGoals(m.home, m.away, cfg); if (G) { row.g = [r4(G.lh), r4(G.la), r4(G.rho || 0)]; const B = G.M && G.M.Bp; if (B && B.m0) row.g.push(r4(B.m0.lh), r4(B.m0.la)); } } catch (e) {}   // 17/11/2026: anche λ di M0 per la verifica prospettica della V2
     try { const O = A.offModel(m.home, m.away); if (O && !O.nd) row.o = [r4(O.lh), r4(O.la), -1, RT[0], 0]; } catch (e) {}
     out.push(row);
   }

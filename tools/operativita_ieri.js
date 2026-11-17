@@ -22,7 +22,7 @@ const ctx = vm.createContext({ console, Math, Date, JSON, Intl, Map, Set, Number
 vm.runInContext(html.slice(start, end) + "\nvar LINEE = null;\n" + CODE + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, nazEntries, setNaz: j => { CUPD.NAZ = j; }, isoD, addDays, withLeague, attachOffs, opEntry, opSelect, opKelly, OP_C, setCorr: c => { CORR = c; OP_C.clear(); }, setOdds: (q, l) => { QMOV = q; LINEE = l; } };", ctx);
 const A = ctx.API;
 const rd = f => { try { return fs.readFileSync(path.join(DATA, f), "utf8"); } catch (e) { return null; } };
-for (const [v, f] of [["EXTRA", "extra.json"], ["MERCATI", "mercati.json"], ["TAREA", "tiri_area.json"], ["FORMAZ", "formazioni.json"], ["OFFS", "fuorigioco.json"]]) {
+for (const [v, f] of [["EXTRA", "extra.json"], ["MERCATI", "mercati.json"], ["TAREA", "tiri_area.json"], ["FORMAZ", "formazioni.json"], ["OFFS", "fuorigioco.json"], ["GOL_RHO", "gol_rho.json"]]) {
   const t = rd(f); if (t) vm.runInContext(`${v} = ${t}; clearCache();`, ctx);
 }
 const CORR = JSON.parse(rd("corretta.json") || "null");

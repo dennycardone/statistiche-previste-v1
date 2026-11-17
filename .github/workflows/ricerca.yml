@@ -34,7 +34,7 @@ jobs:
       - name: Dati pubblicati e rami delle materie prime
         run: |
           mkdir -p pub ricerca/form2 && git fetch -q --depth 1 origin pages
-          for f in bundle bundle_storico extra tiri_area fuorigioco; do git show FETCH_HEAD:data/$f.json > pub/$f.json 2>/dev/null || rm -f pub/$f.json; done
+          for f in bundle bundle_storico extra tiri_area fuorigioco gol_rho; do git show FETCH_HEAD:data/$f.json > pub/$f.json 2>/dev/null || rm -f pub/$f.json; done
           git fetch -q --depth 1 origin formazioni && git archive FETCH_HEAD | tar -x -C ricerca/form2
           echo "formazioni: $(ls ricerca/form2 | wc -l) file"
       - uses: actions/setup-node@v4
@@ -47,6 +47,9 @@ jobs:
           LGS=$(node -e 'const h=require("fs").readFileSync("index.html","utf8"); const a=h.indexOf("const LEAGUES = ["), b=h.indexOf("];", a); console.log([...h.slice(a,b).matchAll(/code: "([A-Z0-9]+)"/g)].map(m=>m[1]).join(","))')
           echo "campionati: $LGS"
           P2_OUT=ricerca/base node tools/p2/base.js "$LGS" 2023
+      - name: Gol V2 · verifica prospettica sulle partite dopo il congelamento (17/11/2026), contro M0
+        continue-on-error: true
+        run: python3 tools/p2/gol_prospettico.py ricerca/base
       - name: Caratteristiche dei titolari, riposo, posta in gioco
         continue-on-error: true
         run: |

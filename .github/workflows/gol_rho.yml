@@ -1,0 +1,38 @@
+name: Gol V2 · rho del mese
+# 17/11/2026 (Denny, fase 4): rho Dixon-Coles unico della V2 dei gol, stimato all'inizio di ogni mese su tutte le partite giocate prima
+# (31 campionati, λ della V2 congelata, coefficienti fissi). Scrive gol_rho.json sul ramo gol-rho; update.yml lo pubblica in data/.
+# Nessuna richiesta API: usa i dati già pubblicati.
+on:
+  schedule:
+    - cron: "23 3 1 * *"    # il primo del mese alle 3:23 UTC
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  rho:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dati pubblicati
+        run: |
+          mkdir -p pub && git fetch -q --depth 1 origin pages
+          for f in bundle bundle_storico extra tiri_area fuorigioco gol_rho; do git show FETCH_HEAD:data/$f.json > pub/$f.json 2>/dev/null || rm -f pub/$f.json; done
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy pandas scipy
+      - name: Partite dell'app e tabella walk-forward
+        run: |
+          LGS=$(node -e 'const h=require("fs").readFileSync("index.html","utf8"); const a=h.indexOf("const LEAGUES = ["), b=h.indexOf("];", a); console.log([...h.slice(a,b).matchAll(/code: "([A-Z0-9]+)"/g)].map(m=>m[1]).join("\n"))')
+          echo "$LGS" | xargs -P 4 -I{} node tools/p2/gol_dump.js {}
+          python tools/p2/gol_feat.py | tail -3
+      - name: rho per mese
+        run: mkdir -p _gr && python tools/p2/gol_rho_pub.py _gr/gol_rho.json
+      - name: Salva sul ramo gol-rho
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd _gr && git init -q -b gol-rho && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "rho dei gol $(date -u '+%F')" && git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gol-rho

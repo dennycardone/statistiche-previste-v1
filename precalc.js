@@ -22,6 +22,7 @@ try { const ex = fs.readFileSync(path.join(DATA, "extra.json"), "utf8"); vm.runI
 try { const mk = fs.readFileSync(path.join(DATA, "mercati.json"), "utf8"); vm.runInContext("MERCATI = " + mk + ";", ctx); } catch (e) { console.log("mercati.json non disponibile"); }
 // qualità dei tiri nel modello gol (tiri in area e in porta), come nell'app
 try { const ta = fs.readFileSync(path.join(DATA, "tiri_area.json"), "utf8"); vm.runInContext("TAREA = " + ta + "; clearCache();", ctx); } catch (e) { console.log("tiri_area.json non disponibile"); }
+try { const gr = fs.readFileSync(path.join(DATA, "gol_rho.json"), "utf8"); vm.runInContext("GOL_RHO = " + gr + "; clearCache();", ctx); } catch (e) { console.log("gol_rho.json non disponibile: rho dei gol dalla tabella nel codice"); }   // 17/11/2026: V2 dei gol
 // 25/10/2026 (fase 1-B): formazioni ufficiali → correzione dei falli attesi (data/formazioni.json), come nell'app
 try { const fz = fs.readFileSync(path.join(DATA, "formazioni.json"), "utf8"); vm.runInContext("FORMAZ = " + fz + "; clearCache();", ctx); } catch (e) { console.log("formazioni.json non disponibile"); }
 // 25/10/2026: fuorigioco (1X2 nel Grado e nei Segnali, come nell'app); caricato prima delle partite, che ricevono i fuorigioco reali
