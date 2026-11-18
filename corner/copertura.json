@@ -1,0 +1,1664 @@
+{
+ "archivio": [
+  {
+   "lg": "ARG",
+   "se": 2022,
+   "partite": 581,
+   "con_corner": 581
+  },
+  {
+   "lg": "ARG",
+   "se": 2023,
+   "partite": 378,
+   "con_corner": 378
+  },
+  {
+   "lg": "ARG",
+   "se": 2024,
+   "partite": 378,
+   "con_corner": 378
+  },
+  {
+   "lg": "ARG",
+   "se": 2025,
+   "partite": 510,
+   "con_corner": 510
+  },
+  {
+   "lg": "ARG",
+   "se": 2026,
+   "partite": 495,
+   "con_corner": 491
+  },
+  {
+   "lg": "AUT",
+   "se": 2022,
+   "partite": 195,
+   "con_corner": 195
+  },
+  {
+   "lg": "AUT",
+   "se": 2023,
+   "partite": 195,
+   "con_corner": 195
+  },
+  {
+   "lg": "AUT",
+   "se": 2024,
+   "partite": 195,
+   "con_corner": 195
+  },
+  {
+   "lg": "AUT",
+   "se": 2025,
+   "partite": 195,
+   "con_corner": 195
+  },
+  {
+   "lg": "AUT",
+   "se": 2026,
+   "partite": 72,
+   "con_corner": 72
+  },
+  {
+   "lg": "B1",
+   "se": 2022,
+   "partite": 328,
+   "con_corner": 328
+  },
+  {
+   "lg": "B1",
+   "se": 2023,
+   "partite": 315,
+   "con_corner": 311
+  },
+  {
+   "lg": "B1",
+   "se": 2024,
+   "partite": 315,
+   "con_corner": 315
+  },
+  {
+   "lg": "B1",
+   "se": 2025,
+   "partite": 321,
+   "con_corner": 321
+  },
+  {
+   "lg": "B1",
+   "se": 2026,
+   "partite": 99,
+   "con_corner": 99
+  },
+  {
+   "lg": "BLR",
+   "se": 2022,
+   "partite": 242,
+   "con_corner": 55
+  },
+  {
+   "lg": "BLR",
+   "se": 2023,
+   "partite": 212,
+   "con_corner": 172
+  },
+  {
+   "lg": "BLR",
+   "se": 2024,
+   "partite": 242,
+   "con_corner": 11
+  },
+  {
+   "lg": "BLR",
+   "se": 2025,
+   "partite": 243,
+   "con_corner": 4
+  },
+  {
+   "lg": "BLR",
+   "se": 2026,
+   "partite": 224,
+   "con_corner": 116
+  },
+  {
+   "lg": "BRA",
+   "se": 2022,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "BRA",
+   "se": 2023,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "BRA",
+   "se": 2024,
+   "partite": 380,
+   "con_corner": 379
+  },
+  {
+   "lg": "BRA",
+   "se": 2025,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "BRA",
+   "se": 2026,
+   "partite": 339,
+   "con_corner": 339
+  },
+  {
+   "lg": "BUL",
+   "se": 2022,
+   "partite": 284,
+   "con_corner": 196
+  },
+  {
+   "lg": "BUL",
+   "se": 2023,
+   "partite": 284,
+   "con_corner": 239
+  },
+  {
+   "lg": "BUL",
+   "se": 2024,
+   "partite": 295,
+   "con_corner": 127
+  },
+  {
+   "lg": "BUL",
+   "se": 2025,
+   "partite": 293,
+   "con_corner": 182
+  },
+  {
+   "lg": "BUL",
+   "se": 2026,
+   "partite": 97,
+   "con_corner": 63
+  },
+  {
+   "lg": "CHN",
+   "se": 2022,
+   "partite": 304,
+   "con_corner": 295
+  },
+  {
+   "lg": "CHN",
+   "se": 2023,
+   "partite": 240,
+   "con_corner": 240
+  },
+  {
+   "lg": "CHN",
+   "se": 2024,
+   "partite": 240,
+   "con_corner": 240
+  },
+  {
+   "lg": "CHN",
+   "se": 2025,
+   "partite": 240,
+   "con_corner": 240
+  },
+  {
+   "lg": "CHN",
+   "se": 2026,
+   "partite": 240,
+   "con_corner": 240
+  },
+  {
+   "lg": "CRO",
+   "se": 2022,
+   "partite": 180,
+   "con_corner": 180
+  },
+  {
+   "lg": "CRO",
+   "se": 2023,
+   "partite": 180,
+   "con_corner": 178
+  },
+  {
+   "lg": "CRO",
+   "se": 2024,
+   "partite": 180,
+   "con_corner": 175
+  },
+  {
+   "lg": "CRO",
+   "se": 2025,
+   "partite": 180,
+   "con_corner": 174
+  },
+  {
+   "lg": "CRO",
+   "se": 2026,
+   "partite": 64,
+   "con_corner": 64
+  },
+  {
+   "lg": "CYP",
+   "se": 2022,
+   "partite": 267,
+   "con_corner": 197
+  },
+  {
+   "lg": "CYP",
+   "se": 2023,
+   "partite": 268,
+   "con_corner": 217
+  },
+  {
+   "lg": "CYP",
+   "se": 2024,
+   "partite": 240,
+   "con_corner": 53
+  },
+  {
+   "lg": "CYP",
+   "se": 2025,
+   "partite": 240,
+   "con_corner": 84
+  },
+  {
+   "lg": "CYP",
+   "se": 2026,
+   "partite": 63,
+   "con_corner": 9
+  },
+  {
+   "lg": "CZE",
+   "se": 2022,
+   "partite": 280,
+   "con_corner": 257
+  },
+  {
+   "lg": "CZE",
+   "se": 2023,
+   "partite": 281,
+   "con_corner": 271
+  },
+  {
+   "lg": "CZE",
+   "se": 2024,
+   "partite": 280,
+   "con_corner": 275
+  },
+  {
+   "lg": "CZE",
+   "se": 2025,
+   "partite": 279,
+   "con_corner": 277
+  },
+  {
+   "lg": "CZE",
+   "se": 2026,
+   "partite": 111,
+   "con_corner": 110
+  },
+  {
+   "lg": "D1",
+   "se": 2022,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "D1",
+   "se": 2023,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "D1",
+   "se": 2024,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "D1",
+   "se": 2025,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "D1",
+   "se": 2026,
+   "partite": 81,
+   "con_corner": 81
+  },
+  {
+   "lg": "D2",
+   "se": 2022,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "D2",
+   "se": 2023,
+   "partite": 308,
+   "con_corner": 307
+  },
+  {
+   "lg": "D2",
+   "se": 2024,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "D2",
+   "se": 2025,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "D2",
+   "se": 2026,
+   "partite": 99,
+   "con_corner": 99
+  },
+  {
+   "lg": "DNK",
+   "se": 2022,
+   "partite": 193,
+   "con_corner": 193
+  },
+  {
+   "lg": "DNK",
+   "se": 2023,
+   "partite": 193,
+   "con_corner": 193
+  },
+  {
+   "lg": "DNK",
+   "se": 2024,
+   "partite": 193,
+   "con_corner": 193
+  },
+  {
+   "lg": "DNK",
+   "se": 2025,
+   "partite": 193,
+   "con_corner": 193
+  },
+  {
+   "lg": "DNK",
+   "se": 2026,
+   "partite": 84,
+   "con_corner": 84
+  },
+  {
+   "lg": "E0",
+   "se": 2022,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "E0",
+   "se": 2023,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "E0",
+   "se": 2024,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "E0",
+   "se": 2025,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "E0",
+   "se": 2026,
+   "partite": 100,
+   "con_corner": 100
+  },
+  {
+   "lg": "E1",
+   "se": 2022,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E1",
+   "se": 2023,
+   "partite": 557,
+   "con_corner": 554
+  },
+  {
+   "lg": "E1",
+   "se": 2024,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E1",
+   "se": 2025,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E1",
+   "se": 2026,
+   "partite": 180,
+   "con_corner": 180
+  },
+  {
+   "lg": "E2",
+   "se": 2022,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E2",
+   "se": 2023,
+   "partite": 557,
+   "con_corner": 556
+  },
+  {
+   "lg": "E2",
+   "se": 2024,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E2",
+   "se": 2025,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E2",
+   "se": 2026,
+   "partite": 158,
+   "con_corner": 158
+  },
+  {
+   "lg": "E3",
+   "se": 2022,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E3",
+   "se": 2023,
+   "partite": 557,
+   "con_corner": 556
+  },
+  {
+   "lg": "E3",
+   "se": 2024,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E3",
+   "se": 2025,
+   "partite": 557,
+   "con_corner": 557
+  },
+  {
+   "lg": "E3",
+   "se": 2026,
+   "partite": 164,
+   "con_corner": 164
+  },
+  {
+   "lg": "EC",
+   "se": 2022,
+   "partite": 557,
+   "con_corner": 0
+  },
+  {
+   "lg": "EC",
+   "se": 2023,
+   "partite": 556,
+   "con_corner": 0
+  },
+  {
+   "lg": "EC",
+   "se": 2024,
+   "partite": 557,
+   "con_corner": 0
+  },
+  {
+   "lg": "EC",
+   "se": 2025,
+   "partite": 556,
+   "con_corner": 0
+  },
+  {
+   "lg": "EC",
+   "se": 2026,
+   "partite": 189,
+   "con_corner": 0
+  },
+  {
+   "lg": "F1",
+   "se": 2022,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "F1",
+   "se": 2023,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "F1",
+   "se": 2024,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "F1",
+   "se": 2025,
+   "partite": 307,
+   "con_corner": 307
+  },
+  {
+   "lg": "F1",
+   "se": 2026,
+   "partite": 90,
+   "con_corner": 90
+  },
+  {
+   "lg": "F2",
+   "se": 2022,
+   "partite": 379,
+   "con_corner": 379
+  },
+  {
+   "lg": "F2",
+   "se": 2023,
+   "partite": 382,
+   "con_corner": 380
+  },
+  {
+   "lg": "F2",
+   "se": 2024,
+   "partite": 310,
+   "con_corner": 306
+  },
+  {
+   "lg": "F2",
+   "se": 2025,
+   "partite": 309,
+   "con_corner": 309
+  },
+  {
+   "lg": "F2",
+   "se": 2026,
+   "partite": 108,
+   "con_corner": 108
+  },
+  {
+   "lg": "FIN",
+   "se": 2022,
+   "partite": 167,
+   "con_corner": 90
+  },
+  {
+   "lg": "FIN",
+   "se": 2023,
+   "partite": 169,
+   "con_corner": 140
+  },
+  {
+   "lg": "FIN",
+   "se": 2024,
+   "partite": 169,
+   "con_corner": 0
+  },
+  {
+   "lg": "FIN",
+   "se": 2025,
+   "partite": 179,
+   "con_corner": 70
+  },
+  {
+   "lg": "FIN",
+   "se": 2026,
+   "partite": 179,
+   "con_corner": 133
+  },
+  {
+   "lg": "G1",
+   "se": 2022,
+   "partite": 240,
+   "con_corner": 240
+  },
+  {
+   "lg": "G1",
+   "se": 2023,
+   "partite": 240,
+   "con_corner": 239
+  },
+  {
+   "lg": "G1",
+   "se": 2024,
+   "partite": 236,
+   "con_corner": 233
+  },
+  {
+   "lg": "G1",
+   "se": 2025,
+   "partite": 236,
+   "con_corner": 236
+  },
+  {
+   "lg": "G1",
+   "se": 2026,
+   "partite": 69,
+   "con_corner": 69
+  },
+  {
+   "lg": "HUN",
+   "se": 2022,
+   "partite": 198,
+   "con_corner": 87
+  },
+  {
+   "lg": "HUN",
+   "se": 2023,
+   "partite": 198,
+   "con_corner": 182
+  },
+  {
+   "lg": "HUN",
+   "se": 2024,
+   "partite": 198,
+   "con_corner": 131
+  },
+  {
+   "lg": "HUN",
+   "se": 2025,
+   "partite": 198,
+   "con_corner": 122
+  },
+  {
+   "lg": "HUN",
+   "se": 2026,
+   "partite": 77,
+   "con_corner": 69
+  },
+  {
+   "lg": "I1",
+   "se": 2022,
+   "partite": 381,
+   "con_corner": 381
+  },
+  {
+   "lg": "I1",
+   "se": 2023,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "I1",
+   "se": 2024,
+   "partite": 380,
+   "con_corner": 379
+  },
+  {
+   "lg": "I1",
+   "se": 2025,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "I1",
+   "se": 2026,
+   "partite": 110,
+   "con_corner": 110
+  },
+  {
+   "lg": "I2",
+   "se": 2022,
+   "partite": 390,
+   "con_corner": 390
+  },
+  {
+   "lg": "I2",
+   "se": 2023,
+   "partite": 390,
+   "con_corner": 390
+  },
+  {
+   "lg": "I2",
+   "se": 2024,
+   "partite": 389,
+   "con_corner": 388
+  },
+  {
+   "lg": "I2",
+   "se": 2025,
+   "partite": 390,
+   "con_corner": 390
+  },
+  {
+   "lg": "I2",
+   "se": 2026,
+   "partite": 110,
+   "con_corner": 110
+  },
+  {
+   "lg": "IRL",
+   "se": 2022,
+   "partite": 181,
+   "con_corner": 0
+  },
+  {
+   "lg": "IRL",
+   "se": 2023,
+   "partite": 181,
+   "con_corner": 77
+  },
+  {
+   "lg": "IRL",
+   "se": 2024,
+   "partite": 181,
+   "con_corner": 176
+  },
+  {
+   "lg": "IRL",
+   "se": 2025,
+   "partite": 181,
+   "con_corner": 169
+  },
+  {
+   "lg": "IRL",
+   "se": 2026,
+   "partite": 181,
+   "con_corner": 177
+  },
+  {
+   "lg": "ISR",
+   "se": 2022,
+   "partite": 240,
+   "con_corner": 96
+  },
+  {
+   "lg": "ISR",
+   "se": 2023,
+   "partite": 240,
+   "con_corner": 139
+  },
+  {
+   "lg": "ISR",
+   "se": 2024,
+   "partite": 240,
+   "con_corner": 131
+  },
+  {
+   "lg": "ISR",
+   "se": 2025,
+   "partite": 239,
+   "con_corner": 119
+  },
+  {
+   "lg": "ISR",
+   "se": 2026,
+   "partite": 70,
+   "con_corner": 70
+  },
+  {
+   "lg": "JPN",
+   "se": 2022,
+   "partite": 306,
+   "con_corner": 306
+  },
+  {
+   "lg": "JPN",
+   "se": 2023,
+   "partite": 306,
+   "con_corner": 306
+  },
+  {
+   "lg": "JPN",
+   "se": 2024,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "JPN",
+   "se": 2025,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "JPN",
+   "se": 2026,
+   "partite": 200,
+   "con_corner": 200
+  },
+  {
+   "lg": "MEX",
+   "se": 2022,
+   "partite": 342,
+   "con_corner": 342
+  },
+  {
+   "lg": "MEX",
+   "se": 2023,
+   "partite": 340,
+   "con_corner": 339
+  },
+  {
+   "lg": "MEX",
+   "se": 2024,
+   "partite": 340,
+   "con_corner": 339
+  },
+  {
+   "lg": "MEX",
+   "se": 2025,
+   "partite": 337,
+   "con_corner": 337
+  },
+  {
+   "lg": "MEX",
+   "se": 2026,
+   "partite": 143,
+   "con_corner": 143
+  },
+  {
+   "lg": "N1",
+   "se": 2022,
+   "partite": 324,
+   "con_corner": 324
+  },
+  {
+   "lg": "N1",
+   "se": 2023,
+   "partite": 321,
+   "con_corner": 321
+  },
+  {
+   "lg": "N1",
+   "se": 2024,
+   "partite": 321,
+   "con_corner": 321
+  },
+  {
+   "lg": "N1",
+   "se": 2025,
+   "partite": 309,
+   "con_corner": 309
+  },
+  {
+   "lg": "N1",
+   "se": 2026,
+   "partite": 108,
+   "con_corner": 108
+  },
+  {
+   "lg": "NOR",
+   "se": 2022,
+   "partite": 242,
+   "con_corner": 242
+  },
+  {
+   "lg": "NOR",
+   "se": 2023,
+   "partite": 242,
+   "con_corner": 242
+  },
+  {
+   "lg": "NOR",
+   "se": 2024,
+   "partite": 242,
+   "con_corner": 242
+  },
+  {
+   "lg": "NOR",
+   "se": 2025,
+   "partite": 241,
+   "con_corner": 240
+  },
+  {
+   "lg": "NOR",
+   "se": 2026,
+   "partite": 208,
+   "con_corner": 208
+  },
+  {
+   "lg": "P1",
+   "se": 2022,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "P1",
+   "se": 2023,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "P1",
+   "se": 2024,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "P1",
+   "se": 2025,
+   "partite": 308,
+   "con_corner": 308
+  },
+  {
+   "lg": "P1",
+   "se": 2026,
+   "partite": 98,
+   "con_corner": 98
+  },
+  {
+   "lg": "POL",
+   "se": 2022,
+   "partite": 306,
+   "con_corner": 306
+  },
+  {
+   "lg": "POL",
+   "se": 2023,
+   "partite": 306,
+   "con_corner": 301
+  },
+  {
+   "lg": "POL",
+   "se": 2024,
+   "partite": 306,
+   "con_corner": 302
+  },
+  {
+   "lg": "POL",
+   "se": 2025,
+   "partite": 306,
+   "con_corner": 306
+  },
+  {
+   "lg": "POL",
+   "se": 2026,
+   "partite": 124,
+   "con_corner": 124
+  },
+  {
+   "lg": "ROU",
+   "se": 2022,
+   "partite": 321,
+   "con_corner": 233
+  },
+  {
+   "lg": "ROU",
+   "se": 2023,
+   "partite": 321,
+   "con_corner": 313
+  },
+  {
+   "lg": "ROU",
+   "se": 2024,
+   "partite": 319,
+   "con_corner": 313
+  },
+  {
+   "lg": "ROU",
+   "se": 2025,
+   "partite": 321,
+   "con_corner": 320
+  },
+  {
+   "lg": "ROU",
+   "se": 2026,
+   "partite": 120,
+   "con_corner": 120
+  },
+  {
+   "lg": "RUS",
+   "se": 2022,
+   "partite": 244,
+   "con_corner": 244
+  },
+  {
+   "lg": "RUS",
+   "se": 2023,
+   "partite": 244,
+   "con_corner": 243
+  },
+  {
+   "lg": "RUS",
+   "se": 2024,
+   "partite": 244,
+   "con_corner": 241
+  },
+  {
+   "lg": "RUS",
+   "se": 2025,
+   "partite": 244,
+   "con_corner": 243
+  },
+  {
+   "lg": "RUS",
+   "se": 2026,
+   "partite": 112,
+   "con_corner": 112
+  },
+  {
+   "lg": "SC0",
+   "se": 2022,
+   "partite": 234,
+   "con_corner": 228
+  },
+  {
+   "lg": "SC0",
+   "se": 2023,
+   "partite": 234,
+   "con_corner": 228
+  },
+  {
+   "lg": "SC0",
+   "se": 2024,
+   "partite": 234,
+   "con_corner": 228
+  },
+  {
+   "lg": "SC0",
+   "se": 2025,
+   "partite": 234,
+   "con_corner": 230
+  },
+  {
+   "lg": "SC0",
+   "se": 2026,
+   "partite": 75,
+   "con_corner": 75
+  },
+  {
+   "lg": "SC1",
+   "se": 2022,
+   "partite": 186,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC1",
+   "se": 2023,
+   "partite": 186,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC1",
+   "se": 2024,
+   "partite": 186,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC1",
+   "se": 2025,
+   "partite": 186,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC1",
+   "se": 2026,
+   "partite": 69,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC2",
+   "se": 2022,
+   "partite": 186,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC2",
+   "se": 2023,
+   "partite": 186,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC2",
+   "se": 2024,
+   "partite": 186,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC2",
+   "se": 2025,
+   "partite": 186,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC2",
+   "se": 2026,
+   "partite": 69,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC3",
+   "se": 2022,
+   "partite": 182,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC3",
+   "se": 2023,
+   "partite": 182,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC3",
+   "se": 2024,
+   "partite": 182,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC3",
+   "se": 2025,
+   "partite": 182,
+   "con_corner": 0
+  },
+  {
+   "lg": "SC3",
+   "se": 2026,
+   "partite": 65,
+   "con_corner": 0
+  },
+  {
+   "lg": "SP1",
+   "se": 2022,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "SP1",
+   "se": 2023,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "SP1",
+   "se": 2024,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "SP1",
+   "se": 2025,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "SP1",
+   "se": 2026,
+   "partite": 119,
+   "con_corner": 119
+  },
+  {
+   "lg": "SP2",
+   "se": 2022,
+   "partite": 468,
+   "con_corner": 468
+  },
+  {
+   "lg": "SP2",
+   "se": 2023,
+   "partite": 468,
+   "con_corner": 467
+  },
+  {
+   "lg": "SP2",
+   "se": 2024,
+   "partite": 468,
+   "con_corner": 468
+  },
+  {
+   "lg": "SP2",
+   "se": 2025,
+   "partite": 468,
+   "con_corner": 468
+  },
+  {
+   "lg": "SP2",
+   "se": 2026,
+   "partite": 141,
+   "con_corner": 141
+  },
+  {
+   "lg": "SRB",
+   "se": 2022,
+   "partite": 300,
+   "con_corner": 129
+  },
+  {
+   "lg": "SRB",
+   "se": 2023,
+   "partite": 300,
+   "con_corner": 289
+  },
+  {
+   "lg": "SRB",
+   "se": 2024,
+   "partite": 300,
+   "con_corner": 288
+  },
+  {
+   "lg": "SRB",
+   "se": 2025,
+   "partite": 296,
+   "con_corner": 295
+  },
+  {
+   "lg": "SRB",
+   "se": 2026,
+   "partite": 104,
+   "con_corner": 104
+  },
+  {
+   "lg": "SVK",
+   "se": 2022,
+   "partite": 197,
+   "con_corner": 131
+  },
+  {
+   "lg": "SVK",
+   "se": 2023,
+   "partite": 194,
+   "con_corner": 191
+  },
+  {
+   "lg": "SVK",
+   "se": 2024,
+   "partite": 197,
+   "con_corner": 189
+  },
+  {
+   "lg": "SVK",
+   "se": 2025,
+   "partite": 192,
+   "con_corner": 113
+  },
+  {
+   "lg": "SVK",
+   "se": 2026,
+   "partite": 84,
+   "con_corner": 16
+  },
+  {
+   "lg": "SWE",
+   "se": 2022,
+   "partite": 242,
+   "con_corner": 242
+  },
+  {
+   "lg": "SWE",
+   "se": 2023,
+   "partite": 242,
+   "con_corner": 242
+  },
+  {
+   "lg": "SWE",
+   "se": 2024,
+   "partite": 242,
+   "con_corner": 242
+  },
+  {
+   "lg": "SWE",
+   "se": 2025,
+   "partite": 242,
+   "con_corner": 242
+  },
+  {
+   "lg": "SWE",
+   "se": 2026,
+   "partite": 224,
+   "con_corner": 224
+  },
+  {
+   "lg": "SWZ",
+   "se": 2022,
+   "partite": 182,
+   "con_corner": 179
+  },
+  {
+   "lg": "SWZ",
+   "se": 2023,
+   "partite": 230,
+   "con_corner": 228
+  },
+  {
+   "lg": "SWZ",
+   "se": 2024,
+   "partite": 230,
+   "con_corner": 228
+  },
+  {
+   "lg": "SWZ",
+   "se": 2025,
+   "partite": 230,
+   "con_corner": 230
+  },
+  {
+   "lg": "SWZ",
+   "se": 2026,
+   "partite": 80,
+   "con_corner": 80
+  },
+  {
+   "lg": "T1",
+   "se": 2022,
+   "partite": 341,
+   "con_corner": 313
+  },
+  {
+   "lg": "T1",
+   "se": 2023,
+   "partite": 380,
+   "con_corner": 380
+  },
+  {
+   "lg": "T1",
+   "se": 2024,
+   "partite": 342,
+   "con_corner": 341
+  },
+  {
+   "lg": "T1",
+   "se": 2025,
+   "partite": 306,
+   "con_corner": 306
+  },
+  {
+   "lg": "T1",
+   "se": 2026,
+   "partite": 99,
+   "con_corner": 99
+  },
+  {
+   "lg": "UKR",
+   "se": 2022,
+   "partite": 244,
+   "con_corner": 164
+  },
+  {
+   "lg": "UKR",
+   "se": 2023,
+   "partite": 244,
+   "con_corner": 189
+  },
+  {
+   "lg": "UKR",
+   "se": 2024,
+   "partite": 247,
+   "con_corner": 112
+  },
+  {
+   "lg": "UKR",
+   "se": 2025,
+   "partite": 243,
+   "con_corner": 129
+  },
+  {
+   "lg": "UKR",
+   "se": 2026,
+   "partite": 89,
+   "con_corner": 32
+  },
+  {
+   "lg": "USA",
+   "se": 2022,
+   "partite": 489,
+   "con_corner": 488
+  },
+  {
+   "lg": "USA",
+   "se": 2023,
+   "partite": 521,
+   "con_corner": 521
+  },
+  {
+   "lg": "USA",
+   "se": 2024,
+   "partite": 522,
+   "con_corner": 522
+  },
+  {
+   "lg": "USA",
+   "se": 2025,
+   "partite": 540,
+   "con_corner": 540
+  },
+  {
+   "lg": "USA",
+   "se": 2026,
+   "partite": 510,
+   "con_corner": 508
+  }
+ ],
+ "app": [
+  {
+   "lg": "ARG",
+   "partite": 2166,
+   "con_previsione": 2166,
+   "con_reale": 1724
+  },
+  {
+   "lg": "AUT",
+   "partite": 648,
+   "con_previsione": 648,
+   "con_reale": 648
+  },
+  {
+   "lg": "B1",
+   "partite": 1030,
+   "con_previsione": 1030,
+   "con_reale": 1029
+  },
+  {
+   "lg": "BRA",
+   "partite": 1479,
+   "con_previsione": 1479,
+   "con_reale": 1478
+  },
+  {
+   "lg": "CZE",
+   "partite": 947,
+   "con_previsione": 947,
+   "con_reale": 929
+  },
+  {
+   "lg": "D1",
+   "partite": 996,
+   "con_previsione": 996,
+   "con_reale": 995
+  },
+  {
+   "lg": "D2",
+   "partite": 1014,
+   "con_previsione": 1014,
+   "con_reale": 1014
+  },
+  {
+   "lg": "DNK",
+   "partite": 657,
+   "con_previsione": 657,
+   "con_reale": 657
+  },
+  {
+   "lg": "E0",
+   "partite": 1235,
+   "con_previsione": 1235,
+   "con_reale": 1235
+  },
+  {
+   "lg": "E1",
+   "partite": 1836,
+   "con_previsione": 1836,
+   "con_reale": 1836
+  },
+  {
+   "lg": "E2",
+   "partite": 1814,
+   "con_previsione": 1814,
+   "con_reale": 1814
+  },
+  {
+   "lg": "E3",
+   "partite": 1820,
+   "con_previsione": 1820,
+   "con_reale": 1820
+  },
+  {
+   "lg": "F1",
+   "partite": 1002,
+   "con_previsione": 1002,
+   "con_reale": 1002
+  },
+  {
+   "lg": "F2",
+   "partite": 1098,
+   "con_previsione": 1098,
+   "con_reale": 1098
+  },
+  {
+   "lg": "G1",
+   "partite": 773,
+   "con_previsione": 773,
+   "con_reale": 772
+  },
+  {
+   "lg": "I1",
+   "partite": 1245,
+   "con_previsione": 1245,
+   "con_reale": 1245
+  },
+  {
+   "lg": "I2",
+   "partite": 1247,
+   "con_previsione": 1247,
+   "con_reale": 1247
+  },
+  {
+   "lg": "IRL",
+   "partite": 723,
+   "con_previsione": 607,
+   "con_reale": 598
+  },
+  {
+   "lg": "JPN",
+   "partite": 1405,
+   "con_previsione": 1405,
+   "con_reale": 1405
+  },
+  {
+   "lg": "MEX",
+   "partite": 1157,
+   "con_previsione": 1157,
+   "con_reale": 1153
+  },
+  {
+   "lg": "N1",
+   "partite": 1021,
+   "con_previsione": 1021,
+   "con_reale": 1021
+  },
+  {
+   "lg": "NOR",
+   "partite": 925,
+   "con_previsione": 925,
+   "con_reale": 903
+  },
+  {
+   "lg": "P1",
+   "partite": 1011,
+   "con_previsione": 1011,
+   "con_reale": 1011
+  },
+  {
+   "lg": "RUS",
+   "partite": 832,
+   "con_previsione": 832,
+   "con_reale": 827
+  },
+  {
+   "lg": "SC0",
+   "partite": 757,
+   "con_previsione": 757,
+   "con_reale": 757
+  },
+  {
+   "lg": "SC3",
+   "partite": 605,
+   "con_previsione": 605,
+   "con_reale": 600
+  },
+  {
+   "lg": "SP1",
+   "partite": 1254,
+   "con_previsione": 1254,
+   "con_reale": 1254
+  },
+  {
+   "lg": "SP2",
+   "partite": 1522,
+   "con_previsione": 1522,
+   "con_reale": 1522
+  },
+  {
+   "lg": "SWE",
+   "partite": 941,
+   "con_previsione": 941,
+   "con_reale": 941
+  },
+  {
+   "lg": "SWZ",
+   "partite": 761,
+   "con_previsione": 761,
+   "con_reale": 759
+  },
+  {
+   "lg": "T1",
+   "partite": 1123,
+   "con_previsione": 1123,
+   "con_reale": 1121
+  },
+  {
+   "lg": "USA",
+   "partite": 2093,
+   "con_previsione": 2093,
+   "con_reale": 2090
+  }
+ ],
+ "anomalie": {
+  "squadra_0": 2584,
+  "squadra_ge20": 17,
+  "totale_0": 50,
+  "totale_ge25": 8,
+  "max_squadra": 26,
+  "max_totale": 28,
+  "con_tiri_bloccati": 53939,
+  "con_possesso": 53866,
+  "con_xg": 28143,
+  "corner_senza_tiri": 723,
+  "corner_maggiori_tiri_0": 1,
+  "coerenza_fonti": {
+   "partite_confrontate": 26641,
+   "corner_uguali": 99.81,
+   "diff_media_assoluta": 0.003
+  }
+ },
+ "unite": 34217,
+ "per_periodo": {
+  "holdout": 13193,
+  "scelta": 10797,
+  "verifica": 10227
+ },
+ "archivio_partite": 66100,
+ "archivio_con_corner": 56877
+}
