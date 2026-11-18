@@ -1,0 +1,46 @@
+name: Laboratorio (ogni notte)
+# 18/11/2026 (Denny: "un meccanismo che testi formule migliori, una volta al giorno"). Ogni notte:
+# 1) prova le prossime idee in coda (tools/lab/idee.json, al massimo 2) con la regola del laboratorio (99% in verifica, stesso segno in holdout,
+#    maggioranza dei campionati), contro le previsioni walk-forward dell'app (ramo ricerca, base) unite all'archivio API-Football (ramo storico);
+# 2) segue in ombra sulle partite nuove le idee che hanno passato il laboratorio (tools/lab/ombra.py), senza toccare l'app;
+# 3) salva stato.json, ombra.json e RIEPILOGO.md sul ramo lab. Nessuna richiesta API, nessuna modifica all'app.
+on:
+  schedule:
+    - cron: "51 2 * * *"
+  workflow_dispatch:
+    inputs:
+      per_giro: { description: "idee da provare in questo giro (vuoto = come idee.json)", required: false, default: "" }
+concurrency:
+  group: lab
+  cancel-in-progress: false
+permissions:
+  contents: write
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dati (ricerca, storico, pagine pubblicate) e stato del laboratorio
+        run: |
+          mkdir -p ricerca/storico _pages _lab
+          git fetch -q --depth 1 origin ricerca && git archive FETCH_HEAD base | tar -x -C ricerca
+          git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C ricerca/storico
+          git fetch -q --depth 1 origin pages && git archive FETCH_HEAD data/precalc.json data/extra.json data/bundle.json | tar -x -C _pages
+          if git ls-remote --exit-code origin lab >/dev/null 2>&1; then git fetch -q --depth 1 origin lab && git archive FETCH_HEAD | tar -x -C _lab; fi
+          ls ricerca/base | wc -l; ls ricerca/storico | wc -l
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -q numpy pandas scipy
+      - name: Idee in coda
+        env:
+          LAB_PER_GIRO: ${{ github.event.inputs.per_giro }}
+        run: python tools/lab/lab.py _lab
+      - name: Prova in ombra
+        run: python tools/lab/ombra.py _pages/data _lab
+      - name: Salva sul ramo lab
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd _lab && rm -rf .git && git init -q -b lab && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Laboratorio $(date -u '+%F')" && git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" lab

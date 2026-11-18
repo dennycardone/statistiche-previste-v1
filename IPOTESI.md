@@ -232,3 +232,12 @@ fuorigioco identici (Serie A e MLS, 3.343 partite); precalc: cambiano solo gol, 
 (99,8% tra 0,89 e 1,21), λ massimo 4,40; VIF < 2 (FS correlata 0,47 con il rating strutturale: i coefficienti misurano solo l'informazione in più).
 Coefficienti stimati sulla sola verifica (controllo, non usati): 5,32 e 2,80 (congelati 6,48 e 2,54). Holdout già visto = periodo di confronto.
 Verifica prospettica: tools/p2/gol_prospettico.py (ogni domenica in ricerca.yml) e al checkpoint del 7/12.
+
+## 18/11/2026 · Laboratorio automatico (Denny: "un meccanismo che testi formule migliori, una volta al giorno"), si parte dai falli
+tools/lab: idee.json (formule fissate prima dei risultati), comune.py (app walk-forward + archivio API, coefficienti nuovi stimati solo nel periodo
+scelta con l'app fissa; riferimento alla pari = app + sola costante), lab.py (ogni notte le prossime 2 idee), ombra.py (le idee promosse seguite
+sulle partite nuove, senza toccare l'app), workflow lab.yml (ramo lab: stato.json, ombra.json, RIEPILOGO.md). Regola: 99% in verifica, stesso
+segno in holdout, maggioranza dei campionati, 1X2 non peggiorato in modo sicuro.
+Primo giro, falli (34.155 partite): F1 derby PASSA (+5,7% falli nei derby, verosimiglianza −0,033% verifica / −0,027% holdout, 19/31 e 21/31)
+→ in ombra; F2 differenza di forza, F3 partita che conta (salvezza +4%, vertice +4%, ultime giornate −3%, ma al 99% non passa), F4 riposo,
+F5 avvio di stagione: scartate.
