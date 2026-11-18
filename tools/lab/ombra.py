@@ -14,6 +14,10 @@ EX = json.load(open(os.path.join(DATA, "extra.json"))).get("partite", {})
 # moltiplicatori delle idee in ombra (solo idee sui falli per ora; ogni idea dice quale caratteristica le serve)
 def feat_derby(key): x = EX.get(key); return 1.0 if x and len(x) > 8 and x[8] and len(x[8]) > 5 and x[8][5] and x[8][5] > 1.0 else 0.0
 FEAT = {"F1": lambda key: {"derby": feat_derby(key)}}
+INTEG = {x["id"] for x in json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "idee.json")))["idee"] if x.get("integrata")}
+for iid in INTEG:
+    if iid in ST["idee"]: ST["idee"][iid]["esito"] = "integrata nell'app"
+json.dump(ST, open(os.path.join(OUT, "stato.json"), "w"), indent=1, ensure_ascii=False, default=float)
 for iid, v in ST["idee"].items():
     if v["esito"] != "in ombra" or iid not in FEAT: continue
     co = {k: a[0] for k, a in v["risultato"]["coefficienti"].items()}
@@ -37,6 +41,7 @@ for fl in json.load(open(os.path.join(DATA, "bundle.json")))["files"]:
 def ll(y, mu, r=200.0): return -nbinom.logpmf(y, r, r / (r + mu))
 REP = []
 for iid, O in OM.items():
+    if iid in INTEG: REP.append(f"{iid}: integrata nell'app, prova in ombra chiusa ({len(O['partite'])} partite registrate)"); continue
     G = [(k, p, Y[k]) for k, p in O["partite"].items() if k in Y and p["d"] < oggi]
     for k, p, y in G: p["y"] = list(y)
     if not G: REP.append(f"{iid}: in ombra dal {O['dal']}, nessuna partita con risultato ancora"); continue

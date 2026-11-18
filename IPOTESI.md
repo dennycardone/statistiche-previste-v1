@@ -254,3 +254,6 @@ tools/p2/falli_dump.js (app con e senza arbitro, 35.950 partite dal 2023), falli
   Brier Over/Under −0,50%/−0,46%, 24/31 e 25/31); coefficiente +0,056 ± 0,011 (≈ +6%); nei derby 23,2 previsti contro 25,3 reali (verifica), 23,9/25,7 (holdout).
 - r più alti: verosimiglianza del totale meglio in verifica, holdout non significativo, coda alta (linea +3) peggio calibrata → non adottare, eventualmente in ombra.
 - Livello: la produzione sottostima di circa 0,2-0,3 falli (23,78 contro 24,10 in verifica; Over sulla linea vicina 44,6 contro 47,2).
+- 18/11/2026 · INTEGRATO (Denny: "integrazione subito"): derby nei falli, FD_DERBY = { on: true, b: 0.0564 } in modelRef dopo l'arbitro
+  (derby da extra.json, stesso fattore dei cartellini). Verificato: Serie A e Premier, cambiano solo le 41 partite derby con extra.json (×1,058),
+  modello base invariato; "E se…" e Lettura con il derby. Laboratorio: F1 segnata "integrata", prova in ombra chiusa. Per tornare a prima: on = false.

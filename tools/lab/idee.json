@@ -1,11 +1,42 @@
 {
- "nota": "Laboratorio di Prevista (18/11/2026, Denny). Ogni idea ha la formula fissata PRIMA di vedere i risultati (vedi il modulo indicato). Il giro di ogni notte (lab.yml) prova le prossime idee 'in coda', al massimo 2 al giorno; chi passa la regola va in prova in ombra (ombra.py) sulle partite nuove; nulla entra nell'app senza l'OK di Denny.",
+ "nota": "Laboratorio di Prevista (18/11/2026, Denny). Ogni idea ha la formula fissata PRIMA di vedere i risultati (vedi il modulo indicato). Il giro di ogni notte (lab.yml) prova le prossime idee 'in coda', al massimo 2 al giorno; chi passa la regola va in prova in ombra (ombra.py) sulle partite nuove; nulla entra nell'app senza l'OK di Denny. Un'idea con 'integrata' è entrata nell'app: la prova in ombra si ferma (l'app la contiene già).",
  "per_giro": 2,
  "idee": [
-  {"id": "F1", "stat": "falli", "modulo": "idee_falli", "nome": "Derby", "descrizione": "derby (lista di derby.py): un coefficiente sui falli di entrambe le squadre"},
-  {"id": "F2", "stat": "falli", "modulo": "idee_falli", "nome": "Differenza di forza", "descrizione": "λ gol squadra − λ gol avversaria: la sfavorita fa più falli?"},
-  {"id": "F3", "stat": "falli", "modulo": "idee_falli", "nome": "Partita che conta", "descrizione": "classifica prima della partita: entrambe nelle ultime 4, entrambe nelle prime 4, distanza ≤ 3 punti (dalla 10ª giornata), ultime 6 giornate"},
-  {"id": "F4", "stat": "falli", "modulo": "idee_falli", "nome": "Riposo", "descrizione": "ln(giorni dall'ultima partita / 7), campionato + coppe europee, squadra e avversaria"},
-  {"id": "F5", "stat": "falli", "modulo": "idee_falli", "nome": "Avvio di stagione", "descrizione": "prime 5 giornate della stagione"}
+  {
+   "id": "F1",
+   "stat": "falli",
+   "modulo": "idee_falli",
+   "nome": "Derby",
+   "descrizione": "derby (lista di derby.py): un coefficiente sui falli di entrambe le squadre",
+   "integrata": "2026-11-18"
+  },
+  {
+   "id": "F2",
+   "stat": "falli",
+   "modulo": "idee_falli",
+   "nome": "Differenza di forza",
+   "descrizione": "λ gol squadra − λ gol avversaria: la sfavorita fa più falli?"
+  },
+  {
+   "id": "F3",
+   "stat": "falli",
+   "modulo": "idee_falli",
+   "nome": "Partita che conta",
+   "descrizione": "classifica prima della partita: entrambe nelle ultime 4, entrambe nelle prime 4, distanza ≤ 3 punti (dalla 10ª giornata), ultime 6 giornate"
+  },
+  {
+   "id": "F4",
+   "stat": "falli",
+   "modulo": "idee_falli",
+   "nome": "Riposo",
+   "descrizione": "ln(giorni dall'ultima partita / 7), campionato + coppe europee, squadra e avversaria"
+  },
+  {
+   "id": "F5",
+   "stat": "falli",
+   "modulo": "idee_falli",
+   "nome": "Avvio di stagione",
+   "descrizione": "prime 5 giornate della stagione"
+  }
  ]
 }
