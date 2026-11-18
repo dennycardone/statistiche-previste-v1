@@ -257,3 +257,7 @@ tools/p2/falli_dump.js (app con e senza arbitro, 35.950 partite dal 2023), falli
 - 18/11/2026 · INTEGRATO (Denny: "integrazione subito"): derby nei falli, FD_DERBY = { on: true, b: 0.0564 } in modelRef dopo l'arbitro
   (derby da extra.json, stesso fattore dei cartellini). Verificato: Serie A e Premier, cambiano solo le 41 partite derby con extra.json (×1,058),
   modello base invariato; "E se…" e Lettura con il derby. Laboratorio: F1 segnata "integrata", prova in ombra chiusa. Per tornare a prima: on = false.
+- 18/11/2026 · Tetto dell'arbitro sui falli (Denny: "chi ha scelto il 4%? e con 5, 6, 7…?"): griglia 0-12% e senza tetto, pavimenti −3…−8%
+  (tools/p2/falli_tetto.py, produzione + derby). Tetti più alti vanno un po' meglio in tutti e tre i periodi (es. +8%: −0,0009 / −0,0008 / −0,0005),
+  il migliore nello sviluppo (+10%, pavimento −8%) contro +4%: verifica −0,00075 [−0,0017, +0,0001], holdout −0,00044 [−0,0014, +0,0004],
+  16/31 campionati → non significativo, non passa. Pavimenti verso il basso peggiorano. Il tetto resta +4%.
