@@ -263,3 +263,17 @@ tools/p2/falli_dump.js (app con e senza arbitro, 35.950 partite dal 2023), falli
   16/31 campionati → non significativo, non passa. Pavimenti verso il basso peggiorano. Il tetto resta +4%.
 - 18/11/2026 · Laboratorio: F6 "tetto dell'arbitro a +8%" in prova in ombra per decisione di Denny (ombra_diretta in idee.json): ogni giorno falli
   dell'app × min(f,1,08)/min(f,1,04) quando il fattore arbitro di extra.json supera +4%, confronto con l'app sulle partite giocate.
+
+## 18/11/2026 · Audit del modello corner (Denny) — SOLO ANALISI, niente in produzione
+tools/p2/corner_dati.py (caratteristiche pre-partita da storico + statistiche in più), corner_audit.py … corner_audit5.py; risultati in ricerca/corner (ramo ricerca-corner).
+34.217 partite dell'app dal 2023 unite all'archivio API (sviluppo 10.797, verifica 10.227, holdout 13.193; 31 campionati).
+- Modello attuale ricostruito e ricalcolato a mano (Inter-Torino 25/8/2025: 6,11 / 3,07; 1X2 copula 74,1/8,1/17,8 identico in Python).
+  Coefficienti CDYN stimati fino al 2024-25 e CNS_B fino a giugno 2025: per l'app la verifica è in parte nel campione, l'holdout no.
+- Distribuzione: r stimati 12,2 per squadra (app 12) e 65-79 sul totale (app 60, cambio non significativo); correlazione dei residui −0,20,
+  copula −0,20 confermata (migliore tra 0/−0,1/−0,2/−0,3); somma con copula = NB r 60 diretta sul totale.
+- Riferimenti da zero (media campionato, rating, forma 5/10/decadimento, campo, contesto) tutti peggiori dell'app. Sull'app, da sole: forma 10,
+  decadimento, sede della squadra, rating 365, bloccati, possesso, xG, forza, calibrazione per campionato (mobile o fissa), inizio stagione: nessun guadagno.
+- Problema: previsioni troppo lontane dalla media del campionato (pendenza casa 0,88-0,93; fascia > 11,5 attesi 11,9 reali 10,9 in verifica).
+- Candidato: app × e^(c + tiri e tiri in porta ultime 10 di squadra e avversario + contrazione verso la media per sede), coefficienti nello sviluppo:
+  verosimiglianza per squadra −0,0014 (verifica, 99%) / −0,0018 (holdout, 99%), 20/31 e 23/31; 1X2 −0,10% / −0,20% (99%);
+  totale −0,0010 (n.s.) / −0,0012 (99%). Variante per i totali: tiri + contrazione (totale 99% in verifica e holdout). IN ATTESA DI DENNY.
