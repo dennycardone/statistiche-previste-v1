@@ -241,3 +241,16 @@ segno in holdout, maggioranza dei campionati, 1X2 non peggiorato in modo sicuro.
 Primo giro, falli (34.155 partite): F1 derby PASSA (+5,7% falli nei derby, verosimiglianza −0,033% verifica / −0,027% holdout, 19/31 e 21/31)
 → in ombra; F2 differenza di forza, F3 partita che conta (salvezza +4%, vertice +4%, ultime giornate −3%, ma al 99% non passa), F4 riposo,
 F5 avvio di stagione: scartate.
+
+## 18/11/2026 · Audit del modello falli (Denny) — SOLO ANALISI, niente in produzione
+tools/p2/falli_dump.js (app con e senza arbitro, 35.950 partite dal 2023), falli_audit.py, falli_audit2.py; risultati ricerca/falli (ramo ricerca-falli).
+- Modello attuale molto più informato dei riferimenti: media del campionato +0,134 log-loss per partita, medie squadra ristrette +0,007/+0,012.
+- Distribuzione: grezza sovradispersa (var/media 1,1-1,5 per campionato), ma condizionata al modello quasi Poisson (squadra 1,04, totale 1,09);
+  r stimati nello sviluppo 650/440 contro 200/150 dell'app; correlazione dei residui casa-ospite 0,05.
+- Arbitro: è la variabile più forte (−0,017 per partita senza → con). Tetto +4%: toglierlo non passa (P4 contro P3: n.s. in verifica, 0 in holdout).
+  Arbitro sui residui del modello (K 10) non meglio di quello di produzione. Affidabilità metà pari/dispari 0,42 (10-20 partite), 0,49 (20-40), 0,59 (40+).
+- Forma ultime 5/10, casa/fuori della squadra: nessun guadagno (il modello ha già le ultime 5). Forza relativa, classifica, riposo, avvio: laboratorio, scartate.
+- Derby su produzione: PASSA anche al 99% (verifica −0,057% verosimiglianza squadra, 25/31; holdout −0,045%, 20/31; totale −0,09%/−0,07%;
+  Brier Over/Under −0,50%/−0,46%, 24/31 e 25/31); coefficiente +0,056 ± 0,011 (≈ +6%); nei derby 23,2 previsti contro 25,3 reali (verifica), 23,9/25,7 (holdout).
+- r più alti: verosimiglianza del totale meglio in verifica, holdout non significativo, coda alta (linea +3) peggio calibrata → non adottare, eventualmente in ombra.
+- Livello: la produzione sottostima di circa 0,2-0,3 falli (23,78 contro 24,10 in verifica; Over sulla linea vicina 44,6 contro 47,2).
