@@ -14,10 +14,25 @@ EX = json.load(open(os.path.join(DATA, "extra.json"))).get("partite", {})
 # moltiplicatori delle idee in ombra (solo idee sui falli per ora; ogni idea dice quale caratteristica le serve)
 def feat_derby(key): x = EX.get(key); return 1.0 if x and len(x) > 8 and x[8] and len(x[8]) > 5 and x[8][5] and x[8][5] > 1.0 else 0.0
 FEAT = {"F1": lambda key: {"derby": feat_derby(key)}}
+# idee senza coefficienti nuovi: moltiplicatore diretto sulla previsione dell'app; il riferimento è l'app così com'è
+def mult_tetto(key, cap=1.08, cap_app=1.04):   # F6: tetto del fattore arbitro sui falli +8% invece di +4% (extra.json: x[2] = fattore senza tetto)
+    x = EX.get(key); f0 = x[2] if x and len(x) > 2 and isinstance(x[2], (int, float)) else None
+    if not f0 or f0 <= cap_app: return 1.0, {"arbitro": f0}
+    return min(f0, cap) / min(f0, cap_app), {"arbitro": f0}
+MULT = {"F6": mult_tetto}
 INTEG = {x["id"] for x in json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "idee.json")))["idee"] if x.get("integrata")}
 for iid in INTEG:
     if iid in ST["idee"]: ST["idee"][iid]["esito"] = "integrata nell'app"
 json.dump(ST, open(os.path.join(OUT, "stato.json"), "w"), indent=1, ensure_ascii=False, default=float)
+for iid, v in ST["idee"].items():
+    if v["esito"] != "in ombra" or iid not in MULT: continue
+    O = OM.setdefault(iid, {"dal": oggi, "partite": {}})
+    for k, row in PC.items():
+        if not k.endswith("|dyn") or len(row) < 7 or not isinstance(row[6], dict) or "f" not in row[6]: continue
+        key = k[:-4]; d = key.split("|")[1]
+        if d < oggi: continue
+        f = row[6]["f"]; lh, la = f[0], f[1]; m, x = MULT[iid](key)
+        O["partite"][key] = {"d": d, "app": [lh, la], "rif": [lh, la], "idea": [lh * m, la * m], "x": x}
 for iid, v in ST["idee"].items():
     if v["esito"] != "in ombra" or iid not in FEAT: continue
     co = {k: a[0] for k, a in v["risultato"]["coefficienti"].items()}

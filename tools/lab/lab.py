@@ -11,6 +11,10 @@ oggi = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
 coda = [x for x in I["idee"] if x["id"] not in ST["idee"]][: int(os.environ.get("LAB_PER_GIRO") or I.get("per_giro", 2))]
 cache = {}
 for x in coda:
+    if x.get("ombra_diretta"):   # decisione di Denny: va in ombra senza il giro del laboratorio (il test è già stato fatto, vedi "test")
+        ST["idee"][x["id"]] = {"stat": x["stat"], "nome": x["nome"], "descrizione": x["descrizione"], "provata": oggi, "esito": "in ombra",
+                               "risultato": {"nota": x.get("test", ""), "coefficienti": {}, "confronti": {}}}
+        print(f"{x['id']} {x['nome']}: in ombra per decisione di Denny", flush=True); continue
     M = importlib.import_module(x["modulo"])
     if x["modulo"] not in cache: cache[x["modulo"]] = M.prepare()
     J, F = cache[x["modulo"]]
@@ -24,6 +28,8 @@ def f(v): return f"{v['diff']:+.5f} ({v['pct']:+.3f}%) [99%: {v['lo99']:+.5f} / 
 L = [f"# Laboratorio di Prevista · {oggi}", "", "Regola: in verifica (2024-25) miglioramento con intervallo al 99% sotto zero, stesso segno in holdout (da luglio 2025, solo confronto), maggioranza dei campionati. Riferimento: previsioni dell'app con la sola costante stimata nel periodo scelta. Negativo = meglio.", ""]
 for k, v in ST["idee"].items():
     r = v["risultato"]; c = r["confronti"]
+    if not c:
+        L += [f"## {k} · {v['nome']} ({v['stat']}) — {v['esito'].upper()} (dal {v['provata']})", v["descrizione"], "", r.get("nota", ""), ""]; continue
     L += [f"## {k} · {v['nome']} ({v['stat']}) — {v['esito'].upper()} (provata il {v['provata']})", v["descrizione"], "",
           "coefficienti (stima, errore standard): " + ", ".join(f"{n} {a[0]:+.4f} ± {a[1]:.4f}" for n, a in r["coefficienti"].items()), "",
           f"- verosimiglianza per squadra · verifica {f(c['ll_team']['verifica'])} · holdout {f(c['ll_team']['holdout'])}",

@@ -261,3 +261,5 @@ tools/p2/falli_dump.js (app con e senza arbitro, 35.950 partite dal 2023), falli
   (tools/p2/falli_tetto.py, produzione + derby). Tetti più alti vanno un po' meglio in tutti e tre i periodi (es. +8%: −0,0009 / −0,0008 / −0,0005),
   il migliore nello sviluppo (+10%, pavimento −8%) contro +4%: verifica −0,00075 [−0,0017, +0,0001], holdout −0,00044 [−0,0014, +0,0004],
   16/31 campionati → non significativo, non passa. Pavimenti verso il basso peggiorano. Il tetto resta +4%.
+- 18/11/2026 · Laboratorio: F6 "tetto dell'arbitro a +8%" in prova in ombra per decisione di Denny (ombra_diretta in idee.json): ogni giorno falli
+  dell'app × min(f,1,08)/min(f,1,04) quando il fattore arbitro di extra.json supera +4%, confronto con l'app sulle partite giocate.
