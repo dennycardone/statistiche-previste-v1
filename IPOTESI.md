@@ -277,3 +277,10 @@ tools/p2/corner_dati.py (caratteristiche pre-partita da storico + statistiche in
 - Candidato: app × e^(c + tiri e tiri in porta ultime 10 di squadra e avversario + contrazione verso la media per sede), coefficienti nello sviluppo:
   verosimiglianza per squadra −0,0014 (verifica, 99%) / −0,0018 (holdout, 99%), 20/31 e 23/31; 1X2 −0,10% / −0,20% (99%);
   totale −0,0010 (n.s.) / −0,0012 (99%). Variante per i totali: tiri + contrazione (totale 99% in verifica e holdout). IN ATTESA DI DENNY.
+- 18/11/2026 · PROVA IN OMBRA approvata da Denny (NON in produzione). index.html: CORNER_V2 (coefficienti congelati) + cornerV2(), non usati
+  dall'app; precalc.js scrive data/corner_v2.json (ufficiale e V2 sulla stessa partita); tools/lab/ombra_corner.py ogni notte (lab.yml) registra
+  e confronta sugli stessi eventi (report CORNER_V2.md sul ramo lab). Con dati insufficienti (< 5 partite utili in uno degli indici) V2 = ufficiale.
+  Controlli: JavaScript = Python su 35.915 partite (differenza massima 1e-6, stessa accensione nel 100%), ricaduta esatta, precalc.json
+  identico byte per byte con e senza la modifica, app avviata nel browser senza errori. Backup: rami backup-pre-corner-v2 e backup-pages-pre-corner-v2.
+  Backtest della versione JavaScript (dati dell'app): squadra −0,0012 verifica / −0,0018 holdout (99%), 1X2 99% in entrambi, totale 99% solo holdout.
+  Bootstrap anche per campionato-stagione e campionato e con Bonferroni (3 varianti): squadra e 1X2 holdout restano significativi.

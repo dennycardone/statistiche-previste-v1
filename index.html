@@ -2425,6 +2425,58 @@ distribuzione: Binomiale Negativa sul totale r = ${CD_R_TOT}; per squadra r = ${
     muH: F.muH, muA: F.muA, n: F.n, nH, nA, nHt, nAt };
 }
 
+/* ===== 18/11/2026 (Denny): CORNER V2 IN PROVA IN OMBRA — NON usato da nessuna parte dell'app =====
+   Audit dei corner (tools/p2/corner_audit*.py, ramo ricerca-corner): sulle previsioni ufficiali (cornerDynParts) un ritocco con i tiri e i tiri
+   in porta delle ultime 10 partite e una contrazione verso la media del campionato per sede:
+     λ_V2 = λ_app · e^(c + a_s·S_att + d_s·S_dif,avv + a_t·T_att + d_t·T_dif,avv + k_sede·ln(λ_app / μ_sede))
+   S = ln[(Σ tiri ultime 10 + K·ē) / (Σ attesi + K·ē)], attesi = tiri medi del campionato nella sede di quella partita (365 giorni precedenti,
+   almeno 30 partite), K = 3; T uguale con i tiri in porta; "_dif,avv" = tiri concessi dall'avversario; μ = corner medi di lega per sede (cdynFit).
+   Coefficienti CONGELATI (stima sulle partite fino al 30/6/2024): non si aggiornano durante la prova. Con dati insufficienti (meno di 5 partite
+   utili in uno dei quattro indici, o media di lega mancante) λ_V2 = λ_app esattamente. Distribuzioni invariate (NB r 12 / 60, copula −0,20).
+   Usato solo da precalc.js per scrivere data/corner_v2.json (prova in ombra, tools/lab/ombra_corner.py). L'app non lo legge. */
+const CORNER_V2 = { c: 0.0054715, s_att: 0.1043709, s_def: 0.0711996, st_att: 0.0727421, st_def: 0.1112512, kH: -0.2057728, kA: -0.1658093, N: 10, K: 3, MIN: 5, LOOK: 365, MINM: 30 };
+const cv2Day = d => Math.round(+d / DAYMS);
+function cv2League(div) {   // per ogni partita del campionato (con i corner): tiri e tiri in porta attesi per sede dalle partite dei 365 giorni precedenti
+  const key = "cv2|" + div; if (CACHE.has(key)) return CACHE.get(key);
+  const L = [...S.matches.values()].filter(m => m.div === div && m.hc != null && m.ac != null).sort((a, b) => a.date - b.date || (a.home < b.home ? -1 : 1));
+  const C = CORNER_V2, day = L.map(m => cv2Day(m.date)), E = new Map(), byTeam = new Map();
+  const col = [["hs", "as"], ["hst", "ast"]];
+  // somme cumulate per statistica e sede (solo partite con il dato)
+  const cum = col.map(([a, b]) => { const sa = [0], na = [0], sb = [0], nb = [0];
+    for (const m of L) { const va = m[a], vb = m[b]; sa.push(sa[sa.length - 1] + (va != null ? va : 0)); na.push(na[na.length - 1] + (va != null ? 1 : 0)); sb.push(sb[sb.length - 1] + (vb != null ? vb : 0)); nb.push(nb[nb.length - 1] + (vb != null ? 1 : 0)); }
+    return { sa, na, sb, nb }; });
+  const lb = x => { let lo = 0, hi = day.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (day[mid] < x) lo = mid + 1; else hi = mid; } return lo; };
+  L.forEach((m, i) => {
+    const lo = lb(day[i] - C.LOOK), hi = lb(day[i]), e = [];
+    for (const q of cum) { const n1 = q.na[hi] - q.na[lo], n2 = q.nb[hi] - q.nb[lo];
+      e.push(n1 >= C.MINM ? (q.sa[hi] - q.sa[lo]) / n1 : null, n2 >= C.MINM ? (q.sb[hi] - q.sb[lo]) / n2 : null); }
+    E.set(m, e);   // [tiri casa, tiri ospite, in porta casa, in porta ospite] attesi
+    for (const t of [m.home, m.away]) { if (!byTeam.has(t)) byTeam.set(t, []); byTeam.get(t).push(m); }
+  });
+  const res = { E, byTeam }; CACHE.set(key, res); return res;
+}
+function cv2Index(F, team, D, k, side) {   // k 0 tiri, 1 tiri in porta; side "f" fatti, "a" concessi → [indice, partite utili]
+  const g = (F.byTeam.get(team) || []), Dd = cv2Day(D); let j = g.length; while (j > 0 && cv2Day(g[j - 1].date) >= Dd) j--;
+  const last = g.slice(Math.max(0, j - CORNER_V2.N), j); let sy = 0, se = 0, n = 0;
+  for (const m of last) {
+    const home = m.home === team, own = home === (side === "f"), e = F.E.get(m);
+    const y = own ? m[k ? "hst" : "hs"] : m[k ? "ast" : "as"], ex = e[2 * k + (own ? 0 : 1)];
+    if (y == null || ex == null || !isFinite(y)) continue; sy += y; se += ex; n++;
+  }
+  if (!n) return [0, 0];
+  const eb = se / n, K = CORNER_V2.K; return [Math.log((sy + K * eb) / (se + K * eb)), n];
+}
+function cornerV2(home, away, P) {   // P = cornerDynParts(home, away); restituisce { lh, la, on } (on = false: valori ufficiali invariati)
+  if (!P || !isFinite(P.lh) || !isFinite(P.la)) return null;
+  const D = goalDate(home, away), F = cv2League(S.league), C = CORNER_V2;
+  const ix = [cv2Index(F, home, D, 0, "f"), cv2Index(F, away, D, 0, "a"), cv2Index(F, home, D, 1, "f"), cv2Index(F, away, D, 1, "a"),
+              cv2Index(F, away, D, 0, "f"), cv2Index(F, home, D, 0, "a"), cv2Index(F, away, D, 1, "f"), cv2Index(F, home, D, 1, "a")];
+  if (ix.some(x => x[1] < C.MIN) || !(P.muH > 0) || !(P.muA > 0)) return { lh: P.lh, la: P.la, on: false, ix };
+  const lh = P.lh * Math.exp(C.c + C.s_att * ix[0][0] + C.s_def * ix[1][0] + C.st_att * ix[2][0] + C.st_def * ix[3][0] + C.kH * Math.log(P.lh / P.muH));
+  const la = P.la * Math.exp(C.c + C.s_att * ix[4][0] + C.s_def * ix[5][0] + C.st_att * ix[6][0] + C.st_def * ix[7][0] + C.kA * Math.log(P.la / P.muA));
+  return isFinite(lh) && isFinite(la) ? { lh, la, on: true, ix } : { lh: P.lh, la: P.la, on: false, ix };
+}
+
 /* ===== Media dinamica sui FALLI: modello verificato (regressione di Poisson, casa e ospite separati) =====
    log(falli attesi) = b0 + a·log(falli medi di lega per quella sede, 365 giorni) + b·log(falli attesi dal rating falli)
                        + c·log(falli commessi dalla squadra, ultime 5) + d·log(falli subiti dall'avversario, ultime 5)

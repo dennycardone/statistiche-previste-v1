@@ -48,10 +48,11 @@ for iid, v in ST["idee"].items():
 # risultati veri (falli) dal bundle
 Y = {}
 for fl in json.load(open(os.path.join(DATA, "bundle.json")))["files"]:
+    stem = fl["name"].rsplit(".", 1)[0].split("_")[0]   # 18/11/2026: anche i campionati API (ARG.csv…: senza Div, colonne Home/Away)
     for r in csv.DictReader(io.StringIO(fl["text"])):
         try:
             dd, mm, yy = r["Date"].split("/"); yy = ("20" + yy) if len(yy) == 2 else yy
-            if r.get("HF") not in (None, "") and r.get("AF") not in (None, ""): Y[f"{r['Div']}|{yy}-{mm}-{dd}|{r['HomeTeam']}|{r['AwayTeam']}"] = (int(float(r["HF"])), int(float(r["AF"])))
+            if r.get("HF") not in (None, "") and r.get("AF") not in (None, ""): Y[f"{r.get('Div') or stem}|{yy}-{mm}-{dd}|{r.get('HomeTeam') or r.get('Home')}|{r.get('AwayTeam') or r.get('Away')}"] = (int(float(r["HF"])), int(float(r["AF"])))
         except Exception: pass
 def ll(y, mu, r=200.0): return -nbinom.logpmf(y, r, r / (r + mu))
 REP = []

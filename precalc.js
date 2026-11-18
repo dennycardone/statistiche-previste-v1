@@ -10,7 +10,7 @@ const noop = () => {};
 const ctx = vm.createContext({ console, Math, Date, JSON, Intl, Map, Set, Number, String, Object, Array, isFinite, isNaN, parseFloat, parseInt, Infinity, NaN, Float64Array, WeakMap,
   document: { addEventListener: noop, querySelector: () => null, querySelectorAll: () => [] },
   localStorage: { getItem: () => null, setItem: noop, removeItem: noop }, matchMedia: () => ({ matches: false }) });
-vm.runInContext(html.slice(start, end) + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, rowCompute, isoD, addDays, withLeague, confMatch, confPack, CONF_COEF };", ctx);
+vm.runInContext(html.slice(start, end) + ";globalThis.API = { S, MODES, parseCSV, addParsed, resetState, allEntries, rowCompute, isoD, addDays, withLeague, confMatch, confPack, CONF_COEF, cornerDynParts, cornerV2, isCup };", ctx);
 const A = ctx.API;
 // impostazioni predefinite delle segnalazioni, lette dalla pagina (mercati accesi e probabilità minima)
 const markets = [...html.matchAll(/class="chip sstat" data-k="([a-z0-9]+)" aria-pressed="true"/g)].map(m => m[1]);
@@ -36,6 +36,7 @@ const t0 = process.env.PRECALC_DAY || A.isoD(new Date());
 const all = A.allEntries(A.addDays(t0, 1)).concat(A.allEntries(A.addDays(t0, -1)));   // finestra un po' più larga (fusi orari)
 const seen = new Set(), entries = all.filter(e => !seen.has(e.id) && seen.add(e.id));
 const rows = {}, r4 = x => x == null ? null : Math.round(x * 10000) / 10000, t = Date.now();
+const CV2 = {}, r6 = x => x == null || !isFinite(x) ? null : Math.round(x * 1e6) / 1e6;
 for (const mode of ["dyn"]) {   // 19/10/2026: solo la Media dinamica (la Classica è stata tolta)
   const cfg = A.MODES[mode];
   for (const e of entries) {
@@ -53,9 +54,20 @@ for (const mode of ["dyn"]) {   // 19/10/2026: solo la Media dinamica (la Classi
         }
       }
       rows[e.id + "|" + mode] = row;
+      // 18/11/2026 (Denny): Corner V2 in prova in ombra → data/corner_v2.json, che l'app NON legge (le previsioni ufficiali restano quelle sopra)
+      if (!e.m && R.stats && R.stats.c && !A.isCup(e.lg.code)) {
+        try {
+          const v = A.withLeague(e.lg.code, () => { A.S.cutoff = null; const P = A.cornerDynParts(e.home, e.away); return P ? [P, A.cornerV2(e.home, e.away, P)] : null; });
+          if (v && v[1]) CV2[e.id] = [e.lg.code, e.d, e.home, e.away, r6(R.stats.c[0]), r6(R.stats.c[1]), r6(v[0].lh), r6(v[0].la), r6(v[1].lh), r6(v[1].la), v[1].on ? 1 : 0, r6(v[0].muH), r6(v[0].muA)];
+        } catch (err) { console.log("corner V2", e.id, err.message); }
+      }
     } catch (err) { console.log("errore", e.id, mode, err.message); }
   }
   console.log(mode, "fatto", Math.round((Date.now() - t) / 1000), "s");
 }
 fs.writeFileSync(path.join(DATA, "precalc.json"), JSON.stringify({ v: 1, updated: man.updated, st: { markets, minP }, rows }));
+// 18/11/2026: Corner V2 in ombra. Per partita: campionato, data, casa, ospite, corner ufficiali (precalc, 4 decimali), corner del modello
+// (cornerDynParts, 6 decimali), Corner V2, V2 attivo (0 = dati insufficienti, uguale all'ufficiale), corner medi di lega casa/fuori
+fs.writeFileSync(path.join(DATA, "corner_v2.json"), JSON.stringify({ v: 1, updated: man.updated, coef: vm.runInContext("CORNER_V2", ctx), partite: CV2 }));
+console.log("corner V2 in ombra:", Object.keys(CV2).length, "partite");
 console.log("precalc:", entries.length, "partite (Media dinamica),", Math.round((Date.now() - t) / 1000), "s");
