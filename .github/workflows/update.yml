@@ -30,6 +30,12 @@ jobs:
           if [ -z "$last" ] || [ $(( $(date -u +%s) - $(date -u -d "$last" +%s) )) -gt 1200 ]; then
             gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/workflows/basket_quote.yml/dispatches" -f ref=main && echo "giro basket avviato"
           else echo "giro basket recente ($last)"; fi
+          # 19/11/2026 (Denny, ok): la notte del 18-19/11 GitHub non ha avviato lab.yml (51 2 * * *). Dopo le 3:00 UTC, se oggi non c'è ancora
+          # un suo giro, lo avvia questo: la prova in ombra di Corner V2 registra così ogni giorno le partite prima che si giochino.
+          lab=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/lab.yml/runs?per_page=1" -q '.workflow_runs[0].created_at' 2>/dev/null || echo "")
+          if [ "$(date -u +%H)" -ge 3 ] && [ "${lab:0:10}" != "$(date -u +%F)" ]; then
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/actions/workflows/lab.yml/dispatches" -f ref=main && echo "giro del laboratorio avviato"
+          else echo "giro del laboratorio di oggi già partito ($lab)"; fi
       - name: Archivi dei dati dal magazzino privato di GitHub Actions (non pubblico)
         id: dati
         uses: actions/cache/restore@v4
