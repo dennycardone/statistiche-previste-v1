@@ -284,3 +284,11 @@ tools/p2/corner_dati.py (caratteristiche pre-partita da storico + statistiche in
   identico byte per byte con e senza la modifica, app avviata nel browser senza errori. Backup: rami backup-pre-corner-v2 e backup-pages-pre-corner-v2.
   Backtest della versione JavaScript (dati dell'app): squadra −0,0012 verifica / −0,0018 holdout (99%), 1X2 99% in entrambi, totale 99% solo holdout.
   Bootstrap anche per campionato-stagione e campionato e con Bonferroni (3 varianti): squadra e 1X2 holdout restano significativi.
+
+## 18/11/2026 · Correzione della prova in ombra F6 (falli, tetto arbitro +8%) — documentazione separata (Denny, 19/11)
+- Cosa: tools/lab/ombra.py cercava i falli reali nel bundle solo con le colonne Div/HomeTeam/AwayTeam (file football-data). I file dei campionati
+  presi da API-Football (ARG.csv, USA.csv…) hanno Home/Away e nessuna colonna Div, quindi per quei campionati la prova F6 non trovava mai il risultato.
+- Correzione (commit 88620a2): campionato dal nome del file quando manca Div, squadre da Home/Away quando mancano HomeTeam/AwayTeam.
+- Effetto: SOLO sul conteggio della prova in ombra F6 (più campionati con risultato). Nessun effetto sulle previsioni ufficiali: ombra.py gira nel
+  laboratorio (lab.yml), legge le pagine pubblicate e scrive solo sul ramo lab; precalc.json verificato identico byte per byte. Coefficienti e
+  regola di F6 invariati. Le partite F6 registrate prima del 18/11 nei campionati API risultano ora con il risultato se presenti nel bundle.
