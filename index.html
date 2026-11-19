@@ -146,6 +146,8 @@ summary{cursor:pointer;font-weight:600}
 .formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--surface-2);padding:8px 10px;border-radius:6px;overflow-x:auto;white-space:pre}
 .cmark{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.02em;margin-left:6px;padding:1px 5px;border-radius:4px;background:var(--surface-2);color:var(--warn);border:1px solid var(--warn);white-space:nowrap;vertical-align:1px}
 .cmark.first{background:var(--warn);color:var(--bg)}
+.dmark{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.02em;margin-left:6px;padding:1px 5px;border-radius:4px;background:var(--surface-2);color:var(--accent);border:1px solid var(--accent);white-space:nowrap;vertical-align:1px}
+.derbybox{border-left:3px solid var(--accent);padding:6px 10px;background:var(--surface-2);border-radius:0 6px 6px 0;font-size:13px}
 .warnbox{border-left:3px solid var(--warn);padding:6px 10px;background:var(--surface-2);border-radius:0 6px 6px 0;font-size:13px}
 .srcline{font-size:13px;color:var(--ink-2)}
 .viewnav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:4px}
@@ -1059,7 +1061,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <button type="button" class="mtab" data-mt="rend" aria-pressed="false">Rendimento</button>
     </div>
     <div class="mpane" data-mp="prev">
-      <section class="card" id="mcoach" aria-label="Cambio di allenatore" hidden></section>
+      <section class="card" id="mcoach" aria-label="Avvisi della partita: cambio di allenatore, derby" hidden></section>
       <section class="mhead" id="mhead" aria-label="Lettura della partita"></section>
       <section class="card" id="mxi" aria-label="Formazioni ufficiali" hidden></section>
       <section class="card" id="mwhy" aria-label="Perché questi numeri" hidden></section>
@@ -4066,7 +4068,7 @@ async function tryHosted(ST0) {
     }).catch(() => null);
     const P = { bundle: getBundle("bundle.json"), storico: ST && ST.v && ST.v.bundle_storico ? getBundle("bundle_storico.json") : Promise.resolve(null),
                 crests: get("crests.json"), loghi: get("loghi.json"), odds: get("odds.json"), linee: get("linee.json"),
-                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json"), fz: get("formazioni.json"), gi: get("giocatori.json"), as: get("assenze.json"), al: get("allenatori.json"), gr: get("gol_rho.json") };
+                extra: get("extra.json"), qual: get("qualita.json"), pre: get("precalc.json"), half: get("tempi.json"), qual2: get("tiri_area.json"), mer: get("mercati.json"), fz: get("formazioni.json"), gi: get("giocatori.json"), as: get("assenze.json"), al: get("allenatori.json"), gr: get("gol_rho.json"), dj: get("derby.json") };
     let man = null, texts = null;
     const [b, bs] = await Promise.all([P.bundle, P.storico]);
     if (ST && ST.v && ST.v.bundle_storico && !(bs && bs.files)) return false;   // stagioni chiuse non arrivate: meglio non mostrare dati a metà
@@ -4078,9 +4080,10 @@ async function tryHosted(ST0) {
     const tmp = texts.map(parseCSV);
     if (!tmp.some(p => p.matches.length)) return false;
     resetState(); tmp.forEach(addParsed);
-    const [cr, lo, od, li, ex, qu, pr, hf, qa, me, fz, gi, as, al, gr] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer, P.fz, P.gi, P.as, P.al, P.gr]);
+    const [cr, lo, od, li, ex, qu, pr, hf, qa, me, fz, gi, as, al, gr, dj] = await Promise.all([P.crests, P.loghi, P.odds, P.linee, P.extra, P.qual, P.pre, P.half, P.qual2, P.mer, P.fz, P.gi, P.as, P.al, P.gr, P.dj]);
     if (gi && gi.squadre) GIOC = gi; if (as && as.partite) ASSENZE = as; if (al && al.squadre) { ALLEN = al; COACH_C.clear(); }
     if (gr && gr.rho) { GOL_RHO = gr; clearCache(); }
+    if (dj && dj.partite) DERBYI = dj;
     if (me && me.giocabili) MERCATI = me;
     if (fz && fz.partite) { FORMAZ = fz; clearCache(); }
     if (qa && qa.campionati) { TAREA = qa; clearCache(); }
@@ -4151,7 +4154,7 @@ function sigCardsHTML(rows, pref, withMatch = true, played = null) {
     const detail = r.mk === "gg" ? `gol previsti ${f2(r.lh)} – ${f2(r.la)}` : r.team ? `${esc(r.team)} ne fa di più · ${f1(r.lh)} – ${f1(r.la)} · pari ${pc(r.draw)}` : `previsti ${r.k === "g" ? f2(r.tot) : f1(r.tot)}${r.mk === "k" && !played ? (r.bkl ? " · linea dei book" : " · linea nostra, dei book N.D.") : ""}`;
     return `<div class="sig">
       <button type="button" class="sigopen" data-lg="${r.lg.code}" data-h="${esc(r.f.home)}" data-a="${esc(r.f.away)}" data-d="${isoD(r.f.date)}"${withMatch ? "" : " disabled"}>
-        ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}
+        ${withMatch ? `<span class="m">${esc(r.f.home)} – ${esc(r.f.away)}${derbyMk(`${r.lg.code}|${isoD(r.f.date)}|${r.f.home}|${r.f.away}`)}</span>` : `<span class="m">${esc(MK_LABEL[r.mk])}</span>`}
         <span class="p num">${pc(r.p)}${played ? "" : qSm(sigQuota(r))}</span>
         <span class="d"><span class="stag">${MK_TAG[r.mk]}</span>${r.mk === "f" && FORMAZ && FORMAZ.partite && FORMAZ.partite[`${r.lg.code}|${isoD(r.f.date)}|${r.f.home}|${r.f.away}`] ? `<span class="xitag" title="Falli corretti con le formazioni ufficiali">XI</span>` : ""}<b>${esc(r.fav)}</b> · ${detail}</span>
         ${withMatch ? `<span class="w">${r.team ? `${r.team === r.f.home ? "In casa con" : "In trasferta con"} ${crest(r.lg.code, r.team === r.f.home ? r.f.away : r.f.home)}<b>${esc(r.team === r.f.home ? r.f.away : r.f.home)}</b> · ` : ""}${DAYS_SHORT[r.f.date.getUTCDay()]} ${dstr(r.f.date)}${r.f.time ? " " + esc(r.f.time) : ""} · ${esc(r.lg.name)}</span>` : ""}
@@ -4327,7 +4330,7 @@ function renderSched() {
     const end = R && m ? presiHTML(R) : "";   // sotto l'orario: % presi delle partite finite (i segnali A+ restano nel Radar)
     return `<button type="button" class="mrow" data-id="${esc(e.id)}">
           <span class="tmc"><span class="tm${m ? " fin" : ""}">${m ? "Finale" : e.time ? esc(e.time) : (e.d < t0 ? "ris. n.d." : "--:--")}</span>${end}</span>
-          <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}${m ? "" : coachMark(e.lg.code, e.home, e.id)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}${m ? "" : coachMark(e.lg.code, e.away, e.id)}</span><b>${m ? m.ag : ""}</b></span>
+          <span class="tt"><span class="${m && m.hg > m.ag ? "w" : ""}">${crest(e.lg.code, e.home)}${esc(e.home)}${m ? "" : coachMark(e.lg.code, e.home, e.id)}</span><b>${m ? m.hg : ""}</b><span class="${m && m.ag > m.hg ? "w" : ""}">${crest(e.lg.code, e.away)}${esc(e.away)}${m ? "" : coachMark(e.lg.code, e.away, e.id) + derbyMk(e.id)}</span><b>${m ? m.ag : ""}</b></span>
         </button>`; };   // percentuali Over/Gol tolte dalla lista (7/10/2026): restano nella Lettura
   const bind = b => b.addEventListener("click", () => { const e = all.find(x => x.id === b.dataset.id); if (e) openEntry(e); });
   const daySum = () => {
@@ -4750,6 +4753,24 @@ function coachNew(lg, team, key) {   // key = partita (lega|data|casa|trasferta)
   if (n == null) { n = 0; for (const m of S.matches.values()) if (m.div === lg && (m.home === team || m.away === team) && m.date.toISOString().slice(0, 10) >= x.da) n++; }
   const r = n < COACH_N ? { ...x, n } : null; COACH_C.set(k, r); return r;
 }
+/* 19/11/2026 (Denny): avviso derby, come il cambio di allenatore. Solo informazione: nessuna previsione cambia.
+   Derby = stessa lista dei modelli cartellini e falli (derby.py → extra.json, fattore derby x[8][5]); tipo e nome da data/derby.json
+   (derby_info.py, classificati a mano): s stracittadina (con la città), r derby regionale, t rivalità storica. */
+let DERBYI = null;
+const DERBY_TIPO = { s: "Stracittadina", r: "Derby regionale", t: "Rivalità storica" };
+function derbyOf(key) {
+  try { const x = EXTRA && EXTRA.partite && EXTRA.partite[key]; if (!isDerbyX(x)) return null;
+    const t = (DERBYI && DERBYI.partite && DERBYI.partite[key]) || ["", "", ""]; return { tipo: t[0], nome: t[1], citta: t[2], cart: x[8][5] }; } catch (e) { return null; }
+}
+const derbyMk = key => { const d = key ? derbyOf(key) : null; return d ? `<i class="dmark" title="${esc(d.nome || "Derby")}">derby</i>` : ""; };
+function derbyHTML(key) {
+  const d = derbyOf(key); if (!d) return "";
+  const pc = v => `+${Math.round((v - 1) * 100)}%`;
+  const head = d.nome ? `<b>${esc(d.nome)}</b>` : "<b>Derby</b>", tipo = DERBY_TIPO[d.tipo] ? ` · ${DERBY_TIPO[d.tipo]}${d.citta ? ` (${esc(d.citta)})` : ""}` : "";
+  const fd = FD_DERBY.on ? `falli attesi ${pc(Math.exp(FD_DERBY.b))} per entrambe le squadre, ` : "";
+  return `<h2>Derby</h2><p class="derbybox" style="margin:0 0 8px">${head}${tipo}.<br>Nel modello: ${fd}cartellini ${pc(d.cart)}. Corner, tiri, tiri in porta, gol e fuorigioco senza correzione (nessun effetto verificato).</p>`
+    + `<p class="small muted" style="margin:0">Stracittadine, derby regionali e rivalità storiche note (circa 230 coppie in 29 campionati, lista scritta a mano). Nei test i derby avevano più falli e cartellini del previsto; per le altre statistiche nessuna differenza verificata. È un'informazione: le previsioni non cambiano per questo avviso.</p>`;
+}
 const coachMark = (lg, team, key) => { const x = coachNew(lg, team, key); return x ? `<i class="cmark${x.n === 0 ? " first" : ""}" title="Nuovo allenatore">${x.n === 0 ? "1ª nuovo all." : "nuovo all."}</i>` : ""; };
 function coachHTML(lg, home, away, key) {
   const L = [[home, coachNew(lg, home, key)], [away, coachNew(lg, away, key)]].filter(x => x[1]); if (!L.length) return "";
@@ -4947,7 +4968,7 @@ function renderMatchExtras(home, away) {
   $("#mhead").innerHTML = matchHeroHTML(home, away, e, cfg, G); HEROCTX = { home, away, e, cfg, G };
   if (!isCup(S.league) || S.league === "NAZ") renderMatchConf(home, away, e, cfg);
   $("#mref").hidden = true; REFCTX = { home, away, e };
-  { const bc = $("#mcoach"); let h = ""; try { h = home && away && home !== away ? coachHTML(S.league, home, away, e ? e.id : null) : ""; } catch (x) {} bc.hidden = !h; bc.innerHTML = h; }
+  { const bc = $("#mcoach"); let h = ""; try { h = home && away && home !== away ? coachHTML(S.league, home, away, e ? e.id : null) + (e ? derbyHTML(e.id) : "") : ""; } catch (x) {} bc.hidden = !h; bc.innerHTML = h; }
   { const bx = $("#mxi"); let MFx = null; try { MFx = !m && home && away && home !== away ? model(home, away, cfg, "f") : null; } catch (x) {}   // formazioni ufficiali (fase 1-B)
     bx.hidden = !(MFx && MFx.xiF); bx.innerHTML = MFx && MFx.xiF ? xiBoxHTML(home, away, MFx) : ""; }   // cartellini e arbitro: nella i dell'arbitro (refSheetHTML)
   { const bw = $("#mwhy"); let h = ""; try { h = !m && home && away && home !== away && !isCup(S.league) ? whyHTML(home, away, cfg) : ""; } catch (x) {}   // fase 3: Perché questi numeri / E se…
@@ -6163,7 +6184,7 @@ function renderSel() {
   aBox.innerHTML = `<div class="selhead"><h2><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>A+ sul radar</h2><span class="small muted" style="white-space:nowrap">${selDaysTxt()}</span></div>` + (todo.length ? `<p class="muted" style="margin:0">Calcolo… ${got.length}/${ents.length} partite</p>` :
     apm.length ? `<div class="aplist">${apm.map(([e, L]) => `<button type="button" class="apcard" data-id="${esc(e.id)}">
       <span class="aptag"><svg class="ic ic-aplus" aria-hidden="true"><use href="#i-aplus"/></svg>SEGNALE A+${L.length > 1 ? ` · ${L.length} previsioni collegate` : ""}</span>
-      <span class="apm">${esc(e.home)} – ${esc(e.away)}${past && e.m ? ` <small class="muted">${e.m.hg}-${e.m.ag}</small>` : ""}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
+      <span class="apm">${esc(e.home)} – ${esc(e.away)}${derbyMk(e.id)}${past && e.m ? ` <small class="muted">${e.m.hg}-${e.m.ag}</small>` : ""}</span><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span>
       ${L.map(r => `<span class="aprow2"><span class="apmk">${esc(plainLab(r))}</span><small class="muted">${esc(confLab(r))}</small>
         <span class="gline"><span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gword sm">${GRADE_WORD[r.cls]}</span>${gradeDots(gradeRate(r), r.cls)}</span>
         <span class="gsay sm">Previsioni come questa sono uscite <b>${Math.round(gradeRate(r) * 100)} volte su 100</b>.${past ? " " + gmk(e, r) : ""}</span>
@@ -6178,7 +6199,7 @@ function renderSel() {
     gsum = `<div class="bkieri gsum"><p>${sm(sh, `Previsioni mostrate · ${selDaysTxt().toLowerCase()}`)}</p><p>${sm(ap, "Segnali A+")}</p><p class="bkric">Previsioni ricalcolate con i soli dati precedenti a ogni partita, con il metodo e il filtro scelti.</p></div>`;
   }
   list.innerHTML = gsum + (!ents.length ? `<p class="muted" style="margin:0">${past ? `Nessuna partita giocata ${selDaysTxt().toLowerCase()} nei nostri campionati.` : `Nessuna partita ${SEL.day === 0 ? "oggi" : SEL.day === 1 ? "domani" : selDaysTxt().toLowerCase()} ancora da giocare.`}</p>` :
-    (rows.length ? rows.map(([e, L]) => `<button type="button" class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}${past && e.m ? ` <small class="muted">${e.m.hg}-${e.m.ag}</small>` : ""}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
+    (rows.length ? rows.map(([e, L]) => `<button type="button" class="selm" data-id="${esc(e.id)}"><span class="selt"><b>${esc(e.home)} – ${esc(e.away)}${derbyMk(e.id)}${past && e.m ? ` <small class="muted">${e.m.hg}-${e.m.ag}</small>` : ""}</b><span class="small muted">${esc(lgName(e.lg))} · ${when(e)}</span></span>
       ${L.slice(0, 3).map(r => `<span class="selp2"><span>${esc(plainLab({ ...r, h: e.home, a: e.away }))}${r.mk === "f" && FORMAZ && FORMAZ.partite && FORMAZ.partite[e.id] ? `<span class="xitag" title="Falli corretti con le formazioni ufficiali">XI</span>` : ""}</span>${qSm(quotaFor(e, r.mk, r.side)) || "<small></small>"}<span class="ccls c-${gradeC(r.cls)}">${r.cls}</span><span class="gin"><b class="num">${Math.round(gradeRate(r) * 100)}</b> su 100${past ? gmk(e, r) : ""}</span></span>`).join("")}</button>`).join("")
       : `<p class="muted" style="margin:0">Nessuna previsione con questo filtro.</p>`) + (todo.length ? `<p class="small muted" style="margin:0">Calcolo delle altre partite…</p>` : ""));
   document.querySelectorAll("#selAplus [data-id], #selList [data-id]").forEach(b => b.addEventListener("click", () => { const e = ents.find(x => x.id === b.dataset.id); if (e) openEntry(e); }));

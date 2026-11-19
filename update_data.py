@@ -1268,6 +1268,9 @@ try:
                 try: dd = r["Date"].strip().split("/"); y = dd[2] if len(dd[2]) == 4 else "20" + dd[2]; pairs[(lgf, h, a)].append(datetime.date(int(y), int(dd[1]), int(dd[0])))
                 except Exception: pass
         except Exception: pass
+    DJ = {}
+    try: import derby_info
+    except Exception as e: derby_info = None; print("derby_info:", e)
     for lg, L in by_lg.items():
         mp = MAPS[lg]
         rows = []
@@ -1290,6 +1293,12 @@ try:
             else: ent = [x["ref"], x["n"], x["ff"], None, None, real, None, None, None]
             ent.append(TR.get((lg, v[0], v[2], v[3])))   # [9] errori standard per il range: gol casa, gol ospite, cartellini casa, cartellini ospite
             for z in ds: EX[f"{lg}|{z}|{h}|{a}"] = ent
+            # 19/11/2026 (Denny): avviso derby nell'app, tipo e nome (derby_info.py; solo informazione, i modelli non lo leggono)
+            di = derby_info.info(lg, v[2], v[3]) if derby_info else None
+            if di:
+                for z in ds: DJ[f"{lg}|{z}|{h}|{a}"] = di
+    try: json.dump({"v": 1, "partite": DJ}, open(os.path.join(OUT, "derby.json"), "w"), separators=(",", ":"), ensure_ascii=False); print("derby:", len(DJ), "partite")
+    except Exception as e: print("derby.json:", e)
     json.dump({"partite": EX, "alpha": _alpha if CMP else None, "modello": cards_model.VERSION if CMP else "cartellini-v1"},
               open(os.path.join(OUT, "extra.json"), "w"), separators=(",", ":"), ensure_ascii=False)
     print("arbitri e cartellini:", len(EX), "partite abbinate")
