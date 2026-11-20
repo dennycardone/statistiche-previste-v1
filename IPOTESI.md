@@ -292,3 +292,16 @@ tools/p2/corner_dati.py (caratteristiche pre-partita da storico + statistiche in
 - Effetto: SOLO sul conteggio della prova in ombra F6 (più campionati con risultato). Nessun effetto sulle previsioni ufficiali: ombra.py gira nel
   laboratorio (lab.yml), legge le pagine pubblicate e scrive solo sul ramo lab; precalc.json verificato identico byte per byte. Coefficienti e
   regola di F6 invariati. Le partite F6 registrate prima del 18/11 nei campionati API risultano ora con il risultato se presenti nel bundle.
+
+## 20/11/2026 · Cartellini, studio sui soli dati (Denny: "lavorare solo sui dati e non sui book … studia tutto") — SOLO ANALISI
+tools/p2/cart_dati.py (modello dell'app rifatto walk-forward come in produzione: corr 0,9987 con extra.json), cart_studio.py, cart_book.py;
+risultati sul ramo ricerca-cartellini. 53.193 partite (sviluppo 20.849, verifica 13.595, holdout 18.749), 47 campionati e coppe.
+- App ben tarata in generale: holdout 4,35 attesi / 4,30 reali, Under sulla linea vicina 53,8% / 53,7%; fascia Under 60-65% un po' alta (61,5 → 59,5).
+- Passa la regola: cartellini PER SQUADRA con Poisson invece della NB del totale (r stimato → infinito): log-loss per squadra −0,0021 verifica /
+  −0,0028 holdout (99%, 37/47 e 38/47), Brier linee fisse 0,5/1,5/2,5 meglio al 99%. Linea vicina all'atteso: invariata.
+- Livello recente del campionato (reali/attesi ultimi 30 giorni, shrinkage 50, coeff. 0,75): meglio in tutti i periodi, ma il totale non arriva
+  al 99% in verifica; con Poisson per squadra (F+A30+E) passa per squadra (log-loss, Brier linea vicina e fisse).
+- Non passano: livello 60/120/365 giorni, avanzamento della stagione, costante per campionato (peggio), sede delle squadre, contrazione (≈0).
+- Tabellone sulle linee archiviate (1.172 partite, il book solo come metro): giocate del Mercato dell'app (≥65%, valore ≥5%) 156, 89% Under,
+  prese 62,8% contro 69,4% dichiarato, rendimento +5,4% (totali +10%, per squadra −8/0%). Le varianti non cambiano il quadro: lo scarto tra
+  dichiarato e preso nasce dalla selezione (si scelgono le partite dove il modello si discosta di più). IN ATTESA DI DENNY.
