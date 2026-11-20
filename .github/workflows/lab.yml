@@ -4,7 +4,8 @@ name: Laboratorio (ogni notte)
 #    maggioranza dei campionati), contro le previsioni walk-forward dell'app (ramo ricerca, base) unite all'archivio API-Football (ramo storico);
 # 2) segue in ombra sulle partite nuove le idee che hanno passato il laboratorio (tools/lab/ombra.py), senza toccare l'app;
 # 3) 18/11/2026: Corner V2 in ombra (tools/lab/ombra_corner.py, data/corner_v2.json scritto da precalc.js): registro e report CORNER_V2.md;
-# 4) salva stato.json, ombra.json, ombra_corner.json, CORNER_V2.md e RIEPILOGO.md sul ramo lab. Nessuna richiesta API, nessuna modifica all'app.
+# 4) 20/11/2026: Cartellini V2 in ombra (tools/lab/ombra_cartellini.py): registro e report CARTELLINI_V2.md;
+# 5) salva stato.json, ombra.json, ombra_corner.json, CORNER_V2.md e RIEPILOGO.md sul ramo lab. Nessuna richiesta API, nessuna modifica all'app.
 on:
   schedule:
     - cron: "51 2 * * *"
@@ -29,6 +30,7 @@ jobs:
           git fetch -q --depth 1 origin storico && git archive FETCH_HEAD | tar -x -C ricerca/storico
           git fetch -q --depth 1 origin pages && git archive FETCH_HEAD data/precalc.json data/extra.json data/bundle.json | tar -x -C _pages
           git archive FETCH_HEAD data/corner_v2.json 2>/dev/null | tar -x -C _pages || echo "corner_v2.json non ancora pubblicato"
+          git archive FETCH_HEAD data/linee.json 2>/dev/null | tar -x -C _pages || echo "linee.json non trovato"
           if git ls-remote --exit-code origin lab >/dev/null 2>&1; then git fetch -q --depth 1 origin lab && git archive FETCH_HEAD | tar -x -C _lab; fi
           ls ricerca/base | wc -l; ls ricerca/storico | wc -l
       - uses: actions/setup-python@v5
@@ -42,6 +44,8 @@ jobs:
         run: python tools/lab/ombra.py _pages/data _lab
       - name: Corner V2 in ombra (registro delle partite, confronto con l'app sugli stessi eventi; nessuna ricalibrazione)
         run: python tools/lab/ombra_corner.py _pages/data _lab || echo "::warning title=Corner V2 in ombra::giro non riuscito"
+      - name: Cartellini V2 in ombra (livello 30 giorni + Poisson per squadra; giocate per squadra tolte dal Mercato il 20/11)
+        run: python tools/lab/ombra_cartellini.py _pages/data _lab || echo "::warning title=Cartellini V2 in ombra::giro non riuscito"
       - name: Salva sul ramo lab
         env:
           GH_TOKEN: ${{ github.token }}

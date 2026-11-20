@@ -305,3 +305,7 @@ risultati sul ramo ricerca-cartellini. 53.193 partite (sviluppo 20.849, verifica
 - Tabellone sulle linee archiviate (1.172 partite, il book solo come metro): giocate del Mercato dell'app (≥65%, valore ≥5%) 156, 89% Under,
   prese 62,8% contro 69,4% dichiarato, rendimento +5,4% (totali +10%, per squadra −8/0%). Le varianti non cambiano il quadro: lo scarto tra
   dichiarato e preso nasce dalla selezione (si scelgono le partite dove il modello si discosta di più). IN ATTESA DI DENNY.
+- 20/11/2026 · Decisione di Denny: (1) Cartellini V2 IN OMBRA (livello del campionato 30 giorni, coeff. 0,0007 + 0,752·L30, congelati;
+  Poisson per squadra) con tools/lab/ombra_cartellini.py ogni notte, report CARTELLINI_V2.md sul ramo lab; previsioni ufficiali invariate.
+  (2) Giocate del Mercato sui cartellini PER SQUADRA tolte dall'app (isVal: c.ombra; nella scheda la linea resta con "in prova"); seguite in
+  ombra nello stesso registro, con app e V2, accanto ai cartellini totali.

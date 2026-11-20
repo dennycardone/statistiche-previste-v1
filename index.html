@@ -4616,7 +4616,9 @@ function renderQuote() {
     <p class="small muted" style="margin:0">▼ quota in calo (il bookmaker la ritiene più probabile) · ▲ quota in salita.</p>` + RG_LINE;
 }
 const RG_LINE = `<p class="rgline">Quote solo informative · Prevista non è un bookmaker · 18+ · Gioca responsabilmente</p>`;
-const isVal = c => !!(c && c.po != null && !c.gol && c.ev >= BK_MIN);
+// 20/11/2026 (Denny): cartellini PER SQUADRA tolti dalle giocate del Mercato (rendimento negativo sulle linee archiviate, 89% Under);
+// la linea resta visibile nella scheda con "in prova" e le giocate sono seguite in ombra (tools/lab/ombra_cartellini.py)
+const isVal = c => !!(c && c.po != null && !c.gol && !c.ombra && c.ev >= BK_MIN);
 // 6/11/2026: linee della media dei book (mb, [linea, media Over, media Under, n. book, max Over, book, max Under, book]) dove ci sono, altrimenti 1xBet
 const bkLines = e => { const b = (e && LINEE && LINEE.partite && LINEE.partite[e.id]) || null; return b && b.mb ? { ...b, ...b.mb } : b; };
 function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u, n, po, side, p, odd, ev, real, hit} o null (N.D.)
@@ -4642,7 +4644,7 @@ function bkCalc(Mods, LB, m) {   // → righe {lab, t, h, a} con celle {L, o, u,
     if (po == null || !isFinite(po)) return { L, o, u, n, po: null, real, gol: base === "g" || base === "o" };
     // 15/11/2026 (Denny): il lato è quello della lettura (sopra il 50%), non quello col valore più alto: niente Under se Prevista legge l'Over
     const eo = po * o - 1, eu = (1 - po) * u - 1, side = po >= 0.5 ? "O" : "U";
-    return { L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, mx: side === "O" ? oM : uM, bk: side === "O" ? oB : uB, ev: side === "O" ? eo : eu, real, gol: base === "g" || base === "o", hit: real == null ? null : side === "O" ? real > L : real < L };
+    return { ombra: base === "k" && i !== 1, L, o, u, n, po, side, p: side === "O" ? po : 1 - po, odd: side === "O" ? o : u, mx: side === "O" ? oM : uM, bk: side === "O" ? oB : uB, ev: side === "O" ? eo : eu, real, gol: base === "g" || base === "o", hit: real == null ? null : side === "O" ? real > L : real < L };
   };
   return ("O" in Mods ? BK_ROWS.concat([["Fuorigioco", "o", "ho", "ao"]]) : BK_ROWS).map(([lab, t, h, a]) => ({ lab, t: cell(t, t, 1), h: cell(h, t, 0), a: cell(a, t, 2), mk: t }));
 }
@@ -4871,7 +4873,7 @@ function bkCellHTML(c, center, lab) {
   const val = isVal(c), evt = `${c.ev >= 0 ? "+" : "−"}${Math.round(Math.abs(c.ev) * 100)}%`;
   return `<span class="${center ? "sx-m" : "sx-v"} bk${val ? " val" : ""}">${head}${ln}
     <span class="bk-s ${c.side === "O" ? "ov" : "un"}">${c.side === "O" ? "Over" : "Under"} <b>${pc(c.p)}</b></span>
-    <span class="bk-q">@${f2(c.odd)}${c.gol ? "" : ` <em class="${val ? "pos" : c.ev > 0 ? "" : "neg"}">${evt}</em>`}${c.n > 1 && c.mx > c.odd + 0.005 ? `<small class="bk-mx">max ${f2(c.mx)} ${esc(c.bk || "")}</small>` : ""}</span>
+    <span class="bk-q">@${f2(c.odd)}${c.gol ? "" : ` <em class="${val ? "pos" : c.ev > 0 ? "" : "neg"}">${evt}</em>`}${c.n > 1 && c.mx > c.odd + 0.005 ? `<small class="bk-mx">max ${f2(c.mx)} ${esc(c.bk || "")}</small>` : ""}${c.ombra ? `<small class="bk-mx" title="Cartellini per squadra: fuori dalle giocate del Mercato dal 20/11/2026, seguiti in prova">in prova</small>` : ""}</span>
     ${c.real != null ? `<span class="bk-r">reale <b>${c.real}</b> ${c.hit ? `<i class="mk ok">✓</i>` : `<i class="mk ko">✗</i>`}</span>` : ""}</span>`;
 }
 function matchHeroHTML(home, away, e, cfg, G) {
