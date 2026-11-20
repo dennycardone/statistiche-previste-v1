@@ -1,0 +1,276 @@
+{
+ "app": {
+  "linee": 958,
+  "giocate": 156,
+  "under": 89.1,
+  "presa": 62.8,
+  "dichiarata": 69.4,
+  "rendimento": 5.4,
+  "per_mercato": {
+   "ak": {
+    "n": 31,
+    "presa": 61.3,
+    "dichiarata": 70.1,
+    "rendimento": 0.3
+   },
+   "hk": {
+    "n": 23,
+    "presa": 56.5,
+    "dichiarata": 71.2,
+    "rendimento": -8.1
+   },
+   "k": {
+    "n": 102,
+    "presa": 64.7,
+    "dichiarata": 68.9,
+    "rendimento": 10.1
+   }
+  },
+  "tutte_le_linee": {
+   "lettura_presa": 54.8,
+   "dichiarata": 58.8
+  }
+ },
+ "A rec30": {
+  "linee": 958,
+  "giocate": 147,
+  "under": 89.1,
+  "presa": 61.2,
+  "dichiarata": 70.0,
+  "rendimento": 2.6,
+  "per_mercato": {
+   "ak": {
+    "n": 34,
+    "presa": 58.8,
+    "dichiarata": 70.1,
+    "rendimento": -3.4
+   },
+   "hk": {
+    "n": 24,
+    "presa": 54.2,
+    "dichiarata": 70.7,
+    "rendimento": -11.9
+   },
+   "k": {
+    "n": 89,
+    "presa": 64.0,
+    "dichiarata": 69.8,
+    "rendimento": 8.9
+   }
+  },
+  "tutte_le_linee": {
+   "lettura_presa": 55.0,
+   "dichiarata": 58.8
+  }
+ },
+ "D sede": {
+  "linee": 958,
+  "giocate": 142,
+  "under": 88.7,
+  "presa": 62.7,
+  "dichiarata": 69.9,
+  "rendimento": 5.1,
+  "per_mercato": {
+   "ak": {
+    "n": 33,
+    "presa": 63.6,
+    "dichiarata": 69.8,
+    "rendimento": 4.3
+   },
+   "hk": {
+    "n": 22,
+    "presa": 54.5,
+    "dichiarata": 71.2,
+    "rendimento": -10.9
+   },
+   "k": {
+    "n": 87,
+    "presa": 64.4,
+    "dichiarata": 69.6,
+    "rendimento": 9.5
+   }
+  },
+  "tutte_le_linee": {
+   "lettura_presa": 55.1,
+   "dichiarata": 58.8
+  }
+ },
+ "F contrazione": {
+  "linee": 958,
+  "giocate": 149,
+  "under": 87.9,
+  "presa": 62.4,
+  "dichiarata": 69.4,
+  "rendimento": 4.4,
+  "per_mercato": {
+   "ak": {
+    "n": 31,
+    "presa": 61.3,
+    "dichiarata": 69.8,
+    "rendimento": 0.3
+   },
+   "hk": {
+    "n": 24,
+    "presa": 58.3,
+    "dichiarata": 70.9,
+    "rendimento": -5.6
+   },
+   "k": {
+    "n": 94,
+    "presa": 63.8,
+    "dichiarata": 68.8,
+    "rendimento": 8.3
+   }
+  },
+  "tutte_le_linee": {
+   "lettura_presa": 54.9,
+   "dichiarata": 58.6
+  }
+ },
+ "F + E": {
+  "linee": 958,
+  "giocate": 147,
+  "under": 87.8,
+  "presa": 62.6,
+  "dichiarata": 69.5,
+  "rendimento": 4.6,
+  "per_mercato": {
+   "ak": {
+    "n": 30,
+    "presa": 63.3,
+    "dichiarata": 70.1,
+    "rendimento": 3.7
+   },
+   "hk": {
+    "n": 23,
+    "presa": 56.5,
+    "dichiarata": 71.4,
+    "rendimento": -8.9
+   },
+   "k": {
+    "n": 94,
+    "presa": 63.8,
+    "dichiarata": 68.8,
+    "rendimento": 8.3
+   }
+  },
+  "tutte_le_linee": {
+   "lettura_presa": 54.9,
+   "dichiarata": 58.7
+  }
+ },
+ "F + A30 + E": {
+  "linee": 958,
+  "giocate": 144,
+  "under": 88.9,
+  "presa": 61.1,
+  "dichiarata": 70.0,
+  "rendimento": 2.5,
+  "per_mercato": {
+   "ak": {
+    "n": 34,
+    "presa": 58.8,
+    "dichiarata": 70.1,
+    "rendimento": -3.4
+   },
+   "hk": {
+    "n": 24,
+    "presa": 54.2,
+    "dichiarata": 70.8,
+    "rendimento": -11.8
+   },
+   "k": {
+    "n": 86,
+    "presa": 64.0,
+    "dichiarata": 69.8,
+    "rendimento": 8.8
+   }
+  },
+  "tutte_le_linee": {
+   "lettura_presa": 55.2,
+   "dichiarata": 58.8
+  }
+ },
+ "E r squadra (Poisson)": {
+  "linee": 958,
+  "giocate": 157,
+  "under": 88.5,
+  "presa": 63.1,
+  "dichiarata": 69.5,
+  "rendimento": 5.7,
+  "per_mercato": {
+   "ak": {
+    "n": 31,
+    "presa": 61.3,
+    "dichiarata": 70.2,
+    "rendimento": 0.3
+   },
+   "hk": {
+    "n": 24,
+    "presa": 58.3,
+    "dichiarata": 71.3,
+    "rendimento": -5.6
+   },
+   "k": {
+    "n": 102,
+    "presa": 64.7,
+    "dichiarata": 68.9,
+    "rendimento": 10.1
+   }
+  },
+  "tutte_le_linee": {
+   "lettura_presa": 55.0,
+   "dichiarata": 58.8
+  }
+ },
+ "A rec30 + E": {
+  "linee": 958,
+  "giocate": 148,
+  "under": 88.5,
+  "presa": 61.5,
+  "dichiarata": 70.0,
+  "rendimento": 3.1,
+  "per_mercato": {
+   "ak": {
+    "n": 34,
+    "presa": 58.8,
+    "dichiarata": 70.2,
+    "rendimento": -3.4
+   },
+   "hk": {
+    "n": 25,
+    "presa": 56.0,
+    "dichiarata": 70.7,
+    "rendimento": -8.6
+   },
+   "k": {
+    "n": 89,
+    "presa": 64.0,
+    "dichiarata": 69.8,
+    "rendimento": 8.9
+   }
+  },
+  "tutte_le_linee": {
+   "lettura_presa": 55.3,
+   "dichiarata": 58.9
+  }
+ },
+ "livello": {
+  "atteso": 4.082,
+  "reale": 4.048,
+  "campionati": {
+   "E1": 81,
+   "USA": 69,
+   "I2": 59,
+   "I1": 57,
+   "ARG": 55,
+   "UEL": 52,
+   "UCL": 48,
+   "E0": 45,
+   "D2": 43,
+   "F1": 43,
+   "N1": 43,
+   "T1": 43
+  }
+ }
+}
