@@ -149,9 +149,10 @@ summary{cursor:pointer;font-weight:600}
 .mgio h3.gsh{font-size:14px;margin:14px 0 6px}.mgio h3.gsh small{font-weight:400;color:var(--ink-2);font-size:11.5px;margin-left:4px}
 .mgio>*{min-width:0;max-width:100%}.gsw{overflow-x:auto;max-width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;-webkit-overflow-scrolling:touch}.gst-t{border-collapse:separate;border-spacing:0;font-size:12.5px;width:max-content;min-width:100%}
 .gsscr{margin:4px 2px 0;font-size:11px;color:var(--ink-2);text-align:right}.gsr.sel td,.gsr.sel th{background:var(--surface-2)}
-.gst-t th,.gst-t td{padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}.gst-t thead th{font-size:11px;color:var(--ink-2);font-weight:600;text-align:right}
+.gst-t th,.gst-t td{padding:5px 3px;border-bottom:1px solid var(--line);white-space:nowrap}.gst-t{font-size:12px}.gst-t thead th{font-size:11px;color:var(--ink-2);font-weight:600;text-align:right}
 .gst-t thead th:first-child,.gst-t tbody th{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1;border-right:1px solid var(--line)}
-.gst-t tbody th{font-weight:600;min-width:120px;max-width:170px;white-space:normal;line-height:1.25}.gst-t tbody th small{color:var(--ink-2);font-weight:500;margin-right:5px;font-size:10.5px}
+.gst-t td.gsp small{display:block;margin:0}.mgio .gst-t thead button{display:block;max-width:44px;white-space:normal;text-align:right;line-height:1.15;margin-left:auto}
+.gst-t tbody th{font-weight:600;min-width:84px;max-width:96px;white-space:normal;line-height:1.2;padding-left:7px}.gst-t tbody th small{color:var(--ink-2);font-weight:500;margin-right:5px;font-size:10.5px}
 .gst-t td small{color:var(--ink-2);margin-left:3px;font-size:10.5px}.gst-t td.on{color:var(--accent);font-weight:700}
 .gst-t thead button{all:unset;cursor:pointer}.gst-t thead button[aria-pressed="true"]{color:var(--accent)}
 .gsr{cursor:pointer}.gsr.xi th{box-shadow:inset 3px 0 0 var(--accent)}.gsr.out{opacity:.55}
@@ -159,7 +160,7 @@ summary{cursor:pointer;font-weight:600}
 .gsx{font-style:normal;font-size:9.5px;font-weight:700;margin-left:5px;padding:0 4px;border-radius:3px;background:var(--warn);color:var(--bg)}.gsx.dub{background:transparent;color:var(--warn);border:1px solid var(--warn)}
 .gsu{margin-top:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:8px 10px;max-width:100%;box-sizing:border-box}.gsu-h{display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:4px}.gsu-h button{margin-left:auto;all:unset;cursor:pointer;font-size:18px;line-height:1;padding:0 4px;color:var(--ink-2)}
 .gsu table{border-collapse:collapse;font-size:11.5px;width:100%;table-layout:fixed}.gsu th,.gsu td{padding:3px 2px;text-align:center;font-variant-numeric:tabular-nums}.gsu thead th{font-size:10px;color:var(--ink-2);font-weight:600}.gsu tr>:first-child{text-align:left;width:34%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
-.gsm{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}.gsn{margin-top:10px}
+.gsm{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}.gsg .segb{font-weight:700}.gst-t thead th{white-space:normal;line-height:1.15;vertical-align:bottom}.gsn{margin-top:10px}
 .dmark{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.02em;margin-left:6px;padding:1px 5px;border-radius:4px;background:var(--surface-2);color:var(--accent);border:1px solid var(--accent);white-space:nowrap;vertical-align:1px}
 .derbybox{border-left:3px solid var(--accent);padding:6px 10px;background:var(--surface-2);border-radius:0 6px 6px 0;font-size:13px}
 .warnbox{border-left:3px solid var(--warn);padding:6px 10px;background:var(--surface-2);border-radius:0 6px 6px 0;font-size:13px}
@@ -4840,10 +4841,12 @@ const RL_G = { G: "P", D: "D", M: "C", F: "A" };
    ordinabili; tocco sul giocatore = ultime 5 partite. Titolari di oggi (ufficiali o probabili) in cima, indisponibili segnati. Sotto, le
    probabilità dei giocatori (prima nella Lettura). Squadre presenti solo dove i nomi coprono almeno il 90% dei minuti. */
 let GIO_PROPS = "", GIO_ARGS = null;
-const GS = new Map(), GS_LOAD = new Map(), GSV = { mode: "p", sort: null, open: new Set() };
+const GS = new Map(), GS_LOAD = new Map(), GSV = { mode: "p", sort: null, open: new Set(), grp: "att" };
+// gruppi di colonne: sul telefono ogni gruppo entra nella scheda senza scorrere
+const GS_GRP = [["att", "Attacco", ["gol", "ass", "tiri", "tip"]], ["fal", "Falli e cartellini", ["ff", "fs", "gi", "ro"]], ["alt", "Dribbling e difesa", ["dr", "ct", "fg"]]];
 const GS_COL = [["gol", 6, "Gol"], ["ass", 7, "Assist"], ["tiri", 8, "Tiri"], ["tip", 9, "Tiri in porta"], ["ff", 10, "Falli fatti"], ["fs", 11, "Falli subiti"],
   ["gi", 12, "Gialli"], ["ro", 13, "Rossi"], ["fg", 14, "Fuorigioco"], ["ct", 15, "Contrasti"], ["dr", 16, "Dribbling riusciti"]];
-const GS_SH = { gol: "Gol", ass: "Ass", tiri: "Tiri", tip: "T.p.", ff: "F.f.", fs: "F.s.", gi: "Gial", ro: "Rossi", fg: "Fuor", ct: "Contr", dr: "Dribb" };
+const GS_SH = { gol: "Gol", ass: "Assist", tiri: "Tiri", tip: "Tiri in porta", ff: "Falli fatti", fs: "Falli subiti", gi: "Gialli", ro: "Rossi", fg: "Fuori- gioco", ct: "Con- trasti", dr: "Dribbl. riusciti" };
 function gsLoad(lg) {
   if (GS.has(lg)) return Promise.resolve(GS.get(lg)); if (GS_LOAD.has(lg)) return GS_LOAD.get(lg);
   const pr = getData(`gs_${lg}.json`).then(j => { GS.set(lg, j && j.squadre ? j : null); return GS.get(lg); }).catch(() => { GS.set(lg, null); return null; });
@@ -4876,6 +4879,7 @@ function renderGio(e, home, away) {
   tab.hidden = false;
   const LU = gioLineup(e, home, away), mode = GSV.mode, f = v => v == null ? "—" : mode === "t" ? String(v) : v < 0.005 ? "0" : v.toFixed(2).replace(".", ",");
   const val = (r, i) => mode === "t" ? r[i] : mode === "p" ? (r[3] ? r[i] / r[3] : null) : (r[5] >= 45 ? r[i] / r[5] * 90 : null);
+  const grp = GS_GRP.find(g => g[0] === GSV.grp) || GS_GRP[0], COLS = GS_COL.filter(c => grp[2].includes(c[0])).sort((a, b) => grp[2].indexOf(a[0]) - grp[2].indexOf(b[0]));
   const team = (name, T, L, side) => {
     if (!T) return `<h3 class="gsh">${esc(name)}</h3><p class="muted small">Statistiche dei giocatori non disponibili per questa squadra.</p>`;
     let rows = T.g.slice();
@@ -4885,29 +4889,31 @@ function renderGio(e, home, away) {
     const RL = RL_G, nT = rows.filter(today).length;
     const body = rows.map(r => {
       const id = String(r[0]), op = GSV.open.has(side + id), out = LU.OUT.has(id), dub = LU.DUB.has(id);
-      const tag = today(r) ? `<i class="gst${L.uff ? " uff" : ""}" title="${L.uff ? "titolare ufficiale" : "titolare probabile"}">${L.uff ? "XI" : "prob."}</i>` : "";
+      const tag = today(r) && L.uff ? `<i class="gst uff" title="titolare ufficiale">XI</i>` : "";   // titolari probabili: basta la barra a sinistra
       const st = out ? `<i class="gsx" title="indisponibile (API-Football)">fuori</i>` : dub ? `<i class="gsx dub" title="in dubbio">dubbio</i>` : "";
-      let tr = `<tr class="gsr${today(r) ? " xi" : ""}${out ? " out" : ""}${op ? " sel" : ""}" data-gsp="${side}${id}"><th><small>${RL[r[2]] || ""}</small>${esc(r[1])}${tag}${st}</th><td class="num">${r[3]}<small>${r[4]}</small></td><td class="num">${r[5]}</td>${GS_COL.map(c => `<td class="num${GSV.sort === c[0] ? " on" : ""}">${f(val(r, c[1]))}</td>`).join("")}</tr>`;
+      let tr = `<tr class="gsr${today(r) ? " xi" : ""}${out ? " out" : ""}${op ? " sel" : ""}" data-gsp="${side}${id}"><th><small>${RL[r[2]] || ""}</small>${esc(r[1])}${tag}${st}</th><td class="num gsp">${r[3]}<small>${r[4]} tit.</small></td><td class="num">${r[5]}</td>${COLS.map(c => `<td class="num${GSV.sort === c[0] ? " on" : ""}">${f(val(r, c[1]))}</td>`).join("")}</tr>`;
       return tr;
     }).join("");
     const sel = rows.filter(r => GSV.open.has(side + String(r[0])));
     const u5 = sel.map(r => { const U = (T.u5 || {})[String(r[0])] || [];
       return `<div class="gsu"><div class="gsu-h"><b>${esc(r[1])}</b> · ultime 5 di campionato<button type="button" data-gsp="${side}${esc(String(r[0]))}" aria-label="Chiudi">×</button></div>
         <table><thead><tr><th>Partita</th><th>Min</th><th>Gol</th><th>Ass</th><th>Tiri</th><th>T.p.</th><th>F.f.</th><th>F.s.</th><th>Cart</th></tr></thead><tbody>${U.map(u => `<tr><th>${esc(u[0].slice(8, 10) + "/" + u[0].slice(5, 7))} ${u[2] === "C" ? "vs" : "@"} ${esc(u[1])}</th>${u.slice(3).map(v => `<td>${v}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="9" class="muted">Nessuna partita.</td></tr>`}</tbody></table></div>`; }).join("");
-    return `<h3 class="gsh">${esc(name)} <small>${T.partite} partite di campionato · ${nT ? (L.uff ? "titolari ufficiali" : "titolari probabili") + " in cima" : "titolari non noti"}</small></h3>
-      <div class="gsw"><table class="gst-t"><thead><tr><th>Giocatore</th><th title="presenze (da titolare)">Pres</th><th title="minuti giocati">Min</th>${GS_COL.map(c => `<th><button type="button" data-gss="${c[0]}" title="${c[2]}" aria-pressed="${GSV.sort === c[0]}">${GS_SH[c[0]]}</button></th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div><p class="gsscr">scorri la tabella di lato per le altre colonne →</p>${u5}`;
+    return `<h3 class="gsh">${esc(name)} <small>${T.partite} partite di campionato · ${nT ? (L.uff ? "titolari ufficiali (XI)" : "titolari probabili, barra azzurra") + " in cima" : "titolari non noti"}</small></h3>
+      <div class="gsw"><table class="gst-t"><thead><tr><th>Giocatore</th><th title="presenze (da titolare)">Pres</th><th title="minuti giocati">Min</th>${COLS.map(c => `<th><button type="button" data-gss="${c[0]}" title="${c[2]}" aria-pressed="${GSV.sort === c[0]}">${GS_SH[c[0]]}</button></th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>${u5}`;
   };
   box.innerHTML = `<h2>Giocatori · campionato</h2>
+    <div class="gsm gsg" role="group" aria-label="Statistiche">${GS_GRP.map(([k, l]) => `<button type="button" class="segb" data-gsg="${k}" aria-pressed="${GSV.grp === k}">${l}</button>`).join("")}</div>
     <div class="gsm" role="group" aria-label="Valori">${[["p", "A partita"], ["n", "Ogni 90′"], ["t", "Totali"]].map(([k, l]) => `<button type="button" class="segb" data-gsm="${k}" aria-pressed="${mode === k}">${l}</button>`).join("")}${GSV.sort ? `<button type="button" class="segb" data-gss="" aria-pressed="false">Ordine titolari</button>` : ""}</div>
     ${team(home, H, LU.h, "h")}${team(away, A, LU.a, "a")}
-    <p class="small muted gsn">Solo campionato, stagione in corso (API-Football). Pres = presenze, in piccolo da titolare. Ogni 90′: solo chi ha giocato almeno 45 minuti. Tocca una colonna per ordinare, un giocatore per le sue ultime 5 partite.${J && J.agg ? ` Dati del ${esc(J.agg.slice(8, 10) + "/" + J.agg.slice(5, 7))}.` : ""}</p>
+    <p class="small muted gsn">Solo campionato, stagione in corso (API-Football). Pres = presenze, in piccolo da titolare. Ogni 90′: solo chi ha giocato almeno 45 minuti. Scegli il gruppo di statistiche in alto; tocca una colonna per ordinare, un giocatore per le sue ultime 5 partite.${J && J.agg ? ` Dati del ${esc(J.agg.slice(8, 10) + "/" + J.agg.slice(5, 7))}.` : ""}</p>
     ${GIO_PROPS || ""}`;
   if (GSV.sort) box.querySelectorAll(".gsw").forEach(w => { const th = w.querySelector('thead button[aria-pressed="true"]'), c = th && th.closest("th"), f = w.querySelector("thead th");
     if (c && f) w.scrollLeft = Math.max(0, c.offsetLeft - f.offsetWidth); });   // la colonna ordinata resta in vista
 }
 document.addEventListener("click", ev => {
-  const t = ev.target.closest && ev.target.closest("#mgio [data-gsm], #mgio [data-gss], #mgio [data-gsp]"); if (!t || !GIO_ARGS) return;
-  if (t.dataset.gsm) GSV.mode = t.dataset.gsm;
+  const t = ev.target.closest && ev.target.closest("#mgio [data-gsm], #mgio [data-gss], #mgio [data-gsp], #mgio [data-gsg]"); if (!t || !GIO_ARGS) return;
+  if (t.dataset.gsg) { GSV.grp = t.dataset.gsg; const g = GS_GRP.find(z => z[0] === GSV.grp); if (GSV.sort && g && !g[2].includes(GSV.sort)) GSV.sort = null; }
+  else if (t.dataset.gsm) GSV.mode = t.dataset.gsm;
   else if (t.dataset.gss != null) GSV.sort = t.dataset.gss ? (GSV.sort === t.dataset.gss ? null : t.dataset.gss) : null;
   else if (t.dataset.gsp) { const k = t.dataset.gsp; GSV.open.has(k) ? GSV.open.delete(k) : GSV.open.add(k); }
   renderGio(GIO_ARGS.e, GIO_ARGS.home, GIO_ARGS.away);
