@@ -82,7 +82,7 @@ for lg, s in order:
             for t in f.get("players", []):
                 side = 0 if t["team"]["id"] == hid else 1
                 for p in t.get("players", []):
-                    if lg in TOPP and p["player"].get("name"): nomi[str(p["player"]["id"])] = p["player"]["name"]
+                    if p["player"].get("name"): nomi[str(p["player"]["id"])] = p["player"]["name"]   # 21/11/2026: nomi per tutti i campionati (scheda Giocatori), stessa risposta
                     st = (p.get("statistics") or [{}])[0]; g = st.get("games", {}) or {}
                     if not g.get("minutes"): continue
                     P.append([p["player"]["id"], side, num(g.get("minutes")), num((st.get("goals") or {}).get("total")), num((st.get("goals") or {}).get("assists")),

@@ -937,6 +937,7 @@ try:
             import shutil as _sh
             _GP = os.path.join(os.path.dirname(OUT), "valori", "giocatori.json")
             if os.path.exists(_GP): _sh.copyfile(_GP, os.path.join(OUT, "giocatori.json"))
+            for _gs in _g0.glob(os.path.join(os.path.dirname(OUT), "valori", "gs_*.json")): _sh.copyfile(_gs, os.path.join(OUT, os.path.basename(_gs)))   # 21/11: scheda Giocatori
             _BP = os.path.join(os.path.dirname(OUT), "basket_sito", "basket.json")   # 15/11: basket
             if os.path.exists(_BP): _sh.copyfile(_BP, os.path.join(OUT, "basket.json"))
         except Exception as e_: print("::warning title=Giocatori::" + str(e_)[:150])

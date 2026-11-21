@@ -43,6 +43,9 @@ jobs:
           rm -rf _r && mkdir -p _r && git fetch -q --depth 1 origin ricerca && git archive FETCH_HEAD base | tar -x -C _r
           pip install -q numpy && python tools/props/giocatori.py formazioni _r/base storico formazioni/giocatori.json
         continue-on-error: true
+      - name: Statistiche della stagione per la scheda Giocatori (solo campionato, un file per campionato)
+        run: rm -rf formazioni_gs && python tools/props/stagione.py formazioni _r/base formazioni/giocatori.json formazioni_gs
+        continue-on-error: true
       - name: Salva sul ramo formazioni
         if: always()
         env:
@@ -60,7 +63,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           [ -s formazioni/valori.json ] || { echo "::warning title=Valori giocatori::valori.json non calcolato"; exit 0; }
-          rm -rf _v && mkdir _v && cp formazioni/valori.json _v/ && { [ -s formazioni/giocatori.json ] && cp formazioni/giocatori.json _v/ || true; } && cd _v
+          rm -rf _v && mkdir _v && cp formazioni/valori.json _v/ && { [ -s formazioni/giocatori.json ] && cp formazioni/giocatori.json _v/ || true; } && { cp formazioni_gs/gs_*.json _v/ 2>/dev/null || true; } && cd _v
           git init -q -b valori && git config user.name "corner-bot" && git config user.email "corner-bot@users.noreply.github.com"
           git add -A && git commit -q -m "Valori giocatori $(date -u '+%F %H:%M')"
           for t in 1 2 3; do git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" valori && break; sleep 20; done

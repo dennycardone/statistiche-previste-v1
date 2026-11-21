@@ -128,6 +128,7 @@ jobs:
           # 17/11/2026: rho Dixon-Coles del mese per la V2 dei gol (gol_rho.yml, ramo gol-rho); senza file l'app usa la tabella nel codice
           if git ls-remote --exit-code origin gol-rho >/dev/null 2>&1; then (git fetch -q --depth 1 origin gol-rho && git show FETCH_HEAD:gol_rho.json > data/gol_rho.json) || rm -f data/gol_rho.json; fi
           DATA="gol_rho.json allenatori.json corretta.json operativita.json operativita_ieri.json formazioni.json prossime.json mercato_ieri.json mercati.json bundle_storico.json bundle.json extra.json precalc.json odds.json linee.json loghi.json crests.json qualita.json quote_mov.json ucl.json uel.json naz.json tempi.json fuorigioco.json tiri_area.json giocatori.json assenze.json basket.json corner_v2.json derby.json"
+          DATA="$DATA $(cd data && ls gs_*.json 2>/dev/null | tr '\n' ' ')"   # 21/11/2026: statistiche dei giocatori per campionato (scheda Giocatori)
           # 26/10/2026: il micro-processo delle formazioni (formazioni_live.yml) può aver pubblicato formazioni durante questo giro: si tengono
           # (unione con quelle già sul sito, quelle di questo giro hanno la precedenza; via dopo 3 ore dal fischio come in update_data.py)
           git fetch -q --depth 1 origin pages 2>/dev/null && git show FETCH_HEAD:data/formazioni.json > /tmp/fz_sito.json 2>/dev/null || true
