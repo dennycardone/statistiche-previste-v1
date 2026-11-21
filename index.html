@@ -146,6 +146,18 @@ summary{cursor:pointer;font-weight:600}
 .formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--surface-2);padding:8px 10px;border-radius:6px;overflow-x:auto;white-space:pre}
 .cmark{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.02em;margin-left:6px;padding:1px 5px;border-radius:4px;background:var(--surface-2);color:var(--warn);border:1px solid var(--warn);white-space:nowrap;vertical-align:1px}
 .cmark.first{background:var(--warn);color:var(--bg)}
+.mgio h3.gsh{font-size:14px;margin:14px 0 6px}.mgio h3.gsh small{font-weight:400;color:var(--ink-2);font-size:11.5px;margin-left:4px}
+.gsw{overflow-x:auto;margin-inline:-14px;padding-inline:14px}.gst-t{border-collapse:collapse;font-size:12.5px;min-width:100%}
+.gst-t th,.gst-t td{padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}.gst-t thead th{font-size:11px;color:var(--ink-2);font-weight:600;text-align:right}
+.gst-t thead th:first-child,.gst-t tbody th{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
+.gst-t tbody th{font-weight:600;min-width:120px;max-width:170px;white-space:normal;line-height:1.25}.gst-t tbody th small{color:var(--ink-2);font-weight:500;margin-right:5px;font-size:10.5px}
+.gst-t td small{color:var(--ink-2);margin-left:3px;font-size:10.5px}.gst-t td.on{color:var(--accent);font-weight:700}
+.gst-t thead button{all:unset;cursor:pointer}.gst-t thead button[aria-pressed="true"]{color:var(--accent)}
+.gsr{cursor:pointer}.gsr.xi th{box-shadow:inset 3px 0 0 var(--accent)}.gsr.out{opacity:.55}
+.gst{font-style:normal;font-size:9.5px;font-weight:700;margin-left:5px;padding:0 4px;border-radius:3px;border:1px solid var(--line);color:var(--ink-2)}.gst.uff{color:var(--accent);border-color:var(--accent)}
+.gsx{font-style:normal;font-size:9.5px;font-weight:700;margin-left:5px;padding:0 4px;border-radius:3px;background:var(--warn);color:var(--bg)}.gsx.dub{background:transparent;color:var(--warn);border:1px solid var(--warn)}
+.gsu>td{padding:4px 0 8px 18px;background:var(--surface-2)}.gsu table{border-collapse:collapse;font-size:11.5px}.gsu th,.gsu td{padding:2px 6px;border:0;text-align:right}.gsu tbody th{text-align:left;font-weight:500;position:static;background:none}
+.gsm{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px}.gsn{margin-top:10px}
 .dmark{font-style:normal;font-size:10px;font-weight:600;letter-spacing:.02em;margin-left:6px;padding:1px 5px;border-radius:4px;background:var(--surface-2);color:var(--accent);border:1px solid var(--accent);white-space:nowrap;vertical-align:1px}
 .derbybox{border-left:3px solid var(--accent);padding:6px 10px;background:var(--surface-2);border-radius:0 6px 6px 0;font-size:13px}
 .warnbox{border-left:3px solid var(--warn);padding:6px 10px;background:var(--surface-2);border-radius:0 6px 6px 0;font-size:13px}
@@ -1059,6 +1071,7 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
       <button type="button" class="mtab" data-mt="h2h" aria-pressed="false">Precedenti</button>
       <button type="button" class="mtab" data-mt="tab" aria-pressed="false">Classifica</button>
       <button type="button" class="mtab" data-mt="rend" aria-pressed="false">Rendimento</button>
+      <button type="button" class="mtab" data-mt="gio" aria-pressed="false" hidden>Giocatori</button>
     </div>
     <div class="mpane" data-mp="prev">
       <section class="card" id="mcoach" aria-label="Avvisi della partita: cambio di allenatore, derby" hidden></section>
@@ -1098,6 +1111,9 @@ html body{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/200
     </div>
     <div class="mpane" data-mp="rend" hidden>
       <section class="card mtrend" id="mtrend" aria-label="Rendimento in casa e in trasferta" hidden></section>
+    </div>
+    <div class="mpane" data-mp="gio" hidden>
+      <section class="card mgio" id="mgio" aria-label="Giocatori: statistiche della stagione"></section>
     </div>
     <div class="mpane" data-mp="info" hidden>
   <section class="card" aria-label="Scelta partita" hidden style="display:none">   <!-- i menu restano (li usa il codice), ma non si vedono -->
@@ -4816,6 +4832,83 @@ function propsData(e, home, away, MT, MF, x) {
   return { uff, nOut, AS, DUB, refF, h: team(XH, "h", home, away), a: team(XA, "a", away, home) };
 }
 const RL_G = { G: "P", D: "D", M: "C", F: "A" };
+/* 21/11/2026 (Denny): scheda "Giocatori" accanto a Rendimento, come nel basket. Statistiche della stagione in corso, solo campionato
+   (data/gs_<lega>.json, tools/props/stagione.py: archivio formazioni di API-Football, nessuna richiesta in più): presenze, minuti, gol,
+   assist, tiri, tiri in porta, falli fatti e subiti, cartellini, fuorigioco, contrasti, dribbling riusciti; a partita oppure ogni 90'; colonne
+   ordinabili; tocco sul giocatore = ultime 5 partite. Titolari di oggi (ufficiali o probabili) in cima, indisponibili segnati. Sotto, le
+   probabilità dei giocatori (prima nella Lettura). Squadre presenti solo dove i nomi coprono almeno il 90% dei minuti. */
+let GIO_PROPS = "", GIO_ARGS = null;
+const GS = new Map(), GS_LOAD = new Map(), GSV = { mode: "p", sort: null, open: new Set() };
+const GS_COL = [["gol", 6, "Gol"], ["ass", 7, "Assist"], ["tiri", 8, "Tiri"], ["tip", 9, "Tiri in porta"], ["ff", 10, "Falli fatti"], ["fs", 11, "Falli subiti"],
+  ["gi", 12, "Gialli"], ["ro", 13, "Rossi"], ["fg", 14, "Fuorigioco"], ["ct", 15, "Contrasti"], ["dr", 16, "Dribbling riusciti"]];
+const GS_SH = { gol: "Gol", ass: "Ass", tiri: "Tiri", tip: "T.p.", ff: "F.f.", fs: "F.s.", gi: "Gial", ro: "Rossi", fg: "Fuor", ct: "Contr", dr: "Dribb" };
+function gsLoad(lg) {
+  if (GS.has(lg)) return Promise.resolve(GS.get(lg)); if (GS_LOAD.has(lg)) return GS_LOAD.get(lg);
+  const pr = getData(`gs_${lg}.json`).then(j => { GS.set(lg, j && j.squadre ? j : null); return GS.get(lg); }).catch(() => { GS.set(lg, null); return null; });
+  GS_LOAD.set(lg, pr); return pr;
+}
+function gsTeam(J, n) { return J && J.squadre && (J.squadre[n] || (GIOC && GIOC.api && J.squadre[GIOC.api[n]])) || null; }
+function gioLineup(e, home, away) {   // titolari di oggi: ufficiali (formazioni) oppure probabili (data/giocatori.json); indisponibili e in dubbio
+  let F = null; try { F = formazFor(home, away); } catch (err) {}
+  let AS = null; try { AS = ASSENZE && ASSENZE.partite && e && e.d ? ASSENZE.partite[`${S.league}|${e.d}|${home}|${away}`] : null; } catch (err) {}
+  const OUT = new Set((AS ? AS.fuori : []).map(String)), DUB = new Set((AS ? AS.dubbi : []).map(String));
+  const sq = n => GIOC && GIOC.squadre && (GIOC.squadre[n] || (GIOC.api && GIOC.squadre[GIOC.api[n]]));
+  const one = (side, n) => {
+    const off = F && F.xi && F.xi[side];
+    if (off && off.length >= 10 && off.every(p => p.length > 3)) return { uff: true, xi: new Set(off.map(p => String(p[3]))) };
+    const T = sq(n); if (!T) return { uff: false, xi: new Set() };
+    const pool = (T.rosa || T.xi).map(String).filter(id => !OUT.has(id)), gk = pool.filter(id => (GIOC.giocatori[id] || [])[1] === "G").slice(0, 1), mv = pool.filter(id => (GIOC.giocatori[id] || [])[1] !== "G").slice(0, 10);
+    return { uff: false, xi: new Set(gk.concat(mv)) };
+  };
+  return { h: one("h", home), a: one("a", away), OUT, DUB };
+}
+function renderGio(e, home, away) {
+  GIO_ARGS = { e, home, away };
+  const tab = document.querySelector('.mtab[data-mt="gio"]'), box = $("#mgio"); if (!tab || !box) return;
+  const lg = S.league;
+  if (!home || !away || home === away || isCup(lg)) { tab.hidden = true; box.innerHTML = ""; return; }
+  const J = GS.get(lg);
+  if (J === undefined) { tab.hidden = true; gsLoad(lg).then(() => { if (GIO_ARGS && GIO_ARGS.home === home && GIO_ARGS.away === away && S.league === lg) renderGio(e, home, away); }); return; }
+  const H = gsTeam(J, home), A = gsTeam(J, away);
+  if (!H && !A && !GIO_PROPS) { tab.hidden = true; box.innerHTML = ""; if (document.querySelector('.mtab[data-mt="gio"][aria-pressed="true"]')) setMTab("prev"); return; }
+  tab.hidden = false;
+  const LU = gioLineup(e, home, away), mode = GSV.mode, f = v => v == null ? "—" : mode === "t" ? String(v) : v < 0.005 ? "0" : v.toFixed(2).replace(".", ",");
+  const val = (r, i) => mode === "t" ? r[i] : mode === "p" ? (r[3] ? r[i] / r[3] : null) : (r[5] >= 45 ? r[i] / r[5] * 90 : null);
+  const team = (name, T, L, side) => {
+    if (!T) return `<h3 class="gsh">${esc(name)}</h3><p class="muted small">Statistiche dei giocatori non disponibili per questa squadra.</p>`;
+    let rows = T.g.slice();
+    const today = r => L.xi.has(String(r[0]));
+    if (GSV.sort) { const c = GS_COL.find(z => z[0] === GSV.sort); rows.sort((u, v) => (val(v, c[1]) ?? -1) - (val(u, c[1]) ?? -1) || v[5] - u[5]); }
+    else rows.sort((u, v) => (today(v) - today(u)) || v[5] - u[5]);
+    const RL = RL_G, nT = rows.filter(today).length;
+    const body = rows.map(r => {
+      const id = String(r[0]), op = GSV.open.has(side + id), out = LU.OUT.has(id), dub = LU.DUB.has(id);
+      const tag = today(r) ? `<i class="gst${L.uff ? " uff" : ""}" title="${L.uff ? "titolare ufficiale" : "titolare probabile"}">${L.uff ? "XI" : "prob."}</i>` : "";
+      const st = out ? `<i class="gsx" title="indisponibile (API-Football)">fuori</i>` : dub ? `<i class="gsx dub" title="in dubbio">dubbio</i>` : "";
+      let tr = `<tr class="gsr${today(r) ? " xi" : ""}${out ? " out" : ""}" data-gsp="${side}${id}"><th><small>${RL[r[2]] || ""}</small>${esc(r[1])}${tag}${st}</th><td class="num">${r[3]}<small>${r[4]}</small></td><td class="num">${r[5]}</td>${GS_COL.map(c => `<td class="num${GSV.sort === c[0] ? " on" : ""}">${f(val(r, c[1]))}</td>`).join("")}</tr>`;
+      if (op) {
+        const U = (T.u5 || {})[id] || [];
+        tr += `<tr class="gsu"><td colspan="${3 + GS_COL.length}"><table><thead><tr><th>Ultime 5</th><th>Min</th><th>Gol</th><th>Ass</th><th>Tiri</th><th>T.p.</th><th>F.f.</th><th>F.s.</th><th>Cart</th></tr></thead><tbody>${U.map(u => `<tr><th>${esc(u[0].slice(8, 10) + "/" + u[0].slice(5, 7))} ${u[2] === "C" ? "vs" : "@"} ${esc(u[1])}</th>${u.slice(3).map(v => `<td class="num">${v}</td>`).join("")}</tr>`).join("") || `<tr><td colspan="9" class="muted">Nessuna partita.</td></tr>`}</tbody></table></td></tr>`;
+      }
+      return tr;
+    }).join("");
+    return `<h3 class="gsh">${esc(name)} <small>${T.partite} partite di campionato · ${nT ? (L.uff ? "titolari ufficiali" : "titolari probabili") + " in cima" : "titolari non noti"}</small></h3>
+      <div class="gsw"><table class="gst-t"><thead><tr><th>Giocatore</th><th title="presenze (da titolare)">Pres</th><th title="minuti giocati">Min</th>${GS_COL.map(c => `<th><button type="button" data-gss="${c[0]}" title="${c[2]}" aria-pressed="${GSV.sort === c[0]}">${GS_SH[c[0]]}</button></th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>`;
+  };
+  box.innerHTML = `<h2>Giocatori · campionato</h2>
+    <div class="gsm" role="group" aria-label="Valori">${[["p", "A partita"], ["n", "Ogni 90′"], ["t", "Totali"]].map(([k, l]) => `<button type="button" class="segb" data-gsm="${k}" aria-pressed="${mode === k}">${l}</button>`).join("")}${GSV.sort ? `<button type="button" class="segb" data-gss="" aria-pressed="false">Ordine titolari</button>` : ""}</div>
+    ${team(home, H, LU.h, "h")}${team(away, A, LU.a, "a")}
+    <p class="small muted gsn">Solo campionato, stagione in corso (API-Football). Pres = presenze, in piccolo da titolare. Ogni 90′: solo chi ha giocato almeno 45 minuti. Tocca una colonna per ordinare, un giocatore per le sue ultime 5 partite.${J && J.agg ? ` Dati del ${esc(J.agg.slice(8, 10) + "/" + J.agg.slice(5, 7))}.` : ""}</p>
+    ${GIO_PROPS || ""}`;
+}
+document.addEventListener("click", ev => {
+  const t = ev.target.closest && ev.target.closest("#mgio [data-gsm], #mgio [data-gss], #mgio [data-gsp]"); if (!t || !GIO_ARGS) return;
+  if (t.dataset.gsm) GSV.mode = t.dataset.gsm;
+  else if (t.dataset.gss != null) GSV.sort = t.dataset.gss ? (GSV.sort === t.dataset.gss ? null : t.dataset.gss) : null;
+  else if (t.dataset.gsp) { const k = t.dataset.gsp; GSV.open.has(k) ? GSV.open.delete(k) : GSV.open.add(k); }
+  renderGio(GIO_ARGS.e, GIO_ARGS.home, GIO_ARGS.away);
+});
+
 function propsHTML(e, m, home, away, MT, MF, x) {
   if (m) return "";
   const D = propsData(e, home, away, MT, MF, x); if (!D) return "";
@@ -4949,7 +5042,7 @@ function matchHeroHTML(home, away, e, cfg, G) {
       ${""/* 15/11/2026 (Denny): Fuorigioco 1° tempo tolto dalla scheda, non interessa */}
       ${row("Cartellini", x && x[6], x && x[7], x && x[4], 1, se && se[2], se && se[3], m && m.hk, m && m.ak)}
       ${G || se ? `<p class="sx-fb">${G ? `<b>Multigol (MG)</b> · sotto i gol: la fascia più stretta più probabile, poi la fascia più sicura` : ""}${G && se ? "<br>" : ""}${se ? `<b>Forbice</b> · sotto i cartellini: dove cade la media di quella squadra 8 volte su 10` : ""}</p>` : ""}`}
-    </div>${(() => { try { return propsHTML(e, m, home, away, MT, MF, x); } catch (err) { return ""; } })()}`;
+    </div>${(() => { try { GIO_PROPS = propsHTML(e, m, home, away, MT, MF, x); } catch (err) { GIO_PROPS = ""; } return ""; })()}`;
 }
 /* ===== Valori attesi per tempo di corner, tiri, tiri in porta e (dal 9/11/2026) fuorigioco, sotto le righe della Lettura =====
    Valori attesi della partita (Media dinamica) × quota del tempo nel campionato, per sede, dai soli dati REALI per tempo di
@@ -4983,7 +5076,7 @@ function renderMatchExtras(home, away) {
         return `<h2>Alla prova: ${h} giusti su ${P.length} (${pc(h / P.length)})</h2>` + rowsTable(["Mercato", "Pron.", "Reale"], P.map(x => [x.lab, `<b>${x.pick}</b><br><span class="muted small">${pc(x.p)}</span>`, `${x.ok ? `<span class="good">✓</span>` : `<span class="bad">✗</span>`} <span class="small">${x.txt}</span>`])); })()}`;
   } else { cmp.hidden = true; cmp.innerHTML = ""; }
   renderH2H(home, away, m ? e.date : null);
-  renderTable(home, away); renderMatchTrend(home, away);
+  renderTable(home, away); renderMatchTrend(home, away); renderGio(e, home, away);
   // segnalazioni della partita: sostituite dal Confidence Score nella scheda "Confidence" (6/10/2026)
   const box = $("#msig");
   if (true || !home || !away || home === away) { box.innerHTML = ""; return; }
